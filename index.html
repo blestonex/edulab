@@ -351,7 +351,7 @@ body{display:flex;flex-direction:column}
     <div class="subj-card" onclick="openLessonList()">
       <div class="subj-head">
         <div class="subj-icon" style="background:#E0F0FF;color:#1565C0">📖</div>
-        <div class="subj-meta"><div class="subj-name">English</div><div class="subj-desc">Vocabulary · Reading · Writing</div></div>
+        <div class="subj-meta"><div class="subj-name">English</div><div class="subj-desc">Animals · My Body · Food · Colours & Shapes</div></div>
         <span style="font-size:22px;color:var(--sm)">›</span>
       </div>
       <div class="subj-prog">
@@ -372,7 +372,7 @@ body{display:flex;flex-direction:column}
     <div class="tlogo">English <span>Vocabulary</span></div>
     <button id="lessons-sw" class="tswitch" style="display:none" onclick="switchStudent()">Switch</button>
   </div>
-  <div style="background:rgba(0,0,0,.08);padding:7px 16px;font-size:12px;color:rgba(255,255,255,.8);flex-shrink:0" id="lessons-bc">English › Vocabulary › Lower Primary</div>
+  <div style="background:rgba(0,0,0,.08);padding:7px 16px;font-size:12px;color:rgba(255,255,255,.8);flex-shrink:0" id="lessons-bc">English › All Units</div>
   <div class="content" id="lessons-list"></div>
 </div>
 
@@ -582,6 +582,67 @@ var C={
   pollination:{bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#451A03'},biodiversity:{bg:'linear-gradient(135deg,#86EFAC,#7C3AED)',wc:'#3B0764'},
   archaeology:{bg:'linear-gradient(135deg,#D97706,#78350F)',wc:'#FFDFC0'},legislation:{bg:'linear-gradient(135deg,#818CF8,#1E40AF)',wc:'#1E3A8A'},
   deforestation:{bg:'linear-gradient(135deg,#4ADE80,#78350F)',wc:'#052E16'},urbanisation:{bg:'linear-gradient(135deg,#94A3B8,#1E293B)',wc:'#E2E8F0'},
+  // JSS Life Science
+  predator:{bg:'linear-gradient(135deg,#FB923C,#B91C1C)',wc:'#450A0A'},prey:{bg:'linear-gradient(135deg,#86EFAC,#15803D)',wc:'#052E16'},
+  herbivore:{bg:'linear-gradient(135deg,#BEF264,#4D7C0F)',wc:'#365314'},carnivore:{bg:'linear-gradient(135deg,#EF4444,#991B1B)',wc:'#FEF2F2'},
+  omnivore:{bg:'linear-gradient(135deg,#FDBA74,#D97706)',wc:'#451A03'},habitat:{bg:'linear-gradient(135deg,#6EE7B7,#047857)',wc:'#064E3B'},
+  mammal:{bg:'linear-gradient(135deg,#D97706,#78350F)',wc:'#FFDFC0'},reptile:{bg:'linear-gradient(135deg,#4ADE80,#166534)',wc:'#052E16'},
+  amphibian:{bg:'linear-gradient(135deg,#34D399,#0D9488)',wc:'#134E4A'},migration:{bg:'linear-gradient(135deg,#93C5FD,#1E40AF)',wc:'#1E3A8A'},
+  adaptation:{bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#451A03'},camouflage:{bg:'linear-gradient(135deg,#86EFAC,#4B5563)',wc:'#052E16'},
+  extinction:{bg:'linear-gradient(135deg,#6B7280,#111827)',wc:'#E5E7EB'},symbiosis:{bg:'linear-gradient(135deg,#34D399,#2563EB)',wc:'#1E3A8A'},
+  conservation:{bg:'linear-gradient(135deg,#4ADE80,#065F46)',wc:'#ECFDF5'},nocturnal:{bg:'linear-gradient(135deg,#312E81,#1E1B4B)',wc:'#C7D2FE'},
+  hibernation:{bg:'linear-gradient(135deg,#94A3B8,#334155)',wc:'#F1F5F9'},invertebrate:{bg:'linear-gradient(135deg,#C084FC,#6D28D9)',wc:'#EDE9FE'},
+  vertebrate:{bg:'linear-gradient(135deg,#60A5FA,#1E40AF)',wc:'#EFF6FF'},classification:{bg:'linear-gradient(135deg,#818CF8,#3730A3)',wc:'#E0E7FF'},
+  taxonomy:{bg:'linear-gradient(135deg,#A78BFA,#4C1D95)',wc:'#F5F3FF'},species:{bg:'linear-gradient(135deg,#34D399,#0F766E)',wc:'#F0FDFA'},
+  organism:{bg:'linear-gradient(135deg,#6EE7B7,#065F46)',wc:'#ECFDF5'},genetics:{bg:'linear-gradient(135deg,#818CF8,#1E1B4B)',wc:'#E0E7FF'},
+  mutation:{bg:'linear-gradient(135deg,#C084FC,#7C3AED)',wc:'#F5F3FF'},evolution:{bg:'linear-gradient(135deg,#86EFAC,#4ADE80)',wc:'#052E16'},
+  ecology:{bg:'linear-gradient(135deg,#4ADE80,#16A34A)',wc:'#052E16'},DNA:{bg:'linear-gradient(135deg,#818CF8,#4338CA)',wc:'#E0E7FF'},
+  inheritance:{bg:'linear-gradient(135deg,#FCD34D,#D97706)',wc:'#451A03'},fossil:{bg:'linear-gradient(135deg,#D97706,#78350F)',wc:'#FFDFC0'},
+  reproduction:{bg:'linear-gradient(135deg,#F9A8D4,#BE185D)',wc:'#FDF2F8'},genome:{bg:'linear-gradient(135deg,#818CF8,#3730A3)',wc:'#E0E7FF'},
+  // JSS Human Biology
+  neuron:{bg:'linear-gradient(135deg,#FDE68A,#EAB308)',wc:'#713F12'},hormone:{bg:'linear-gradient(135deg,#C084FC,#7C3AED)',wc:'#F5F3FF'},
+  puberty:{bg:'linear-gradient(135deg,#FB923C,#9A3412)',wc:'#FFF7ED'},fertilisation:{bg:'linear-gradient(135deg,#F9A8D4,#EC4899)',wc:'#FDF2F8'},
+  embryo:{bg:'linear-gradient(135deg,#FDA4AF,#E11D48)',wc:'#FFF1F2'},reflex:{bg:'linear-gradient(135deg,#FDE68A,#B45309)',wc:'#451A03'},
+  ovary:{bg:'linear-gradient(135deg,#F9A8D4,#DB2777)',wc:'#FDF2F8'},uterus:{bg:'linear-gradient(135deg,#FCA5A5,#DC2626)',wc:'#FEF2F2'},
+  immunity:{bg:'linear-gradient(135deg,#6EE7B7,#0D9488)',wc:'#F0FDFA'},antibody:{bg:'linear-gradient(135deg,#93C5FD,#1D4ED8)',wc:'#EFF6FF'},
+  pathogen:{bg:'linear-gradient(135deg,#F87171,#991B1B)',wc:'#FEF2F2'},vaccination:{bg:'linear-gradient(135deg,#6EE7B7,#15803D)',wc:'#F0FDF4'},
+  infection:{bg:'linear-gradient(135deg,#FCA5A5,#B91C1C)',wc:'#FEF2F2'},inflammation:{bg:'linear-gradient(135deg,#FB923C,#EA580C)',wc:'#FFF7ED'},
+  alveolus:{bg:'linear-gradient(135deg,#BAE6FD,#0284C7)',wc:'#F0F9FF'},bronchus:{bg:'linear-gradient(135deg,#93C5FD,#1E40AF)',wc:'#EFF6FF'},
+  menstruation:{bg:'linear-gradient(135deg,#FCA5A5,#9F1239)',wc:'#FFF1F2'},testosterone:{bg:'linear-gradient(135deg,#60A5FA,#1E3A8A)',wc:'#EFF6FF'},
+  oestrogen:{bg:'linear-gradient(135deg,#F9A8D4,#9D174D)',wc:'#FDF2F8'},epidemic:{bg:'linear-gradient(135deg,#FB923C,#7C2D12)',wc:'#FFF7ED'},
+  antibiotic:{bg:'linear-gradient(135deg,#6EE7B7,#047857)',wc:'#F0FDFA'},symptom:{bg:'linear-gradient(135deg,#FDE68A,#92400E)',wc:'#FFFBEB'},
+  diagnosis:{bg:'linear-gradient(135deg,#93C5FD,#1D4ED8)',wc:'#EFF6FF'},transmission:{bg:'linear-gradient(135deg,#FCA5A5,#DC2626)',wc:'#FEF2F2'},
+  genotype:{bg:'linear-gradient(135deg,#818CF8,#3730A3)',wc:'#E0E7FF'},phenotype:{bg:'linear-gradient(135deg,#C084FC,#6D28D9)',wc:'#F5F3FF'},
+  haemoglobin:{bg:'linear-gradient(135deg,#FCA5A5,#991B1B)',wc:'#FEF2F2'},plasma:{bg:'linear-gradient(135deg,#FEF08A,#EAB308)',wc:'#713F12'},
+  platelet:{bg:'linear-gradient(135deg,#FDA4AF,#E11D48)',wc:'#FFF1F2'},lymphocyte:{bg:'linear-gradient(135deg,#BAE6FD,#0284C7)',wc:'#F0F9FF'},
+  chromosome:{bg:'linear-gradient(135deg,#818CF8,#1E1B4B)',wc:'#E0E7FF'},
+  // JSS Food Science
+  balanced:{bg:'linear-gradient(135deg,#86EFAC,#D97706)',wc:'#052E16'},obesity:{bg:'linear-gradient(135deg,#FCA5A5,#B91C1C)',wc:'#FEF2F2'},
+  anaemia:{bg:'linear-gradient(135deg,#FCA5A5,#9F1239)',wc:'#FFF1F2'},enzyme:{bg:'linear-gradient(135deg,#6EE7B7,#0D9488)',wc:'#F0FDFA'},
+  intestine:{bg:'linear-gradient(135deg,#FDBA74,#EA580C)',wc:'#FFF7ED'},absorption:{bg:'linear-gradient(135deg,#BEF264,#4D7C0F)',wc:'#F7FEE7'},
+  fermentation:{bg:'linear-gradient(135deg,#FDE68A,#78350F)',wc:'#FFFBEB'},dehydration:{bg:'linear-gradient(135deg,#FB923C,#C2410C)',wc:'#FFF7ED'},
+  fortification:{bg:'linear-gradient(135deg,#60A5FA,#1E40AF)',wc:'#EFF6FF'},contamination:{bg:'linear-gradient(135deg,#EF4444,#7F1D1D)',wc:'#FEF2F2'},
+  microorganism:{bg:'linear-gradient(135deg,#A78BFA,#5B21B6)',wc:'#F5F3FF'},sterilisation:{bg:'linear-gradient(135deg,#F87171,#991B1B)',wc:'#FEF2F2'},
+  refrigeration:{bg:'linear-gradient(135deg,#BAE6FD,#1D4ED8)',wc:'#EFF6FF'},hygiene:{bg:'linear-gradient(135deg,#6EE7B7,#065F46)',wc:'#ECFDF5'},
+  preservative:{bg:'linear-gradient(135deg,#94A3B8,#334155)',wc:'#F1F5F9'},additive:{bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#FFFBEB'},
+  toxin:{bg:'linear-gradient(135deg,#4B5563,#111827)',wc:'#F9FAFB'},glycogen:{bg:'linear-gradient(135deg,#FDBA74,#92400E)',wc:'#FFFBEB'},
+  lipid:{bg:'linear-gradient(135deg,#FEF08A,#78350F)',wc:'#FFFBEB'},oxidation:{bg:'linear-gradient(135deg,#FB923C,#7C2D12)',wc:'#FFF7ED'},
+  synthesis:{bg:'linear-gradient(135deg,#818CF8,#4338CA)',wc:'#E0E7FF'},catabolism:{bg:'linear-gradient(135deg,#F87171,#B91C1C)',wc:'#FEF2F2'},
+  // JSS Mathematics
+  angle:{bg:'linear-gradient(135deg,#818CF8,#3730A3)',wc:'#E0E7FF'},acute:{bg:'linear-gradient(135deg,#60A5FA,#1E40AF)',wc:'#EFF6FF'},
+  obtuse:{bg:'linear-gradient(135deg,#A78BFA,#5B21B6)',wc:'#F5F3FF'},parallel:{bg:'linear-gradient(135deg,#34D399,#065F46)',wc:'#ECFDF5'},
+  coordinate:{bg:'linear-gradient(135deg,#F87171,#B91C1C)',wc:'#FEF2F2'},gradient:{bg:'linear-gradient(135deg,#FDBA74,#D97706)',wc:'#FFFBEB'},
+  bisect:{bg:'linear-gradient(135deg,#C084FC,#7C3AED)',wc:'#F5F3FF'},radius:{bg:'linear-gradient(135deg,#60A5FA,#0284C7)',wc:'#EFF6FF'},
+  capacity:{bg:'linear-gradient(135deg,#BAE6FD,#1D4ED8)',wc:'#EFF6FF'},density:{bg:'linear-gradient(135deg,#6B7280,#1F2937)',wc:'#F9FAFB'},
+  proportion:{bg:'linear-gradient(135deg,#FDE68A,#B45309)',wc:'#FFFBEB'},theorem:{bg:'linear-gradient(135deg,#818CF8,#1E1B4B)',wc:'#E0E7FF'},
+  hypotenuse:{bg:'linear-gradient(135deg,#60A5FA,#1E3A8A)',wc:'#EFF6FF'},bearing:{bg:'linear-gradient(135deg,#FCD34D,#D97706)',wc:'#FFFBEB'},
+  median:{bg:'linear-gradient(135deg,#34D399,#0D9488)',wc:'#F0FDFA'},mode:{bg:'linear-gradient(135deg,#A78BFA,#6D28D9)',wc:'#F5F3FF'},
+  frequency:{bg:'linear-gradient(135deg,#FB923C,#C2410C)',wc:'#FFF7ED'},probability:{bg:'linear-gradient(135deg,#FDE68A,#EAB308)',wc:'#FFFBEB'},
+  statistics:{bg:'linear-gradient(135deg,#60A5FA,#4338CA)',wc:'#EFF6FF'},trigonometry:{bg:'linear-gradient(135deg,#C084FC,#4C1D95)',wc:'#F5F3FF'},
+  sine:{bg:'linear-gradient(135deg,#818CF8,#3730A3)',wc:'#E0E7FF'},cosine:{bg:'linear-gradient(135deg,#60A5FA,#1E40AF)',wc:'#EFF6FF'},
+  tangent:{bg:'linear-gradient(135deg,#A78BFA,#5B21B6)',wc:'#F5F3FF'},vector:{bg:'linear-gradient(135deg,#34D399,#1E3A8A)',wc:'#ECFDF5'},
+  scalar:{bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#FFFBEB'},magnitude:{bg:'linear-gradient(135deg,#FB923C,#9A3412)',wc:'#FFF7ED'},
+  resultant:{bg:'linear-gradient(135deg,#60A5FA,#7C3AED)',wc:'#EFF6FF'},
   // Body P4-P6
   vein:        {bg:'linear-gradient(135deg,#FCA5A5,#DC2626)',wc:'#450A0A'},
   artery:      {bg:'linear-gradient(135deg,#FB7185,#BE123C)',wc:'#4C0519'},
@@ -774,6 +835,123 @@ var WORDS={
   quadrilateral:{word:'Quadrilateral',emoji:'🔲',def:'Any flat shape that has exactly four straight sides.',      sentence:'A square, rectangle and rhombus are all quadrilaterals.',  blank:'A _____ is any shape with four straight sides.',        spellAs:'quadrilateral'},
   isosceles:  {word:'Isosceles',  emoji:'🔺',def:'A triangle that has exactly two sides of equal length.',       sentence:'An isosceles triangle has two equal sides and angles.',  blank:'An _____ triangle has two sides the same length.',      spellAs:'isosceles'},
 
+  // ══ JSS LIFE SCIENCE ══
+  predator:     {word:'Predator',     emoji:'🦁',def:'A hunter that catches and eats other animals.',                sentence:'The lion is a predator that hunts zebras on the plains.',    blank:'A _____ hunts and eats other animals to survive.',         spellAs:'predator'},
+  prey:         {word:'Prey',         emoji:'🦌',def:'An animal that is hunted and eaten by another.',                sentence:'The rabbit was caught as prey by the fox.',                 blank:'The deer became easy _____ for the hungry cheetah.',       spellAs:'prey'},
+  herbivore:    {word:'Herbivore',    emoji:'🐄',def:'An animal that only eats plants and vegetation.',               sentence:'A cow is a herbivore because it only eats grass.',          blank:'A rabbit is a _____ that feeds only on plants.',           spellAs:'herbivore'},
+  carnivore:    {word:'Carnivore',    emoji:'🐺',def:'An animal that only eats the meat of other animals.',           sentence:'A shark is a carnivore that hunts fish and seals.',         blank:'A lion is a _____ that eats only meat.',                   spellAs:'carnivore'},
+  omnivore:     {word:'Omnivore',     emoji:'🐻',def:'An animal that eats both plants and meat.',                     sentence:'A human being is an omnivore who eats vegetables and meat.', blank:'A bear is an _____ because it eats both plants and fish.',  spellAs:'omnivore'},
+  habitat:      {word:'Habitat',      emoji:'🌿',def:'The natural environment where an animal or plant lives.',       sentence:'The tropical rainforest is the habitat of the gorilla.',    blank:'The ocean is the _____ of whales and dolphins.',           spellAs:'habitat'},
+  mammal:       {word:'Mammal',       emoji:'🐘',def:'A warm-blooded animal that feeds its young with milk.',         sentence:'A whale is a mammal even though it lives in the ocean.',    blank:'A dog is a _____ because it feeds its puppies with milk.',  spellAs:'mammal'},
+  reptile:      {word:'Reptile',      emoji:'🦎',def:'A cold-blooded animal with dry scaly skin.',                    sentence:'The crocodile is a large reptile that lives near rivers.',  blank:'A snake is a _____ with scaly skin and no legs.',          spellAs:'reptile'},
+  amphibian:    {word:'Amphibian',    emoji:'🐸',def:'An animal that lives both on land and in water.',               sentence:'The frog is an amphibian that begins life as a tadpole.',  blank:'A toad is an _____ that can breathe on land and in water.', spellAs:'amphibian'},
+  migration:    {word:'Migration',    emoji:'🦅',def:'The seasonal journey animals make to find food or warmth.',     sentence:'Every year the wildebeest makes a long migration across Africa.',blank:'Birds fly south in autumn as part of their annual _____.',  spellAs:'migration'},
+  adaptation:   {word:'Adaptation',  emoji:'🌵',def:'A feature that helps a living thing survive in its habitat.',   sentence:'The thick fur of the polar bear is an adaptation to cold.',  blank:'The camel\'s hump is an _____ to life in the desert.',     spellAs:'adaptation'},
+  camouflage:   {word:'Camouflage',  emoji:'🦎',def:'The ability to blend into surroundings so as not to be seen.',  sentence:'The chameleon uses camouflage to hide from predators.',     blank:'The stick insect uses _____ to look like a twig.',         spellAs:'camouflage'},
+  extinction:   {word:'Extinction',  emoji:'💀',def:'When every member of a species has died out forever.',           sentence:'The dodo bird was hunted to extinction by the 1680s.',      blank:'Habitat destruction leads to the _____ of many species.',  spellAs:'extinction'},
+  symbiosis:    {word:'Symbiosis',   emoji:'🐦',def:'When two different species live closely together and both benefit.',sentence:'The crocodile and the plover bird live in symbiosis.',    blank:'_____ is when two species both benefit from living together.',spellAs:'symbiosis'},
+  conservation: {word:'Conservation',emoji:'🌍',def:'The protection of animals, plants and natural environments.',    sentence:'Wildlife conservation protects endangered animals from extinction.',blank:'_____ efforts have helped the rhino population recover.',  spellAs:'conservation'},
+  nocturnal:    {word:'Nocturnal',   emoji:'🦉',def:'Active at night and sleeping during the day.',                   sentence:'The owl is nocturnal and hunts mice in the darkness.',      blank:'Bats are _____ creatures that sleep upside down by day.',  spellAs:'nocturnal'},
+  hibernation:  {word:'Hibernation', emoji:'🐻',def:'A deep winter sleep some animals use to save energy.',          sentence:'Bears enter hibernation when the temperature drops in winter.',blank:'The hedgehog uses _____ to survive the cold months.',      spellAs:'hibernation'},
+  invertebrate: {word:'Invertebrate',emoji:'🦋',def:'An animal that has no backbone or internal spine.',              sentence:'Insects, worms and jellyfish are all invertebrates.',       blank:'A snail is an _____ because it has no backbone at all.',   spellAs:'invertebrate'},
+  vertebrate:   {word:'Vertebrate',  emoji:'🐟',def:'An animal that has a backbone running down its body.',           sentence:'Fish, birds, reptiles and mammals are all vertebrates.',    blank:'A frog is a _____ because it has a backbone inside.',      spellAs:'vertebrate'},
+  classification:{word:'Classification',emoji:'📋',def:'The grouping of living things by their shared features.',    sentence:'The classification of animals puts them into kingdoms and phyla.',blank:'Biological _____ organises all living things into groups.', spellAs:'classification'},
+  taxonomy:     {word:'Taxonomy',    emoji:'📚',def:'The science of naming and classifying all living things.',       sentence:'Taxonomy was developed by Carl Linnaeus in the 18th century.',blank:'Scientists use _____ to give every species a unique name.',  spellAs:'taxonomy'},
+  species:      {word:'Species',     emoji:'🦓',def:'A group of living things that can breed with each other.',       sentence:'The zebra and the donkey are different species entirely.',  blank:'Animals of the same _____ can reproduce with each other.',  spellAs:'species'},
+  organism:     {word:'Organism',    emoji:'🦠',def:'Any living thing including animals, plants and bacteria.',       sentence:'Every organism needs energy, water and nutrients to survive.',blank:'A bacterium is the smallest type of living _____.',         spellAs:'organism'},
+  genetics:     {word:'Genetics',    emoji:'🧬',def:'The study of how traits are passed from parents to children.',   sentence:'Genetics explains why children look similar to their parents.',blank:'_____ is the science of inherited traits and DNA.',         spellAs:'genetics'},
+  mutation:     {word:'Mutation',    emoji:'🧬',def:'A random change in the genetic code of a living thing.',        sentence:'A mutation can sometimes make an organism stronger or weaker.',blank:'A _____ in DNA can cause a new or changed trait to appear.', spellAs:'mutation'},
+  evolution:    {word:'Evolution',   emoji:'🐒',def:'The gradual change of species over millions of years.',         sentence:'Evolution explains how humans and apes share a common ancestor.',blank:'Charles Darwin proposed the theory of natural _____ to explain life.',spellAs:'evolution'},
+  ecology:      {word:'Ecology',     emoji:'🌿',def:'The study of how living things interact with their environment.', sentence:'Ecology shows how removing one species affects all others.', blank:'_____ studies the relationships between organisms and habitats.',spellAs:'ecology'},
+  DNA:          {word:'DNA',         emoji:'🧬',def:'The molecule that carries the genetic code inside every cell.',  sentence:'Every person has unique DNA except for identical twins.',    blank:'_____ contains the instructions that make every living thing.',spellAs:'dna'},
+  inheritance:  {word:'Inheritance', emoji:'👨‍👩‍👧',def:'The passing of genes and traits from parents to children.',   sentence:'Eye colour is determined by genetic inheritance from parents.', blank:'The child got her curly hair through _____ from her mother.', spellAs:'inheritance'},
+  fossil:       {word:'Fossil',      emoji:'🦴',def:'The preserved remains of an ancient living thing found in rock.',sentence:'Scientists found a dinosaur fossil buried in the desert rock.',blank:'A _____ tells us what animals looked like millions of years ago.',spellAs:'fossil'},
+  reproduction: {word:'Reproduction',emoji:'🥚',def:'The process by which living things produce new offspring.',      sentence:'Reproduction ensures a species continues to survive over time.',blank:'Sexual _____ requires both a male and a female parent.',     spellAs:'reproduction'},
+  genome:       {word:'Genome',      emoji:'🧬',def:'The complete set of all genetic instructions in a living thing.', sentence:'Scientists have mapped the entire human genome successfully.',blank:'The human _____ contains about three billion base pairs.',   spellAs:'genome'},
+  // ══ JSS HUMAN BIOLOGY ══
+  neuron:       {word:'Neuron',      emoji:'⚡',def:'A nerve cell that carries electrical signals through the body.',  sentence:'A neuron carries messages between your brain and your muscles.',blank:'Each _____ in your brain connects to thousands of others.',  spellAs:'neuron'},
+  hormone:      {word:'Hormone',     emoji:'🧪',def:'A chemical messenger made by glands to control body functions.',  sentence:'Insulin is a hormone that controls blood sugar levels.',    blank:'Adrenaline is a _____ released when you feel frightened.',  spellAs:'hormone'},
+  puberty:      {word:'Puberty',     emoji:'📈',def:'The stage when a child\'s body develops into an adult body.',    sentence:'Puberty usually begins between the ages of ten and fourteen.',blank:'During _____ the body grows quickly and changes shape.',     spellAs:'puberty'},
+  fertilisation:{word:'Fertilisation',emoji:'🥚',def:'When a sperm cell joins with an egg cell to begin new life.',  sentence:'Fertilisation of the egg by the sperm starts a new life.',  blank:'_____ occurs when a sperm and an egg cell successfully join.',spellAs:'fertilisation'},
+  embryo:       {word:'Embryo',      emoji:'🫀',def:'An unborn baby in the very early stages of development.',        sentence:'The embryo develops into a foetus after eight weeks.',       blank:'The _____ grows inside the uterus for the first two months.', spellAs:'embryo'},
+  reflex:       {word:'Reflex',      emoji:'🦵',def:'An automatic body response that happens without thinking.',      sentence:'Blinking when something moves near your eye is a reflex.',  blank:'Pulling your hand away from fire is a _____ action.',       spellAs:'reflex'},
+  ovary:        {word:'Ovary',       emoji:'🔵',def:'The female organ that produces egg cells for reproduction.',     sentence:'The female has two ovaries that release one egg each month.', blank:'The _____ releases an egg cell once every month.',           spellAs:'ovary'},
+  uterus:       {word:'Uterus',      emoji:'🔴',def:'The organ in females where a baby grows before birth.',          sentence:'The baby grows inside the mother\'s uterus for nine months.', blank:'The foetus develops inside the _____ for nine months.',      spellAs:'uterus'},
+  immunity:     {word:'Immunity',    emoji:'🛡️',def:'The body\'s ability to resist and fight off diseases.',         sentence:'Vaccination builds immunity against dangerous diseases.',    blank:'Good _____ means your body can fight off most infections.',  spellAs:'immunity'},
+  antibody:     {word:'Antibody',    emoji:'🦠',def:'A protein made by the body to destroy specific harmful germs.',  sentence:'The body produces antibodies whenever it detects an infection.',blank:'Each _____ is designed to destroy one specific type of germ.',spellAs:'antibody'},
+  pathogen:     {word:'Pathogen',    emoji:'🦠',def:'A germ such as a bacterium or virus that causes disease.',       sentence:'The pathogen spread quickly through the contaminated water.', blank:'A _____ is any microorganism that causes illness in humans.',  spellAs:'pathogen'},
+  vaccination:  {word:'Vaccination', emoji:'💉',def:'Giving a weakened germ to the body to build immunity.',         sentence:'Vaccination against polio has saved millions of lives.',     blank:'Regular _____ protects children from dangerous diseases.',   spellAs:'vaccination'},
+  infection:    {word:'Infection',   emoji:'🤒',def:'When harmful germs enter the body and cause illness.',           sentence:'The wound became infected because it was not cleaned properly.',blank:'She stayed home from school because of a throat _____.',    spellAs:'infection'},
+  inflammation: {word:'Inflammation',emoji:'🔴',def:'Redness and swelling that the body produces to fight injury.',  sentence:'Inflammation of the knee made it painful and difficult to walk.',blank:'The _____ around the cut showed the body was fighting infection.',spellAs:'inflammation'},
+  alveolus:     {word:'Alveolus',   emoji:'🫁',def:'A tiny air sac in the lungs where gas exchange takes place.',    sentence:'Each alveolus is surrounded by tiny blood capillaries.',    blank:'Oxygen passes into the blood through each tiny _____.',     spellAs:'alveolus'},
+  bronchus:     {word:'Bronchus',    emoji:'🫁',def:'A large airway tube that carries air from the windpipe into a lung.',sentence:'The bronchus divides into smaller tubes inside the lung.',blank:'Air travels through the _____ into each lung.',              spellAs:'bronchus'},
+  menstruation: {word:'Menstruation',emoji:'📅',def:'The monthly release of blood from the uterus in females.',      sentence:'Menstruation is a normal part of the female reproductive cycle.',blank:'_____ usually begins between the ages of ten and sixteen.',  spellAs:'menstruation'},
+  testosterone: {word:'Testosterone',emoji:'💪',def:'The main male sex hormone produced in the testes.',             sentence:'Testosterone causes the voice to deepen during male puberty.',blank:'_____ is responsible for muscle growth in males during puberty.',spellAs:'testosterone'},
+  oestrogen:    {word:'Oestrogen',   emoji:'🌸',def:'The main female sex hormone produced in the ovaries.',          sentence:'Oestrogen controls the development of female characteristics.',blank:'_____ prepares the uterus each month for a possible pregnancy.',spellAs:'oestrogen'},
+  epidemic:     {word:'Epidemic',    emoji:'⚠️',def:'A rapid spread of disease through a large population.',         sentence:'The cholera epidemic affected thousands of people in the city.',blank:'Health workers rushed to contain the _____ before it spread.',spellAs:'epidemic'},
+  antibiotic:   {word:'Antibiotic',  emoji:'💊',def:'A medicine that kills or stops the growth of bacteria.',        sentence:'The doctor prescribed an antibiotic to treat the infection.',blank:'You must finish the full course of _____ the doctor gives you.',spellAs:'antibiotic'},
+  symptom:      {word:'Symptom',     emoji:'🤒',def:'A sign that shows a person may have a disease or illness.',     sentence:'A high fever is a common symptom of malaria.',              blank:'A sore throat is a _____ of many common infections.',        spellAs:'symptom'},
+  diagnosis:    {word:'Diagnosis',   emoji:'🩺',def:'A doctor\'s identification of what illness a patient has.',     sentence:'The diagnosis confirmed the patient had typhoid fever.',    blank:'The doctor made a _____ after examining all the test results.',spellAs:'diagnosis'},
+  transmission: {word:'Transmission',emoji:'🦟',def:'The passing of a disease from one person or animal to another.',sentence:'Malaria transmission happens through the bite of a mosquito.',blank:'Washing hands reduces the _____ of harmful germs.',           spellAs:'transmission'},
+  genotype:     {word:'Genotype',    emoji:'🧬',def:'The full genetic make-up of an organism inside its cells.',     sentence:'The genotype determines which traits an organism can pass on.',blank:'An organism\'s _____ is the complete set of genes it carries.',spellAs:'genotype'},
+  phenotype:    {word:'Phenotype',   emoji:'👁️',def:'The physical characteristics an organism shows on the outside.',sentence:'Hair colour and eye colour are both parts of your phenotype.',blank:'Your _____ is the set of traits that others can observe.',    spellAs:'phenotype'},
+  haemoglobin:  {word:'Haemoglobin',emoji:'🩸',def:'The red protein in blood that carries oxygen around the body.',  sentence:'Haemoglobin gives blood its bright red colour.',            blank:'Without enough _____ the blood cannot carry sufficient oxygen.',spellAs:'haemoglobin'},
+  plasma:       {word:'Plasma',      emoji:'💧',def:'The liquid part of blood that carries blood cells and nutrients.',sentence:'Plasma makes up about fifty-five percent of all blood volume.',blank:'Blood _____ carries dissolved nutrients around the body.',    spellAs:'plasma'},
+  platelet:     {word:'Platelet',    emoji:'🩹',def:'A tiny blood cell that helps blood to clot after injury.',      sentence:'Platelets rush to a wound and help form a protective clot.', blank:'Without _____ cells, a small cut could cause dangerous bleeding.',spellAs:'platelet'},
+  lymphocyte:   {word:'Lymphocyte',  emoji:'🛡️',def:'A white blood cell that fights infection in the body.',        sentence:'Lymphocytes produce antibodies to destroy invading germs.',  blank:'A _____ is the key white blood cell of the immune system.',  spellAs:'lymphocyte'},
+  chromosome:   {word:'Chromosome',  emoji:'🧬',def:'A thread-like structure in cells that carries genetic information.',sentence:'Humans have forty-six chromosomes in every body cell.',   blank:'Each _____ contains hundreds of genes made of DNA.',         spellAs:'chromosome'},
+  // ══ JSS FOOD SCIENCE ══
+  balanced:     {word:'Balanced',    emoji:'⚖️',def:'Containing the right amounts of all the nutrients the body needs.',sentence:'A balanced meal includes proteins, carbohydrates and vegetables.',blank:'A _____ diet keeps the body healthy and full of energy.',   spellAs:'balanced'},
+  obesity:      {word:'Obesity',     emoji:'⚠️',def:'A condition of carrying too much body fat to be healthy.',      sentence:'Obesity increases the risk of heart disease and diabetes.',  blank:'Poor diet and lack of exercise can lead to _____ over time.',spellAs:'obesity'},
+  anaemia:      {word:'Anaemia',     emoji:'🩸',def:'A shortage of healthy red blood cells or haemoglobin.',         sentence:'Anaemia causes tiredness because less oxygen reaches the body.',blank:'A diet low in iron often leads to _____ in young children.', spellAs:'anaemia'},
+  enzyme:       {word:'Enzyme',      emoji:'⚗️',def:'A protein that speeds up chemical reactions inside the body.',  sentence:'Saliva contains an enzyme that begins to digest starch.',   blank:'Each digestive _____ breaks down a specific type of food.',  spellAs:'enzyme'},
+  intestine:    {word:'Intestine',   emoji:'🫃',def:'The long tube that digests food and absorbs nutrients.',         sentence:'The small intestine absorbs most nutrients into the blood.', blank:'Digested food passes through the _____ before nutrients enter blood.',spellAs:'intestine'},
+  absorption:   {word:'Absorption',  emoji:'💧',def:'When digested nutrients pass from the gut into the bloodstream.',sentence:'Absorption of iron happens mainly in the small intestine.',  blank:'The small intestine is the main site of nutrient _____ in humans.',spellAs:'absorption'},
+  fermentation: {word:'Fermentation',emoji:'🍶',def:'When microbes break down sugars and produce energy or gases.',  sentence:'Fermentation of dough by yeast makes bread rise when baked.',blank:'The _____ of grapes by yeast produces wine.',                spellAs:'fermentation'},
+  dehydration:  {word:'Dehydration', emoji:'🥵',def:'The dangerous loss of too much water from the body.',           sentence:'Dehydration during exercise can cause dizziness and fainting.',blank:'Drink plenty of water to prevent _____ in hot weather.',    spellAs:'dehydration'},
+  fortification:{word:'Fortification',emoji:'🥛',def:'Adding vitamins or minerals to food to improve its nutrition.', sentence:'Fortification of flour with iron helps prevent anaemia.',   blank:'The _____ of salt with iodine prevents thyroid disease.',    spellAs:'fortification'},
+  contamination:{word:'Contamination',emoji:'☣️',def:'When harmful substances get into food and make it unsafe.',    sentence:'Contamination of the water supply caused an outbreak of cholera.',blank:'Food _____ by bacteria can cause serious food poisoning.',  spellAs:'contamination'},
+  microorganism:{word:'Microorganism',emoji:'🦠',def:'A living thing too small to see without a microscope.',        sentence:'Bacteria are microorganisms that can cause serious disease.', blank:'A _____ can only be seen using a powerful microscope.',      spellAs:'microorganism'},
+  sterilisation:{word:'Sterilisation',emoji:'🔥',def:'Killing all microorganisms using heat or chemicals.',          sentence:'Sterilisation of surgical tools prevents infections after operations.',blank:'_____ of baby bottles kills all harmful bacteria inside them.',spellAs:'sterilisation'},
+  refrigeration:{word:'Refrigeration',emoji:'🧊',def:'Keeping food cold to slow the growth of bacteria.',           sentence:'Refrigeration of meat prevents dangerous bacterial growth.',  blank:'Without _____ meat goes bad within hours in hot weather.',  spellAs:'refrigeration'},
+  hygiene:      {word:'Hygiene',     emoji:'🧼',def:'The practice of keeping clean to prevent disease and illness.',  sentence:'Good hygiene includes washing hands before handling food.',  blank:'Personal _____ prevents the spread of many common diseases.',spellAs:'hygiene'},
+  preservative: {word:'Preservative',emoji:'🧂',def:'A substance added to food to stop it from going bad.',          sentence:'Salt is the oldest food preservative used by humans.',       blank:'The _____ in tinned food allows it to last for many years.',spellAs:'preservative'},
+  additive:     {word:'Additive',    emoji:'🎨',def:'A substance added to food to change its colour, taste or shelf life.',sentence:'Some food additives cause allergic reactions in children.',blank:'Every _____ in packaged food must be listed on the label.',  spellAs:'additive'},
+  toxin:        {word:'Toxin',       emoji:'☠️',def:'A poisonous substance produced by bacteria or other organisms.', sentence:'A toxin released by bacteria caused the severe food poisoning.',blank:'The _____ produced by the bacteria made the patient very ill.',spellAs:'toxin'},
+  glycogen:     {word:'Glycogen',    emoji:'🍠',def:'The form in which the body stores glucose in the liver and muscles.',sentence:'Athletes eat carbohydrates to build up their glycogen stores.',blank:'The body converts excess glucose into _____ for later use.',  spellAs:'glycogen'},
+  lipid:        {word:'Lipid',       emoji:'🧈',def:'A fat or oil molecule that stores energy in the body.',          sentence:'Lipids form the outer membrane of every cell in the body.',  blank:'A _____ is a fat-based molecule that stores chemical energy.', spellAs:'lipid'},
+  oxidation:    {word:'Oxidation',   emoji:'🔥',def:'A chemical reaction where a substance combines with oxygen.',   sentence:'The oxidation of glucose releases energy that the body uses.',blank:'Cellular respiration uses _____ to release energy from food.',spellAs:'oxidation'},
+  synthesis:    {word:'Synthesis',   emoji:'⚗️',def:'The process of building a complex substance from simpler ones.',sentence:'The body uses protein synthesis to build new muscle tissue.',  blank:'Protein _____ occurs in the ribosomes of every body cell.',  spellAs:'synthesis'},
+  catabolism:   {word:'Catabolism',  emoji:'⚡',def:'The breaking down of complex molecules to release energy.',      sentence:'Catabolism of fat releases energy during long exercise periods.',blank:'The body uses _____ to break down stored fat for energy.',   spellAs:'catabolism'},
+  // ══ JSS MATHEMATICS ══
+  angle:        {word:'Angle',       emoji:'📐',def:'The space between two lines that meet at a point, in degrees.',  sentence:'A right angle measures exactly ninety degrees.',            blank:'The _____ between the two walls of the room is ninety degrees.',spellAs:'angle'},
+  acute:        {word:'Acute',       emoji:'🔺',def:'An angle that measures less than ninety degrees.',              sentence:'A forty-five degree angle is an example of an acute angle.',blank:'Any angle smaller than ninety degrees is called an _____ angle.',spellAs:'acute'},
+  obtuse:       {word:'Obtuse',      emoji:'📐',def:'An angle that measures between ninety and one hundred eighty degrees.',sentence:'A hundred and twenty degree angle is an obtuse angle.',blank:'An _____ angle is wider than a right angle but less than straight.',spellAs:'obtuse'},
+  parallel:     {word:'Parallel',    emoji:'〰️',def:'Lines that are always the same distance apart and never meet.',  sentence:'Railway tracks are parallel lines that never meet each other.',blank:'The two _____ lines will never cross no matter how far they extend.',spellAs:'parallel'},
+  coordinate:   {word:'Coordinate',  emoji:'📍',def:'A number pair that gives the exact position of a point on a grid.',sentence:'The coordinate (3,4) means three along and four up on the grid.',blank:'The _____ of the point is written as a pair of numbers.',    spellAs:'coordinate'},
+  gradient:     {word:'Gradient',    emoji:'📈',def:'A measure of how steep a slope or line is.',                    sentence:'The gradient of the hill made it hard to ride a bicycle up.',blank:'A steeper slope has a higher _____ than a gentle slope.',    spellAs:'gradient'},
+  bisect:       {word:'Bisect',      emoji:'✂️',def:'To cut or divide something exactly into two equal halves.',     sentence:'A diagonal line bisects a rectangle into two equal triangles.',blank:'Use a compass and ruler to _____ the angle exactly in half.', spellAs:'bisect'},
+  radius:       {word:'Radius',      emoji:'⭕',def:'The distance from the centre of a circle to its outer edge.',   sentence:'The radius of a circle is exactly half its diameter.',      blank:'The _____ of the circle is five centimetres long.',          spellAs:'radius'},
+  capacity:     {word:'Capacity',    emoji:'🪣',def:'The maximum amount a container can hold.',                      sentence:'The capacity of the bucket is ten litres of water.',        blank:'Check the _____ of the tank before filling it with water.',  spellAs:'capacity'},
+  density:      {word:'Density',     emoji:'🧱',def:'The mass of a substance for each unit of its volume.',          sentence:'Iron has a much higher density than wood or cork.',          blank:'A substance with high _____ sinks in water and feels heavy.', spellAs:'density'},
+  proportion:   {word:'Proportion',  emoji:'⚖️',def:'A statement showing that two ratios are equal.',               sentence:'In a recipe, the proportion of flour to sugar must be correct.',blank:'The _____ of boys to girls in the class is two to three.',   spellAs:'proportion'},
+  theorem:      {word:'Theorem',     emoji:'📐',def:'A mathematical statement that has been proved to be true.',     sentence:'Pythagoras\' theorem applies only to right-angled triangles.',blank:'Every mathematical _____ must be proved with logical steps.', spellAs:'theorem'},
+  hypotenuse:   {word:'Hypotenuse',  emoji:'📐',def:'The longest side of a right-angled triangle, opposite the right angle.',sentence:'The hypotenuse of a right triangle is always the longest side.',blank:'Square the _____ to get the sum of the other two squares.', spellAs:'hypotenuse'},
+  bearing:      {word:'Bearing',     emoji:'🧭',def:'A direction measured clockwise from north in degrees.',         sentence:'The ship sailed on a bearing of zero-nine-zero degrees east.',blank:'The aircraft flew on a _____ of two-seven-zero degrees west.',spellAs:'bearing'},
+  median:       {word:'Median',      emoji:'📊',def:'The middle value in a data set arranged in order.',             sentence:'The median of 3, 5 and 7 is the middle value which is 5.',  blank:'Arrange the values in order then find the _____ in the middle.',spellAs:'median'},
+  mode:         {word:'Mode',        emoji:'📊',def:'The value that appears most often in a set of data.',           sentence:'In the set 2,3,3,4,5 the mode is 3 because it appears twice.',blank:'The _____ is the most frequent value in any data set.',       spellAs:'mode'},
+  frequency:    {word:'Frequency',   emoji:'📊',def:'How often a particular value occurs in a data set.',            sentence:'The frequency of the number 4 in the data was six times.',  blank:'The _____ table shows how often each score appeared.',       spellAs:'frequency'},
+  probability:  {word:'Probability', emoji:'🎲',def:'The likelihood or chance that a particular event will happen.',  sentence:'The probability of getting heads when you flip a coin is half.',blank:'The _____ of rolling a six on a dice is one in six.',        spellAs:'probability'},
+  statistics:   {word:'Statistics',  emoji:'📈',def:'The collection, organisation and analysis of numerical data.',  sentence:'Statistics showed that more students preferred mathematics.',blank:'The government uses _____ to plan schools and hospitals.',     spellAs:'statistics'},
+  trigonometry: {word:'Trigonometry',emoji:'📐',def:'The branch of mathematics dealing with angles and triangles.',   sentence:'Trigonometry is used by engineers when designing buildings.',blank:'We use _____ to calculate unknown sides and angles in triangles.',spellAs:'trigonometry'},
+  sine:         {word:'Sine',        emoji:'📐',def:'The ratio of the opposite side to the hypotenuse in a right triangle.',sentence:'The sine of thirty degrees is exactly zero point five.',blank:'Calculate the _____ of the angle to find the opposite side.',  spellAs:'sine'},
+  cosine:       {word:'Cosine',      emoji:'📐',def:'The ratio of the adjacent side to the hypotenuse in a right triangle.',sentence:'The cosine of sixty degrees equals zero point five.',  blank:'Use the _____ rule to find an unknown side of a triangle.',  spellAs:'cosine'},
+  tangent:      {word:'Tangent',     emoji:'📐',def:'The ratio of the opposite side to the adjacent side in a right triangle.',sentence:'The tangent of forty-five degrees equals exactly one.',blank:'Divide opposite by adjacent to calculate the _____ of the angle.',spellAs:'tangent'},
+  vector:       {word:'Vector',      emoji:'➡️',def:'A quantity that has both a size and a direction.',              sentence:'Velocity is a vector because it has speed and direction.',  blank:'A _____ quantity like force has both size and direction.',    spellAs:'vector'},
+  scalar:       {word:'Scalar',      emoji:'🔢',def:'A quantity that has size only, without any direction.',         sentence:'Temperature is a scalar because it has no direction.',      blank:'Speed is a _____ quantity but velocity is a vector quantity.',spellAs:'scalar'},
+  magnitude:    {word:'Magnitude',   emoji:'📏',def:'The size or numerical amount of a quantity.',                   sentence:'The magnitude of the earthquake was measured at six point five.',blank:'The _____ of a vector tells you how large or strong it is.', spellAs:'magnitude'},
+  resultant:    {word:'Resultant',   emoji:'➡️',def:'The single vector equivalent to two or more combined vectors.',  sentence:'The resultant of two forces shows their combined effect.',  blank:'Add the two vectors to find the _____ force acting on the object.',spellAs:'resultant'},
+
   // ══ PRIMARY 4 — ENVIRONMENT & TOOLS ══
   volcano:    {word:'Volcano',    emoji:'🌋',def:'A mountain that can explode and shoot out hot lava.',          sentence:'The volcano erupted and covered the village in ash.',   blank:'Hot lava poured down the side of the _____.',        spellAs:'volcano'},
   glacier:    {word:'Glacier',    emoji:'🏔️',def:'A huge slow-moving river of ice found on mountains.',         sentence:'The glacier moves only a few centimetres every year.',  blank:'Scientists study the _____ to understand climate change.',spellAs:'glacier'},
@@ -882,12 +1060,12 @@ var BODY_STAGES={
   'Primary 2':[{id:'b-p2-s1',label:'Stage 1 — Simple Parts',    words:['neck','arm','leg','lip'],            emoji:'💪'},
                {id:'b-p2-s2',label:'Stage 2 — Joints & Curves',words:['elbow','cheek','ankle','thumb'],      emoji:'🦾'},
                {id:'b-p2-s3',label:'Stage 3 — Bigger Words',   words:['finger','shoulder','stomach','forehead'],emoji:'☝️'},
-               {id:'b-p2-s4',label:'Stage 4 — Detailed Parts', words:['eyelid','nostril','eyelid','nostril'],emoji:'👁️'}],
+               {id:'b-p2-s4',label:'Stage 4 — Detailed Parts', words:['eyelid','nostril','cheek','ankle'],emoji:'👁️'}],
   'Primary 3':[{id:'b-p3-s1',label:'Stage 1 — Simple Parts',    words:['neck','arm','leg','lip'],            emoji:'💪'},
                {id:'b-p3-s2',label:'Stage 2 — Joints & Curves',words:['elbow','cheek','ankle','thumb'],      emoji:'🦾'},
                {id:'b-p3-s3',label:'Stage 3 — Bigger Words',   words:['finger','shoulder','stomach','forehead'],emoji:'☝️'},
-               {id:'b-p3-s4',label:'Stage 4 — Detailed Parts', words:['eyelid','nostril','eyelid','nostril'],emoji:'👁️'},
-               {id:'b-p3-s5',label:'Stage 5 — Expert Parts',   words:['skeleton','knuckle','skeleton','knuckle'],emoji:'💀'}]
+               {id:'b-p3-s4',label:'Stage 4 — Detailed Parts', words:['eyelid','nostril','cheek','ankle'],emoji:'👁️'},
+               {id:'b-p3-s5',label:'Stage 5 — Expert Parts',   words:['skeleton','knuckle','finger','shoulder'],emoji:'💀'}]
 };
 // Body stages P4-P6: new harder anatomy vocabulary
 BODY_STAGES['Primary 4']=[
@@ -921,12 +1099,12 @@ var FOOD_STAGES={
   'Primary 2':[{id:'f-p2-s1',label:'Stage 1 — Fruits & Veggies',words:['mango','orange','banana','onion'], emoji:'🥭'},
                {id:'f-p2-s2',label:'Stage 2 — Market Produce',  words:['tomato','carrot','potato','pepper'],emoji:'🍅'},
                {id:'f-p2-s3',label:'Stage 3 — Tropical Foods',  words:['pineapple','plantain','coconut','cassava'],emoji:'🍍'},
-               {id:'f-p2-s4',label:'Stage 4 — Special Foods',   words:['avocado','biscuit','avocado','biscuit'],emoji:'🥑'}],
+               {id:'f-p2-s4',label:'Stage 4 — Special Foods',   words:['avocado','biscuit','groundnut','watermelon'],emoji:'🥑'}],
   'Primary 3':[{id:'f-p3-s1',label:'Stage 1 — Fruits & Veggies',words:['mango','orange','banana','onion'], emoji:'🥭'},
                {id:'f-p3-s2',label:'Stage 2 — Market Produce',  words:['tomato','carrot','potato','pepper'],emoji:'🍅'},
                {id:'f-p3-s3',label:'Stage 3 — Tropical Foods',  words:['pineapple','plantain','coconut','cassava'],emoji:'🍍'},
-               {id:'f-p3-s4',label:'Stage 4 — Special Foods',   words:['avocado','biscuit','avocado','biscuit'],emoji:'🥑'},
-               {id:'f-p3-s5',label:'Stage 5 — Long Words',      words:['groundnut','watermelon','groundnut','watermelon'],emoji:'🥜'}]
+               {id:'f-p3-s4',label:'Stage 4 — Special Foods',   words:['avocado','biscuit','groundnut','watermelon'],emoji:'🥑'},
+               {id:'f-p3-s5',label:'Stage 5 — Long Words',      words:['groundnut','watermelon','pineapple','plantain'],emoji:'🥜'}]
 };
 FOOD_STAGES['Primary 4']=[
   {id:'f-p4-s1',label:'Stage 1 — Nutrients',         words:['protein','vitamin','mineral','carbohydrate'], emoji:'🥩'},
@@ -959,12 +1137,12 @@ var COLOUR_STAGES={
   'Primary 2':[{id:'c-p2-s1',label:'Stage 1 — Simple Shapes',   words:['oval','star','heart','cube'],       emoji:'⭐'},
                {id:'c-p2-s2',label:'Stage 2 — More Shapes',     words:['circle','square','arrow','triangle'],emoji:'⭕'},
                {id:'c-p2-s3',label:'Stage 3 — Long Names',      words:['rectangle','diamond','purple','silver'],emoji:'🔺'},
-               {id:'c-p2-s4',label:'Stage 4 — Many-Sided',      words:['hexagon','pentagon','hexagon','pentagon'],emoji:'🔷'}],
+               {id:'c-p2-s4',label:'Stage 4 — Many-Sided',      words:['hexagon','pentagon','rectangle','diamond'],emoji:'🔷'}],
   'Primary 3':[{id:'c-p3-s1',label:'Stage 1 — Simple Shapes',   words:['oval','star','heart','cube'],       emoji:'⭐'},
                {id:'c-p3-s2',label:'Stage 2 — More Shapes',     words:['circle','square','arrow','triangle'],emoji:'⭕'},
                {id:'c-p3-s3',label:'Stage 3 — Long Names',      words:['rectangle','diamond','purple','silver'],emoji:'🔺'},
-               {id:'c-p3-s4',label:'Stage 4 — Many-Sided',      words:['hexagon','pentagon','hexagon','pentagon'],emoji:'🔷'},
-               {id:'c-p3-s5',label:'Stage 5 — 3D Shapes',       words:['cylinder','pyramid','cylinder','pyramid'],emoji:'🥫'}]
+               {id:'c-p3-s4',label:'Stage 4 — Many-Sided',      words:['hexagon','pentagon','rectangle','diamond'],emoji:'🔷'},
+               {id:'c-p3-s5',label:'Stage 5 — 3D Shapes',       words:['cylinder','pyramid','purple','silver'],emoji:'🥫'}]
 };
 COLOUR_STAGES['Primary 4']=[
   {id:'c-p4-s1',label:'Stage 1 — Rich Colours',      words:['crimson','indigo','turquoise','magenta'],     emoji:'🎨'},
@@ -985,15 +1163,101 @@ COLOUR_STAGES['Primary 6']=[
   {id:'c-p6-s5',label:'Stage 5 — Master Level',      words:['isosceles','parallelogram','perpendicular','quadrilateral'],emoji:'💎'}
 ];
 
-// ════ JSS & SSS — map to P6 stages with unique IDs ════
-// JSS 1 = same words as P6 (hardest primary content) + unique IDs so progress is tracked separately
-['JSS 1','JSS 2','JSS 3','SSS 1'].forEach(function(cl){
-  var prefix=cl.replace(' ','').toLowerCase();
-  STAGES[cl]     =STAGES['Primary 6'].map(function(s){return Object.assign({},s,{id:s.id.replace('p6',prefix)});});
-  BODY_STAGES[cl]=BODY_STAGES['Primary 6'].map(function(s){return Object.assign({},s,{id:s.id.replace('b-p6','b-'+prefix)});});
-  FOOD_STAGES[cl]=FOOD_STAGES['Primary 6'].map(function(s){return Object.assign({},s,{id:s.id.replace('f-p6','f-'+prefix)});});
-  COLOUR_STAGES[cl]=COLOUR_STAGES['Primary 6'].map(function(s){return Object.assign({},s,{id:s.id.replace('c-p6','c-'+prefix)});});
-});
+// ════ JSS 1 — differentiated stages ════
+STAGES['JSS 1']=[
+  {id:'j1-s1',label:'Stage 1 — Food Chains',        words:['predator','prey','herbivore','carnivore'],     emoji:'🦁'},
+  {id:'j1-s2',label:'Stage 2 — Habitats',            words:['habitat','mammal','reptile','amphibian'],      emoji:'🌿'},
+  {id:'j1-s3',label:'Stage 3 — Animal Behaviour',   words:['migration','omnivore','nocturnal','hibernation'],emoji:'🦅'}
+];
+BODY_STAGES['JSS 1']=[
+  {id:'bj1-s1',label:'Stage 1 — Nervous System',    words:['neuron','hormone','reflex','puberty'],          emoji:'⚡'},
+  {id:'bj1-s2',label:'Stage 2 — Reproduction',      words:['fertilisation','embryo','ovary','uterus'],      emoji:'🥚'}
+];
+FOOD_STAGES['JSS 1']=[
+  {id:'fj1-s1',label:'Stage 1 — Balanced Diet',     words:['balanced','obesity','anaemia','enzyme'],        emoji:'⚖️'},
+  {id:'fj1-s2',label:'Stage 2 — Digestion',         words:['intestine','absorption','dehydration','hygiene'],emoji:'🫃'}
+];
+COLOUR_STAGES['JSS 1']=[
+  {id:'cj1-s1',label:'Stage 1 — Angles & Lines',    words:['angle','acute','obtuse','parallel'],            emoji:'📐'},
+  {id:'cj1-s2',label:'Stage 2 — Coordinates',       words:['coordinate','gradient','bisect','radius'],      emoji:'📍'},
+  {id:'cj1-s3',label:'Stage 3 — Measurement',       words:['capacity','density','proportion','theorem'],    emoji:'📏'}
+];
+
+// ════ JSS 2 — differentiated stages ════
+STAGES['JSS 2']=[
+  {id:'j2-s1',label:'Stage 1 — Adaptation',         words:['adaptation','camouflage','extinction','conservation'],emoji:'🌍'},
+  {id:'j2-s2',label:'Stage 2 — Ecosystems',         words:['symbiosis','invertebrate','vertebrate','habitat'],emoji:'🌿'},
+  {id:'j2-s3',label:'Stage 3 — Classification',     words:['species','organism','genetics','mutation'],     emoji:'🧬'}
+];
+BODY_STAGES['JSS 2']=[
+  {id:'bj2-s1',label:'Stage 1 — Immune System',     words:['immunity','antibody','pathogen','vaccination'], emoji:'🛡️'},
+  {id:'bj2-s2',label:'Stage 2 — Respiratory System',words:['infection','inflammation','alveolus','bronchus'],emoji:'🫁'},
+  {id:'bj2-s3',label:'Stage 3 — Long Words',        words:['fertilisation','inflammation','vaccination','chromosome'],emoji:'📚'}
+];
+FOOD_STAGES['JSS 2']=[
+  {id:'fj2-s1',label:'Stage 1 — Food Preservation', words:['fermentation','contamination','microorganism','sterilisation'],emoji:'🔬'},
+  {id:'fj2-s2',label:'Stage 2 — Food Safety',       words:['refrigeration','hygiene','preservative','additive'],emoji:'🧊'},
+  {id:'fj2-s3',label:'Stage 3 — Long Words',        words:['sterilisation','contamination','refrigeration','fermentation'],emoji:'📚'}
+];
+COLOUR_STAGES['JSS 2']=[
+  {id:'cj2-s1',label:'Stage 1 — Triangles',         words:['theorem','hypotenuse','angle','bisect'],        emoji:'📐'},
+  {id:'cj2-s2',label:'Stage 2 — Data',              words:['median','mode','frequency','probability'],      emoji:'📊'},
+  {id:'cj2-s3',label:'Stage 3 — Long Words',        words:['hypotenuse','probability','frequency','proportion'],emoji:'📚'}
+];
+
+// ════ JSS 3 — differentiated stages ════
+STAGES['JSS 3']=[
+  {id:'j3-s1',label:'Stage 1 — Classification',     words:['classification','taxonomy','species','organism'],emoji:'📋'},
+  {id:'j3-s2',label:'Stage 2 — Genetics',           words:['chromosome','genetics','mutation','inheritance'],emoji:'🧬'},
+  {id:'j3-s3',label:'Stage 3 — Evolution',          words:['evolution','ecology','adaptation','extinction'], emoji:'🌍'},
+  {id:'j3-s4',label:'Stage 4 — Long Words',         words:['classification','taxonomy','chromosome','invertebrate'],emoji:'📚'}
+];
+BODY_STAGES['JSS 3']=[
+  {id:'bj3-s1',label:'Stage 1 — Hormones',          words:['menstruation','testosterone','oestrogen','puberty'],emoji:'🌸'},
+  {id:'bj3-s2',label:'Stage 2 — Disease',           words:['epidemic','antibiotic','symptom','diagnosis'],  emoji:'🏥'},
+  {id:'bj3-s3',label:'Stage 3 — Transmission',      words:['transmission','pathogen','immunity','vaccination'],emoji:'🦠'},
+  {id:'bj3-s4',label:'Stage 4 — Long Words',        words:['menstruation','testosterone','transmission','inflammation'],emoji:'📚'}
+];
+FOOD_STAGES['JSS 3']=[
+  {id:'fj3-s1',label:'Stage 1 — Food Safety',       words:['toxin','additive','preservative','contamination'],emoji:'☠️'},
+  {id:'fj3-s2',label:'Stage 2 — Body & Food',       words:['enzyme','absorption','intestine','metabolism'],  emoji:'⚗️'},
+  {id:'fj3-s3',label:'Stage 3 — Long Words',        words:['microorganism','sterilisation','contamination','fermentation'],emoji:'📚'}
+];
+COLOUR_STAGES['JSS 3']=[
+  {id:'cj3-s1',label:'Stage 1 — Data & Statistics', words:['statistics','probability','frequency','median'], emoji:'📈'},
+  {id:'cj3-s2',label:'Stage 2 — Trigonometry Intro',words:['trigonometry','theorem','hypotenuse','angle'],   emoji:'📐'},
+  {id:'cj3-s3',label:'Stage 3 — Long Words',        words:['statistics','trigonometry','probability','frequency'],emoji:'📚'}
+];
+
+// ════ SSS 1 — most advanced content ════
+STAGES['SSS 1']=[
+  {id:'s1-s1',label:'Stage 1 — DNA & Genetics',     words:['DNA','inheritance','genome','reproduction'],    emoji:'🧬'},
+  {id:'s1-s2',label:'Stage 2 — Evolution',          words:['evolution','ecology','adaptation','species'],   emoji:'🌍'},
+  {id:'s1-s3',label:'Stage 3 — Classification',     words:['classification','taxonomy','organism','genetics'],emoji:'📋'},
+  {id:'s1-s4',label:'Stage 4 — Advanced Biology',   words:['chromosome','mutation','fossil','conservation'],emoji:'🔬'},
+  {id:'s1-s5',label:'Stage 5 — Master Level',       words:['genome','chromosome','classification','taxonomy'],emoji:'🏆'}
+];
+BODY_STAGES['SSS 1']=[
+  {id:'bs1-s1',label:'Stage 1 — Blood Science',     words:['genotype','phenotype','haemoglobin','plasma'],  emoji:'🩸'},
+  {id:'bs1-s2',label:'Stage 2 — Blood Cells',       words:['platelet','lymphocyte','chromosome','antibody'],emoji:'🛡️'},
+  {id:'bs1-s3',label:'Stage 3 — Organ Systems',     words:['hormone','neuron','alveolus','diaphragm'],      emoji:'🧠'},
+  {id:'bs1-s4',label:'Stage 4 — Disease Science',   words:['transmission','epidemic','diagnosis','antibiotic'],emoji:'🏥'},
+  {id:'bs1-s5',label:'Stage 5 — Master Level',      words:['haemoglobin','lymphocyte','testosterone','oestrogen'],emoji:'🏆'}
+];
+FOOD_STAGES['SSS 1']=[
+  {id:'fs1-s1',label:'Stage 1 — Metabolism',        words:['metabolism','glycogen','lipid','oxidation'],    emoji:'⚗️'},
+  {id:'fs1-s2',label:'Stage 2 — Biochemistry',      words:['synthesis','catabolism','enzyme','absorption'], emoji:'🔬'},
+  {id:'fs1-s3',label:'Stage 3 — Food Safety',       words:['toxin','contamination','sterilisation','pathogen'],emoji:'☠️'},
+  {id:'fs1-s4',label:'Stage 4 — Nutrition Science', words:['malnutrition','deficiency','obesity','anaemia'],emoji:'🩺'},
+  {id:'fs1-s5',label:'Stage 5 — Master Level',      words:['catabolism','metabolism','sterilisation','contamination'],emoji:'🏆'}
+];
+COLOUR_STAGES['SSS 1']=[
+  {id:'cs1-s1',label:'Stage 1 — Trigonometry',      words:['trigonometry','sine','cosine','tangent'],       emoji:'📐'},
+  {id:'cs1-s2',label:'Stage 2 — Vectors',           words:['vector','scalar','magnitude','resultant'],      emoji:'➡️'},
+  {id:'cs1-s3',label:'Stage 3 — Data Analysis',     words:['statistics','probability','frequency','median'],emoji:'📊'},
+  {id:'cs1-s4',label:'Stage 4 — Advanced Geometry', words:['hypotenuse','theorem','bearing','proportion'],  emoji:'🔺'},
+  {id:'cs1-s5',label:'Stage 5 — Master Level',      words:['trigonometry','resultant','probability','statistics'],emoji:'🏆'}
+];
 
 // ════ UNITS — master list ════
 var UNITS=[
@@ -1009,11 +1273,14 @@ var UNITS=[
 var DMODE='';
 var STU={name:'',classLabel:'',uid:''};
 var S={
-  unitKey:'animals',       // which unit is active
-  currentStages:[],        // resolved stage array for active unit + class
+  unitKey:'animals',
+  currentStages:[],
   stageIdx:0,
   learnIdx:0,
   words:[],
+  allStageWords:[],  // full word list for this stage (for distractors)
+  retestWords:[],    // only the words the student got wrong
+  isRetest:false,    // true when in targeted review after fail
   practiceQ:[],practiceIdx:0,
   testQ:[],testIdx:0,testAnswers:[]
 };
@@ -1022,7 +1289,12 @@ function lg(k){try{return JSON.parse(localStorage.getItem(k))||null}catch(e){ret
 function ls(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function sk(){return STU.uid||STU.name}
 function prog(){var p=lg(LK_PROG)||{};return p[sk()]||{}}
-function saveProg(sid,data){var p=lg(LK_PROG)||{};if(!p[sk()])p[sk()]={};var prev=p[sk()][sid]||{};Object.assign(prev,data);p[sk()][sid]=prev;ls(LK_PROG,p);return prev;}
+function saveProg(sid,data){
+  var p=lg(LK_PROG)||{};if(!p[sk()])p[sk()]={};
+  var prev=p[sk()][sid]||{attempts:0};
+  Object.assign(prev,data);
+  p[sk()][sid]=prev;ls(LK_PROG,p);return prev;
+}
 function starsStr(n){var s='';for(var i=0;i<3;i++)s+=i<n?'★':'☆';return s;}
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
 // Distractor pool: first try stage words; if <3 available fall back to all unit words
@@ -1254,7 +1526,7 @@ function loadHome(){
 // ════════════════════════════════════════
 function openLessonList(){
   if(DMODE==='shared')document.getElementById('lessons-sw').style.display='';
-  document.getElementById('lessons-bc').textContent='English › Vocabulary › '+STU.classLabel;
+  document.getElementById('lessons-bc').textContent='English › '+STU.classLabel+' — All Units';
   var p=prog();
   var list=document.getElementById('lessons-list');list.innerHTML='';
   UNITS.forEach(function(unit){
@@ -1291,7 +1563,10 @@ function startStage(unitKey,stageIdx){
   var unit=UNITS.find(function(u){return u.key===unitKey;})||UNITS[0];
   var stages=unit.stagesMap[STU.classLabel]||unit.stagesMap['Nursery 2']||[];
   S.unitKey=unitKey;S.currentStages=stages;
-  S.stageIdx=stageIdx;S.words=[...new Set(stages[stageIdx].words)];S.learnIdx=0;
+  S.stageIdx=stageIdx;
+  S.allStageWords=[...new Set(stages[stageIdx].words)];
+  S.words=S.allStageWords;
+  S.learnIdx=0;S.isRetest=false;S.retestWords=[];
   startLearn();
 }
 
@@ -1306,7 +1581,9 @@ function startLearn(){
 }
 
 function renderLearnCard(){
-  var idx=S.learnIdx;var total=S.words.length;var key=S.words[idx];var wd=WORDS[key];var col=wc(key);
+  var idx=S.learnIdx;var total=S.words.length;var key=S.words[idx];
+  var wd=WORDS[key];var col=wc(key);
+  if(!wd){console.warn('[EduLab] Missing word:',key);return;}
   document.getElementById('learn-cur').textContent=idx+1;
   document.getElementById('learn-total').textContent=total;
   document.getElementById('learn-prog').style.width=Math.round((idx+1)/total*100)+'%';
@@ -1369,7 +1646,14 @@ function renderPQ(){
   var ph=document.getElementById('pr-hint');if(ph)ph.style.display='none';
   renderQ('pr-card','pr-pill',q,false);
 }
-function prNext(){S.practiceIdx++;if(S.practiceIdx>=S.practiceQ.length)startTest();else renderPQ();}
+function prNext(){
+  S.practiceIdx++;
+  if(S.practiceIdx>=S.practiceQ.length){
+    // After retest practice, restore full stage words for the actual test
+    if(S.isRetest){S.words=S.allStageWords;S.isRetest=false;}
+    startTest();
+  }else renderPQ();
+}
 
 // ════════════════════════════════════════
 // RENDER QUESTION (practice + test)
@@ -1595,7 +1879,8 @@ function finishTest(){
   var stars=pct===100?3:pct>=80?2:pct>=70?1:0;
   var stages=S.currentStages||[];
   var st=stages[S.stageIdx];
-  saveProg(st.id,{passed:passed,bestScore:pct,stars:stars,attempts:1});
+  var prev=saveProg(st.id,{})||{};
+  saveProg(st.id,{passed:passed,bestScore:Math.max(pct,prev.bestScore||0),stars:Math.max(stars,prev.stars||0),attempts:(prev.attempts||0)+1});
   var missed=[...new Set(answers.filter(function(a){return !a.correct;}).map(function(a){return a.key;}))];
   var tc=passed?'#451A03':'#1E1B4B';
 
@@ -1626,22 +1911,63 @@ function finishTest(){
     sFail();
     var re=document.getElementById('res-em');if(re)re.textContent='📚';
     var rt=document.getElementById('res-title');if(rt)rt.textContent='Almost there!';
-    var rsb=document.getElementById('res-sub');if(rsb)rsb.textContent='You scored '+pct+'%. You need 70% to pass. Let\'s review the tricky words.';
+    var rsb=document.getElementById('res-sub');
+    var missedLabel=missed.length?missed.length+' word'+(missed.length!==1?'s':'')+' to review':'all words';
+    if(rsb)rsb.textContent='You scored '+pct+'%. You need 70% to pass. We will review just the '+missedLabel+' you missed.';
     if(missed.length){
       var ml=document.getElementById('res-missed-list');
-      if(ml){ml.innerHTML='';missed.forEach(function(k){var w=WORDS[k];var d=document.createElement('div');d.className='missed-word';d.innerHTML='<span>'+w.emoji+'</span><span>'+w.word+' — '+w.def+'</span>';ml.appendChild(d);});}
+      if(ml){ml.innerHTML='';missed.forEach(function(k){var w=WORDS[k];if(!w)return;var d=document.createElement('div');d.className='missed-word';d.innerHTML='<span>'+w.emoji+'</span><span>'+w.word+' — '+w.def+'</span>';ml.appendChild(d);});}
       var rm=document.getElementById('res-missed');if(rm)rm.style.display='';
     }else{var rm=document.getElementById('res-missed');if(rm)rm.style.display='none';}
+    // Retest: only study and practice the missed words, then retest the full stage
+    S.retestWords=missed.length?missed:S.allStageWords;
+    S.isRetest=true;
     var rb1=document.getElementById('res-btn1');
-    if(rb1){rb1.textContent='Review & Try Again →';rb1.style.color=tc;rb1.onclick=function(){S.learnIdx=0;startLearn();};}
+    if(rb1){
+      rb1.textContent='Review missed words →';rb1.style.color=tc;
+      rb1.onclick=function(){
+        S.words=S.retestWords;  // only the missed words
+        S.learnIdx=0;
+        startLearn();
+      };
+    }
     var rb2=document.getElementById('res-btn2');
-    if(rb2){rb2.textContent='Back to Stages';rb2.onclick=function(){openLessonList();};}
+    if(rb2){rb2.textContent='Back to Stages';rb2.onclick=function(){
+      // Reset to full word set before leaving
+      S.words=S.allStageWords;S.isRetest=false;
+      openLessonList();
+    };}
   }
 }
 function resAction1(){document.getElementById('res-btn1').onclick();}
 function resAction2(){document.getElementById('res-btn2').onclick();}
 
 window.addEventListener('DOMContentLoaded',init);
+
+// ════ SHARED DEVICE AUTO-TIMEOUT ════
+// Returns to roster after 5 minutes of no taps (shared mode only)
+var _inactivityTimer=null;
+function resetInactivityTimer(){
+  if(DMODE!=='shared')return;
+  clearTimeout(_inactivityTimer);
+  _inactivityTimer=setTimeout(function(){
+    // Only fire if student is in a lesson (not on roster/admin/splash)
+    var active=document.querySelector('.screen.active');
+    var safeScreens=['roster','splash','setup','admin','add-student'];
+    if(active&&safeScreens.indexOf(active.id)===-1){
+      // Save any pending progress then return to roster
+      toast('Session timed out — returning to student list',2500);
+      setTimeout(function(){
+        S.words=S.allStageWords||S.words;S.isRetest=false;
+        showRoster();
+      },2600);
+    }
+  },5*60*1000); // 5 minutes
+}
+// Listen on touch and click
+['touchstart','click','keydown'].forEach(function(ev){
+  document.addEventListener(ev,resetInactivityTimer,{passive:true});
+});
 
 // ════════════════════════════════════════
 var FB={initialized:false,db:null,user:null,
@@ -1704,7 +2030,7 @@ var FB={initialized:false,db:null,user:null,
   // ── 2. Register service worker via blob URL ──
   if('serviceWorker' in navigator){
     var SW_CODE = [
-      "var CACHE='edulab-v5';",
+      "var CACHE='edulab-v10';",
       "var OFFLINE_URLS=['/'];",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
