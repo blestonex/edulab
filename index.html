@@ -255,8 +255,13 @@ body{display:flex;flex-direction:column}
 <!-- ROSTER -->
 <div id="roster" class="screen">
   <div class="roster-hdr">
-    <h2>Who is learning today? 👋</h2>
-    <p>Tap your name to begin · <span id="roster-count" style="opacity:.8"></span></p>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <h2>Who is learning today? 👋</h2>
+        <p>Tap your name to begin · <span id="roster-count" style="opacity:.8"></span></p>
+      </div>
+      <button onclick="openAdmin()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);border-radius:10px;color:#fff;padding:8px 12px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;white-space:nowrap">⚙️ Admin</button>
+    </div>
   </div>
   <div class="roster-search">
     <span style="font-size:16px;opacity:.5">🔍</span>
@@ -337,7 +342,6 @@ body{display:flex;flex-direction:column}
     <div class="tlogo">Edu<span>Lab</span></div>
     <div id="home-sn" class="tsname"></div>
     <button id="home-sw" class="tswitch" style="display:none" onclick="switchStudent()">Switch</button>
-    <button id="home-admin" class="tswitch" style="display:none;margin-left:4px" onclick="openAdmin()">⚙️</button>
   </div>
   <div class="home-banner" style="background:linear-gradient(135deg,#FF6B35,#FF8E53)">
     <h2 id="home-greet">Hello! Ready to learn? 🎉</h2>
@@ -981,6 +985,16 @@ COLOUR_STAGES['Primary 6']=[
   {id:'c-p6-s5',label:'Stage 5 — Master Level',      words:['isosceles','parallelogram','perpendicular','quadrilateral'],emoji:'💎'}
 ];
 
+// ════ JSS & SSS — map to P6 stages with unique IDs ════
+// JSS 1 = same words as P6 (hardest primary content) + unique IDs so progress is tracked separately
+['JSS 1','JSS 2','JSS 3','SSS 1'].forEach(function(cl){
+  var prefix=cl.replace(' ','').toLowerCase();
+  STAGES[cl]     =STAGES['Primary 6'].map(function(s){return Object.assign({},s,{id:s.id.replace('p6',prefix)});});
+  BODY_STAGES[cl]=BODY_STAGES['Primary 6'].map(function(s){return Object.assign({},s,{id:s.id.replace('b-p6','b-'+prefix)});});
+  FOOD_STAGES[cl]=FOOD_STAGES['Primary 6'].map(function(s){return Object.assign({},s,{id:s.id.replace('f-p6','f-'+prefix)});});
+  COLOUR_STAGES[cl]=COLOUR_STAGES['Primary 6'].map(function(s){return Object.assign({},s,{id:s.id.replace('c-p6','c-'+prefix)});});
+});
+
 // ════ UNITS — master list ════
 var UNITS=[
   {key:'animals',title:'Animals Around Us',emoji:'🦁',stagesMap:STAGES},
@@ -1148,7 +1162,7 @@ function openAdmin(){
   var sc=document.getElementById('admin-school-code');if(sc)sc.value=settings.code||'';
   renderAdminProgress();SS('admin');
 }
-function adminBack(){if(DMODE==='shared')SS('roster');else SS('home');}
+function adminBack(){SS('roster');}
 function saveSchoolSettings(){
   var name=(document.getElementById('admin-school-name')||{}).value||'';
   var code=(document.getElementById('admin-school-code')||{}).value||'';
@@ -1220,7 +1234,6 @@ function loadHome(){
   document.getElementById('home-cls').textContent=(STU.classLabel||'Lower Primary')+' · English';
   if(DMODE==='shared'){
     document.getElementById('home-sw').style.display='';
-    document.getElementById('home-admin').style.display='';
   }
   var p=prog();
   var totalStages=0,doneStages=0;
