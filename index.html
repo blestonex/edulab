@@ -245,7 +245,7 @@ body{display:flex;flex-direction:column}
 <div id="setup" class="screen">
   <div class="setup-body">
     <div id="sw1"><div class="setup-hdr"><h2>What is your name?</h2><p>Your name shows on your progress</p></div><div class="setup-field"><input id="sw-name" class="setup-input" type="text" placeholder="Type your name…" maxlength="30" oninput="swCheck()"></div></div>
-    <div id="sw2" style="display:none"><div class="setup-hdr"><h2>What is your class?</h2><p>This sets the right level for you</p></div><div class="class-grid"><button class="class-btn" onclick="swCls(this,'Nursery 1')">Nursery 1</button><button class="class-btn" onclick="swCls(this,'Nursery 2')">Nursery 2</button><button class="class-btn" onclick="swCls(this,'Primary 1')">Primary 1</button><button class="class-btn" onclick="swCls(this,'Primary 2')">Primary 2</button><button class="class-btn" onclick="swCls(this,'Primary 3')">Primary 3</button><button class="class-btn" onclick="swCls(this,'Primary 4')">Primary 4</button><button class="class-btn" onclick="swCls(this,'Primary 5')">Primary 5</button><button class="class-btn" onclick="swCls(this,'Primary 6')">Primary 6</button></div></div>
+    <div id="sw2" style="display:none"><div class="setup-hdr"><h2>What is your class?</h2><p>This sets the right level for you</p></div><div class="class-grid"><button class="class-btn" onclick="swCls(this,'Nursery 1')">Nursery 1</button><button class="class-btn" onclick="swCls(this,'Nursery 2')">Nursery 2</button><button class="class-btn" onclick="swCls(this,'Primary 1')">Primary 1</button><button class="class-btn" onclick="swCls(this,'Primary 2')">Primary 2</button><button class="class-btn" onclick="swCls(this,'Primary 3')">Primary 3</button><button class="class-btn" onclick="swCls(this,'Primary 4')">Primary 4</button><button class="class-btn" onclick="swCls(this,'Primary 5')">Primary 5</button><button class="class-btn" onclick="swCls(this,'Primary 6')">Primary 6</button><button class="class-btn" onclick="swCls(this,'JSS 1')">JSS 1</button><button class="class-btn" onclick="swCls(this,'JSS 2')">JSS 2</button><button class="class-btn" onclick="swCls(this,'JSS 3')">JSS 3</button><button class="class-btn" onclick="swCls(this,'SSS 1')">SSS 1</button></div></div>
     <div id="sw3" style="display:none"><div class="setup-hdr"><h2>School code</h2><p>Ask your teacher. You can skip this.</p></div><div class="setup-field"><input id="sw-code" class="setup-input" type="text" placeholder="e.g. BLX001" maxlength="8" style="text-transform:uppercase;letter-spacing:3px;font-size:22px" oninput="this.value=this.value.toUpperCase()"></div><p style="text-align:center;font-size:12px;color:rgba(255,255,255,.4);margin-top:8px">Optional — works without it</p></div>
     <div class="step-dots"><div class="dot active" id="dot0"></div><div class="dot" id="dot1"></div><div class="dot" id="dot2"></div></div>
   </div>
@@ -254,9 +254,81 @@ body{display:flex;flex-direction:column}
 
 <!-- ROSTER -->
 <div id="roster" class="screen">
-  <div class="roster-hdr"><h2>Who is learning today? 👋</h2><p>Tap your name to begin</p></div>
-  <div class="roster-search"><span style="font-size:16px;opacity:.5">🔍</span><input type="text" placeholder="Search your name…" oninput="filterRoster(this.value)"></div>
+  <div class="roster-hdr">
+    <h2>Who is learning today? 👋</h2>
+    <p>Tap your name to begin · <span id="roster-count" style="opacity:.8"></span></p>
+  </div>
+  <div class="roster-search">
+    <span style="font-size:16px;opacity:.5">🔍</span>
+    <input type="text" id="roster-search-input" placeholder="Search your name…" oninput="filterRoster(this.value)">
+  </div>
   <div id="roster-grid" class="roster-grid"></div>
+  <!-- Add student button at bottom -->
+  <div style="padding:0 16px 16px;flex-shrink:0">
+    <button onclick="SS('add-student')" style="width:100%;padding:14px;border:2px dashed rgba(255,255,255,.35);border-radius:var(--r);background:rgba(255,255,255,.1);color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer">
+      ➕ Add new student
+    </button>
+  </div>
+</div>
+
+<!-- ADD STUDENT SCREEN (new) -->
+<div id="add-student" class="screen" style="background:linear-gradient(145deg,#0F7B8C,#1A9BAD)">
+  <div class="topbar" style="background:transparent">
+    <button class="tback" onclick="SS('roster')">‹</button>
+    <div class="tlogo">Add Student</div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px">
+    <div class="setup-hdr"><h2>Student's name</h2><p>Type the full name as it appears on the register</p></div>
+    <div class="setup-field"><input id="as-name" class="setup-input" type="text" placeholder="e.g. Chidi Okonkwo" maxlength="40" oninput="asCheck()"></div>
+    <div class="setup-hdr" style="margin-top:4px"><h2>Class</h2><p>Select the student's current class</p></div>
+    <div class="class-grid">
+      <button class="class-btn" onclick="asCls(this,'Nursery 1')">Nursery 1</button>
+      <button class="class-btn" onclick="asCls(this,'Nursery 2')">Nursery 2</button>
+      <button class="class-btn" onclick="asCls(this,'Primary 1')">Primary 1</button>
+      <button class="class-btn" onclick="asCls(this,'Primary 2')">Primary 2</button>
+      <button class="class-btn" onclick="asCls(this,'Primary 3')">Primary 3</button>
+      <button class="class-btn" onclick="asCls(this,'Primary 4')">Primary 4</button>
+      <button class="class-btn" onclick="asCls(this,'Primary 5')">Primary 5</button>
+      <button class="class-btn" onclick="asCls(this,'Primary 6')">Primary 6</button>
+      <button class="class-btn" onclick="asCls(this,'JSS 1')">JSS 1</button>
+      <button class="class-btn" onclick="asCls(this,'JSS 2')">JSS 2</button>
+      <button class="class-btn" onclick="asCls(this,'JSS 3')">JSS 3</button>
+      <button class="class-btn" onclick="asCls(this,'SSS 1')">SSS 1</button>
+    </div>
+  </div>
+  <div style="padding:14px 20px 20px;flex-shrink:0">
+    <button id="as-save" class="btn-sw" disabled onclick="saveNewStudent()">Save Student →</button>
+  </div>
+</div>
+
+<!-- ADMIN SCREEN -->
+<div id="admin" class="screen" style="background:linear-gradient(180deg,#1565C0 0%,#1565C0 110px,#EEF3FF 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#1565C0,#1976D2)">
+    <button class="tback" onclick="adminBack()">‹</button>
+    <div class="tlogo">Admin <span>Panel</span></div>
+    <button onclick="SS('roster')" class="tswitch">Roster</button>
+  </div>
+  <div class="content">
+    <!-- School info -->
+    <div style="background:#fff;border-radius:var(--r);padding:18px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:#1565C0;margin-bottom:12px">🏫 School Settings</div>
+      <div style="font-size:12px;color:var(--sm);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">School Name</div>
+      <input id="admin-school-name" type="text" placeholder="e.g. Blestonex Academy" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:15px;font-family:'Nunito',sans-serif;font-weight:700;margin-bottom:10px">
+      <div style="font-size:12px;color:var(--sm);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">School Code</div>
+      <input id="admin-school-code" type="text" placeholder="e.g. BLX001" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:15px;font-family:'Nunito',monospace;font-weight:700;letter-spacing:3px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+      <button onclick="saveSchoolSettings()" style="width:100%;margin-top:10px;padding:12px;background:#1565C0;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer">Save Settings</button>
+    </div>
+
+    <!-- Student progress table -->
+    <div style="background:#fff;border-radius:var(--r);padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:#1565C0">👥 Student Progress</div>
+        <div id="admin-student-count" style="font-size:12px;color:var(--sm)"></div>
+      </div>
+      <div id="admin-progress-list"></div>
+      <button onclick="clearAllStudents()" style="width:100%;margin-top:12px;padding:11px;background:var(--errl);color:var(--err);border:1.5px solid var(--err);border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">🗑️ Remove All Students</button>
+    </div>
+  </div>
 </div>
 
 <!-- HOME -->
@@ -265,6 +337,7 @@ body{display:flex;flex-direction:column}
     <div class="tlogo">Edu<span>Lab</span></div>
     <div id="home-sn" class="tsname"></div>
     <button id="home-sw" class="tswitch" style="display:none" onclick="switchStudent()">Switch</button>
+    <button id="home-admin" class="tswitch" style="display:none;margin-left:4px" onclick="openAdmin()">⚙️</button>
   </div>
   <div class="home-banner" style="background:linear-gradient(135deg,#FF6B35,#FF8E53)">
     <h2 id="home-greet">Hello! Ready to learn? 🎉</h2>
@@ -878,10 +951,133 @@ function swNext(){
 // ROSTER
 // ════════════════════════════════════════
 var ROSTER=[];
-function showRoster(){var r=lg(LK_ROSTER);if(!r||!r.length){r=[{name:'Amara Okafor',classLabel:'Primary 2',uid:'s_amara',emoji:'🌟'},{name:'Chidi Nwosu',classLabel:'Primary 1',uid:'s_chidi',emoji:'📚'},{name:'Fatima Bello',classLabel:'Primary 3',uid:'s_fatima',emoji:'🎯'},{name:'Emeka Eze',classLabel:'Nursery 2',uid:'s_emeka',emoji:'🌿'},{name:'Ngozi Adeyemi',classLabel:'Primary 2',uid:'s_ngozi',emoji:'💫'}];ls(LK_ROSTER,r);}ROSTER=r;renderRoster(r);SS('roster');}
-function renderRoster(list){var g=document.getElementById('roster-grid');g.innerHTML='';list.forEach(function(s){var d=document.createElement('div');d.className='rc';d.innerHTML='<div class="rc-av">'+(s.emoji||'👤')+'</div><div class="rc-name">'+s.name+'</div><div class="rc-cls">'+s.classLabel+'</div>';d.onclick=function(){STU=s;loadHome();};g.appendChild(d);});}
-function filterRoster(q){q=q.toLowerCase();renderRoster(ROSTER.filter(function(s){return s.name.toLowerCase().includes(q);}));}
+function showRoster(){
+  var r=lg(LK_ROSTER);
+  ROSTER=r||[];
+  renderRoster(ROSTER);
+  var si=document.getElementById('roster-search-input');if(si)si.value='';
+  var rc=document.getElementById('roster-count');
+  if(rc)rc.textContent=ROSTER.length+' student'+(ROSTER.length!==1?'s':'');
+  SS('roster');
+}
+function renderRoster(list){
+  var g=document.getElementById('roster-grid');if(!g)return;
+  var rc=document.getElementById('roster-count');
+  if(rc)rc.textContent=ROSTER.length+' student'+(ROSTER.length!==1?'s':'');
+  g.innerHTML='';
+  if(!list.length){
+    g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:rgba(255,255,255,.5)"><div style="font-size:40px;margin-bottom:10px">&#128070;</div><div style="font-weight:800;font-size:16px;color:rgba(255,255,255,.8)">No students yet</div><div style="font-size:13px;margin-top:6px">Tap Add New Student below to begin</div></div>';
+    return;
+  }
+  var EMOJIS=['🌟','📚','🎯','🌿','💫','🔮','🦁','🌈','⭐','🎨','🔥','💎'];
+  list.forEach(function(s,i){
+    var d=document.createElement('div');d.className='rc';
+    d.innerHTML='<div class="rc-av">'+(s.emoji||EMOJIS[i%EMOJIS.length])+'</div><div class="rc-name">'+s.name+'</div><div class="rc-cls">'+s.classLabel+'</div>';
+    d.onclick=function(){STU=s;loadHome();};
+    g.appendChild(d);
+  });
+}
+function filterRoster(q){
+  q=(q||'').toLowerCase();
+  renderRoster(q?ROSTER.filter(function(s){return s.name.toLowerCase().includes(q);}):ROSTER);
+}
 function switchStudent(){if(DMODE==='shared')showRoster();else startSetup();}
+
+// ADD STUDENT
+var asClass='';
+function asCheck(){
+  var n=document.getElementById('as-name');
+  var b=document.getElementById('as-save');
+  if(b)b.disabled=!((n&&n.value.trim())&&asClass);
+}
+function asCls(btn,cls){
+  asClass=cls;
+  document.querySelectorAll('#add-student .class-btn').forEach(function(b){b.classList.remove('sel');});
+  btn.classList.add('sel');asCheck();
+}
+function saveNewStudent(){
+  var nameEl=document.getElementById('as-name');
+  var name=(nameEl&&nameEl.value.trim())||'';
+  if(!name||!asClass)return;
+  var EMOJIS=['🌟','📚','🎯','🌿','💫','🔮','🦁','🌈','⭐','🎨','🔥','💎'];
+  ROSTER.push({name:name,classLabel:asClass,uid:'s_'+name.replace(/\s+/g,'_').toLowerCase()+'_'+Date.now(),emoji:EMOJIS[ROSTER.length%EMOJIS.length]});
+  ls(LK_ROSTER,ROSTER);
+  if(nameEl)nameEl.value='';asClass='';
+  document.querySelectorAll('#add-student .class-btn').forEach(function(b){b.classList.remove('sel');});
+  var sb=document.getElementById('as-save');if(sb)sb.disabled=true;
+  toast('✅ '+name+' added!',2000);
+  showRoster();
+}
+
+// ADMIN PANEL
+function openAdmin(){
+  var settings=lg('el_school')||{};
+  var sn=document.getElementById('admin-school-name');if(sn)sn.value=settings.name||'';
+  var sc=document.getElementById('admin-school-code');if(sc)sc.value=settings.code||'';
+  renderAdminProgress();SS('admin');
+}
+function adminBack(){if(DMODE==='shared')SS('roster');else SS('home');}
+function saveSchoolSettings(){
+  var name=(document.getElementById('admin-school-name')||{}).value||'';
+  var code=(document.getElementById('admin-school-code')||{}).value||'';
+  ls('el_school',{name:name,code:code});toast('✅ Settings saved',1800);
+}
+function renderAdminProgress(){
+  var list=document.getElementById('admin-progress-list');if(!list)return;
+  var cnt=document.getElementById('admin-student-count');if(cnt)cnt.textContent=ROSTER.length+' students';
+  if(!ROSTER.length){
+    list.innerHTML='<div style="text-align:center;padding:20px;color:var(--sm);font-size:14px">No students added yet</div>';
+    return;
+  }
+  var allProg=lg(LK_PROG)||{};
+  var rows=ROSTER.map(function(s){
+    var sk=s.uid||s.name;
+    var sp=allProg[sk]||{};
+    var passed=Object.values(sp).filter(function(v){return v&&v.passed;}).length;
+    var scores=Object.values(sp).filter(function(v){return v&&v.bestScore>0;}).map(function(v){return v.bestScore;});
+    var best=scores.length?Math.max.apply(null,scores):0;
+    var bestColor=best>=70?'var(--ok)':'var(--sm)';
+    var row=document.createElement('tr');
+    row.style.borderBottom='1px solid var(--bd)';
+    row.innerHTML=[
+      '<td style="padding:9px 10px;font-weight:700;color:var(--sl)">'+(s.emoji||'👤')+' '+s.name+'</td>',
+      '<td style="padding:9px 10px;color:var(--sm)">'+s.classLabel+'</td>',
+      '<td style="padding:9px 10px;text-align:center"><span style="background:var(--gl);color:var(--gm);border-radius:6px;padding:2px 8px;font-weight:800;font-size:12px">'+passed+'</span></td>',
+      '<td style="padding:9px 10px;text-align:center"><span style="font-weight:800;color:'+bestColor+'">'+best+'%</span></td>',
+      '<td style="padding:4px 2px;text-align:center"><button id="rm-'+sk+'" style="background:none;border:none;color:var(--err);font-size:16px;cursor:pointer;padding:2px 6px">🗑</button></td>'
+    ].join('');
+    return {row:row, sk:sk};
+  });
+  var wrap=document.createElement('div');
+  wrap.style.overflowX='auto';
+  var tbl=document.createElement('table');
+  tbl.style.cssText='width:100%;border-collapse:collapse;font-size:13px';
+  var thead=document.createElement('thead');
+  thead.innerHTML='<tr style="background:var(--slt)"><th style="padding:8px 10px;text-align:left;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--sm);border-bottom:1px solid var(--bd)">Student</th><th style="padding:8px 10px;text-align:left;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--sm);border-bottom:1px solid var(--bd)">Class</th><th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--sm);border-bottom:1px solid var(--bd)">Done</th><th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--sm);border-bottom:1px solid var(--bd)">Best</th><th style="padding:8px 2px;border-bottom:1px solid var(--bd)"></th></tr>';
+  var tbody=document.createElement('tbody');
+  rows.forEach(function(item){
+    tbody.appendChild(item.row);
+    var btn=document.getElementById('rm-'+item.sk);
+    if(btn)btn.onclick=function(){removeStudent(item.sk);};
+  });
+  tbl.appendChild(thead);tbl.appendChild(tbody);wrap.appendChild(tbl);
+  list.innerHTML='';list.appendChild(wrap);
+  // Attach onclick after DOM insert
+  rows.forEach(function(item){
+    var btn=list.querySelector('#rm-'+item.sk);
+    if(btn)btn.onclick=function(){removeStudent(item.sk);};
+  });
+}
+function removeStudent(uid){
+  if(!confirm('Remove this student? Their progress will also be deleted.'))return;
+  ROSTER=ROSTER.filter(function(s){return (s.uid||s.name)!==uid;});ls(LK_ROSTER,ROSTER);
+  var p=lg(LK_PROG)||{};delete p[uid];ls(LK_PROG,p);
+  renderAdminProgress();toast('Student removed',1800);
+}
+function clearAllStudents(){
+  if(!confirm('Remove ALL students and their progress? This cannot be undone.'))return;
+  ROSTER=[];ls(LK_ROSTER,[]);ls(LK_PROG,{});renderAdminProgress();toast('All students cleared',1800);
+}
 
 // ════════════════════════════════════════
 // HOME
@@ -890,7 +1086,10 @@ function loadHome(){
   document.getElementById('home-sn').textContent=STU.name.split(' ')[0];
   document.getElementById('home-greet').textContent='Hello, '+STU.name.split(' ')[0]+'! Ready to learn? 🎉';
   document.getElementById('home-cls').textContent=(STU.classLabel||'Lower Primary')+' · English';
-  if(DMODE==='shared')document.getElementById('home-sw').style.display='';
+  if(DMODE==='shared'){
+    document.getElementById('home-sw').style.display='';
+    document.getElementById('home-admin').style.display='';
+  }
   var p=prog();
   var totalStages=0,doneStages=0;
   UNITS.forEach(function(u){
