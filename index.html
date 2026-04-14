@@ -483,7 +483,28 @@ var C={
   arrow:    {bg:'linear-gradient(135deg,#FDBA74,#EA580C)',wc:'#431407'},triangle:{bg:'linear-gradient(135deg,#A78BFA,#4F46E5)',wc:'#1E1B4B'},
   rectangle:{bg:'linear-gradient(135deg,#67E8F9,#0D9488)',wc:'#134E4A'},diamond:{bg:'linear-gradient(135deg,#A5F3FC,#0891B2)',wc:'#164E63'},
   hexagon:  {bg:'linear-gradient(135deg,#818CF8,#3730A3)',wc:'#1E1B4B'},pentagon:{bg:'linear-gradient(135deg,#5EEAD4,#0D9488)',wc:'#134E4A'},
-  cylinder: {bg:'linear-gradient(135deg,#93C5FD,#1D4ED8)',wc:'#1E3A8A'},pyramid:{bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#451A03'}
+  cylinder: {bg:'linear-gradient(135deg,#93C5FD,#1D4ED8)',wc:'#1E3A8A'},pyramid:{bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#451A03'},
+  // P4 environment & tools
+  volcano:    {bg:'linear-gradient(135deg,#FB923C,#DC2626)',wc:'#450A0A'},glacier:{bg:'linear-gradient(135deg,#BAE6FD,#0284C7)',wc:'#0C4A6E'},
+  desert:     {bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#451A03'},forest:{bg:'linear-gradient(135deg,#86EFAC,#15803D)',wc:'#052E16'},
+  continent:  {bg:'linear-gradient(135deg,#34D399,#0D9488)',wc:'#134E4A'},peninsula:{bg:'linear-gradient(135deg,#22D3EE,#0891B2)',wc:'#164E63'},
+  climate:    {bg:'linear-gradient(135deg,#93C5FD,#2563EB)',wc:'#1E3A8A'},harvest:{bg:'linear-gradient(135deg,#FCD34D,#D97706)',wc:'#451A03'},
+  microscope: {bg:'linear-gradient(135deg,#A5F3FC,#0891B2)',wc:'#164E63'},telescope:{bg:'linear-gradient(135deg,#818CF8,#4338CA)',wc:'#1E1B4B'},
+  compass:    {bg:'linear-gradient(135deg,#FCA5A5,#DC2626)',wc:'#450A0A'},thermometer:{bg:'linear-gradient(135deg,#F87171,#EF4444)',wc:'#450A0A'},
+  // P5 science & society
+  gravity:    {bg:'linear-gradient(135deg,#C4B5FD,#7C3AED)',wc:'#3B0764'},energy:{bg:'linear-gradient(135deg,#FDE68A,#EAB308)',wc:'#713F12'},
+  oxygen:     {bg:'linear-gradient(135deg,#BAE6FD,#0EA5E9)',wc:'#0C4A6E'},erosion:{bg:'linear-gradient(135deg,#D97706,#78350F)',wc:'#FFDFC0'},
+  photosynthesis:{bg:'linear-gradient(135deg,#86EFAC,#16A34A)',wc:'#052E16'},evaporation:{bg:'linear-gradient(135deg,#FED7AA,#EA580C)',wc:'#431407'},
+  condensation:{bg:'linear-gradient(135deg,#BAE6FD,#0284C7)',wc:'#0C4A6E'},democracy:{bg:'linear-gradient(135deg,#FCD34D,#D97706)',wc:'#451A03'},
+  constitution:{bg:'linear-gradient(135deg,#D97706,#78350F)',wc:'#FFDFC0'},parliament:{bg:'linear-gradient(135deg,#818CF8,#4338CA)',wc:'#1E1B4B'},
+  independence:{bg:'linear-gradient(135deg,#34D399,#059669)',wc:'#064E3B'},legislature:{bg:'linear-gradient(135deg,#FCA5A5,#B91C1C)',wc:'#450A0A'},
+  // P6 advanced
+  atmosphere: {bg:'linear-gradient(135deg,#BAE6FD,#1D4ED8)',wc:'#1E3A8A'},ecosystem:{bg:'linear-gradient(135deg,#86EFAC,#065F46)',wc:'#052E16'},
+  metamorphosis:{bg:'linear-gradient(135deg,#F9A8D4,#9333EA)',wc:'#3B0764'},germination:{bg:'linear-gradient(135deg,#BEF264,#4D7C0F)',wc:'#365314'},
+  federation: {bg:'linear-gradient(135deg,#6EE7B7,#047857)',wc:'#064E3B'},sovereignty:{bg:'linear-gradient(135deg,#FCD34D,#B45309)',wc:'#451A03'},
+  pollination:{bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#451A03'},biodiversity:{bg:'linear-gradient(135deg,#86EFAC,#7C3AED)',wc:'#3B0764'},
+  archaeology:{bg:'linear-gradient(135deg,#D97706,#78350F)',wc:'#FFDFC0'},legislation:{bg:'linear-gradient(135deg,#818CF8,#1E40AF)',wc:'#1E3A8A'},
+  deforestation:{bg:'linear-gradient(135deg,#4ADE80,#78350F)',wc:'#052E16'},urbanisation:{bg:'linear-gradient(135deg,#94A3B8,#1E293B)',wc:'#E2E8F0'}
 };
 function wc(key){return C[key]||{bg:'linear-gradient(135deg,#60A5FA,#3B82F6)',wc:'#1E3A8A'};}
 
@@ -588,7 +609,46 @@ var WORDS={
   hexagon:  {word:'Hexagon',  emoji:'🔷', def:'A flat shape with exactly six straight sides.',               sentence:'A beehive cell is the shape of a hexagon.',            blank:'A _____ has six sides — count them carefully.',      spellAs:'hexagon'},
   pentagon: {word:'Pentagon', emoji:'⬠',  def:'A flat shape with exactly five straight sides.',               sentence:'She counted the five sides of the pentagon carefully.', blank:'A _____ has five sides and five corners.',           spellAs:'pentagon'},
   cylinder: {word:'Cylinder', emoji:'🥫', def:'A solid shape with two circular ends and one curved side.',   sentence:'A tin of tomatoes is shaped like a cylinder.',         blank:'A _____ looks like a tin can standing upright.',     spellAs:'cylinder'},
-  pyramid:  {word:'Pyramid',  emoji:'🔺', def:'A solid shape with a flat base and triangular sides meeting at a point.',sentence:'The pyramids of Egypt are famous all over the world.',blank:'A _____ comes to a point at the very top.',       spellAs:'pyramid'}
+  pyramid:  {word:'Pyramid',  emoji:'🔺', def:'A solid shape with a flat base and triangular sides meeting at a point.',sentence:'The pyramids of Egypt are famous all over the world.',blank:'A _____ comes to a point at the very top.',       spellAs:'pyramid'},
+  // ══ PRIMARY 4 — ENVIRONMENT & TOOLS ══
+  volcano:    {word:'Volcano',    emoji:'🌋',def:'A mountain that can explode and shoot out hot lava.',          sentence:'The volcano erupted and covered the village in ash.',   blank:'Hot lava poured down the side of the _____.',        spellAs:'volcano'},
+  glacier:    {word:'Glacier',    emoji:'🏔️',def:'A huge slow-moving river of ice found on mountains.',         sentence:'The glacier moves only a few centimetres every year.',  blank:'Scientists study the _____ to understand climate change.',spellAs:'glacier'},
+  desert:     {word:'Desert',     emoji:'🏜️',def:'A very dry area of land with little rain and few plants.',    sentence:'The Sahara desert is the largest hot desert in the world.',blank:'Camels are well suited to living in the _____.',      spellAs:'desert'},
+  forest:     {word:'Forest',     emoji:'🌳',def:'A large area of land covered with many trees.',                sentence:'The forest was full of birds singing in the morning.',  blank:'She walked deep into the _____ to collect firewood.',  spellAs:'forest'},
+  continent:  {word:'Continent',  emoji:'🌍',def:'One of the seven large areas of land on the Earth.',           sentence:'Africa is the second largest continent on Earth.',      blank:'Nigeria is a country on the _____ of Africa.',        spellAs:'continent'},
+  peninsula:  {word:'Peninsula',  emoji:'🗺️',def:'A piece of land surrounded by water on three sides.',         sentence:'Italy is shaped like a famous boot-shaped peninsula.',  blank:'A _____ has water on three of its four sides.',       spellAs:'peninsula'},
+  climate:    {word:'Climate',    emoji:'🌤️',def:'The usual weather pattern in an area over many years.',       sentence:'Nigeria has a tropical climate with heavy rainfall.',   blank:'The _____ of a place affects what crops can be grown.',spellAs:'climate'},
+  harvest:    {word:'Harvest',    emoji:'🌾',def:'The time when farmers gather their crops from the fields.',    sentence:'The whole family helped during the yam harvest.',       blank:'The farmer was happy with the large _____ this season.',spellAs:'harvest'},
+  microscope: {word:'Microscope', emoji:'🔬',def:'A tool that makes very tiny things look much bigger.',         sentence:'She used a microscope to look at the leaf cells.',      blank:'She saw the tiny insect clearly through the _____.',  spellAs:'microscope'},
+  telescope:  {word:'Telescope',  emoji:'🔭',def:'A tool used to look at stars and objects far away.',           sentence:'He pointed the telescope at the moon and saw craters.', blank:'She used the _____ to see the planet clearly.',       spellAs:'telescope'},
+  compass:    {word:'Compass',    emoji:'🧭',def:'A tool that always points north to help with direction.',      sentence:'The explorer used a compass to find his way through the forest.',blank:'She checked her _____ and turned to face north.',  spellAs:'compass'},
+  thermometer:{word:'Thermometer',emoji:'🌡️',def:'A tool used to measure temperature.',                         sentence:'The nurse checked his temperature with a thermometer.', blank:'The doctor put the _____ under the patient\'s tongue.',spellAs:'thermometer'},
+  // ══ PRIMARY 5 — SCIENCE & SOCIETY ══
+  gravity:    {word:'Gravity',    emoji:'🍎',def:'The force that pulls everything down towards the Earth.',      sentence:'Gravity is why an apple always falls down from a tree.', blank:'Without _____, we would float off into space.',       spellAs:'gravity'},
+  energy:     {word:'Energy',     emoji:'⚡',def:'The power that makes things work, move, or produce heat.',     sentence:'The solar panels convert sunlight into electrical energy.',blank:'We need _____ from food to run, jump, and think.',   spellAs:'energy'},
+  oxygen:     {word:'Oxygen',     emoji:'💨',def:'The gas in air that living things need to breathe.',           sentence:'Without oxygen, no human or animal can stay alive.',    blank:'Plants produce _____ during the process of photosynthesis.',spellAs:'oxygen'},
+  erosion:    {word:'Erosion',    emoji:'🏔️',def:'When soil and rock are worn away slowly by wind or water.',   sentence:'Erosion by the river made the cliff face very steep.',  blank:'Heavy rainfall causes soil _____ on hillsides.',      spellAs:'erosion'},
+  photosynthesis:{word:'Photosynthesis',emoji:'🌱',def:'The process plants use to make food from sunlight and water.',sentence:'Photosynthesis only happens when there is enough light.',blank:'Plants use _____ to make their own food from sunlight.',spellAs:'photosynthesis'},
+  evaporation:{word:'Evaporation',emoji:'☀️',def:'When a liquid turns into a gas because of heat.',             sentence:'Evaporation of water from the sea forms clouds above.',  blank:'_____ turns liquid water into water vapour in the air.',spellAs:'evaporation'},
+  condensation:{word:'Condensation',emoji:'💧',def:'When a gas cools down and turns back into a liquid.',        sentence:'Condensation formed on the cold glass of water.',       blank:'The _____ on the window came from warm air meeting cold glass.',spellAs:'condensation'},
+  democracy:  {word:'Democracy',  emoji:'🗳️',def:'A system where citizens vote to choose their government.',    sentence:'Nigeria practises democracy with regular elections.',    blank:'In a _____, every adult citizen has the right to vote.',spellAs:'democracy'},
+  constitution:{word:'Constitution',emoji:'📜',def:'The written document that contains the laws governing a country.',sentence:'The Nigerian constitution was revised several times after independence.',blank:'The _____ protects the rights of every Nigerian citizen.',spellAs:'constitution'},
+  parliament:  {word:'Parliament', emoji:'🏛️',def:'The group of elected people who make laws for a country.',   sentence:'The Nigerian parliament is called the National Assembly.',blank:'A bill must be passed by _____ before it becomes law.', spellAs:'parliament'},
+  independence:{word:'Independence',emoji:'🇳🇬',def:'Freedom from control by another country or person.',       sentence:'Nigeria gained independence from Britain on 1st October 1960.',blank:'Nigeria celebrated _____ after years of colonial rule.',spellAs:'independence'},
+  legislature: {word:'Legislature',emoji:'⚖️',def:'The branch of government that makes and changes laws.',      sentence:'The legislature voted on the new education bill.',       blank:'The _____ is responsible for making new laws.',        spellAs:'legislature'},
+  // ══ PRIMARY 6 — ADVANCED VOCABULARY ══
+  atmosphere:  {word:'Atmosphere', emoji:'🌐',def:'The layers of gases that surround the Earth.',                sentence:'The atmosphere protects us from harmful rays of the sun.',blank:'Astronauts need oxygen tanks outside the _____.',     spellAs:'atmosphere'},
+  ecosystem:   {word:'Ecosystem',  emoji:'🌿',def:'All the living things in an area and how they depend on each other.',sentence:'The forest ecosystem was damaged by deforestation.',blank:'Every plant and animal plays a role in the _____.',    spellAs:'ecosystem'},
+  metamorphosis:{word:'Metamorphosis',emoji:'🦋',def:'A complete change in the form of an animal as it grows.',  sentence:'The caterpillar goes through metamorphosis to become a butterfly.',blank:'A butterfly goes through _____ from egg to adult.',spellAs:'metamorphosis'},
+  germination: {word:'Germination',emoji:'🌱',def:'When a seed begins to sprout and grow into a plant.',         sentence:'Germination requires water, warmth, and oxygen.',       blank:'The _____ of the seed happened after three days of watering.',spellAs:'germination'},
+  federation:  {word:'Federation', emoji:'🗺️',def:'A group of states joined together under one central government.',sentence:'Nigeria is a federation made up of 36 states.',        blank:'The Nigerian _____ has a president at its head.',      spellAs:'federation'},
+  sovereignty: {word:'Sovereignty',emoji:'👑',def:'The full power of a country to govern itself without outside control.',sentence:'Sovereignty means no other country can make laws for Nigeria.',blank:'_____ gives a nation the right to govern itself.',   spellAs:'sovereignty'},
+  pollination: {word:'Pollination',emoji:'🐝',def:'When pollen is carried from one flower to another to make seeds.',sentence:'Bees carry out pollination as they collect nectar.',   blank:'Without _____ by bees, many plants could not reproduce.',spellAs:'pollination'},
+  biodiversity:{word:'Biodiversity',emoji:'🌈',def:'The variety of all living things found in a place.',         sentence:'The rainforest has remarkable biodiversity with millions of species.',blank:'Human activity threatens the _____ of the Niger Delta.',spellAs:'biodiversity'},
+  archaeology: {word:'Archaeology',emoji:'🏺',def:'The study of history by digging up and examining old objects.',sentence:'Archaeology revealed that Nok people lived in Nigeria over 2000 years ago.',blank:'_____ helps us learn about ancient Nigerian civilisations.',spellAs:'archaeology'},
+  legislation: {word:'Legislation',emoji:'📋',def:'Laws that have been made by a government.',                   sentence:'New legislation was passed to protect children in Nigeria.',blank:'The government passed _____ to improve school funding.',spellAs:'legislation'},
+  deforestation:{word:'Deforestation',emoji:'🪓',def:'The cutting down of large numbers of trees in a forest.',  sentence:'Deforestation in the Niger Delta causes flooding every year.',blank:'_____ destroys animal habitats and causes soil erosion.',spellAs:'deforestation'},
+  urbanisation:{word:'Urbanisation',emoji:'🏙️',def:'When more and more people move from villages to cities to live.',sentence:'Rapid urbanisation has made Lagos one of Africa\'s biggest cities.',blank:'_____ has caused Lagos to grow into a megacity.',      spellAs:'urbanisation'}
 };
 
 // STAGES — ordered easy → hard within each class
@@ -624,10 +684,27 @@ var STAGES={
     {id:'p3-s5',label:'Stage 5 — Hidden Animals',    words:['prayingMantis','chameleon'],         emoji:'🦗'}
   ]
 };
-// P4-P6 get same as P3
-['Primary 4','Primary 5','Primary 6'].forEach(function(cl){
-  STAGES[cl]=STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('p3',cl.replace('Primary ','p').replace(' ',''))});});
-});
+// Primary 4 — Environment & Science Tools (own unique content, not a clone of P3)
+STAGES['Primary 4']=[
+  {id:'p4-s1',label:'Stage 1 — Our Environment',words:['volcano','glacier','desert','forest'],    emoji:'🌋'},
+  {id:'p4-s2',label:'Stage 2 — Geography',       words:['continent','peninsula','climate','harvest'],emoji:'🌍'},
+  {id:'p4-s3',label:'Stage 3 — Science Tools',   words:['microscope','telescope','compass','thermometer'],emoji:'🔬'}
+];
+// Primary 5 — Science Processes & Civic Education
+STAGES['Primary 5']=[
+  {id:'p5-s1',label:'Stage 1 — Forces & Matter',   words:['gravity','energy','oxygen','erosion'],             emoji:'⚡'},
+  {id:'p5-s2',label:'Stage 2 — Plant Science',     words:['photosynthesis','evaporation','condensation','germination'],emoji:'🌱'},
+  {id:'p5-s3',label:'Stage 3 — Civic Education',   words:['democracy','constitution','parliament','independence'],emoji:'🗳️'},
+  {id:'p5-s4',label:'Stage 4 — Government',        words:['legislature','federation','legislation','sovereignty'],emoji:'⚖️'}
+];
+// Primary 6 — Advanced Science & Society (hardest words in the app)
+STAGES['Primary 6']=[
+  {id:'p6-s1',label:'Stage 1 — Earth Science',     words:['atmosphere','ecosystem','erosion','climate'],       emoji:'🌐'},
+  {id:'p6-s2',label:'Stage 2 — Biology Processes', words:['metamorphosis','pollination','biodiversity','photosynthesis'],emoji:'🦋'},
+  {id:'p6-s3',label:'Stage 3 — Nigerian Society',  words:['federation','sovereignty','independence','constitution'],emoji:'🇳🇬'},
+  {id:'p6-s4',label:'Stage 4 — Long Words',        words:['deforestation','urbanisation','archaeology','legislation'],emoji:'🏙️'},
+  {id:'p6-s5',label:'Stage 5 — Master Level',      words:['biodiversity','metamorphosis','deforestation','urbanisation'],emoji:'🏆'}
+];
 
 // ════ UNIT 2: MY BODY ════
 var BODY_STAGES={
@@ -648,9 +725,10 @@ var BODY_STAGES={
                {id:'b-p3-s4',label:'Stage 4 — Detailed Parts', words:['eyelid','nostril','eyelid','nostril'],emoji:'👁️'},
                {id:'b-p3-s5',label:'Stage 5 — Expert Parts',   words:['skeleton','knuckle','skeleton','knuckle'],emoji:'💀'}]
 };
-['Primary 4','Primary 5','Primary 6'].forEach(function(cl){
-  BODY_STAGES[cl]=BODY_STAGES['Primary 3'].map(function(s){var p=cl.replace('Primary ','bp').replace(' ','');return Object.assign({},s,{id:s.id.replace('b-p3',p)});});
-});
+// Body stages P4-P6: same words as P3 (body parts are exhausted) — keep but rename clearly
+BODY_STAGES['Primary 4']=BODY_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('b-p3','b-p4')});});
+BODY_STAGES['Primary 5']=BODY_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('b-p3','b-p5')});});
+BODY_STAGES['Primary 6']=BODY_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('b-p3','b-p6')});});
 
 // ════ UNIT 3: FOOD & DRINKS ════
 var FOOD_STAGES={
@@ -671,9 +749,9 @@ var FOOD_STAGES={
                {id:'f-p3-s4',label:'Stage 4 — Special Foods',   words:['avocado','biscuit','avocado','biscuit'],emoji:'🥑'},
                {id:'f-p3-s5',label:'Stage 5 — Long Words',      words:['groundnut','watermelon','groundnut','watermelon'],emoji:'🥜'}]
 };
-['Primary 4','Primary 5','Primary 6'].forEach(function(cl){
-  FOOD_STAGES[cl]=FOOD_STAGES['Primary 3'].map(function(s){var p='f-'+cl.replace('Primary ','p').replace(' ','');return Object.assign({},s,{id:s.id.replace('f-p3',p)});});
-});
+FOOD_STAGES['Primary 4']=FOOD_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('f-p3','f-p4')});});
+FOOD_STAGES['Primary 5']=FOOD_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('f-p3','f-p5')});});
+FOOD_STAGES['Primary 6']=FOOD_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('f-p3','f-p6')});});
 
 // ════ UNIT 4: COLOURS & SHAPES ════
 var COLOUR_STAGES={
@@ -694,9 +772,9 @@ var COLOUR_STAGES={
                {id:'c-p3-s4',label:'Stage 4 — Many-Sided',      words:['hexagon','pentagon','hexagon','pentagon'],emoji:'🔷'},
                {id:'c-p3-s5',label:'Stage 5 — 3D Shapes',       words:['cylinder','pyramid','cylinder','pyramid'],emoji:'🥫'}]
 };
-['Primary 4','Primary 5','Primary 6'].forEach(function(cl){
-  COLOUR_STAGES[cl]=COLOUR_STAGES['Primary 3'].map(function(s){var p='c-'+cl.replace('Primary ','p').replace(' ','');return Object.assign({},s,{id:s.id.replace('c-p3',p)});});
-});
+COLOUR_STAGES['Primary 4']=COLOUR_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('c-p3','c-p4')});});
+COLOUR_STAGES['Primary 5']=COLOUR_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('c-p3','c-p5')});});
+COLOUR_STAGES['Primary 6']=COLOUR_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('c-p3','c-p6')});});
 
 // ════ UNITS — master list ════
 var UNITS=[
