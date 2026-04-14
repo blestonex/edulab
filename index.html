@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#7C3AED">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EduLab">
+<meta name="application-name" content="EduLab">
+<meta name="description" content="Blestonex EduLab — vocabulary learning for Nigerian primary schools">
+<link id="pwa-manifest" rel="manifest">
+<title>Blestonex EduLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#1B5E3A;--gm:#27834F;--gl:#E8F5EE;
+  --t:#0F7B8C;--tl:#E6F5F7;
+  --go:#C8870A;--gol:#FFF4DC;
+  --sl:#3D4A5C;--sm:#6B7B8D;--slt:#F0F3F6;
+  --ok:#1A7F4B;--okl:#E6F5ED;
+  --err:#B54040;--errl:#FEF0F0;
+  --bd:#D8E0E8;--bg:#F0EDFF;
+  --white:#fff;--r:14px;--rs:10px;
+  /* screen accent colours */
+  --pr-color:#7C3AED; /* practice purple */
+  --ts-color:#0D9488; /* test teal */
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:'Nunito Sans',sans-serif;background:#F0EDFF;color:var(--sl)}
+body{display:flex;flex-direction:column}
+.screen{display:none;flex-direction:column;height:100%;overflow:hidden}
+.screen.active{display:flex}
+/* each screen gets its own vivid background */
+#home{background:linear-gradient(180deg,#FF6B35 0%,#FF6B35 140px,#FFF3E8 140px)}
+#lessons{background:linear-gradient(180deg,#1565C0 0%,#1565C0 120px,#EEF3FF 120px)}
+#learn{background:#F0EDFF}
+#practice{background:linear-gradient(180deg,#7C3AED 0%,#7C3AED 100px,#F0EDFF 100px)}
+#test{background:linear-gradient(180deg,#0D9488 0%,#0D9488 100px,#E6FFFE 100px)}
+/* TOPBAR */
+.topbar{color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.tlogo{font-family:'Nunito',sans-serif;font-weight:900;font-size:17px}
+.tlogo span{opacity:.5}
+.tback{background:none;border:none;color:rgba(255,255,255,.9);font-size:28px;cursor:pointer;padding:0 2px;line-height:1}
+.tsname{margin-left:auto;font-size:13px;font-weight:700;background:rgba(255,255,255,.18);padding:4px 11px;border-radius:20px}
+.tswitch{font-size:12px;color:rgba(255,255,255,.85);background:none;border:1.5px solid rgba(255,255,255,.3);border-radius:8px;padding:4px 9px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:16px;scrollbar-width:none;-ms-overflow-style:none}
+.content::-webkit-scrollbar{display:none}
+.roster-grid{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+.roster-grid::-webkit-scrollbar{display:none}
+.actionbar{background:transparent;padding:12px 16px 20px;flex-shrink:0}
+.btn{width:100%;padding:16px;border:none;border-radius:var(--r);font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;cursor:pointer;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn-g{background:#7C3AED;color:#fff} /* default vivid purple */
+.btn-purple{background:#7C3AED;color:#fff}
+.btn-teal{background:#0D9488;color:#fff}
+.btn-orange{background:#EA580C;color:#fff}
+.btn-ghost{background:#fff;color:var(--sm);border:1.5px solid var(--bd);font-size:14px;padding:12px}
+/* PROGRESS */
+.prog-wrap{background:rgba(0,0,0,.1);border-radius:20px;height:7px;overflow:hidden}
+.prog-bar{height:7px;border-radius:20px;transition:width .4s ease}
+/* TOAST */
+#toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:#1E2A35;color:#fff;padding:9px 18px;border-radius:24px;font-size:13px;font-weight:700;opacity:0;transition:opacity .2s;z-index:999;white-space:nowrap;pointer-events:none}
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-6px)}50%{transform:translateX(6px)}}
+.fade-in{animation:fadeUp .25s ease both}
+.shake{animation:shake .3s ease}
+
+/* ── SPLASH ── */
+#splash{background:linear-gradient(145deg,#FF6B35,#FF8E53,#FFBE76);justify-content:center;align-items:center}
+.splash-inner{text-align:center;padding:36px 28px;max-width:340px;width:100%}
+.splash-logo{font-family:'Nunito',sans-serif;font-weight:900;font-size:44px;color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.18)}
+.splash-logo span{opacity:.45}
+.splash-sub{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:44px}
+.splash-lbl{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:14px}
+.mode-btn{width:100%;padding:17px;border:2px solid rgba(255,255,255,.3);border-radius:var(--r);background:rgba(255,255,255,.14);color:#fff;text-align:left;cursor:pointer;margin-bottom:10px}
+.mode-btn:active{background:rgba(255,255,255,.25)}
+.mode-btn .mt{font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;display:block}
+.mode-btn .md{font-size:12px;color:rgba(255,255,255,.55);display:block;margin-top:3px}
+
+/* ── SETUP ── */
+#setup{background:linear-gradient(145deg,#6C48CC,#8B5CF6,#A78BFA)}
+.setup-body{flex:1;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:18px}
+.setup-hdr{text-align:center;color:#fff}
+.setup-hdr h2{font-family:'Nunito',sans-serif;font-weight:900;font-size:26px;margin-bottom:5px}
+.setup-hdr p{font-size:14px;opacity:.68}
+.setup-field{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.28);border-radius:var(--r)}
+.setup-input{width:100%;padding:16px;background:none;border:none;color:#fff;font-size:20px;font-family:'Nunito',sans-serif;font-weight:800;outline:none}
+.setup-input::placeholder{color:rgba(255,255,255,.3)}
+.class-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.class-btn{padding:13px;border:2px solid rgba(255,255,255,.2);border-radius:var(--rs);background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer;transition:all .15s}
+.class-btn.sel{background:rgba(255,255,255,.24);border-color:#fff;color:#fff}
+.setup-action{padding:14px 20px 20px;flex-shrink:0}
+.btn-sw{width:100%;padding:16px;background:#fff;color:#6C48CC;border:none;border-radius:var(--r);font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;cursor:pointer}
+.btn-sw:disabled{opacity:.4;cursor:not-allowed}
+.step-dots{display:flex;justify-content:center;gap:7px;margin-top:10px}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25)}
+.dot.active{background:#fff}
+
+/* ── ROSTER ── */
+#roster{background:linear-gradient(145deg,#0F7B8C,#1A9BAD)}
+.roster-hdr{padding:20px 16px 10px;color:#fff}
+.roster-hdr h2{font-family:'Nunito',sans-serif;font-weight:900;font-size:24px}
+.roster-hdr p{font-size:13px;opacity:.62;margin-top:3px}
+.roster-search{margin:0 16px 12px;background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.22);border-radius:var(--rs);display:flex;align-items:center;padding:9px 13px;gap:8px}
+.roster-search input{background:none;border:none;color:#fff;font-size:15px;flex:1;outline:none;font-family:'Nunito',sans-serif;font-weight:700}
+.roster-search input::placeholder{color:rgba(255,255,255,.4)}
+.roster-grid{flex:1;overflow-y:auto;padding:0 16px 16px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.rc{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.18);border-radius:var(--r);padding:14px 12px;cursor:pointer}
+.rc:active{background:rgba(255,255,255,.22)}
+.rc-av{font-size:30px;margin-bottom:8px}
+.rc-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:#fff}
+.rc-cls{font-size:12px;color:rgba(255,255,255,.5);margin-top:2px}
+
+/* ── HOME ── */
+.home-banner{padding:20px 16px 18px;color:#fff}
+.home-banner h2{font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;margin-bottom:3px}
+.home-banner p{font-size:13px;opacity:.72}
+.subj-card{background:#fff;border-radius:var(--r);overflow:hidden;cursor:pointer;box-shadow:0 2px 14px rgba(0,0,0,.09);margin-bottom:12px}
+.subj-card:active{transform:scale(.99)}
+.subj-head{padding:16px;display:flex;align-items:center;gap:12px}
+.subj-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.subj-meta{flex:1}
+.subj-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;color:var(--sl)}
+.subj-desc{font-size:12px;color:var(--sm);margin-top:2px}
+.subj-prog{padding:0 16px 15px}
+.prog-label{display:flex;justify-content:space-between;font-size:12px;color:var(--sm);margin-top:5px}
+
+/* ── STAGE LIST ── */
+.unit-lbl{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--sm);margin:4px 0 10px 2px}
+.stage-row{background:#fff;border-radius:var(--r);padding:15px 16px;display:flex;align-items:center;gap:13px;margin-bottom:9px;cursor:pointer;box-shadow:0 1px 8px rgba(0,0,0,.07);border:2px solid transparent;transition:border-color .15s}
+.stage-row:active{border-color:var(--t)}
+.stage-row.locked{opacity:.4;cursor:not-allowed}
+.stage-ic{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.stage-meta{flex:1}
+.stage-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:var(--sl)}
+.stage-words{font-size:12px;color:var(--sm);margin-top:3px}
+.stage-stars{font-size:15px;letter-spacing:2px;color:#F59E0B}
+
+/* ── LEARN ── */
+.learn-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.learn-lbl{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:6px;background:var(--gl);color:var(--gm)}
+.word-card{border-radius:20px;overflow:hidden;box-shadow:0 4px 22px rgba(0,0,0,.14);margin-bottom:14px}
+.wc-top{padding:28px 20px 22px;text-align:center;position:relative}
+.wc-em{font-size:80px;line-height:1;display:block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.13))}
+.tts-btn{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.22);border:none;border-radius:9px;width:38px;height:38px;cursor:pointer;font-size:18px;color:#fff;display:flex;align-items:center;justify-content:center}
+.wc-bot{background:#fff;padding:18px 18px 14px}
+.wc-word{font-family:'Nunito',sans-serif;font-weight:900;font-size:34px;margin-bottom:7px;letter-spacing:-.5px}
+.wc-def{font-size:14px;color:var(--sl);margin-bottom:10px;line-height:1.55}
+.wc-sent{font-size:13px;color:var(--sm);font-style:italic;line-height:1.55;background:var(--slt);border-radius:9px;padding:10px 13px}
+.card-nav{display:flex;gap:8px}
+.card-nav-btn{flex:1;padding:14px;border:2px solid var(--bd);border-radius:var(--rs);background:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:var(--sl);cursor:pointer;transition:all .15s}
+.card-nav-btn:active{transform:scale(.97)}
+
+/* ── QUESTION CARD ── */
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.q-pill{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:4px 10px;border-radius:6px}
+.q-match{background:#E0F0FF;color:#1565C0}
+.q-fill{background:#E8F5E9;color:#2E7D32}
+.q-spell{background:#FFF3E0;color:#E65100}
+.q-num{font-size:13px;color:var(--sm);font-weight:700}
+.q-card{background:#fff;border-radius:16px;padding:20px 17px;box-shadow:0 2px 14px rgba(0,0,0,.09);margin-bottom:10px}
+.q-em{font-size:52px;text-align:center;display:block;margin-bottom:8px;line-height:1}
+.q-def{font-size:14px;color:var(--sl);text-align:center;line-height:1.55;margin-bottom:4px}
+.q-blank{font-size:15px;color:var(--sl);text-align:center;line-height:1.65;font-weight:700}
+.q-blank em{display:inline-block;min-width:60px;border-bottom:3px solid var(--t);margin:0 3px;font-style:normal;font-weight:900;color:var(--t)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.opt{padding:15px 10px;border:2px solid var(--bd);border-radius:var(--rs);background:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:var(--sl);cursor:pointer;transition:all .15s;text-align:center}
+.opt:active:not(.dis){transform:scale(.95)}
+.opt.ok{background:#E8F5E9;border-color:#2E7D32;color:#2E7D32}
+.opt.no{background:var(--errl);border-color:var(--err);color:var(--err)}
+.opt.dis{cursor:not-allowed}
+/* SPELL */
+.spell-display{display:flex;justify-content:center;align-items:center;gap:5px;min-height:58px;border:2px dashed var(--bd);border-radius:var(--rs);padding:10px;margin-bottom:10px;flex-wrap:wrap;background:var(--slt)}
+.ss{width:38px;height:46px;border:2.5px solid var(--t);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;flex-shrink:0}
+.ss:not(.filled){background:rgba(255,255,255,.7);border-style:dashed}
+.ss.filled{background:var(--tl);border-style:solid}
+.ss.ok{border-color:#2E7D32;background:#E8F5E9}
+.ss.no{border-color:var(--err);background:var(--errl)}
+.ssltr{font-family:'Nunito',sans-serif;font-weight:900;font-size:19px;color:var(--t);line-height:1;pointer-events:none}
+.ss.ok .ssltr{color:#2E7D32}
+.ss.no .ssltr{color:var(--err)}
+.spell-gap{width:12px;flex-shrink:0}
+.pool{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.lt{width:40px;height:46px;border:2px solid var(--bd);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:18px;color:var(--sl);background:#fff;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.07);transition:transform .1s}
+.lt:active:not(.used){transform:scale(.88)}
+.lt.used{opacity:.2;cursor:not-allowed}
+.hint-btn{background:#FFF3E0;color:#E65100;border:none;border-radius:8px;padding:8px 14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;margin:0 auto;display:block}
+.q-msg{text-align:center;font-size:14px;font-weight:700;padding:8px 12px;min-height:26px;border-radius:8px;margin-bottom:4px}
+.q-msg.ok{color:#2E7D32;background:#E8F5E9}
+.q-msg.no{color:var(--err);background:var(--errl)}
+
+/* ── PWA INSTALL BANNER ── */
+#install-banner{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;padding:14px 16px;display:none;align-items:center;gap:12px;z-index:9999;box-shadow:0 -4px 20px rgba(0,0,0,.2)}
+#install-banner.show{display:flex}
+#install-banner .ib-icon{font-size:28px;flex-shrink:0}
+#install-banner .ib-text{flex:1}
+#install-banner .ib-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:15px}
+#install-banner .ib-sub{font-size:12px;opacity:.75;margin-top:2px}
+#install-banner .ib-install{background:#fff;color:#5B21B6;border:none;border-radius:8px;padding:8px 16px;font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;white-space:nowrap}
+#install-banner .ib-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;cursor:pointer;padding:0 4px;line-height:1}
+#ios-tip{position:fixed;bottom:0;left:0;right:0;background:#1E2A35;color:#fff;padding:16px;display:none;z-index:9999;text-align:center;border-top:2px solid rgba(255,255,255,.1)}
+#ios-tip.show{display:block}
+#ios-tip p{font-size:13px;line-height:1.6}
+#ios-tip p strong{color:#A78BFA}
+#ios-tip .ib-close2{background:none;border:none;color:rgba(255,255,255,.6);font-size:13px;cursor:pointer;margin-top:8px;text-decoration:underline}
+#results{justify-content:center;align-items:center;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+#results::-webkit-scrollbar{display:none}
+#results.pass{background:linear-gradient(145deg,#F59E0B,#FBBF24)}
+#results.fail{background:linear-gradient(145deg,#6366F1,#818CF8)}
+.res-wrap{text-align:center;padding:32px 24px;max-width:340px;width:100%}
+.res-em{font-size:80px;display:block;margin-bottom:12px}
+.res-score{font-family:'Nunito',sans-serif;font-weight:900;font-size:58px;margin-bottom:4px}
+.res-lbl{font-size:14px;margin-bottom:12px;opacity:.75}
+.res-stars{font-size:34px;letter-spacing:5px;margin-bottom:18px}
+.res-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:24px;margin-bottom:8px}
+.res-sub{font-size:14px;margin-bottom:24px;line-height:1.55;opacity:.8}
+.res-missed{background:rgba(0,0,0,.12);border-radius:var(--rs);padding:12px 16px;margin-bottom:22px;text-align:left}
+.res-missed-title{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;opacity:.5;margin-bottom:10px}
+.missed-word{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;opacity:.85}
+.btn-res{width:100%;padding:15px;border:none;border-radius:var(--r);font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;cursor:pointer;margin-bottom:9px}
+.btn-res:active{transform:scale(.97)}
+.btn-res.p{background:rgba(255,255,255,.9)}
+.btn-res.g{background:rgba(255,255,255,.18);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash" class="screen">
+  <div class="splash-inner fade-in">
+    <div class="splash-logo">Edu<span>Lab</span></div>
+    <div class="splash-sub">by Blestonex Global Services</div>
+    <div class="splash-lbl">How is this device used?</div>
+    <button class="mode-btn" onclick="pickMode('single')"><span class="mt">👤 My personal device</span><span class="md">One student uses this device</span></button>
+    <button class="mode-btn" onclick="pickMode('shared')"><span class="mt">👥 Shared class device</span><span class="md">Multiple students take turns</span></button>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div id="setup" class="screen">
+  <div class="setup-body">
+    <div id="sw1"><div class="setup-hdr"><h2>What is your name?</h2><p>Your name shows on your progress</p></div><div class="setup-field"><input id="sw-name" class="setup-input" type="text" placeholder="Type your name…" maxlength="30" oninput="swCheck()"></div></div>
+    <div id="sw2" style="display:none"><div class="setup-hdr"><h2>What is your class?</h2><p>This sets the right level for you</p></div><div class="class-grid"><button class="class-btn" onclick="swCls(this,'Nursery 1')">Nursery 1</button><button class="class-btn" onclick="swCls(this,'Nursery 2')">Nursery 2</button><button class="class-btn" onclick="swCls(this,'Primary 1')">Primary 1</button><button class="class-btn" onclick="swCls(this,'Primary 2')">Primary 2</button><button class="class-btn" onclick="swCls(this,'Primary 3')">Primary 3</button><button class="class-btn" onclick="swCls(this,'Primary 4')">Primary 4</button><button class="class-btn" onclick="swCls(this,'Primary 5')">Primary 5</button><button class="class-btn" onclick="swCls(this,'Primary 6')">Primary 6</button></div></div>
+    <div id="sw3" style="display:none"><div class="setup-hdr"><h2>School code</h2><p>Ask your teacher. You can skip this.</p></div><div class="setup-field"><input id="sw-code" class="setup-input" type="text" placeholder="e.g. BLX001" maxlength="8" style="text-transform:uppercase;letter-spacing:3px;font-size:22px" oninput="this.value=this.value.toUpperCase()"></div><p style="text-align:center;font-size:12px;color:rgba(255,255,255,.4);margin-top:8px">Optional — works without it</p></div>
+    <div class="step-dots"><div class="dot active" id="dot0"></div><div class="dot" id="dot1"></div><div class="dot" id="dot2"></div></div>
+  </div>
+  <div class="setup-action"><button id="sw-next" class="btn-sw" disabled onclick="swNext()">Continue →</button></div>
+</div>
+
+<!-- ROSTER -->
+<div id="roster" class="screen">
+  <div class="roster-hdr"><h2>Who is learning today? 👋</h2><p>Tap your name to begin</p></div>
+  <div class="roster-search"><span style="font-size:16px;opacity:.5">🔍</span><input type="text" placeholder="Search your name…" oninput="filterRoster(this.value)"></div>
+  <div id="roster-grid" class="roster-grid"></div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="screen">
+  <div class="topbar" id="home-tb" style="background:linear-gradient(135deg,#FF6B35,#FF8E53)">
+    <div class="tlogo">Edu<span>Lab</span></div>
+    <div id="home-sn" class="tsname"></div>
+    <button id="home-sw" class="tswitch" style="display:none" onclick="switchStudent()">Switch</button>
+  </div>
+  <div class="home-banner" style="background:linear-gradient(135deg,#FF6B35,#FF8E53)">
+    <h2 id="home-greet">Hello! Ready to learn? 🎉</h2>
+    <p id="home-cls">Lower Primary · English</p>
+  </div>
+  <div class="content">
+    <div class="subj-card" onclick="openLessonList()">
+      <div class="subj-head">
+        <div class="subj-icon" style="background:#E0F0FF;color:#1565C0">📖</div>
+        <div class="subj-meta"><div class="subj-name">English</div><div class="subj-desc">Vocabulary · Reading · Writing</div></div>
+        <span style="font-size:22px;color:var(--sm)">›</span>
+      </div>
+      <div class="subj-prog">
+        <div class="prog-wrap"><div class="prog-bar" id="eng-pb" style="width:0%;background:#1565C0"></div></div>
+        <div class="prog-label"><span id="eng-pt">0 stages complete</span><span id="eng-pp">0%</span></div>
+      </div>
+    </div>
+    <div class="subj-card" style="opacity:.4;cursor:not-allowed">
+      <div class="subj-head"><div class="subj-icon" style="background:#FFF3E0;color:#E65100">➕</div><div class="subj-meta"><div class="subj-name" style="color:var(--sm)">Mathematics</div><div class="subj-desc">Coming soon in Phase 2</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- LESSON LIST (stages) -->
+<div id="lessons" class="screen">
+  <div class="topbar" id="lessons-tb" style="background:linear-gradient(135deg,#1565C0,#1976D2)">
+    <button class="tback" onclick="SS('home')">‹</button>
+    <div class="tlogo">English <span>Vocabulary</span></div>
+    <button id="lessons-sw" class="tswitch" style="display:none" onclick="switchStudent()">Switch</button>
+  </div>
+  <div style="background:rgba(0,0,0,.08);padding:7px 16px;font-size:12px;color:rgba(255,255,255,.8);flex-shrink:0" id="lessons-bc">English › Vocabulary › Lower Primary</div>
+  <div class="content" id="lessons-list"></div>
+</div>
+
+<!-- LEARN -->
+<div id="learn" class="screen">
+  <div class="topbar" id="learn-tb">
+    <button class="tback" id="learn-back" onclick="confirmLeaveLearn()">‹</button>
+    <div class="tlogo" id="learn-title">Animals</div>
+    <button id="learn-sw" class="tswitch" style="display:none" onclick="switchStudent()">Switch</button>
+  </div>
+  <div class="content">
+    <div class="learn-top">
+      <div style="font-size:13px;color:var(--sm);font-weight:600">Word <span id="learn-cur">1</span> of <span id="learn-total">4</span></div>
+      <div class="learn-lbl">Learn</div>
+    </div>
+    <div class="prog-wrap" style="margin-bottom:14px"><div class="prog-bar" id="learn-prog" style="width:0%"></div></div>
+    <div id="learn-card" class="word-card">
+      <div class="wc-top" id="wc-top">
+        <button class="tts-btn" onclick="speakNow()">🔊</button>
+        <span id="lc-em" class="wc-em">🐄</span>
+      </div>
+      <div class="wc-bot">
+        <div class="wc-word" id="lc-word">Cow</div>
+        <div class="wc-def" id="lc-def">A big farm animal that gives us milk.</div>
+        <div class="wc-sent" id="lc-sent">The cow is eating grass in the field.</div>
+      </div>
+    </div>
+  </div>
+  <div class="actionbar" style="background:rgba(255,255,255,.95);border-top:1px solid rgba(0,0,0,.06)">
+    <div class="card-nav">
+      <button class="card-nav-btn" id="learn-prev" onclick="learnPrev()">← Back</button>
+      <button class="card-nav-btn" id="learn-next" onclick="learnNext()" style="color:#fff">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRACTICE -->
+<div id="practice" class="screen">
+  <div class="topbar" id="practice-tb">
+    <button class="tback" onclick="SS('lessons')">‹</button>
+    <div class="tlogo">Practice</div>
+    <button id="practice-sw" class="tswitch" style="display:none" onclick="switchStudent()">Switch</button>
+  </div>
+  <div class="content">
+    <div class="q-meta"><div id="pr-pill" class="q-pill q-match">Word Match</div><div id="pr-num" class="q-num">1 / 12</div></div>
+    <div class="prog-wrap" style="margin-bottom:13px"><div class="prog-bar" id="pr-prog" style="width:0%;background:#7C3AED"></div></div>
+    <div id="pr-card" class="q-card"></div>
+    <div id="pr-msg" class="q-msg"></div>
+    <div id="pr-hint" style="display:none;margin-top:6px"><button class="hint-btn" onclick="spellHint()">💡 Hint: show first letter</button></div>
+  </div>
+  <div class="actionbar">
+    <button id="pr-next" class="btn btn-purple" onclick="prNext()" disabled>Next →</button>
+  </div>
+</div>
+
+<!-- TEST — no back button intentionally -->
+<div id="test" class="screen">
+  <div class="topbar" id="test-tb" style="background:linear-gradient(135deg,#0F7B8C,#1A9BAD)">
+    <div style="width:28px"></div><!-- spacer where back btn would be -->
+    <div class="tlogo" style="flex:1;text-align:center">⭐ Mastery Test</div>
+    <div id="test-qcount" style="font-size:13px;font-weight:700;color:rgba(255,255,255,.8)"></div>
+  </div>
+  <div class="content">
+    <div class="q-meta"><div id="t-pill" class="q-pill q-match">Word Match</div><div id="t-num" class="q-num">1 / 6</div></div>
+    <div class="prog-wrap" style="margin-bottom:13px"><div class="prog-bar" id="t-prog" style="width:0%;background:#0F7B8C"></div></div>
+    <div id="t-card" class="q-card"></div>
+    <div id="t-msg" class="q-msg"></div>
+    <div id="t-hint-wrap" style="display:none;margin-top:4px">
+      <p style="font-size:12px;color:var(--sm);text-align:center">No hints in the test — you can do it! 💪</p>
+    </div>
+  </div>
+  <!-- Spell-only submit — hidden for match/fill -->
+  <div class="actionbar" id="t-action" style="display:none">
+    <button id="t-submit" class="btn btn-teal" onclick="testSpellSubmit()">Check Answer ✓</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="screen">
+  <div class="res-wrap">
+    <span id="res-em" class="res-em">🏆</span>
+    <div class="res-score" id="res-score">5/6</div>
+    <div class="res-lbl" id="res-lbl">Stage Test</div>
+    <div class="res-stars" id="res-stars">★★★</div>
+    <div class="res-title" id="res-title">Well done!</div>
+    <div class="res-sub" id="res-sub">You passed!</div>
+    <div id="res-missed" class="res-missed" style="display:none">
+      <div class="res-missed-title">Words to review</div>
+      <div id="res-missed-list"></div>
+    </div>
+    <button class="btn-res p" id="res-btn1" onclick="resAction1()">→</button>
+    <button class="btn-res g" id="res-btn2" onclick="resAction2()">←</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- PWA INSTALL BANNER (Android/Chrome) -->
+<div id="install-banner">
+  <div class="ib-icon">📚</div>
+  <div class="ib-text">
+    <div class="ib-title">Install EduLab</div>
+    <div class="ib-sub">Works offline · No internet needed in class</div>
+  </div>
+  <button class="ib-install" onclick="pwaInstall()">Install</button>
+  <button class="ib-close" onclick="pwaDismiss()">✕</button>
+</div>
+
+<!-- iOS INSTALL TIP (Safari) -->
+<div id="ios-tip">
+  <p>To install EduLab on this iPad/iPhone:<br>Tap <strong>Share ⬆</strong> then <strong>"Add to Home Screen"</strong></p>
+  <button class="ib-close2" onclick="document.getElementById('ios-tip').classList.remove('show')">Got it</button>
+</div>
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════
+// COLOUR TABLE — one per animal
+// ════════════════════════════════════════
+var C={
+  cow:          {bg:'linear-gradient(135deg,#FF8C42,#FF6B35)',wc:'#7C2D12'},
+  goat:         {bg:'linear-gradient(135deg,#A855F7,#7C3AED)',wc:'#4C1D95'},
+  chicken:      {bg:'linear-gradient(135deg,#FBBF24,#F59E0B)',wc:'#78350F'},
+  pig:          {bg:'linear-gradient(135deg,#F472B6,#EC4899)',wc:'#831843'},
+  sheep:        {bg:'linear-gradient(135deg,#60A5FA,#3B82F6)',wc:'#1E3A8A'},
+  dog:          {bg:'linear-gradient(135deg,#34D399,#059669)',wc:'#064E3B'},
+  cat:          {bg:'linear-gradient(135deg,#C084FC,#9333EA)',wc:'#3B0764'},
+  duck:         {bg:'linear-gradient(135deg,#2DD4BF,#0D9488)',wc:'#134E4A'},
+  lion:         {bg:'linear-gradient(135deg,#FCD34D,#F59E0B)',wc:'#78350F'},
+  tiger:        {bg:'linear-gradient(135deg,#FB923C,#DC2626)',wc:'#450A0A'},
+  zebra:        {bg:'linear-gradient(135deg,#9CA3AF,#4B5563)',wc:'#111827'},
+  hippo:        {bg:'linear-gradient(135deg,#818CF8,#4F46E5)',wc:'#1E1B4B'},
+  parrot:       {bg:'linear-gradient(135deg,#34D399,#2563EB)',wc:'#1E3A8A'},
+  monkey:       {bg:'linear-gradient(135deg,#FCA5A5,#EF4444)',wc:'#450A0A'},
+  giraffe:      {bg:'linear-gradient(135deg,#FDBA74,#D97706)',wc:'#451A03'},
+  elephant:     {bg:'linear-gradient(135deg,#94A3B8,#475569)',wc:'#0F172A'},
+  crocodile:    {bg:'linear-gradient(135deg,#4ADE80,#16A34A)',wc:'#052E16'},
+  kangaroo:     {bg:'linear-gradient(135deg,#FCA5A5,#E11D48)',wc:'#4C0519'},
+  rhinoceros:   {bg:'linear-gradient(135deg,#D1D5DB,#6B7280)',wc:'#111827'},
+  cheetah:      {bg:'linear-gradient(135deg,#FDE68A,#CA8A04)',wc:'#422006'},
+  prayingMantis:{bg:'linear-gradient(135deg,#6EE7B7,#059669)',wc:'#052E16'},
+  chameleon:    {bg:'linear-gradient(135deg,#C084FC,#0D9488)',wc:'#134E4A'},
+  // ── MY BODY ──
+  eye:      {bg:'linear-gradient(135deg,#38BDF8,#0EA5E9)',wc:'#0C4A6E'},ear:{bg:'linear-gradient(135deg,#F472B6,#EC4899)',wc:'#831843'},
+  nose:     {bg:'linear-gradient(135deg,#FB923C,#EA580C)',wc:'#431407'},mouth:{bg:'linear-gradient(135deg,#F43F5E,#E11D48)',wc:'#4C0519'},
+  hand:     {bg:'linear-gradient(135deg,#FBBF24,#F59E0B)',wc:'#78350F'},foot:{bg:'linear-gradient(135deg,#60A5FA,#3B82F6)',wc:'#1E3A8A'},
+  head:     {bg:'linear-gradient(135deg,#A855F7,#7C3AED)',wc:'#3B0764'},hair:{bg:'linear-gradient(135deg,#D97706,#B45309)',wc:'#451A03'},
+  neck:     {bg:'linear-gradient(135deg,#2DD4BF,#0D9488)',wc:'#134E4A'},arm:{bg:'linear-gradient(135deg,#4ADE80,#16A34A)',wc:'#052E16'},
+  leg:      {bg:'linear-gradient(135deg,#38BDF8,#2563EB)',wc:'#1E3A8A'},lip:{bg:'linear-gradient(135deg,#FB7185,#E11D48)',wc:'#4C0519'},
+  elbow:    {bg:'linear-gradient(135deg,#FCD34D,#D97706)',wc:'#451A03'},cheek:{bg:'linear-gradient(135deg,#FBCFE8,#EC4899)',wc:'#831843'},
+  ankle:    {bg:'linear-gradient(135deg,#93C5FD,#3B82F6)',wc:'#1E3A8A'},thumb:{bg:'linear-gradient(135deg,#6EE7B7,#059669)',wc:'#064E3B'},
+  finger:   {bg:'linear-gradient(135deg,#67E8F9,#0891B2)',wc:'#164E63'},shoulder:{bg:'linear-gradient(135deg,#818CF8,#4F46E5)',wc:'#1E1B4B'},
+  stomach:  {bg:'linear-gradient(135deg,#FDBA74,#EA580C)',wc:'#431407'},forehead:{bg:'linear-gradient(135deg,#C084FC,#7C3AED)',wc:'#3B0764'},
+  eyelid:   {bg:'linear-gradient(135deg,#BAE6FD,#0284C7)',wc:'#0C4A6E'},nostril:{bg:'linear-gradient(135deg,#99F6E4,#0D9488)',wc:'#134E4A'},
+  skeleton: {bg:'linear-gradient(135deg,#D1D5DB,#6B7280)',wc:'#111827'},knuckle:{bg:'linear-gradient(135deg,#D97706,#92400E)',wc:'#451A03'},
+  // ── FOOD ──
+  rice:     {bg:'linear-gradient(135deg,#FEF3C7,#F59E0B)',wc:'#78350F'},egg:{bg:'linear-gradient(135deg,#FEF08A,#EAB308)',wc:'#713F12'},
+  yam:      {bg:'linear-gradient(135deg,#7C5230,#4A2810)',wc:'#FFDFC0',nc:'#5C3A1A'},fish:{bg:'linear-gradient(135deg,#22D3EE,#0891B2)',wc:'#164E63'},
+  milk:     {bg:'linear-gradient(135deg,#BAE6FD,#3B82F6)',wc:'#1E3A8A'},soup:{bg:'linear-gradient(135deg,#FB923C,#DC2626)',wc:'#450A0A'},
+  meat:     {bg:'linear-gradient(135deg,#FCA5A5,#B91C1C)',wc:'#450A0A'},bread:{bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#451A03'},
+  mango:    {bg:'linear-gradient(135deg,#FDE68A,#F59E0B)',wc:'#78350F'},orange:{bg:'linear-gradient(135deg,#FED7AA,#EA580C)',wc:'#431407'},
+  banana:   {bg:'linear-gradient(135deg,#FEF08A,#CA8A04)',wc:'#422006'},onion:{bg:'linear-gradient(135deg,#DDD6FE,#7C3AED)',wc:'#3B0764'},
+  tomato:   {bg:'linear-gradient(135deg,#FCA5A5,#DC2626)',wc:'#450A0A'},carrot:{bg:'linear-gradient(135deg,#FDBA74,#EA580C)',wc:'#431407'},
+  potato:   {bg:'linear-gradient(135deg,#D97706,#78350F)',wc:'#451A03'},pepper:{bg:'linear-gradient(135deg,#F87171,#B91C1C)',wc:'#450A0A'},
+  pineapple:{bg:'linear-gradient(135deg,#FEF08A,#65A30D)',wc:'#365314'},plantain:{bg:'linear-gradient(135deg,#BEF264,#65A30D)',wc:'#365314'},
+  coconut:  {bg:'linear-gradient(135deg,#D97706,#78350F)',wc:'#451A03'},cassava:{bg:'linear-gradient(135deg,#FEF3C7,#78350F)',wc:'#451A03'},
+  avocado:  {bg:'linear-gradient(135deg,#86EFAC,#15803D)',wc:'#052E16'},biscuit:{bg:'linear-gradient(135deg,#FEF3C7,#D97706)',wc:'#451A03'},
+  groundnut:{bg:'linear-gradient(135deg,#D97706,#92400E)',wc:'#451A03'},watermelon:{bg:'linear-gradient(135deg,#86EFAC,#DC2626)',wc:'#450A0A'},
+  // ── COLOURS ──
+  red:      {bg:'linear-gradient(135deg,#FF3333,#CC0000)',wc:'#7F0000'},
+  blue:     {bg:'linear-gradient(135deg,#3399FF,#0055CC)',wc:'#002B66'},
+  pink:     {bg:'linear-gradient(135deg,#FF66BB,#CC0077)',wc:'#660038'},
+  gold:     {bg:'linear-gradient(135deg,#FFD700,#CC9900)',wc:'#5C3D00'},
+  green:    {bg:'linear-gradient(135deg,#33CC33,#007700)',wc:'#003A00'},
+  black:    {bg:'linear-gradient(135deg,#4A4A4A,#111111)',wc:'#EEEEEE',nc:'#2D2D2D'},
+  white:    {bg:'linear-gradient(135deg,#F2F2F2,#C8C8C8)',wc:'#2D2D2D',nc:'#6B7280'},
+  brown:    {bg:'linear-gradient(135deg,#8B4513,#5C2E0A)',wc:'#FFDDCC',nc:'#5C2E0A'},
+  purple:   {bg:'linear-gradient(135deg,#9933FF,#6600BB)',wc:'#E8CCFF',nc:'#4B0082'},
+  silver:   {bg:'linear-gradient(135deg,#D0D0D0,#A0A0A0)',wc:'#2D2D2D',nc:'#6B7280'},
+  // ── SHAPES ──
+  oval:     {bg:'linear-gradient(135deg,#C084FC,#7C3AED)',wc:'#3B0764'},star:{bg:'linear-gradient(135deg,#FDE68A,#CA8A04)',wc:'#422006'},
+  heart:    {bg:'linear-gradient(135deg,#FDA4AF,#E11D48)',wc:'#4C0519'},cube:{bg:'linear-gradient(135deg,#93C5FD,#1D4ED8)',wc:'#1E3A8A'},
+  circle:   {bg:'linear-gradient(135deg,#60A5FA,#2563EB)',wc:'#1E3A8A'},square:{bg:'linear-gradient(135deg,#4ADE80,#15803D)',wc:'#052E16'},
+  arrow:    {bg:'linear-gradient(135deg,#FDBA74,#EA580C)',wc:'#431407'},triangle:{bg:'linear-gradient(135deg,#A78BFA,#4F46E5)',wc:'#1E1B4B'},
+  rectangle:{bg:'linear-gradient(135deg,#67E8F9,#0D9488)',wc:'#134E4A'},diamond:{bg:'linear-gradient(135deg,#A5F3FC,#0891B2)',wc:'#164E63'},
+  hexagon:  {bg:'linear-gradient(135deg,#818CF8,#3730A3)',wc:'#1E1B4B'},pentagon:{bg:'linear-gradient(135deg,#5EEAD4,#0D9488)',wc:'#134E4A'},
+  cylinder: {bg:'linear-gradient(135deg,#93C5FD,#1D4ED8)',wc:'#1E3A8A'},pyramid:{bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#451A03'}
+};
+function wc(key){return C[key]||{bg:'linear-gradient(135deg,#60A5FA,#3B82F6)',wc:'#1E3A8A'};}
+
+// ════════════════════════════════════════
+// LESSON DATA — staged progression
+// Each stage: words get progressively longer / harder to spell
+// ════════════════════════════════════════
+var WORDS={
+  cow:          {word:'Cow',          emoji:'🐄',def:'A big farm animal that gives us milk.',                                  sentence:'The cow is eating grass in the field.',                            blank:'The _____ gives us fresh milk every morning.',          spellAs:'cow'},
+  goat:         {word:'Goat',         emoji:'🐐',def:'A farm animal with horns and a short tail.',                            sentence:'Mama bought a goat from the market.',                              blank:'Our _____ makes a loud "baa" sound.',                   spellAs:'goat'},
+  chicken:      {word:'Chicken',      emoji:'🐔',def:'A farm bird with wings that lays eggs.',                                sentence:'The chicken laid three eggs this morning.',                         blank:'We found two eggs under the _____.',                    spellAs:'chicken'},
+  pig:          {word:'Pig',          emoji:'🐷',def:'A pink farm animal with a curly tail.',                                 sentence:'The pig rolled in the mud to stay cool.',                          blank:'The _____ has a round pink nose and a curly tail.',    spellAs:'pig'},
+  sheep:        {word:'Sheep',        emoji:'🐑',def:'A woolly farm animal that gives us wool.',                              sentence:'The sheep has fluffy white wool on its body.',                     blank:"The farmer cut the _____'s wool to make clothing.",    spellAs:'sheep'},
+  dog:          {word:'Dog',          emoji:'🐶',def:'A friendly animal that guards the farm.',                               sentence:"The farmer's dog keeps all the animals safe.",                     blank:'Our farm _____ barks when strangers come near.',        spellAs:'dog'},
+  cat:          {word:'Cat',          emoji:'🐱',def:'A small furry animal that catches mice.',                               sentence:'The cat sleeps near the barn to catch mice.',                      blank:'The _____ hid behind the barn waiting for a mouse.',   spellAs:'cat'},
+  duck:         {word:'Duck',         emoji:'🦆',def:'A farm bird that swims and says "quack".',                              sentence:'The duck walked to the pond and jumped in.',                       blank:'A _____ says "quack" and loves to swim in water.',     spellAs:'duck'},
+  lion:         {word:'Lion',         emoji:'🦁',def:'A large wild cat called the king of the jungle.',                      sentence:'The lion let out a loud roar that shook the ground.',              blank:'The _____ is known as the king of all animals.',       spellAs:'lion'},
+  tiger:        {word:'Tiger',        emoji:'🐯',def:'A large wild cat with orange fur and black stripes.',                  sentence:'The tiger crept quietly through the tall grass.',                  blank:'A _____ has orange and black stripes on its body.',    spellAs:'tiger'},
+  zebra:        {word:'Zebra',        emoji:'🦓',def:'A horse-like animal with black and white stripes.',                    sentence:'The zebra ran across the open plain.',                             blank:'A _____ looks like a horse but has black and white stripes.',spellAs:'zebra'},
+  hippo:        {word:'Hippo',        emoji:'🦛',def:'A very large animal that lives near rivers.',                          sentence:'The hippo opened its huge mouth wide in the water.',               blank:'A _____ spends most of the day in the river.',         spellAs:'hippo'},
+  parrot:       {word:'Parrot',       emoji:'🦜',def:'A colourful bird that can copy words people say.',                     sentence:'Our parrot keeps saying "Good morning!" every day.',               blank:'A _____ is a colourful bird that can talk.',           spellAs:'parrot'},
+  monkey:       {word:'Monkey',       emoji:'🐒',def:'A clever animal with a long tail that swings in trees.',               sentence:'The monkey swung from branch to branch in the forest.',            blank:'The _____ used its tail to swing through the trees.',  spellAs:'monkey'},
+  giraffe:      {word:'Giraffe',      emoji:'🦒',def:'The tallest animal, with a very long neck.',                           sentence:'The giraffe reached high into the tree to eat the leaves.',        blank:'A _____ uses its long neck to eat leaves from tall trees.',spellAs:'giraffe'},
+  elephant:     {word:'Elephant',     emoji:'🐘',def:'The largest land animal, with a long trunk and big ears.',             sentence:'The elephant used its trunk to drink water from the river.',       blank:'The _____ is the biggest animal that lives on land.',  spellAs:'elephant'},
+  crocodile:    {word:'Crocodile',    emoji:'🐊',def:'A large reptile with sharp teeth that lives in rivers.',               sentence:'The crocodile lay still in the water, watching everything.',       blank:'A _____ has very sharp teeth and a long scaly body.', spellAs:'crocodile'},
+  kangaroo:     {word:'Kangaroo',     emoji:'🦘',def:'An Australian animal that hops and carries its baby in a pouch.',     sentence:"The baby kangaroo peeped out from its mother's warm pouch.",       blank:'A _____ carries its baby in a pouch on its belly.',   spellAs:'kangaroo'},
+  rhinoceros:   {word:'Rhinoceros',   emoji:'🦏',def:'A large heavy animal with a big horn on its nose.',                   sentence:'The rhinoceros charged and scared the other animals.',             blank:'A _____ has a large horn on the top of its nose.',     spellAs:'rhinoceros'},
+  cheetah:      {word:'Cheetah',      emoji:'🐆',def:'The fastest land animal, covered in black spots.',                    sentence:'The cheetah sprinted after the deer and caught it.',               blank:'A _____ can run faster than any other animal on land.',spellAs:'cheetah'},
+  prayingMantis:{word:'Praying Mantis',emoji:'🦗',def:'An insect that holds its front legs up like it is praying.',        sentence:'The praying mantis sat perfectly still on the leaf.',              blank:'A _____ _____ holds its front legs up like it is praying.',spellAs:'prayingmantis',spellDisplay:['praying','mantis']},
+  chameleon:    {word:'Chameleon',    emoji:'🦎',def:'A lizard that can change the colour of its skin.',                    sentence:'The chameleon turned brown to blend in with the branch.',          blank:'A _____ can change colour to hide from other animals.',spellAs:'chameleon'},
+  // ══ MY BODY ══
+  eye:      {word:'Eye',      emoji:'👁️', def:'The part of your face that you use to see.',              sentence:'She opened her eye wide to read the tiny writing.',    blank:'Use your _____ to look at the blackboard.',          spellAs:'eye'},
+  ear:      {word:'Ear',      emoji:'👂', def:'The part of your head that you use to hear.',              sentence:'He put his hand over his ear to block the noise.',     blank:'She whispered into my _____ quietly.',               spellAs:'ear'},
+  nose:     {word:'Nose',     emoji:'👃', def:'The part of your face that you use to smell.',             sentence:'The baby has a tiny button nose.',                      blank:'Blow your _____ into the tissue.',                   spellAs:'nose'},
+  mouth:    {word:'Mouth',    emoji:'👄', def:'The opening in your face used for eating and talking.',   sentence:'Open your mouth wide and say "aah" for the doctor.',   blank:'Brush the teeth inside your _____.',                 spellAs:'mouth'},
+  hand:     {word:'Hand',     emoji:'🤚', def:'The part at the end of your arm with five fingers.',       sentence:'Wash your hand before you eat your food.',             blank:'She raised her _____ to answer the question.',       spellAs:'hand'},
+  foot:     {word:'Foot',     emoji:'🦶', def:'The part at the end of your leg that you walk on.',        sentence:'He took off his shoe and showed his foot.',            blank:'Put your right _____ forward first.',                spellAs:'foot'},
+  head:     {word:'Head',     emoji:'🧠', def:'The round part at the very top of your body.',             sentence:'She nodded her head to say yes.',                       blank:'Put your _____ down on the desk.',                   spellAs:'head'},
+  hair:     {word:'Hair',     emoji:'💇', def:'The thin strands that grow on top of your head.',          sentence:'Her hair is long, black, and beautiful.',               blank:'Comb your _____ before you go to school.',           spellAs:'hair'},
+  neck:     {word:'Neck',     emoji:'🦒', def:'The part that joins your head to your shoulders.',          sentence:'She wore a beaded necklace around her neck.',           blank:'The giraffe has a very long _____.',                 spellAs:'neck'},
+  arm:      {word:'Arm',      emoji:'💪', def:'The long body part from your shoulder to your hand.',       sentence:'He raised his arm to ask a question in class.',        blank:'She carried the baby on her _____ all day.',         spellAs:'arm'},
+  leg:      {word:'Leg',      emoji:'🦵', def:'The long body part you use to walk and run.',               sentence:'She hurt her leg when she fell on the playground.',    blank:'Stand on one _____ and count to ten.',               spellAs:'leg'},
+  lip:      {word:'Lip',      emoji:'💄', def:'One of the two soft edges around your mouth.',              sentence:'She pressed her lip together to stop herself laughing.',blank:'She smiled and bit her lower _____ shyly.',          spellAs:'lip'},
+  elbow:    {word:'Elbow',    emoji:'🦾', def:'The joint in the middle of your arm where it bends.',       sentence:'He knocked his elbow hard on the edge of the table.', blank:'Do not put your _____ on the dining table.',         spellAs:'elbow'},
+  cheek:    {word:'Cheek',    emoji:'😊', def:'The soft part of your face on either side of your nose.',   sentence:'Grandma pinched his cheek and laughed at him.',        blank:'She blushed and her _____ turned bright red.',       spellAs:'cheek'},
+  ankle:    {word:'Ankle',    emoji:'🦶', def:'The joint that connects your foot to your leg.',             sentence:'She twisted her ankle while running in the field.',    blank:'She sprained her _____ and had to rest for days.',   spellAs:'ankle'},
+  thumb:    {word:'Thumb',    emoji:'👍', def:'The short thick finger on the side of your hand.',           sentence:'He gave a thumbs up with his thumb.',                  blank:'She pressed her _____ on the fingerprint reader.',   spellAs:'thumb'},
+  finger:   {word:'Finger',   emoji:'☝️', def:'One of the five thin parts at the end of your hand.',       sentence:'She pointed her finger at the writing on the board.',  blank:'He wore a gold ring on his _____ at the ceremony.',  spellAs:'finger'},
+  shoulder: {word:'Shoulder', emoji:'🤷', def:'The part of your body at the very top of your arm.',         sentence:'He put his arm around her shoulder kindly.',           blank:'She carried the heavy bag on her _____ all day.',    spellAs:'shoulder'},
+  stomach:  {word:'Stomach',  emoji:'🫃', def:'The part inside your body that digests your food.',          sentence:'My stomach is growling loudly because I am hungry.',   blank:'She held her _____ after eating too much rice.',     spellAs:'stomach'},
+  forehead: {word:'Forehead', emoji:'😅', def:'The flat part of your face above your eyebrows.',            sentence:'She wiped the sweat from her forehead after running.', blank:'He pressed a cool cloth on his warm _____.',         spellAs:'forehead'},
+  eyelid:   {word:'Eyelid',   emoji:'😴', def:'The thin skin that covers and protects your eye.',           sentence:'She blinked her eyelid slowly in the bright sunlight.',blank:'She felt her _____ getting very heavy and sleepy.',  spellAs:'eyelid'},
+  nostril:  {word:'Nostril',  emoji:'👃', def:'One of the two holes in your nose you breathe through.',     sentence:'He wrinkled his nostril at the very strong smell.',    blank:'Air enters your body through each _____.',           spellAs:'nostril'},
+  skeleton: {word:'Skeleton', emoji:'💀', def:'All the bones inside your body together.',                   sentence:'The human skeleton has over two hundred bones.',        blank:'Your _____ is the frame that holds your body up.',   spellAs:'skeleton'},
+  knuckle:  {word:'Knuckle',  emoji:'✊', def:'The joint at the base of each finger on your hand.',         sentence:'He knocked politely on the door with his knuckle.',   blank:'She cracked her _____ before she started writing.',  spellAs:'knuckle'},
+  // ══ FOOD & DRINKS ══
+  rice:     {word:'Rice',     emoji:'🍚', def:'Small white grains cooked as a main meal.',                  sentence:'Mama cooked jollof rice and chicken for Sunday lunch.', blank:'She served _____ and stew on every plate.',         spellAs:'rice'},
+  egg:      {word:'Egg',      emoji:'🥚', def:'An oval food from a hen with a shell.',                      sentence:'She fried an egg with tomato for breakfast.',           blank:'Boil the _____ for five minutes then peel it.',      spellAs:'egg'},
+  yam:      {word:'Yam',      emoji:'🌰', def:'A large brown root vegetable, used to make pounded yam.',  sentence:'We had pounded yam and egusi soup for dinner.',         blank:'She pounded the _____ into a very smooth paste.',    spellAs:'yam'},
+  fish:     {word:'Fish',     emoji:'🐟', def:'A water animal that we cook and eat.',                        sentence:'Daddy bought fresh fish from the market this morning.', blank:'She used fresh _____ to cook the pepper soup.',      spellAs:'fish'},
+  milk:     {word:'Milk',     emoji:'🥛', def:'A white liquid drink that comes from a cow.',                  sentence:'Pour some cold milk into your cup of Milo.',           blank:'She drinks a glass of _____ every morning.',         spellAs:'milk'},
+  soup:     {word:'Soup',     emoji:'🍲', def:'A warm liquid food with vegetables and meat inside.',         sentence:'Grandma makes the best egusi soup in our whole family.',blank:'She added palm oil to the _____ for colour.',        spellAs:'soup'},
+  meat:     {word:'Meat',     emoji:'🥩', def:'The flesh of an animal that is cooked and eaten.',            sentence:'He picked out the meat from his bowl of soup.',        blank:'She fried the _____ in a hot pot of oil.',           spellAs:'meat'},
+  bread:    {word:'Bread',    emoji:'🍞', def:'A baked food made from flour eaten at breakfast.',            sentence:'She spread groundnut paste on her slice of bread.',    blank:'He bought a fresh loaf of _____ from the bakery.',   spellAs:'bread'},
+  mango:    {word:'Mango',    emoji:'🥭', def:'A sweet yellow tropical fruit with a big seed inside.',       sentence:'She bit into a big ripe juicy mango.',                 blank:'The _____ tree in our compound gives us shade.',     spellAs:'mango'},
+  orange:   {word:'Orange',   emoji:'🍊', def:'A round citrus fruit with a bright orange peel.',             sentence:'Peel the orange before you eat it.',                   blank:'She squeezed three _____ fruits to make juice.',     spellAs:'orange'},
+  banana:   {word:'Banana',   emoji:'🍌', def:'A long yellow curved fruit with a sweet soft inside.',        sentence:'He peeled the banana and ate it slowly.',              blank:'She put a _____ in her school bag as a snack.',      spellAs:'banana'},
+  onion:    {word:'Onion',    emoji:'🧅', def:'A round vegetable with layers and a sharp strong smell.',     sentence:'Cutting the onion made her eyes fill with tears.',     blank:'She fried _____ and tomato together in the pot.',    spellAs:'onion'},
+  tomato:   {word:'Tomato',   emoji:'🍅', def:'A round red fruit used in soups and Nigerian stews.',         sentence:'She added blended tomato to the big pot of stew.',    blank:'The _____ made the stew turn bright red.',           spellAs:'tomato'},
+  carrot:   {word:'Carrot',   emoji:'🥕', def:'An orange vegetable that grows underground.',                 sentence:'The rabbit loves to eat a crunchy fresh carrot.',      blank:'She grated the _____ to add to the salad.',         spellAs:'carrot'},
+  potato:   {word:'Potato',   emoji:'🥔', def:'A round underground vegetable that is brown outside.',        sentence:'She peeled the potato to make crispy chips.',          blank:'He boiled the _____ and mashed it with butter.',     spellAs:'potato'},
+  pepper:   {word:'Pepper',   emoji:'🌶️', def:'A hot vegetable used to spice up food.',                    sentence:'Too much pepper makes the soup too hot to eat.',       blank:'Add a little _____ to give the soup some heat.',     spellAs:'pepper'},
+  pineapple:{word:'Pineapple',emoji:'🍍', def:'A large tropical fruit with a spiky top and sweet inside.',  sentence:'She cut the pineapple into sweet juicy slices.',       blank:'She peeled the _____ and shared it with friends.',   spellAs:'pineapple'},
+  plantain: {word:'Plantain', emoji:'🍌', def:'A large banana-like fruit that is fried or boiled.',          sentence:'Fried plantain is her favourite after-school snack.',  blank:'She peeled the _____ and sliced it before frying.',  spellAs:'plantain'},
+  coconut:  {word:'Coconut',  emoji:'🥥', def:'A round fruit with a hard shell and white inside.',           sentence:'He cracked open the coconut and drank the cool water.',blank:'She grated the _____ to put into the rice dish.',    spellAs:'coconut'},
+  cassava:  {word:'Cassava',  emoji:'🌿', def:'A starchy root used to make garri and fufu.',                 sentence:'Grandma grated the cassava to make fresh garri.',      blank:'She dug up the _____ from the farm.',                spellAs:'cassava'},
+  avocado:  {word:'Avocado',  emoji:'🥑', def:'A pear-shaped fruit with green skin and creamy inside.',      sentence:'She spread ripe avocado on her slice of bread.',       blank:'The _____ is smooth and creamy when it is ripe.',    spellAs:'avocado'},
+  biscuit:  {word:'Biscuit',  emoji:'🍪', def:'A small flat crispy baked snack.',                            sentence:'He ate three biscuits with his afternoon tea.',         blank:'She dipped her _____ into her cup of hot cocoa.',    spellAs:'biscuit'},
+  groundnut:{word:'Groundnut',emoji:'🥜', def:'A small nut that grows in the ground, also called peanut.',  sentence:'She bought roasted groundnut from the roadside seller.',blank:'He crushed the _____ to make groundnut soup.',       spellAs:'groundnut'},
+  watermelon:{word:'Watermelon',emoji:'🍉',def:'A very large green fruit with sweet red inside.',            sentence:'We shared a cold watermelon together at the party.',   blank:'She cut the _____ into big slices for everyone.',    spellAs:'watermelon'},
+  // ══ COLOURS & SHAPES ══
+  red:      {word:'Red',      emoji:'🔴', def:'The bright warm colour of blood and fire.',                   sentence:'She wore a beautiful red dress to the party.',         blank:'The fire engine is painted _____ all over.',         spellAs:'red'},
+  blue:     {word:'Blue',     emoji:'🔵', def:'The cool colour of the sky and deep water.',                  sentence:'His favourite colour is a bright blue.',               blank:'The sky turns dark _____ at night.',                 spellAs:'blue'},
+  pink:     {word:'Pink',     emoji:'🩷', def:'A gentle colour made by mixing red and white.',               sentence:'Her bedroom walls are painted a soft pink.',           blank:'She coloured the flower petals _____ with her crayon.',spellAs:'pink'},
+  gold:     {word:'Gold',     emoji:'🌟', def:'A bright shiny yellow colour like a gold coin.',              sentence:'She wore a gold bracelet on her wrist to school.',     blank:'The trophy was painted shiny _____ all over.',       spellAs:'gold'},
+  green:    {word:'Green',    emoji:'🟢', def:'The colour of fresh leaves and grass.',                       sentence:'The frog is a bright shiny green colour.',             blank:'She coloured all the leaves _____ in her drawing.',  spellAs:'green'},
+  black:    {word:'Black',    emoji:'⚫', def:'The very dark colour of the night sky.',                      sentence:'He wrote his name with a black ink pen.',              blank:'The board in our classroom is painted _____.',       spellAs:'black'},
+  white:    {word:'White',    emoji:'⚪', def:'The lightest colour of all, like chalk or clouds.',            sentence:'She wore a clean white shirt to school today.',        blank:'She drew a _____ cloud in her blue sky picture.',    spellAs:'white'},
+  brown:    {word:'Brown',    emoji:'🟤', def:'The colour of wood, earth, and chocolate.',                   sentence:'The monkey has beautiful brown fur on its body.',       blank:'She painted the tree trunk a dark _____ colour.',    spellAs:'brown'},
+  purple:   {word:'Purple',   emoji:'🟣', def:'A rich colour made by mixing red and blue together.',         sentence:'The grapes hanging on the vine are a deep purple.',    blank:'She mixed red and blue paint to make _____.',        spellAs:'purple'},
+  silver:   {word:'Silver',   emoji:'🪙', def:'A shiny light grey colour like a metal coin.',                sentence:'She wore a silver ring on her finger.',                blank:'The spoon is made from shiny _____ metal.',          spellAs:'silver'},
+  oval:     {word:'Oval',     emoji:'🥚', def:'A shape like a stretched circle, the shape of an egg.',       sentence:'The mirror on the wall is an oval shape.',             blank:'A rugby ball is an _____ shape.',                    spellAs:'oval'},
+  star:     {word:'Star',     emoji:'⭐', def:'A shape with five points sticking outward.',                   sentence:'She drew a five-pointed gold star on her book.',       blank:'She cut a _____ shape from the yellow paper.',       spellAs:'star'},
+  heart:    {word:'Heart',    emoji:'❤️', def:'A shape with a dip at the top that stands for love.',         sentence:'She cut a red heart shape from red paper.',            blank:'She drew a _____ on the card for her mother.',       spellAs:'heart'},
+  cube:     {word:'Cube',     emoji:'🎲', def:'A solid shape with six equal square sides.',                  sentence:'A dice is a perfect cube shape.',                       blank:'She built a _____ from six square pieces of card.',  spellAs:'cube'},
+  circle:   {word:'Circle',   emoji:'⭕', def:'A perfectly round flat shape with no corners.',               sentence:'She drew a circle using a coin as a guide.',           blank:'The wheel of a bicycle is shaped like a _____.',     spellAs:'circle'},
+  square:   {word:'Square',   emoji:'🟥', def:'A flat shape with four equal sides and four corners.',        sentence:'The window pane is the shape of a square.',            blank:'A chessboard is made up of _____ shapes.',           spellAs:'square'},
+  arrow:    {word:'Arrow',    emoji:'➡️', def:'A shape with a point at one end showing direction.',         sentence:'The arrow on the road sign pointed to the right.',    blank:'Draw an _____ pointing to the correct answer.',      spellAs:'arrow'},
+  triangle: {word:'Triangle', emoji:'🔺', def:'A flat shape with exactly three sides and three corners.',    sentence:'A slice of pizza is shaped like a triangle.',          blank:'A _____ has three sides and three corners.',         spellAs:'triangle'},
+  rectangle:{word:'Rectangle',emoji:'🔲', def:'A flat shape with four sides where two are longer.',          sentence:'A classroom door is shaped like a rectangle.',         blank:'A _____ has two long sides and two short sides.',    spellAs:'rectangle'},
+  diamond:  {word:'Diamond',  emoji:'💎', def:'A square shape turned on its corner with four equal sides.',  sentence:'She drew a diamond shape for her kite.',               blank:'A kite is shaped like a _____.',                     spellAs:'diamond'},
+  hexagon:  {word:'Hexagon',  emoji:'🔷', def:'A flat shape with exactly six straight sides.',               sentence:'A beehive cell is the shape of a hexagon.',            blank:'A _____ has six sides — count them carefully.',      spellAs:'hexagon'},
+  pentagon: {word:'Pentagon', emoji:'⬠',  def:'A flat shape with exactly five straight sides.',               sentence:'She counted the five sides of the pentagon carefully.', blank:'A _____ has five sides and five corners.',           spellAs:'pentagon'},
+  cylinder: {word:'Cylinder', emoji:'🥫', def:'A solid shape with two circular ends and one curved side.',   sentence:'A tin of tomatoes is shaped like a cylinder.',         blank:'A _____ looks like a tin can standing upright.',     spellAs:'cylinder'},
+  pyramid:  {word:'Pyramid',  emoji:'🔺', def:'A solid shape with a flat base and triangular sides meeting at a point.',sentence:'The pyramids of Egypt are famous all over the world.',blank:'A _____ comes to a point at the very top.',       spellAs:'pyramid'}
+};
+
+// STAGES — ordered easy → hard within each class
+// Nursery: short familiar farm animals, 2 stages
+// Primary 1: wild animals, 3 stages (short → medium → long)
+// Primary 2: adds rhinoceros + cheetah as Stage 4
+// Primary 3: adds praying mantis + chameleon as Stage 5
+var STAGES={
+  'Nursery 1':[
+    {id:'n1-s1',label:'Stage 1 — Farm Friends',     words:['cow','pig','dog','cat'],     emoji:'🐄'},
+    {id:'n1-s2',label:'Stage 2 — More Farm Animals',words:['goat','duck','sheep','chicken'],emoji:'🐐'}
+  ],
+  'Nursery 2':[
+    {id:'n2-s1',label:'Stage 1 — Farm Friends',     words:['cow','pig','dog','cat'],     emoji:'🐄'},
+    {id:'n2-s2',label:'Stage 2 — More Farm Animals',words:['goat','duck','sheep','chicken'],emoji:'🐐'}
+  ],
+  'Primary 1':[
+    {id:'p1-s1',label:'Stage 1 — Big Cats & Stripes',words:['lion','tiger','zebra'],           emoji:'🦁'},
+    {id:'p1-s2',label:'Stage 2 — River & Sky',       words:['hippo','parrot','monkey','giraffe'],emoji:'🦛'},
+    {id:'p1-s3',label:'Stage 3 — Giant Animals',     words:['elephant','crocodile','kangaroo'],  emoji:'🐘'}
+  ],
+  'Primary 2':[
+    {id:'p2-s1',label:'Stage 1 — Big Cats & Stripes',words:['lion','tiger','zebra'],           emoji:'🦁'},
+    {id:'p2-s2',label:'Stage 2 — River & Sky',       words:['hippo','parrot','monkey','giraffe'],emoji:'🦛'},
+    {id:'p2-s3',label:'Stage 3 — Giant Animals',     words:['elephant','crocodile','kangaroo'],  emoji:'🐘'},
+    {id:'p2-s4',label:'Stage 4 — Speed & Power',     words:['rhinoceros','cheetah'],             emoji:'🦏'}
+  ],
+  'Primary 3':[
+    {id:'p3-s1',label:'Stage 1 — Big Cats & Stripes',words:['lion','tiger','zebra'],             emoji:'🦁'},
+    {id:'p3-s2',label:'Stage 2 — River & Sky',       words:['hippo','parrot','monkey','giraffe'],emoji:'🦛'},
+    {id:'p3-s3',label:'Stage 3 — Giant Animals',     words:['elephant','crocodile','kangaroo'],   emoji:'🐘'},
+    {id:'p3-s4',label:'Stage 4 — Speed & Power',     words:['rhinoceros','cheetah'],              emoji:'🦏'},
+    {id:'p3-s5',label:'Stage 5 — Hidden Animals',    words:['prayingMantis','chameleon'],         emoji:'🦗'}
+  ]
+};
+// P4-P6 get same as P3
+['Primary 4','Primary 5','Primary 6'].forEach(function(cl){
+  STAGES[cl]=STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('p3',cl.replace('Primary ','p').replace(' ',''))});});
+});
+
+// ════ UNIT 2: MY BODY ════
+var BODY_STAGES={
+  'Nursery 1':[{id:'b-n1-s1',label:'Stage 1 — Head & Face',    words:['eye','ear','nose','mouth'],emoji:'👁️'},
+               {id:'b-n1-s2',label:'Stage 2 — Hands & Feet',  words:['hand','foot','head','hair'],emoji:'🤚'}],
+  'Nursery 2':[{id:'b-n2-s1',label:'Stage 1 — Head & Face',    words:['eye','ear','nose','mouth'],emoji:'👁️'},
+               {id:'b-n2-s2',label:'Stage 2 — Hands & Feet',  words:['hand','foot','head','hair'],emoji:'🤚'}],
+  'Primary 1':[{id:'b-p1-s1',label:'Stage 1 — Simple Parts',    words:['neck','arm','leg','lip'],            emoji:'💪'},
+               {id:'b-p1-s2',label:'Stage 2 — Joints & Curves',words:['elbow','cheek','ankle','thumb'],      emoji:'🦾'},
+               {id:'b-p1-s3',label:'Stage 3 — Bigger Words',   words:['finger','shoulder','stomach','forehead'],emoji:'☝️'}],
+  'Primary 2':[{id:'b-p2-s1',label:'Stage 1 — Simple Parts',    words:['neck','arm','leg','lip'],            emoji:'💪'},
+               {id:'b-p2-s2',label:'Stage 2 — Joints & Curves',words:['elbow','cheek','ankle','thumb'],      emoji:'🦾'},
+               {id:'b-p2-s3',label:'Stage 3 — Bigger Words',   words:['finger','shoulder','stomach','forehead'],emoji:'☝️'},
+               {id:'b-p2-s4',label:'Stage 4 — Detailed Parts', words:['eyelid','nostril','eyelid','nostril'],emoji:'👁️'}],
+  'Primary 3':[{id:'b-p3-s1',label:'Stage 1 — Simple Parts',    words:['neck','arm','leg','lip'],            emoji:'💪'},
+               {id:'b-p3-s2',label:'Stage 2 — Joints & Curves',words:['elbow','cheek','ankle','thumb'],      emoji:'🦾'},
+               {id:'b-p3-s3',label:'Stage 3 — Bigger Words',   words:['finger','shoulder','stomach','forehead'],emoji:'☝️'},
+               {id:'b-p3-s4',label:'Stage 4 — Detailed Parts', words:['eyelid','nostril','eyelid','nostril'],emoji:'👁️'},
+               {id:'b-p3-s5',label:'Stage 5 — Expert Parts',   words:['skeleton','knuckle','skeleton','knuckle'],emoji:'💀'}]
+};
+['Primary 4','Primary 5','Primary 6'].forEach(function(cl){
+  BODY_STAGES[cl]=BODY_STAGES['Primary 3'].map(function(s){var p=cl.replace('Primary ','bp').replace(' ','');return Object.assign({},s,{id:s.id.replace('b-p3',p)});});
+});
+
+// ════ UNIT 3: FOOD & DRINKS ════
+var FOOD_STAGES={
+  'Nursery 1':[{id:'f-n1-s1',label:'Stage 1 — Nigerian Staples',words:['rice','egg','yam','fish'],         emoji:'🍚'},
+               {id:'f-n1-s2',label:'Stage 2 — More Foods',       words:['milk','soup','meat','bread'],      emoji:'🥛'}],
+  'Nursery 2':[{id:'f-n2-s1',label:'Stage 1 — Nigerian Staples',words:['rice','egg','yam','fish'],         emoji:'🍚'},
+               {id:'f-n2-s2',label:'Stage 2 — More Foods',       words:['milk','soup','meat','bread'],      emoji:'🥛'}],
+  'Primary 1':[{id:'f-p1-s1',label:'Stage 1 — Fruits & Veggies',words:['mango','orange','banana','onion'], emoji:'🥭'},
+               {id:'f-p1-s2',label:'Stage 2 — Market Produce',  words:['tomato','carrot','potato','pepper'],emoji:'🍅'},
+               {id:'f-p1-s3',label:'Stage 3 — Tropical Foods',  words:['pineapple','plantain','coconut','cassava'],emoji:'🍍'}],
+  'Primary 2':[{id:'f-p2-s1',label:'Stage 1 — Fruits & Veggies',words:['mango','orange','banana','onion'], emoji:'🥭'},
+               {id:'f-p2-s2',label:'Stage 2 — Market Produce',  words:['tomato','carrot','potato','pepper'],emoji:'🍅'},
+               {id:'f-p2-s3',label:'Stage 3 — Tropical Foods',  words:['pineapple','plantain','coconut','cassava'],emoji:'🍍'},
+               {id:'f-p2-s4',label:'Stage 4 — Special Foods',   words:['avocado','biscuit','avocado','biscuit'],emoji:'🥑'}],
+  'Primary 3':[{id:'f-p3-s1',label:'Stage 1 — Fruits & Veggies',words:['mango','orange','banana','onion'], emoji:'🥭'},
+               {id:'f-p3-s2',label:'Stage 2 — Market Produce',  words:['tomato','carrot','potato','pepper'],emoji:'🍅'},
+               {id:'f-p3-s3',label:'Stage 3 — Tropical Foods',  words:['pineapple','plantain','coconut','cassava'],emoji:'🍍'},
+               {id:'f-p3-s4',label:'Stage 4 — Special Foods',   words:['avocado','biscuit','avocado','biscuit'],emoji:'🥑'},
+               {id:'f-p3-s5',label:'Stage 5 — Long Words',      words:['groundnut','watermelon','groundnut','watermelon'],emoji:'🥜'}]
+};
+['Primary 4','Primary 5','Primary 6'].forEach(function(cl){
+  FOOD_STAGES[cl]=FOOD_STAGES['Primary 3'].map(function(s){var p='f-'+cl.replace('Primary ','p').replace(' ','');return Object.assign({},s,{id:s.id.replace('f-p3',p)});});
+});
+
+// ════ UNIT 4: COLOURS & SHAPES ════
+var COLOUR_STAGES={
+  'Nursery 1':[{id:'c-n1-s1',label:'Stage 1 — Warm Colours',    words:['red','pink','gold','brown'],        emoji:'🔴'},
+               {id:'c-n1-s2',label:'Stage 2 — Cool Colours',    words:['blue','green','black','white'],     emoji:'🔵'}],
+  'Nursery 2':[{id:'c-n2-s1',label:'Stage 1 — Warm Colours',    words:['red','pink','gold','brown'],        emoji:'🔴'},
+               {id:'c-n2-s2',label:'Stage 2 — Cool Colours',    words:['blue','green','black','white'],     emoji:'🔵'}],
+  'Primary 1':[{id:'c-p1-s1',label:'Stage 1 — Simple Shapes',   words:['oval','star','heart','cube'],       emoji:'⭐'},
+               {id:'c-p1-s2',label:'Stage 2 — More Shapes',     words:['circle','square','arrow','triangle'],emoji:'⭕'},
+               {id:'c-p1-s3',label:'Stage 3 — Long Names',      words:['rectangle','diamond','purple','silver'],emoji:'🔺'}],
+  'Primary 2':[{id:'c-p2-s1',label:'Stage 1 — Simple Shapes',   words:['oval','star','heart','cube'],       emoji:'⭐'},
+               {id:'c-p2-s2',label:'Stage 2 — More Shapes',     words:['circle','square','arrow','triangle'],emoji:'⭕'},
+               {id:'c-p2-s3',label:'Stage 3 — Long Names',      words:['rectangle','diamond','purple','silver'],emoji:'🔺'},
+               {id:'c-p2-s4',label:'Stage 4 — Many-Sided',      words:['hexagon','pentagon','hexagon','pentagon'],emoji:'🔷'}],
+  'Primary 3':[{id:'c-p3-s1',label:'Stage 1 — Simple Shapes',   words:['oval','star','heart','cube'],       emoji:'⭐'},
+               {id:'c-p3-s2',label:'Stage 2 — More Shapes',     words:['circle','square','arrow','triangle'],emoji:'⭕'},
+               {id:'c-p3-s3',label:'Stage 3 — Long Names',      words:['rectangle','diamond','purple','silver'],emoji:'🔺'},
+               {id:'c-p3-s4',label:'Stage 4 — Many-Sided',      words:['hexagon','pentagon','hexagon','pentagon'],emoji:'🔷'},
+               {id:'c-p3-s5',label:'Stage 5 — 3D Shapes',       words:['cylinder','pyramid','cylinder','pyramid'],emoji:'🥫'}]
+};
+['Primary 4','Primary 5','Primary 6'].forEach(function(cl){
+  COLOUR_STAGES[cl]=COLOUR_STAGES['Primary 3'].map(function(s){var p='c-'+cl.replace('Primary ','p').replace(' ','');return Object.assign({},s,{id:s.id.replace('c-p3',p)});});
+});
+
+// ════ UNITS — master list ════
+var UNITS=[
+  {key:'animals',title:'Animals Around Us',emoji:'🦁',stagesMap:STAGES},
+  {key:'body',   title:'My Body',           emoji:'🫀',stagesMap:BODY_STAGES},
+  {key:'food',   title:'Food & Drinks',     emoji:'🍎',stagesMap:FOOD_STAGES},
+  {key:'colours',title:'Colours & Shapes',  emoji:'🎨',stagesMap:COLOUR_STAGES}
+];
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+var DMODE='';
+var STU={name:'',classLabel:'',uid:''};
+var S={
+  unitKey:'animals',       // which unit is active
+  currentStages:[],        // resolved stage array for active unit + class
+  stageIdx:0,
+  learnIdx:0,
+  words:[],
+  practiceQ:[],practiceIdx:0,
+  testQ:[],testIdx:0,testAnswers:[]
+};
+var LK_MODE='el_mode',LK_STU='el_stu',LK_PROG='el_prog',LK_ROSTER='el_roster';
+function lg(k){try{return JSON.parse(localStorage.getItem(k))||null}catch(e){return null}}
+function ls(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function sk(){return STU.uid||STU.name}
+function prog(){var p=lg(LK_PROG)||{};return p[sk()]||{}}
+function saveProg(sid,data){var p=lg(LK_PROG)||{};if(!p[sk()])p[sk()]={};var prev=p[sk()][sid]||{};Object.assign(prev,data);p[sk()][sid]=prev;ls(LK_PROG,p);return prev;}
+function starsStr(n){var s='';for(var i=0;i<3;i++)s+=i<n?'★':'☆';return s;}
+function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+// Distractor pool: first try stage words; if <3 available fall back to all unit words
+function getDistractors(key,count){
+  var pool=S.words.filter(function(k){return k!==key;});
+  if(pool.length<count){
+    var seen={};seen[key]=true;
+    S.currentStages.forEach(function(st){st.words.forEach(function(w){if(!seen[w]){seen[w]=true;pool.push(w);}});});
+  }
+  return shuffle(pool).slice(0,count);
+}
+
+// ════════════════════════════════════════
+// SCREEN SWITCH
+// ════════════════════════════════════════
+function SS(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});var t=document.getElementById(id);if(t)t.classList.add('active');}
+
+// ════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════
+var _tt;
+function toast(m,d){var e=document.getElementById('toast');e.textContent=m;e.style.opacity='1';clearTimeout(_tt);_tt=setTimeout(function(){e.style.opacity='0';},d||1900);}
+
+// ════════════════════════════════════════
+// TTS — only on button tap
+// ════════════════════════════════════════
+function speakNow(){
+  if(!window.speechSynthesis)return;
+  var key=S.words[S.learnIdx];if(!key)return;
+  try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(WORDS[key].word);u.lang='en-NG';u.rate=0.82;u.pitch=1.1;window.speechSynthesis.speak(u);}catch(e){}
+}
+
+// ════════════════════════════════════════
+// AUDIO
+// ════════════════════════════════════════
+var actx;var AC=window.AudioContext||window.webkitAudioContext;
+function tone(f,t,d,v,dl){try{if(!actx)actx=new AC();var o=actx.createOscillator(),g=actx.createGain();o.connect(g);g.connect(actx.destination);o.type=t;o.frequency.value=f;var s=actx.currentTime+(dl||0);g.gain.setValueAtTime(v||.11,s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.start(s);o.stop(s+d);}catch(e){}}
+function sOk(){tone(520,'sine',.09,.18,0);tone(680,'sine',.09,.18,.1);tone(840,'sine',.12,.18,.2);}
+function sFail(){tone(220,'sawtooth',.1,.12,0);tone(180,'sawtooth',.1,.12,.08);}
+function sPass(){[440,550,660,880].forEach(function(f,i){tone(f,'sine',.18,.2,i*.09);});}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+function init(){
+  var m=lg(LK_MODE);if(!m){SS('splash');return;}
+  DMODE=m;
+  if(DMODE==='single'){var s=lg(LK_STU);if(!s||!s.name){startSetup();return;}STU=s;loadHome();}
+  else showRoster();
+}
+
+// ════════════════════════════════════════
+// SPLASH
+// ════════════════════════════════════════
+function pickMode(m){DMODE=m;ls(LK_MODE,m);if(m==='single')startSetup();else showRoster();}
+
+// ════════════════════════════════════════
+// SETUP
+// ════════════════════════════════════════
+var swStep=0,swName='',swClass='';
+function startSetup(){swStep=0;swName='';swClass='';['sw1','sw2','sw3'].forEach(function(id,i){document.getElementById(id).style.display=i===0?'':'none';});document.getElementById('sw-name').value='';swDots(0);document.getElementById('sw-next').disabled=true;SS('setup');}
+function swCheck(){document.getElementById('sw-next').disabled=!document.getElementById('sw-name').value.trim();}
+function swCls(btn,cls){document.querySelectorAll('.class-btn').forEach(function(b){b.classList.remove('sel');});btn.classList.add('sel');swClass=cls;document.getElementById('sw-next').disabled=false;}
+function swDots(a){for(var i=0;i<3;i++){var d=document.getElementById('dot'+i);if(d)d.classList.toggle('active',i===a);}}
+function swNext(){
+  if(swStep===0){swName=document.getElementById('sw-name').value.trim();if(!swName)return;document.getElementById('sw1').style.display='none';document.getElementById('sw2').style.display='';swStep=1;swDots(1);document.getElementById('sw-next').disabled=true;}
+  else if(swStep===1){if(!swClass)return;document.getElementById('sw2').style.display='none';document.getElementById('sw3').style.display='';swStep=2;swDots(2);document.getElementById('sw-next').textContent='Start Learning →';document.getElementById('sw-next').disabled=false;}
+  else{STU={name:swName,classLabel:swClass,uid:'su_'+swName.replace(/\s+/g,'_').toLowerCase()+'_'+Date.now()};ls(LK_STU,STU);loadHome();}
+}
+
+// ════════════════════════════════════════
+// ROSTER
+// ════════════════════════════════════════
+var ROSTER=[];
+function showRoster(){var r=lg(LK_ROSTER);if(!r||!r.length){r=[{name:'Amara Okafor',classLabel:'Primary 2',uid:'s_amara',emoji:'🌟'},{name:'Chidi Nwosu',classLabel:'Primary 1',uid:'s_chidi',emoji:'📚'},{name:'Fatima Bello',classLabel:'Primary 3',uid:'s_fatima',emoji:'🎯'},{name:'Emeka Eze',classLabel:'Nursery 2',uid:'s_emeka',emoji:'🌿'},{name:'Ngozi Adeyemi',classLabel:'Primary 2',uid:'s_ngozi',emoji:'💫'}];ls(LK_ROSTER,r);}ROSTER=r;renderRoster(r);SS('roster');}
+function renderRoster(list){var g=document.getElementById('roster-grid');g.innerHTML='';list.forEach(function(s){var d=document.createElement('div');d.className='rc';d.innerHTML='<div class="rc-av">'+(s.emoji||'👤')+'</div><div class="rc-name">'+s.name+'</div><div class="rc-cls">'+s.classLabel+'</div>';d.onclick=function(){STU=s;loadHome();};g.appendChild(d);});}
+function filterRoster(q){q=q.toLowerCase();renderRoster(ROSTER.filter(function(s){return s.name.toLowerCase().includes(q);}));}
+function switchStudent(){if(DMODE==='shared')showRoster();else startSetup();}
+
+// ════════════════════════════════════════
+// HOME
+// ════════════════════════════════════════
+function loadHome(){
+  document.getElementById('home-sn').textContent=STU.name.split(' ')[0];
+  document.getElementById('home-greet').textContent='Hello, '+STU.name.split(' ')[0]+'! Ready to learn? 🎉';
+  document.getElementById('home-cls').textContent=(STU.classLabel||'Lower Primary')+' · English';
+  if(DMODE==='shared')document.getElementById('home-sw').style.display='';
+  var p=prog();
+  var totalStages=0,doneStages=0;
+  UNITS.forEach(function(u){
+    var stgs=u.stagesMap[STU.classLabel]||u.stagesMap['Nursery 2']||[];
+    totalStages+=stgs.length;
+    doneStages+=stgs.filter(function(st){return p[st.id]&&p[st.id].passed;}).length;
+  });
+  var pct=totalStages>0?Math.round(doneStages/totalStages*100):0;
+  document.getElementById('eng-pb').style.width=pct+'%';
+  document.getElementById('eng-pt').textContent=doneStages+' of '+totalStages+' stages done';
+  document.getElementById('eng-pp').textContent=pct+'%';
+  SS('home');
+}
+
+// ════════════════════════════════════════
+// LESSON LIST (stage list)
+// ════════════════════════════════════════
+function openLessonList(){
+  if(DMODE==='shared')document.getElementById('lessons-sw').style.display='';
+  document.getElementById('lessons-bc').textContent='English › Vocabulary › '+STU.classLabel;
+  var p=prog();
+  var list=document.getElementById('lessons-list');list.innerHTML='';
+  UNITS.forEach(function(unit){
+    var stages=unit.stagesMap[STU.classLabel]||unit.stagesMap['Nursery 2']||[];
+    if(!stages.length)return;
+    var uh=document.createElement('div');uh.className='unit-lbl';
+    uh.textContent=unit.emoji+' '+unit.title;list.appendChild(uh);
+    stages.forEach(function(st,idx){
+      var sp=p[st.id];var passed=sp&&sp.passed;
+      var unlocked=idx===0||(p[stages[idx-1].id]&&p[stages[idx-1].id].passed);
+      var row=document.createElement('div');
+      row.className='stage-row'+(unlocked?'':' locked');
+      var bg=passed?'#E8F5E9':unlocked?'#E0F0FF':'#F0F3F6';
+      var fg=passed?'#2E7D32':unlocked?'#1565C0':'#6B7B8D';
+      var ic=passed?'✅':unlocked?st.emoji:'🔒';
+      var sub=[...new Set(st.words)].map(function(k){return WORDS[k]?WORDS[k].word:k;}).join(', ');
+      var statusTxt=passed?('Best: '+(sp.bestScore||0)+'%'):unlocked?'Tap to start':'Complete the previous stage first';
+      row.innerHTML='<div class="stage-ic" style="background:'+bg+';color:'+fg+'">'+ic+'</div>'
+        +'<div class="stage-meta"><div class="stage-name">'+st.label+'</div><div class="stage-words">'+sub+'</div>'
+        +'<div class="stage-words" style="margin-top:3px;color:'+fg+'">'+statusTxt+'</div></div>'
+        +(passed?'<div class="stage-stars">'+starsStr(sp.stars||0)+'</div>':'')
+        +'<span style="font-size:20px;color:#9CA3AF">›</span>';
+      if(unlocked)(function(ukey,sidx){row.onclick=function(){startStage(ukey,sidx);};})(unit.key,idx);
+      list.appendChild(row);
+    });
+  });
+  SS('lessons');
+}
+
+// ════════════════════════════════════════
+// START STAGE
+// ════════════════════════════════════════
+function startStage(unitKey,stageIdx){
+  var unit=UNITS.find(function(u){return u.key===unitKey;})||UNITS[0];
+  var stages=unit.stagesMap[STU.classLabel]||unit.stagesMap['Nursery 2']||[];
+  S.unitKey=unitKey;S.currentStages=stages;
+  S.stageIdx=stageIdx;S.words=[...new Set(stages[stageIdx].words)];S.learnIdx=0;
+  startLearn();
+}
+
+// ════════════════════════════════════════
+// LEARN
+// ════════════════════════════════════════
+function startLearn(){
+  var st=S.currentStages[S.stageIdx];
+  document.getElementById('learn-title').textContent=st?st.label:'Learning';
+  if(DMODE==='shared')document.getElementById('learn-sw').style.display='';
+  renderLearnCard();SS('learn');
+}
+
+function renderLearnCard(){
+  var idx=S.learnIdx;var total=S.words.length;var key=S.words[idx];var wd=WORDS[key];var col=wc(key);
+  document.getElementById('learn-cur').textContent=idx+1;
+  document.getElementById('learn-total').textContent=total;
+  document.getElementById('learn-prog').style.width=Math.round((idx+1)/total*100)+'%';
+  document.getElementById('learn-prog').style.background=col.wc;
+  document.getElementById('wc-top').style.background=col.bg;
+  document.getElementById('lc-em').textContent=wd.emoji;
+  document.getElementById('lc-word').textContent=wd.word;
+  document.getElementById('lc-word').style.color=col.wc;
+  document.getElementById('lc-def').textContent=wd.def;
+  document.getElementById('lc-sent').textContent=wd.sentence;
+  document.getElementById('learn-tb').style.background=col.bg;
+  document.getElementById('learn-prev').style.display=idx===0?'none':'';
+  var nb=document.getElementById('learn-next');
+  var nextBg=col.nc||col.wc;
+  nb.textContent=idx===total-1?'Start Practice →':'Next →';
+  nb.style.background=nextBg;nb.style.borderColor=nextBg;nb.style.color='#fff';
+  // Smooth fade (RAF-based, no classList jank)
+  var card=document.getElementById('learn-card');
+  card.style.transition='none';card.style.opacity='0';card.style.transform='translateY(10px)';
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    card.style.transition='opacity .22s ease,transform .22s ease';
+    card.style.opacity='1';card.style.transform='translateY(0)';
+  });});
+}
+function learnPrev(){if(S.learnIdx>0){S.learnIdx--;renderLearnCard();}}
+function learnNext(){if(S.learnIdx<S.words.length-1){S.learnIdx++;renderLearnCard();}else startPractice();}
+function confirmLeaveLearn(){if(confirm('Go back to stage list?'))SS('lessons');}
+
+// ════════════════════════════════════════
+// PRACTICE
+// ════════════════════════════════════════
+function buildQ(words,forTest){
+  var qs=[];
+  if(forTest){
+    var sh=shuffle(words.slice());var n=sh.length;
+    // Per word: 1 question. Type rotates: match, fill, spell, match, fill, spell…
+    var types=['match','fill','spell'];
+    sh.forEach(function(k,i){qs.push({key:k,type:types[i%3]});});
+    qs=shuffle(qs);
+  }else{
+    var raw=[];words.forEach(function(k){['match','fill','spell'].forEach(function(t){raw.push({key:k,type:t});});});qs=shuffle(raw);
+  }
+  return qs;
+}
+
+function startPractice(){
+  document.getElementById('practice-tb').style.background='linear-gradient(135deg,#7C3AED,#8B5CF6)';
+  if(DMODE==='shared')document.getElementById('practice-sw').style.display='';
+  S.practiceQ=buildQ(S.words,false);S.practiceIdx=0;
+  renderPQ();SS('practice');
+}
+function renderPQ(){
+  spellPending=false; // cancel any stale pending spell-check from previous question
+  SS2={};             // clear spell state so stale timeouts bail out early
+  var q=S.practiceQ[S.practiceIdx];var total=S.practiceQ.length;var idx=S.practiceIdx;
+  var pn=document.getElementById('pr-num');if(pn)pn.textContent=(idx+1)+' / '+total;
+  var pb=document.getElementById('pr-prog');if(pb)pb.style.width=Math.round((idx+1)/total*100)+'%';
+  var pm=document.getElementById('pr-msg');if(pm){pm.textContent='';pm.className='q-msg';}
+  var nx=document.getElementById('pr-next');if(nx)nx.disabled=true;
+  var ph=document.getElementById('pr-hint');if(ph)ph.style.display='none';
+  renderQ('pr-card','pr-pill',q,false);
+}
+function prNext(){S.practiceIdx++;if(S.practiceIdx>=S.practiceQ.length)startTest();else renderPQ();}
+
+// ════════════════════════════════════════
+// RENDER QUESTION (practice + test)
+// ════════════════════════════════════════
+function renderQ(cardId,pillId,q,isTest){
+  var card=document.getElementById(cardId);
+  var pill=document.getElementById(pillId);
+  if(!card||!pill)return; // guard: elements must exist
+  var wd=WORDS[q.key];
+  var lbl={match:'Word Match',fill:'Fill in the Blank',spell:'Spell It'};
+  var cls={match:'q-pill q-match',fill:'q-pill q-fill',spell:'q-pill q-spell'};
+  pill.textContent=lbl[q.type];
+  pill.className=cls[q.type];
+  if(q.type==='match')renderMatch(card,wd,q,isTest);
+  else if(q.type==='fill')renderFill(card,wd,q,isTest);
+  else renderSpell(card,wd,q,isTest);
+}
+
+// ── MATCH ──
+function renderMatch(card,wd,q,isTest){
+  var wrongs=getDistractors(q.key,3);
+  var opts=shuffle([q.key].concat(wrongs));
+  var html='<span class="q-em">'+wd.emoji+'</span><div class="q-def">'+wd.def+'</div><div class="opts">';
+  opts.forEach(function(k){html+='<button class="opt" data-key="'+k+'" onclick="optPick(this,\''+q.key+'\','+isTest+')">'+WORDS[k].word+'</button>';});
+  html+='</div>';card.innerHTML=html;
+}
+
+// ── FILL ──
+function renderFill(card,wd,q,isTest){
+  var wrongs=getDistractors(q.key,3);
+  var opts=shuffle([q.key].concat(wrongs));
+  var bh=wd.blank.replace('_____','<em>_____</em>');
+  var html='<span class="q-em">'+wd.emoji+'</span><div class="q-blank">'+bh+'</div><div class="opts">';
+  opts.forEach(function(k){html+='<button class="opt" data-key="'+k+'" onclick="optPick(this,\''+q.key+'\','+isTest+')">'+WORDS[k].word+'</button>';});
+  html+='</div>';card.innerHTML=html;
+}
+
+// optPick handles BOTH match and fill for BOTH practice and test
+function optPick(btn,correctKey,isTest){
+  if(btn.classList.contains('dis'))return;
+  var chosen=btn.getAttribute('data-key');
+  // Disable all options
+  btn.closest('.q-card').querySelectorAll('.opt').forEach(function(b){b.classList.add('dis');});
+  var ok=chosen===correctKey;
+  btn.classList.add(ok?'ok':'no');
+  if(!ok) btn.closest('.q-card').querySelector('[data-key="'+correctKey+'"]').classList.add('ok');
+
+  if(isTest){
+    // TEST: record answer and auto-advance after brief pause — NO separate submit btn needed
+    sOk();if(!ok)sFail();
+    recordTAnswer(ok);
+  }else{
+    // PRACTICE: show message, enable Next
+    if(ok){sOk();setPMsg(true,'✅ Correct!');}
+    else{sFail();setPMsg(false,'❌ The answer is: '+WORDS[correctKey].word);}
+    document.getElementById('pr-next').disabled=false;
+  }
+}
+
+// ── SPELL ──
+var SS2={};// spell state (named SS2 to avoid clash with screen switcher SS)
+var spellPending=false; // prevents double-fire of auto-check timeout
+function renderSpell(card,wd,q,isTest){
+  var sa=wd.spellAs||wd.word.toLowerCase().replace(/\s+/g,'');
+  var letters=sa.split('');
+  var pool=letters.slice();
+  if((STU.classLabel||'').match(/Primary [3-6]/)){
+    var dec='bcdfghjklmnpqrstvwxyz'.split('').filter(function(c){return !letters.includes(c);});
+    pool=pool.concat(shuffle(dec).slice(0,2));
+  }
+  pool=shuffle(pool);
+  var twoW=!!(wd.spellDisplay&&wd.spellDisplay.length===2);
+  SS2={answer:letters,placed:new Array(letters.length).fill(null),pool:pool,poolUsed:{},isTest:isTest,twoW:twoW,spellDisplay:wd.spellDisplay||null,key:q.key};
+
+  var slots='<div class="spell-display" id="sdis">';
+  if(twoW&&wd.spellDisplay){
+    wd.spellDisplay[0].split('').forEach(function(l,i){slots+='<div class="ss" id="ss'+i+'" onclick="ssRemove('+i+')"><span class="ssltr"></span></div>';});
+    slots+='<div class="spell-gap"></div>';
+    var off=wd.spellDisplay[0].length;
+    wd.spellDisplay[1].split('').forEach(function(l,i){slots+='<div class="ss" id="ss'+(off+i)+'" onclick="ssRemove('+(off+i)+')"><span class="ssltr"></span></div>';});
+  }else{
+    letters.forEach(function(l,i){slots+='<div class="ss" id="ss'+i+'" onclick="ssRemove('+i+')"><span class="ssltr"></span></div>';});
+  }
+  slots+='</div>';
+  var poolHtml='<div class="pool" id="pool">';
+  pool.forEach(function(l,pi){poolHtml+='<div class="lt" id="lt'+pi+'" onclick="ssPlace(\''+l+'\','+pi+')">'+l.toUpperCase()+'</div>';});
+  poolHtml+='</div>';
+
+  card.innerHTML='<span class="q-em">'+wd.emoji+'</span><div class="q-def">'+wd.def+'</div>'+slots+poolHtml;
+
+  if(isTest){
+    // Show the "Check Answer" action bar, hide hint
+    document.getElementById('t-action').style.display='';
+    document.getElementById('t-submit').disabled=true;
+    document.getElementById('t-hint-wrap').style.display='';
+  }else{
+    document.getElementById('pr-hint').style.display='';
+  }
+}
+
+function ssPlace(letter,pi){
+  if(SS2.poolUsed[pi])return;
+  var ei=-1;for(var i=0;i<SS2.placed.length;i++){if(SS2.placed[i]===null){ei=i;break;}}
+  if(ei===-1)return;
+  SS2.placed[ei]=letter;SS2.poolUsed[pi]=true;
+  var lt=document.getElementById('lt'+pi);if(lt)lt.classList.add('used');
+  var slot=document.getElementById('ss'+ei);
+  if(slot){
+    var sp=slot.querySelector('.ssltr');if(sp)sp.textContent=letter.toUpperCase();
+    slot.classList.add('filled');slot.setAttribute('data-pi',pi);
+  }
+  if(SS2.placed.indexOf(null)===-1){
+    if(SS2.isTest){
+      var sb=document.getElementById('t-submit');if(sb)sb.disabled=false;
+    }else if(!spellPending){
+      spellPending=true;setTimeout(checkSpell,150);
+    }
+  }
+}
+function ssRemove(i){
+  if(SS2.placed[i]===null)return;
+  var slot=document.getElementById('ss'+i);if(!slot||!slot.classList.contains('filled'))return;
+  var pi=slot.getAttribute('data-pi');
+  if(pi!==null){delete SS2.poolUsed[pi];var lt=document.getElementById('lt'+pi);if(lt)lt.classList.remove('used');}
+  SS2.placed[i]=null;
+  var sp=slot.querySelector('.ssltr');if(sp)sp.textContent='';
+  slot.classList.remove('filled','ok','no');slot.removeAttribute('data-pi');
+  if(SS2.isTest){var sb=document.getElementById('t-submit');if(sb)sb.disabled=true;}
+}
+function checkSpell(){
+  spellPending=false; // clear flag so future placements can re-queue
+  if(!SS2||!SS2.answer)return; // guard: SS2 may have been reset by screen switch
+  var ok=true;
+  SS2.placed.forEach(function(l,i){var s=document.getElementById('ss'+i);if(l&&l.toLowerCase()===SS2.answer[i].toLowerCase()){if(s)s.classList.add('ok');}else{if(s)s.classList.add('no');ok=false;}});
+  if(ok){
+    sOk();
+    if(SS2.isTest){recordTAnswer(true);}
+    else{
+      setPMsg(true,'✅ Correct!');
+      var nx=document.getElementById('pr-next');if(nx)nx.disabled=false;
+      var ph=document.getElementById('pr-hint');if(ph)ph.style.display='none';
+    }
+  }else{
+    sFail();
+    if(!SS2.isTest){
+      setPMsg(false,'❌ Not quite — try again!');
+      setTimeout(resetSpell,1100);
+    }else{
+      recordTAnswer(false);
+    }
+  }
+}
+function resetSpell(){
+  spellPending=false;
+  if(!SS2||!SS2.answer)return;
+  SS2.placed=new Array(SS2.answer.length).fill(null);SS2.poolUsed={};
+  for(var i=0;i<SS2.answer.length;i++){
+    var s=document.getElementById('ss'+i);
+    if(s){var sp=s.querySelector('.ssltr');if(sp)sp.textContent='';s.classList.remove('filled','ok','no');s.removeAttribute('data-pi');}
+  }
+  for(var p=0;p<SS2.pool.length;p++){var lt=document.getElementById('lt'+p);if(lt)lt.classList.remove('used');}
+}
+function spellHint(){
+  var first=SS2.answer[0];if(SS2.placed[0]!==null)return;
+  for(var i=0;i<SS2.pool.length;i++){if(!SS2.poolUsed[i]&&SS2.pool[i].toLowerCase()===first.toLowerCase()){ssPlace(SS2.pool[i],i);document.getElementById('pr-hint').style.display='none';toast('💡 Hint used!');break;}}
+}
+function setPMsg(ok,msg){var e=document.getElementById('pr-msg');if(!e)return;e.textContent=msg;e.className='q-msg'+(ok?' ok':msg?' no':'');}
+
+// ════════════════════════════════════════
+// TEST — no back button, auto-advance on match/fill click
+// ════════════════════════════════════════
+function startTest(){
+  document.getElementById('test-tb').style.background='linear-gradient(135deg,#0F7B8C,#1A9BAD)';
+  S.testQ=buildQ(S.words,true);S.testIdx=0;S.testAnswers=[];
+  renderTQ();SS('test');
+}
+
+function renderTQ(){
+  spellPending=false;
+  SS2={};
+  var q=S.testQ[S.testIdx];var total=S.testQ.length;var idx=S.testIdx;
+  var tn=document.getElementById('t-num');if(tn)tn.textContent=(idx+1)+' / '+total;
+  var tc=document.getElementById('t-qcount');if(tc)tc.textContent=(idx+1)+'/'+total;
+  var tpb=document.getElementById('t-prog');if(tpb)tpb.style.width=Math.round((idx+1)/total*100)+'%';
+  var tm=document.getElementById('t-msg');if(tm){tm.textContent='';tm.className='q-msg';}
+  var ta=document.getElementById('t-action');if(ta)ta.style.display='none';
+  var th=document.getElementById('t-hint-wrap');if(th)th.style.display='none';
+  var ts=document.getElementById('t-submit');if(ts)ts.disabled=true;
+  renderQ('t-card','t-pill',q,true);
+}
+
+function testSpellSubmit(){
+  if(!SS2||!SS2.placed||SS2.placed.indexOf(null)!==-1){toast('Fill in all the letters first!');return;}
+  var sb=document.getElementById('t-submit');if(sb)sb.disabled=true;
+  checkSpell();
+}
+
+function recordTAnswer(ok){
+  S.testAnswers.push({key:S.testQ[S.testIdx].key,correct:ok});
+  // Disable all opts immediately
+  var card=document.getElementById('t-card');
+  if(card)card.querySelectorAll('.opt').forEach(function(b){b.classList.add('dis');});
+  // Auto-advance — no button to press, reduces freeze risk completely
+  setTimeout(advanceT,ok?700:1100);
+}
+
+function advanceT(){
+  S.testIdx++;
+  if(S.testIdx>=S.testQ.length)finishTest();
+  else renderTQ();
+}
+function confirmLeaveTest(){/* intentionally empty — no back from test */}
+
+// ════════════════════════════════════════
+// RESULTS
+// ════════════════════════════════════════
+function finishTest(){
+  var answers=S.testAnswers;
+  var correct=answers.filter(function(a){return a.correct;}).length;
+  var total=answers.length;
+  var pct=Math.round(correct/total*100);
+  var passed=pct>=70;
+  var stars=pct===100?3:pct>=80?2:pct>=70?1:0;
+  var stages=S.currentStages||[];
+  var st=stages[S.stageIdx];
+  saveProg(st.id,{passed:passed,bestScore:pct,stars:stars,attempts:1});
+  var missed=[...new Set(answers.filter(function(a){return !a.correct;}).map(function(a){return a.key;}))];
+  var tc=passed?'#451A03':'#1E1B4B';
+
+  // Switch screen FIRST so test disappears immediately
+  var res=document.getElementById('results');
+  res.className='screen active '+(passed?'pass':'fail');
+  SS('results'); // removes active from all others, then re-adds to results
+
+  var ri=document.querySelector('.res-wrap');
+  if(ri)ri.style.color=tc;
+
+  var rs=document.getElementById('res-score');if(rs){rs.textContent=correct+'/'+total;rs.style.color=tc;}
+  var rl=document.getElementById('res-lbl');if(rl)rl.textContent=st?st.label+' — '+(passed?'Passed! 🎉':'Not yet!'):'-';
+  var rstar=document.getElementById('res-stars');if(rstar)rstar.textContent=starsStr(stars);
+
+  if(passed){
+    sPass();
+    var re=document.getElementById('res-em');if(re)re.textContent=pct===100?'🏆':pct>=90?'🌟':pct>=80?'🥇':'👍';
+    var rt=document.getElementById('res-title');if(rt)rt.textContent=pct===100?'Perfect!':pct>=80?'Excellent!':'Well done!';
+    var isLast=S.stageIdx>=stages.length-1;
+    var rsb=document.getElementById('res-sub');if(rsb)rsb.textContent=isLast?'You have completed all stages for '+STU.classLabel+'! 🎊':'You passed! The next stage is now unlocked.';
+    var rm=document.getElementById('res-missed');if(rm)rm.style.display='none';
+    var rb1=document.getElementById('res-btn1');
+    if(rb1){rb1.textContent=isLast?'Back to Lessons':'Next Stage →';rb1.style.color=tc;rb1.onclick=function(){if(isLast)openLessonList();else startStage(S.unitKey,S.stageIdx+1);};}
+    var rb2=document.getElementById('res-btn2');
+    if(rb2){rb2.textContent='Back to Stages';rb2.onclick=function(){openLessonList();};}
+  }else{
+    sFail();
+    var re=document.getElementById('res-em');if(re)re.textContent='📚';
+    var rt=document.getElementById('res-title');if(rt)rt.textContent='Almost there!';
+    var rsb=document.getElementById('res-sub');if(rsb)rsb.textContent='You scored '+pct+'%. You need 70% to pass. Let\'s review the tricky words.';
+    if(missed.length){
+      var ml=document.getElementById('res-missed-list');
+      if(ml){ml.innerHTML='';missed.forEach(function(k){var w=WORDS[k];var d=document.createElement('div');d.className='missed-word';d.innerHTML='<span>'+w.emoji+'</span><span>'+w.word+' — '+w.def+'</span>';ml.appendChild(d);});}
+      var rm=document.getElementById('res-missed');if(rm)rm.style.display='';
+    }else{var rm=document.getElementById('res-missed');if(rm)rm.style.display='none';}
+    var rb1=document.getElementById('res-btn1');
+    if(rb1){rb1.textContent='Review & Try Again →';rb1.style.color=tc;rb1.onclick=function(){S.learnIdx=0;startLearn();};}
+    var rb2=document.getElementById('res-btn2');
+    if(rb2){rb2.textContent='Back to Stages';rb2.onclick=function(){openLessonList();};}
+  }
+}
+function resAction1(){document.getElementById('res-btn1').onclick();}
+function resAction2(){document.getElementById('res-btn2').onclick();}
+
+window.addEventListener('DOMContentLoaded',init);
+
+// ════════════════════════════════════════
+var FB={initialized:false,db:null,user:null,
+  config:{apiKey:"AIzaSyBI9sSU0xIVr-SOlupPSOi59_lYoyhaCfA",authDomain:"word-heist-964ac.firebaseapp.com",projectId:"word-heist-964ac",storageBucket:"word-heist-964ac.firebasestorage.app",messagingSenderId:"476884243104",appId:"1:476884243104:web:5432f4faa4525e01b7afc5"},
+  init:async function(){if(this.initialized)return;if(typeof firebase==='undefined')return;try{if(!firebase.apps.length)firebase.initializeApp(this.config);this.db=firebase.firestore();this.initialized=true;try{await this.db.enablePersistence({synchronizeTabs:true});}catch(e){}var r=await firebase.auth().signInAnonymously();this.user=r.user;}catch(e){}}
+};
+(function(){var sdks=['https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js','https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js','https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js'];var n=0;sdks.forEach(function(src){var s=document.createElement('script');s.src=src;s.onload=function(){if(++n===sdks.length)FB.init();};s.onerror=function(){n++;};document.head.appendChild(s);});})();
+
+// ════════════════════════════════════════
+// PWA — manifest + service worker (both inline blobs, no extra files needed)
+// ════════════════════════════════════════
+(function(){
+  // ── 1. Inject manifest via blob URL ──
+  var MANIFEST = {
+    name: 'Blestonex EduLab',
+    short_name: 'EduLab',
+    description: 'Vocabulary learning for Nigerian primary schools',
+    start_url: '/',
+    display: 'standalone',
+    orientation: 'portrait',
+    background_color: '#7C3AED',
+    theme_color: '#7C3AED',
+    icons: [
+      // SVG icon works on all modern Android/Chrome versions
+      {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%237C3AED'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' font-family='sans-serif'%3E📚%3C/text%3E%3C/svg%3E",
+        sizes: 'any',
+        type: 'image/svg+xml',
+        purpose: 'any maskable'
+      },
+      // PNG fallback generated from canvas at runtime
+      {src:'__PNG192__', sizes:'192x192', type:'image/png', purpose:'any maskable'},
+      {src:'__PNG512__', sizes:'512x512', type:'image/png', purpose:'any maskable'}
+    ]
+  };
+
+  // Generate PNG icons via canvas so we don't need external files
+  function makeIcon(size, cb){
+    try{
+      var cv=document.createElement('canvas');cv.width=size;cv.height=size;
+      var ctx=cv.getContext('2d');
+      var r=size*0.19;
+      ctx.beginPath();ctx.moveTo(r,0);ctx.arcTo(size,0,size,size,r);ctx.arcTo(size,size,0,size,r);ctx.arcTo(0,size,0,0,r);ctx.arcTo(0,0,size,0,r);ctx.closePath();
+      ctx.fillStyle='#7C3AED';ctx.fill();
+      ctx.font=Math.round(size*0.55)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('📚',size/2,size/2+size*0.04);
+      cb(cv.toDataURL('image/png'));
+    }catch(e){cb(null);}
+  }
+
+  makeIcon(192,function(p192){makeIcon(512,function(p512){
+    var m=JSON.parse(JSON.stringify(MANIFEST));
+    if(p192)m.icons[1].src=p192; else m.icons.splice(1,1);
+    if(p512)m.icons[m.icons.length-1].src=p512; else m.icons.splice(-1,1);
+    var blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
+    var el=document.getElementById('pwa-manifest');
+    if(el)el.href=URL.createObjectURL(blob);
+  });});
+
+  // ── 2. Register service worker via blob URL ──
+  if('serviceWorker' in navigator){
+    var SW_CODE = [
+      "var CACHE='edulab-v5';",
+      "var OFFLINE_URLS=['/'];",
+      "self.addEventListener('install',function(e){",
+      "  e.waitUntil(caches.open(CACHE).then(function(c){",
+      "    return c.addAll(OFFLINE_URLS);",
+      "  }).then(function(){return self.skipWaiting();}));",
+      "});",
+      "self.addEventListener('activate',function(e){",
+      "  e.waitUntil(caches.keys().then(function(keys){",
+      "    return Promise.all(keys.filter(function(k){return k!==CACHE;}).map(function(k){return caches.delete(k);}));",
+      "  }).then(function(){return self.clients.claim();}));",
+      "});",
+      "self.addEventListener('fetch',function(e){",
+      "  if(e.request.method!=='GET')return;",
+      "  e.respondWith(",
+      "    caches.match(e.request).then(function(cached){",
+      "      var fresh=fetch(e.request).then(function(res){",
+      "        if(res&&res.status===200&&res.type==='basic'){",
+      "          var clone=res.clone();",
+      "          caches.open(CACHE).then(function(c){c.put(e.request,clone);});",
+      "        }",
+      "        return res;",
+      "      }).catch(function(){return cached;});",
+      "      return cached||fresh;",
+      "    })",
+      "  );",
+      "});"
+    ].join('\n');
+    var swBlob=new Blob([SW_CODE],{type:'application/javascript'});
+    var swURL=URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swURL,{scope:'./'}).then(function(reg){
+      console.log('[EduLab SW] registered, scope:',reg.scope);
+    }).catch(function(e){console.log('[EduLab SW] failed:',e.message);});
+  }
+
+  // ── 3. Install prompt (Android/Chrome) ──
+  var _deferredPrompt=null;
+  window.addEventListener('beforeinstallprompt',function(e){
+    e.preventDefault();_deferredPrompt=e;
+    // Show banner after a short delay so it doesn't appear mid-lesson
+    setTimeout(function(){
+      var b=document.getElementById('install-banner');if(b)b.classList.add('show');
+    },3000);
+  });
+  window.addEventListener('appinstalled',function(){
+    var b=document.getElementById('install-banner');if(b)b.classList.remove('show');
+    _deferredPrompt=null;
+    toast('✅ EduLab installed!',2500);
+  });
+  window.pwaInstall=function(){
+    if(!_deferredPrompt)return;
+    var b=document.getElementById('install-banner');if(b)b.classList.remove('show');
+    _deferredPrompt.prompt();
+    _deferredPrompt.userChoice.then(function(r){
+      if(r.outcome==='accepted')console.log('[EduLab PWA] installed');
+      _deferredPrompt=null;
+    });
+  };
+  window.pwaDismiss=function(){
+    var b=document.getElementById('install-banner');if(b)b.classList.remove('show');
+    _deferredPrompt=null;
+  };
+
+  // ── 4. iOS Safari tip (no beforeinstallprompt on iOS) ──
+  var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  var isStandalone=window.navigator.standalone===true;
+  var iosDismissed=localStorage.getItem('el_ios_tip');
+  if(isIOS&&!isStandalone&&!iosDismissed){
+    setTimeout(function(){
+      var t=document.getElementById('ios-tip');if(t)t.classList.add('show');
+      localStorage.setItem('el_ios_tip','1');
+    },4000);
+  }
+})();
+</script>
+</body>
+</html>
