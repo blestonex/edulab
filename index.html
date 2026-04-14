@@ -577,7 +577,46 @@ var C={
   federation: {bg:'linear-gradient(135deg,#6EE7B7,#047857)',wc:'#064E3B'},sovereignty:{bg:'linear-gradient(135deg,#FCD34D,#B45309)',wc:'#451A03'},
   pollination:{bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#451A03'},biodiversity:{bg:'linear-gradient(135deg,#86EFAC,#7C3AED)',wc:'#3B0764'},
   archaeology:{bg:'linear-gradient(135deg,#D97706,#78350F)',wc:'#FFDFC0'},legislation:{bg:'linear-gradient(135deg,#818CF8,#1E40AF)',wc:'#1E3A8A'},
-  deforestation:{bg:'linear-gradient(135deg,#4ADE80,#78350F)',wc:'#052E16'},urbanisation:{bg:'linear-gradient(135deg,#94A3B8,#1E293B)',wc:'#E2E8F0'}
+  deforestation:{bg:'linear-gradient(135deg,#4ADE80,#78350F)',wc:'#052E16'},urbanisation:{bg:'linear-gradient(135deg,#94A3B8,#1E293B)',wc:'#E2E8F0'},
+  // Body P4-P6
+  vein:        {bg:'linear-gradient(135deg,#FCA5A5,#DC2626)',wc:'#450A0A'},
+  artery:      {bg:'linear-gradient(135deg,#FB7185,#BE123C)',wc:'#4C0519'},
+  muscle:      {bg:'linear-gradient(135deg,#FB923C,#C2410C)',wc:'#431407'},
+  tendon:      {bg:'linear-gradient(135deg,#D97706,#78350F)',wc:'#FFDFC0'},
+  ligament:    {bg:'linear-gradient(135deg,#FCD34D,#B45309)',wc:'#451A03'},
+  cartilage:   {bg:'linear-gradient(135deg,#E5E7EB,#6B7280)',wc:'#111827'},
+  vertebra:    {bg:'linear-gradient(135deg,#D1D5DB,#4B5563)',wc:'#111827'},
+  diaphragm:   {bg:'linear-gradient(135deg,#93C5FD,#1D4ED8)',wc:'#1E3A8A'},
+  capillary:   {bg:'linear-gradient(135deg,#FCA5A5,#9F1239)',wc:'#4C0519'},
+  cerebellum:  {bg:'linear-gradient(135deg,#C084FC,#7C3AED)',wc:'#3B0764'},
+  oesophagus:  {bg:'linear-gradient(135deg,#6EE7B7,#065F46)',wc:'#052E16'},
+  pituitary:   {bg:'linear-gradient(135deg,#818CF8,#3730A3)',wc:'#1E1B4B'},
+  // Food P4-P6
+  protein:     {bg:'linear-gradient(135deg,#FCA5A5,#B91C1C)',wc:'#450A0A'},
+  vitamin:     {bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#451A03'},
+  mineral:     {bg:'linear-gradient(135deg,#BAE6FD,#0284C7)',wc:'#0C4A6E'},
+  carbohydrate:{bg:'linear-gradient(135deg,#FEF08A,#CA8A04)',wc:'#422006'},
+  nutrition:   {bg:'linear-gradient(135deg,#86EFAC,#15803D)',wc:'#052E16'},
+  digestion:   {bg:'linear-gradient(135deg,#FDBA74,#EA580C)',wc:'#431407'},
+  calorie:     {bg:'linear-gradient(135deg,#FCD34D,#EAB308)',wc:'#713F12'},
+  fibre:       {bg:'linear-gradient(135deg,#BEF264,#4D7C0F)',wc:'#365314'},
+  malnutrition:{bg:'linear-gradient(135deg,#FCA5A5,#EF4444)',wc:'#450A0A'},
+  deficiency:  {bg:'linear-gradient(135deg,#FED7AA,#C2410C)',wc:'#431407'},
+  preservation:{bg:'linear-gradient(135deg,#94A3B8,#334155)',wc:'#E2E8F0'},
+  pasteurisation:{bg:'linear-gradient(135deg,#BAE6FD,#1D4ED8)',wc:'#1E3A8A'},
+  // Colours & Shapes P4-P6
+  crimson:     {bg:'linear-gradient(135deg,#DC2626,#7F1D1D)',wc:'#FEF2F2'},
+  indigo:      {bg:'linear-gradient(135deg,#4338CA,#1E1B4B)',wc:'#E0E7FF'},
+  turquoise:   {bg:'linear-gradient(135deg,#2DD4BF,#0F766E)',wc:'#F0FDFA'},
+  magenta:     {bg:'linear-gradient(135deg,#EC4899,#9D174D)',wc:'#FDF2F8'},
+  symmetry:    {bg:'linear-gradient(135deg,#A78BFA,#5B21B6)',wc:'#EDE9FE'},
+  perimeter:   {bg:'linear-gradient(135deg,#60A5FA,#1D4ED8)',wc:'#EFF6FF'},
+  diameter:    {bg:'linear-gradient(135deg,#34D399,#065F46)',wc:'#ECFDF5'},
+  circumference:{bg:'linear-gradient(135deg,#0D9488,#134E4A)',wc:'#F0FDFA'},
+  perpendicular:{bg:'linear-gradient(135deg,#818CF8,#1E1B4B)',wc:'#E0E7FF'},
+  parallelogram:{bg:'linear-gradient(135deg,#C084FC,#4C1D95)',wc:'#F5F3FF'},
+  quadrilateral:{bg:'linear-gradient(135deg,#38BDF8,#0C4A6E)',wc:'#F0F9FF'},
+  isosceles:   {bg:'linear-gradient(135deg,#FB923C,#7C2D12)',wc:'#FFF7ED'}
 };
 function wc(key){return C[key]||{bg:'linear-gradient(135deg,#60A5FA,#3B82F6)',wc:'#1E3A8A'};}
 
@@ -683,6 +722,54 @@ var WORDS={
   pentagon: {word:'Pentagon', emoji:'⬠',  def:'A flat shape with exactly five straight sides.',               sentence:'She counted the five sides of the pentagon carefully.', blank:'A _____ has five sides and five corners.',           spellAs:'pentagon'},
   cylinder: {word:'Cylinder', emoji:'🥫', def:'A solid shape with two circular ends and one curved side.',   sentence:'A tin of tomatoes is shaped like a cylinder.',         blank:'A _____ looks like a tin can standing upright.',     spellAs:'cylinder'},
   pyramid:  {word:'Pyramid',  emoji:'🔺', def:'A solid shape with a flat base and triangular sides meeting at a point.',sentence:'The pyramids of Egypt are famous all over the world.',blank:'A _____ comes to a point at the very top.',       spellAs:'pyramid'},
+  // ══ BODY — PRIMARY 4 ══
+  vein:       {word:'Vein',       emoji:'🩸',def:'A thin tube that carries blood back to your heart.',             sentence:'The nurse found a vein in his arm to take blood.',      blank:'Blood travels back to the heart through a _____.',      spellAs:'vein'},
+  artery:     {word:'Artery',     emoji:'❤️',def:'A strong tube that carries blood away from your heart.',       sentence:'The surgeon carefully repaired the damaged artery.',     blank:'An _____ carries blood from the heart to the body.',    spellAs:'artery'},
+  muscle:     {word:'Muscle',     emoji:'💪',def:'A body tissue that contracts to make you move.',               sentence:'She exercised every day to build her leg muscles.',      blank:'You use your _____ every time you lift something heavy.',spellAs:'muscle'},
+  tendon:     {word:'Tendon',     emoji:'🦵',def:'A strong cord that connects a muscle to a bone.',              sentence:'He tore a tendon in his knee during the football match.',blank:'A _____ connects your muscle firmly to your bone.',      spellAs:'tendon'},
+  // ══ BODY — PRIMARY 5 ══
+  ligament:   {word:'Ligament',   emoji:'🦴',def:'A strong band of tissue that connects two bones at a joint.',  sentence:'She sprained her ankle and stretched a ligament.',       blank:'A _____ holds two bones together at a joint.',          spellAs:'ligament'},
+  cartilage:  {word:'Cartilage',  emoji:'🦴',def:'A firm flexible tissue found at the ends of bones.',          sentence:'Cartilage cushions the bones in your knee joint.',       blank:'_____ stops your bones from grinding together.',        spellAs:'cartilage'},
+  vertebra:   {word:'Vertebra',   emoji:'🦴',def:'One of the small bones that make up your spine.',              sentence:'Each vertebra in the spine protects the spinal cord.',  blank:'A _____ is one of the bones in your backbone.',         spellAs:'vertebra'},
+  diaphragm:  {word:'Diaphragm',  emoji:'🫁',def:'The large muscle under your lungs that helps you breathe.',   sentence:'The diaphragm moves down when you breathe in deeply.',  blank:'The _____ is the muscle that controls your breathing.', spellAs:'diaphragm'},
+  // ══ BODY — PRIMARY 6 ══
+  capillary:  {word:'Capillary',  emoji:'🩸',def:'A very tiny blood vessel that connects arteries to veins.',    sentence:'Capillaries are so small only one blood cell fits through.',blank:'A _____ is the tiniest blood vessel in your body.',     spellAs:'capillary'},
+  cerebellum: {word:'Cerebellum', emoji:'🧠',def:'The part of the brain that controls balance and movement.',   sentence:'The cerebellum coordinates all your body movements.',   blank:'The _____ at the back of your brain controls balance.', spellAs:'cerebellum'},
+  oesophagus: {word:'Oesophagus', emoji:'🫁',def:'The tube that carries food from your mouth to your stomach.', sentence:'Food passes down the oesophagus to reach the stomach.',  blank:'The _____ connects your throat to your stomach.',       spellAs:'oesophagus'},
+  pituitary:  {word:'Pituitary',  emoji:'🧠',def:'A small gland in the brain that controls growth hormones.',   sentence:'The pituitary gland releases hormones that control growth.',blank:'The _____ gland controls many important body functions.',spellAs:'pituitary'},
+
+  // ══ FOOD — PRIMARY 4 ══
+  protein:    {word:'Protein',    emoji:'🥩',def:'A nutrient in food that builds and repairs body tissues.',     sentence:'Meat, fish, and eggs are excellent sources of protein.', blank:'Your muscles are built from _____ found in food.',       spellAs:'protein'},
+  vitamin:    {word:'Vitamin',    emoji:'🍊',def:'A natural substance in food that keeps your body healthy.',   sentence:'Vitamin C found in oranges helps prevent illness.',      blank:'You need _____ C from fruits to stay healthy.',         spellAs:'vitamin'},
+  mineral:    {word:'Mineral',    emoji:'🥛',def:'A natural substance like iron or calcium your body needs.',   sentence:'Milk is rich in calcium which is a vital mineral.',     blank:'Iron is a _____ your blood needs to carry oxygen.',      spellAs:'mineral'},
+  carbohydrate:{word:'Carbohydrate',emoji:'🍚',def:'A nutrient in starchy foods that gives your body energy.',  sentence:'Rice, yam, and bread are rich in carbohydrates.',       blank:'A _____ gives your body the energy it needs to work.',  spellAs:'carbohydrate'},
+  // ══ FOOD — PRIMARY 5 ══
+  nutrition:  {word:'Nutrition',  emoji:'🥗',def:'The process by which your body gets what it needs from food.', sentence:'Good nutrition keeps children healthy and strong.',      blank:'A balanced diet provides all the _____ your body needs.',spellAs:'nutrition'},
+  digestion:  {word:'Digestion',  emoji:'🫃',def:'The process of breaking down food inside your body.',         sentence:'Digestion begins in the mouth when you chew your food.', blank:'_____ breaks food into nutrients your blood can absorb.',spellAs:'digestion'},
+  calorie:    {word:'Calorie',    emoji:'⚡',def:'A unit used to measure the energy in food.',                   sentence:'Running burns more calories than walking slowly.',       blank:'Sugar and fat contain many _____ per gram.',            spellAs:'calorie'},
+  fibre:      {word:'Fibre',      emoji:'🌾',def:'A part of plant food that helps your digestive system work.', sentence:'Vegetables, beans, and oats are high in fibre.',         blank:'Eating enough _____ prevents stomach problems.',        spellAs:'fibre'},
+  // ══ FOOD — PRIMARY 6 ══
+  malnutrition:{word:'Malnutrition',emoji:'⚠️',def:'A condition caused by not eating enough of the right nutrients.',sentence:'Malnutrition in children causes slow growth and weakness.',blank:'_____ occurs when the diet lacks essential nutrients.',  spellAs:'malnutrition'},
+  deficiency: {word:'Deficiency', emoji:'🩺',def:'A lack of a nutrient that the body needs to stay healthy.',   sentence:'A vitamin D deficiency can cause weak and brittle bones.',blank:'An iron _____ makes you tired and short of breath.',    spellAs:'deficiency'},
+  preservation:{word:'Preservation',emoji:'🧂',def:'The process of treating food to stop it from going bad.',   sentence:'Salting and drying are old methods of food preservation.',blank:'Refrigeration is a modern method of food _____.',        spellAs:'preservation'},
+  pasteurisation:{word:'Pasteurisation',emoji:'🥛',def:'Heating food to kill harmful bacteria that cause disease.',sentence:'Pasteurisation of milk makes it safe for children to drink.',blank:'_____ kills bacteria in milk by heating it briefly.',  spellAs:'pasteurisation'},
+
+  // ══ COLOURS & SHAPES — PRIMARY 4 ══
+  crimson:    {word:'Crimson',    emoji:'🔴',def:'A deep rich shade of red colour.',                             sentence:'She wore a beautiful crimson gown to the ceremony.',    blank:'The sunset turned the sky a deep shade of _____.',      spellAs:'crimson'},
+  indigo:     {word:'Indigo',     emoji:'🔵',def:'A deep blue-purple colour between blue and violet.',           sentence:'Indigo is one of the seven colours of the rainbow.',    blank:'The sixth colour in the rainbow is called _____.',      spellAs:'indigo'},
+  turquoise:  {word:'Turquoise',  emoji:'🩵',def:'A blue-green colour like the colour of a tropical sea.',      sentence:'The swimming pool water looks a beautiful turquoise.',   blank:'She painted her bedroom walls _____.',                  spellAs:'turquoise'},
+  magenta:    {word:'Magenta',    emoji:'🩷',def:'A bright pinkish-red colour used in printing.',                sentence:'The printer uses magenta ink to make pink and red.',     blank:'The printer cartridge contains cyan, yellow and _____.', spellAs:'magenta'},
+  // ══ COLOURS & SHAPES — PRIMARY 5 ══
+  symmetry:   {word:'Symmetry',   emoji:'🔀',def:'When both sides of a shape are exactly the same.',            sentence:'A butterfly has perfect symmetry on both its wings.',    blank:'A square has _____ because both sides are equal.',       spellAs:'symmetry'},
+  perimeter:  {word:'Perimeter',  emoji:'📐',def:'The total distance all the way around the outside of a shape.',sentence:'She measured the perimeter of the field before planting.', blank:'Add all the sides together to find the _____ of a shape.',spellAs:'perimeter'},
+  diameter:   {word:'Diameter',   emoji:'⭕',def:'A straight line passing from one side of a circle to the other through the centre.',sentence:'The diameter of a circle is twice the radius.',blank:'The _____ cuts a circle into two equal halves.',       spellAs:'diameter'},
+  circumference:{word:'Circumference',emoji:'⭕',def:'The total distance around the outside edge of a circle.',  sentence:'She used a string to measure the circumference of the ball.',blank:'The _____ of a circle is its perimeter.',              spellAs:'circumference'},
+  // ══ COLOURS & SHAPES — PRIMARY 6 ══
+  perpendicular:{word:'Perpendicular',emoji:'📐',def:'Lines that meet at a perfect right angle of ninety degrees.',sentence:'The walls of a building are perpendicular to the floor.',blank:'Two lines are _____ when they meet at a right angle.',  spellAs:'perpendicular'},
+  parallelogram:{word:'Parallelogram',emoji:'▱', def:'A flat shape with two pairs of parallel sides of equal length.',sentence:'A parallelogram looks like a rectangle that has been pushed sideways.',blank:'A _____ has two pairs of equal and parallel sides.', spellAs:'parallelogram'},
+  quadrilateral:{word:'Quadrilateral',emoji:'🔲',def:'Any flat shape that has exactly four straight sides.',      sentence:'A square, rectangle and rhombus are all quadrilaterals.',  blank:'A _____ is any shape with four straight sides.',        spellAs:'quadrilateral'},
+  isosceles:  {word:'Isosceles',  emoji:'🔺',def:'A triangle that has exactly two sides of equal length.',       sentence:'An isosceles triangle has two equal sides and angles.',  blank:'An _____ triangle has two sides the same length.',      spellAs:'isosceles'},
+
   // ══ PRIMARY 4 — ENVIRONMENT & TOOLS ══
   volcano:    {word:'Volcano',    emoji:'🌋',def:'A mountain that can explode and shoot out hot lava.',          sentence:'The volcano erupted and covered the village in ash.',   blank:'Hot lava poured down the side of the _____.',        spellAs:'volcano'},
   glacier:    {word:'Glacier',    emoji:'🏔️',def:'A huge slow-moving river of ice found on mountains.',         sentence:'The glacier moves only a few centimetres every year.',  blank:'Scientists study the _____ to understand climate change.',spellAs:'glacier'},
@@ -798,10 +885,25 @@ var BODY_STAGES={
                {id:'b-p3-s4',label:'Stage 4 — Detailed Parts', words:['eyelid','nostril','eyelid','nostril'],emoji:'👁️'},
                {id:'b-p3-s5',label:'Stage 5 — Expert Parts',   words:['skeleton','knuckle','skeleton','knuckle'],emoji:'💀'}]
 };
-// Body stages P4-P6: same words as P3 (body parts are exhausted) — keep but rename clearly
-BODY_STAGES['Primary 4']=BODY_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('b-p3','b-p4')});});
-BODY_STAGES['Primary 5']=BODY_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('b-p3','b-p5')});});
-BODY_STAGES['Primary 6']=BODY_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('b-p3','b-p6')});});
+// Body stages P4-P6: new harder anatomy vocabulary
+BODY_STAGES['Primary 4']=[
+  {id:'b-p4-s1',label:'Stage 1 — Blood & Muscles',  words:['vein','artery','muscle','tendon'],           emoji:'💪'},
+  {id:'b-p4-s2',label:'Stage 2 — P3 Review',        words:['eyelid','nostril','skeleton','knuckle'],     emoji:'💀'},
+  {id:'b-p4-s3',label:'Stage 3 — Body Systems',     words:['ligament','cartilage','vertebra','diaphragm'],emoji:'🦴'}
+];
+BODY_STAGES['Primary 5']=[
+  {id:'b-p5-s1',label:'Stage 1 — Circulation',      words:['vein','artery','capillary','diaphragm'],     emoji:'🩸'},
+  {id:'b-p5-s2',label:'Stage 2 — Joints & Spine',   words:['ligament','cartilage','vertebra','tendon'],  emoji:'🦴'},
+  {id:'b-p5-s3',label:'Stage 3 — Brain & Organs',   words:['cerebellum','oesophagus','pituitary','muscle'],emoji:'🧠'},
+  {id:'b-p5-s4',label:'Stage 4 — Long Words',       words:['oesophagus','cerebellum','diaphragm','ligament'],emoji:'📚'}
+];
+BODY_STAGES['Primary 6']=[
+  {id:'b-p6-s1',label:'Stage 1 — Circulation',      words:['capillary','vein','artery','pituitary'],     emoji:'🩸'},
+  {id:'b-p6-s2',label:'Stage 2 — Structure',        words:['vertebra','cartilage','ligament','tendon'],  emoji:'🦴'},
+  {id:'b-p6-s3',label:'Stage 3 — Organs & Systems', words:['cerebellum','oesophagus','diaphragm','muscle'],emoji:'🧠'},
+  {id:'b-p6-s4',label:'Stage 4 — Hardest Words',    words:['oesophagus','pituitary','cerebellum','capillary'],emoji:'🏆'},
+  {id:'b-p6-s5',label:'Stage 5 — Master Level',     words:['diaphragm','cartilage','vertebra','parallelogram'],emoji:'💎'}
+];
 
 // ════ UNIT 3: FOOD & DRINKS ════
 var FOOD_STAGES={
@@ -822,9 +924,24 @@ var FOOD_STAGES={
                {id:'f-p3-s4',label:'Stage 4 — Special Foods',   words:['avocado','biscuit','avocado','biscuit'],emoji:'🥑'},
                {id:'f-p3-s5',label:'Stage 5 — Long Words',      words:['groundnut','watermelon','groundnut','watermelon'],emoji:'🥜'}]
 };
-FOOD_STAGES['Primary 4']=FOOD_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('f-p3','f-p4')});});
-FOOD_STAGES['Primary 5']=FOOD_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('f-p3','f-p5')});});
-FOOD_STAGES['Primary 6']=FOOD_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('f-p3','f-p6')});});
+FOOD_STAGES['Primary 4']=[
+  {id:'f-p4-s1',label:'Stage 1 — Nutrients',         words:['protein','vitamin','mineral','carbohydrate'], emoji:'🥩'},
+  {id:'f-p4-s2',label:'Stage 2 — P3 Review',         words:['avocado','biscuit','groundnut','watermelon'], emoji:'🥑'},
+  {id:'f-p4-s3',label:'Stage 3 — Food Science',      words:['nutrition','digestion','calorie','fibre'],    emoji:'🔬'}
+];
+FOOD_STAGES['Primary 5']=[
+  {id:'f-p5-s1',label:'Stage 1 — Nutrients',         words:['protein','vitamin','mineral','carbohydrate'], emoji:'🥩'},
+  {id:'f-p5-s2',label:'Stage 2 — Food Science',      words:['nutrition','digestion','calorie','fibre'],    emoji:'🔬'},
+  {id:'f-p5-s3',label:'Stage 3 — Food Safety',       words:['preservation','malnutrition','deficiency','pasteurisation'],emoji:'🧂'},
+  {id:'f-p5-s4',label:'Stage 4 — Long Words',        words:['carbohydrate','malnutrition','pasteurisation','preservation'],emoji:'📚'}
+];
+FOOD_STAGES['Primary 6']=[
+  {id:'f-p6-s1',label:'Stage 1 — Nutrients',         words:['protein','vitamin','mineral','fibre'],        emoji:'🥩'},
+  {id:'f-p6-s2',label:'Stage 2 — Body & Food',       words:['nutrition','digestion','calorie','carbohydrate'],emoji:'🔬'},
+  {id:'f-p6-s3',label:'Stage 3 — Food Safety',       words:['preservation','deficiency','malnutrition','pasteurisation'],emoji:'🧂'},
+  {id:'f-p6-s4',label:'Stage 4 — Hardest Words',     words:['pasteurisation','malnutrition','carbohydrate','deficiency'],emoji:'🏆'},
+  {id:'f-p6-s5',label:'Stage 5 — Master Level',      words:['pasteurisation','circumference','parallelogram','quadrilateral'],emoji:'💎'}
+];
 
 // ════ UNIT 4: COLOURS & SHAPES ════
 var COLOUR_STAGES={
@@ -845,9 +962,24 @@ var COLOUR_STAGES={
                {id:'c-p3-s4',label:'Stage 4 — Many-Sided',      words:['hexagon','pentagon','hexagon','pentagon'],emoji:'🔷'},
                {id:'c-p3-s5',label:'Stage 5 — 3D Shapes',       words:['cylinder','pyramid','cylinder','pyramid'],emoji:'🥫'}]
 };
-COLOUR_STAGES['Primary 4']=COLOUR_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('c-p3','c-p4')});});
-COLOUR_STAGES['Primary 5']=COLOUR_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('c-p3','c-p5')});});
-COLOUR_STAGES['Primary 6']=COLOUR_STAGES['Primary 3'].map(function(s){return Object.assign({},s,{id:s.id.replace('c-p3','c-p6')});});
+COLOUR_STAGES['Primary 4']=[
+  {id:'c-p4-s1',label:'Stage 1 — Rich Colours',      words:['crimson','indigo','turquoise','magenta'],     emoji:'🎨'},
+  {id:'c-p4-s2',label:'Stage 2 — P3 Review',         words:['hexagon','pentagon','cylinder','pyramid'],    emoji:'🔷'},
+  {id:'c-p4-s3',label:'Stage 3 — Measurement',       words:['symmetry','perimeter','diameter','circumference'],emoji:'📐'}
+];
+COLOUR_STAGES['Primary 5']=[
+  {id:'c-p5-s1',label:'Stage 1 — Rich Colours',      words:['crimson','indigo','turquoise','magenta'],     emoji:'🎨'},
+  {id:'c-p5-s2',label:'Stage 2 — Measurement',       words:['symmetry','perimeter','diameter','circumference'],emoji:'📐'},
+  {id:'c-p5-s3',label:'Stage 3 — Advanced Shapes',   words:['perpendicular','parallelogram','quadrilateral','isosceles'],emoji:'📏'},
+  {id:'c-p5-s4',label:'Stage 4 — Long Words',        words:['circumference','perpendicular','parallelogram','quadrilateral'],emoji:'📚'}
+];
+COLOUR_STAGES['Primary 6']=[
+  {id:'c-p6-s1',label:'Stage 1 — Rich Colours',      words:['crimson','indigo','turquoise','magenta'],     emoji:'🎨'},
+  {id:'c-p6-s2',label:'Stage 2 — Measurement',       words:['symmetry','perimeter','diameter','circumference'],emoji:'📐'},
+  {id:'c-p6-s3',label:'Stage 3 — Advanced Shapes',   words:['perpendicular','parallelogram','quadrilateral','isosceles'],emoji:'📏'},
+  {id:'c-p6-s4',label:'Stage 4 — Hardest Words',     words:['circumference','perpendicular','parallelogram','quadrilateral'],emoji:'🏆'},
+  {id:'c-p6-s5',label:'Stage 5 — Master Level',      words:['isosceles','parallelogram','perpendicular','quadrilateral'],emoji:'💎'}
+];
 
 // ════ UNITS — master list ════
 var UNITS=[
