@@ -2233,12 +2233,19 @@ function joinFindRoom(){
   if(err)err.style.display='none';
 
   compGetRoom(code,function(data){
-    if(btn){btn.textContent='Find Room →';btn.disabled=false;}
-    if(!data||data.status==='ended'){
+    if(btn){btn.textContent='Find Room \u2192';btn.disabled=false;}
+    if(!data){
       if(err){
-        err.textContent=!data?'Room not found. Check the code and try again.':'That competition has already ended.';
+        // Check if Firebase is even initialized yet
+        err.textContent=FB.initialized
+          ?'Room not found. Check the code and try again.'
+          :'Still connecting to server. Please wait a moment and try again.';
         err.style.display='';
       }
+      return;
+    }
+    if(data.status==='ended'){
+      if(err){err.textContent='That competition has already ended.';err.style.display='';}
       return;
     }
     COMP.roomCode=code;COMP.role='player';
@@ -2488,11 +2495,25 @@ function compUpdateHouseScore(houseIdx,newScore){
 }
 
 function compGetRoom(code,cb){
+  var done=false;
+  // Timeout after 10 seconds — prevents infinite hang
+  var timer=setTimeout(function(){
+    if(done)return;done=true;
+    console.warn('compGetRoom timeout for code:',code);
+    cb(null);
+  },10000);
   FB.onReady(function(){
-    if(!FB.db){cb(null);return;}
+    if(!FB.db){clearTimeout(timer);if(!done){done=true;cb(null);}return;}
     FB.db.collection(COMP_COL).doc(code).get()
-      .then(function(doc){cb(doc.exists?doc.data():null);})
-      .catch(function(e){console.warn('compGetRoom:',e.message);cb(null);});
+      .then(function(doc){
+        clearTimeout(timer);
+        if(!done){done=true;cb(doc.exists?doc.data():null);}
+      })
+      .catch(function(e){
+        clearTimeout(timer);
+        console.warn('compGetRoom error:',e.message);
+        if(!done){done=true;cb(null);}
+      });
   });
 }
 
@@ -2538,7 +2559,22 @@ function resetInactivityTimer(){
 var FB={initialized:false,db:null,user:null,_queue:[],
   onReady:function(cb){if(this.initialized)cb();else this._queue.push(cb);},
   config:{apiKey:"AIzaSyBkFcDVdffmE79rcOZZsLzWD8OQjsIrJdY",authDomain:"blestonex-edulab.firebaseapp.com",projectId:"blestonex-edulab",storageBucket:"blestonex-edulab.firebasestorage.app",messagingSenderId:"499765711214",appId:"1:499765711214:web:81114c1e391add78b2717f"},
-  init:async function(){if(this.initialized)return;if(typeof firebase==='undefined')return;try{if(!firebase.apps.length)firebase.initializeApp(this.config);this.db=firebase.firestore();this.initialized=true;try{await this.db.enablePersistence({synchronizeTabs:true});}catch(e){}var r=await firebase.auth().signInAnonymously();this.user=r.user;var q=this._queue.slice();this._queue=[];q.forEach(function(fn){try{fn();}catch(e){}});}catch(e){}}
+  init:async function(){
+    if(this.initialized)return;
+    if(typeof firebase==='undefined')return;
+    try{
+      if(!firebase.apps.length)firebase.initializeApp(this.config);
+      this.db=firebase.firestore();
+      // Enable persistence but don't let it block initialization
+      try{await this.db.enablePersistence({synchronizeTabs:true});}catch(e){}
+      // Auth FIRST — then mark initialized and flush queue
+      var r=await firebase.auth().signInAnonymously();
+      this.user=r.user;
+      this.initialized=true;
+      var q=this._queue.slice();this._queue=[];
+      q.forEach(function(fn){try{fn();}catch(e){console.warn('FB queue err:',e.message);}});
+    }catch(e){console.warn('FB.init failed:',e.message);}
+  }
 };
 (function(){var sdks=['https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js','https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js','https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js'];var n=0;sdks.forEach(function(src){var s=document.createElement('script');s.src=src;s.onload=function(){if(++n===sdks.length)FB.init();};s.onerror=function(){n++;};document.head.appendChild(s);});})();
 
