@@ -581,28 +581,35 @@ body{display:flex;flex-direction:column}
     <div class="tlogo" style="color:#fff">Join <span style="opacity:.5">Competition</span></div>
   </div>
   <div style="flex:1;display:flex;flex-direction:column;padding:24px;gap:16px">
+
+    <!-- STEP 1: Enter code -->
     <div id="join-step1">
       <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;margin-bottom:6px">Enter Room Code</div>
       <div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:20px">Ask your teacher for the 4-letter code</div>
-      <input id="join-code-input" type="text" maxlength="4" placeholder="e.g. ABCD" oninput="this.value=this.value.toUpperCase()" style="width:100%;padding:18px;border:2px solid rgba(255,255,255,.3);border-radius:14px;background:rgba(255,255,255,.15);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:32px;letter-spacing:12px;text-align:center;outline:none;margin-bottom:14px">
+      <input id="join-code-input" type="text" maxlength="4" placeholder="ABCD" oninput="this.value=this.value.toUpperCase()" style="width:100%;padding:18px;border:2px solid rgba(255,255,255,.3);border-radius:14px;background:rgba(255,255,255,.15);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:32px;letter-spacing:12px;text-align:center;outline:none;margin-bottom:14px">
       <button onclick="joinFindRoom()" style="width:100%;padding:16px;background:#fff;color:#065F46;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;cursor:pointer">Find Room →</button>
-      <div id="join-error" style="text-align:center;color:rgba(255,200,100,1);font-size:14px;font-weight:700;margin-top:10px;display:none">Room not found. Check the code.</div>
+      <div id="join-error" style="text-align:center;color:rgba(255,220,100,1);font-size:14px;font-weight:700;margin-top:10px;display:none"></div>
     </div>
-    <div id="join-step2" style="display:none">
-      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;margin-bottom:6px">Pick your House</div>
-      <div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:16px">Tap the house you belong to</div>
-      <div id="join-houses" style="display:flex;flex-direction:column;gap:10px"></div>
-    </div>
-    <div id="join-step3" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:24px">
-      <div style="font-size:72px" id="join-house-emoji">🏠</div>
-      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:26px;color:#fff" id="join-house-label">Your House</div>
-      <div style="font-size:14px;color:rgba(255,255,255,.65);margin-top:4px">You are in! Waiting for teacher to start…</div>
-      <div style="margin-top:24px;background:rgba(255,255,255,.15);border-radius:14px;padding:18px 24px">
-        <div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Room Code</div>
-        <div id="join-room-code-disp" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:32px;color:#fff;letter-spacing:10px"></div>
+
+    <!-- STEP 2: Waiting for teacher to start (no house picking yet) -->
+    <div id="join-step2" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px">
+      <div style="font-size:64px">🏆</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff">You are in!</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.65)">Waiting for teacher to start the quiz…</div>
+      <div style="background:rgba(255,255,255,.15);border-radius:14px;padding:16px 28px;margin-top:8px">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Room Code</div>
+        <div id="join-room-code-disp" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:34px;color:#fff;letter-spacing:10px"></div>
       </div>
-      <div style="font-size:32px;margin-top:16px;animation:pulse 1.5s infinite" id="join-waiting-dots">⏳</div>
+      <div style="font-size:36px;margin-top:8px;animation:pulse 1.5s infinite">⏳</div>
     </div>
+
+    <!-- STEP 3: Pick house (shown after teacher starts) -->
+    <div id="join-step3" style="display:none;flex:1;flex-direction:column;gap:14px">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff">Pick your House!</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.65)">Teacher started — tap your house now</div>
+      <div id="join-houses" style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1"></div>
+    </div>
+
   </div>
 </div>
 
@@ -2257,13 +2264,13 @@ function hostStartQuiz(){
   // Write playing status to Firestore — this is what triggers all students to start
   FB.onReady(function(){
     var ref=FB.db.collection(COMP_COL).doc(COMP.roomCode);
-    ref.update({
+    ref.set({
       status:'playing',
       houses:houses,
       questions:qs,
       qIdx:0,
       startedAt:Date.now()
-    }).then(function(){
+    },{merge:true}).then(function(){
       COMP.questions=qs;COMP.houses=houses;
       boardShowLive(COMP.roomCode);
       SS('comp-board');
@@ -2278,11 +2285,12 @@ function hostStartQuiz(){
 // ── JOIN ──
 function openCompJoin(){
   COMP._fromScreen=document.querySelector('.screen.active')?document.querySelector('.screen.active').id:'splash';
+  if(COMP.listener){COMP.listener();COMP.listener=null;}
   document.getElementById('join-step1').style.display='';
-  document.getElementById('join-step2').style.display='none';
-  document.getElementById('join-step3').style.display='none';
+  var s2=document.getElementById('join-step2');if(s2)s2.style.display='none';
+  var s3=document.getElementById('join-step3');if(s3)s3.style.display='none';
   document.getElementById('join-code-input').value='';
-  document.getElementById('join-error').style.display='none';
+  var err=document.getElementById('join-error');if(err)err.style.display='none';
   SS('comp-join');
 }
 
@@ -2293,9 +2301,8 @@ function joinFindRoom(){
     if(err){err.textContent='Please enter a 4-letter code.';err.style.display='';}
     return;
   }
-  // Show loading while Firebase responds
   var btn=document.querySelector('#join-step1 button');
-  if(btn){btn.textContent='Searching…';btn.disabled=true;}
+  if(btn){btn.textContent='Searching\u2026';btn.disabled=true;}
   var err=document.getElementById('join-error');
   if(err)err.style.display='none';
 
@@ -2303,10 +2310,9 @@ function joinFindRoom(){
     if(btn){btn.textContent='Find Room \u2192';btn.disabled=false;}
     if(!data){
       if(err){
-        // Check if Firebase is even initialized yet
         err.textContent=FB.initialized
           ?'Room not found. Check the code and try again.'
-          :'Still connecting to server. Please wait a moment and try again.';
+          :'Still connecting. Please wait and try again.';
         err.style.display='';
       }
       return;
@@ -2315,19 +2321,45 @@ function joinFindRoom(){
       if(err){err.textContent='That competition has already ended.';err.style.display='';}
       return;
     }
+    // Room found — go to waiting screen immediately
     COMP.roomCode=code;COMP.role='player';
-    if(err)err.style.display='none';
-    // Show house picker
     document.getElementById('join-step1').style.display='none';
-    document.getElementById('join-step2').style.display='';
-    var hc=document.getElementById('join-houses');hc.innerHTML='';
-    (data.houses||[]).forEach(function(h,i){
-      var btn2=document.createElement('button');
-      btn2.style.cssText='width:100%;padding:15px 18px;border:2px solid '+h.color+';border-radius:12px;background:'+h.bg+';color:'+h.tc+';font-family:\'Nunito\',sans-serif;font-weight:900;font-size:16px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left';
-      btn2.innerHTML='<span style="font-size:28px">'+h.emoji+'</span><span>'+h.name+'</span>';
-      btn2.onclick=function(){joinSelectHouse(i,h);};
-      hc.appendChild(btn2);
+    var s2=document.getElementById('join-step2');
+    if(s2)s2.style.display='flex';
+    var rc=document.getElementById('join-room-code-disp');
+    if(rc)rc.textContent=code;
+
+    // Listen for teacher to start — when status=playing, show house picker
+    if(COMP.listener){COMP.listener();COMP.listener=null;}
+    COMP.listener=compListen(function(d){
+      if(!d)return;
+      if(d.status==='playing'&&d.houses&&d.houses.length>0){
+        // Teacher started — show house picker with ACTUAL configured houses
+        COMP.questions=d.questions||[];
+        COMP.houses=d.houses;
+        if(COMP.listener){COMP.listener();COMP.listener=null;}
+        showHousePicker(d.houses);
+      }
+      if(d.status==='ended'){
+        if(COMP.listener){COMP.listener();COMP.listener=null;}
+        showCompEnd(d.houses||[]);
+      }
     });
+  });
+}
+
+function showHousePicker(houses){
+  // Show step 3 (house picker) with the correct houses from Firestore
+  var s2=document.getElementById('join-step2');if(s2)s2.style.display='none';
+  var s3=document.getElementById('join-step3');if(s3)s3.style.display='flex';
+  var hc=document.getElementById('join-houses');if(!hc)return;
+  hc.innerHTML='';
+  houses.forEach(function(h,i){
+    var btn=document.createElement('button');
+    btn.style.cssText='width:100%;padding:15px 18px;border:2.5px solid '+h.color+';border-radius:12px;background:'+h.bg+';color:'+h.tc+';font-family:\'Nunito\',sans-serif;font-weight:900;font-size:16px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;flex-shrink:0';
+    btn.innerHTML='<span style="font-size:28px">'+h.emoji+'</span><span>'+h.name+'</span>';
+    btn.onclick=function(){joinSelectHouse(i,h);};
+    hc.appendChild(btn);
   });
 }
 
@@ -2335,34 +2367,8 @@ function joinSelectHouse(idx,house){
   COMP.houseIdx=idx;COMP.myScore=0;
   var pid=STU.uid||STU.name||('guest_'+Date.now());
   compUpdatePlayer(pid,{name:STU.name||'Guest',houseIdx:idx,score:0,joinedAt:Date.now()});
-
-  // Show waiting screen
-  document.getElementById('join-step2').style.display='none';
-  var s3=document.getElementById('join-step3');
-  if(s3)s3.style.display='flex';
-  var he=document.getElementById('join-house-emoji');if(he)he.textContent=house.emoji;
-  var hl=document.getElementById('join-house-label');if(hl)hl.textContent=house.name;
-  var rc=document.getElementById('join-room-code-disp');if(rc)rc.textContent=COMP.roomCode;
-
-  // Cancel any previous listener
-  if(COMP.listener){COMP.listener();COMP.listener=null;}
-
-  // Listen for host to start — only the Firestore snapshot triggers the game
-  COMP.listener=compListen(function(data){
-    if(!data)return;
-    // Only start if host explicitly set status to 'playing'
-    if(data.status==='playing'&&data.questions&&data.questions.length>0){
-      COMP.questions=data.questions;
-      COMP.houses=data.houses||[];
-      COMP.qIdx=0; // Always start from question 0 for new joiners
-      if(COMP.listener){COMP.listener();COMP.listener=null;}
-      startCompPlay();
-    }
-    if(data.status==='ended'){
-      if(COMP.listener){COMP.listener();COMP.listener=null;}
-      showCompEnd(data.houses||[]);
-    }
-  });
+  // Go straight into play — questions and houses already loaded from Firestore
+  startCompPlay();
 }
 
 // ── PLAY ──
