@@ -2559,24 +2559,44 @@ function resetInactivityTimer(){
 var FB={initialized:false,db:null,user:null,_queue:[],
   onReady:function(cb){if(this.initialized)cb();else this._queue.push(cb);},
   config:{apiKey:"AIzaSyBkFcDVdffmE79rcOZZsLzWD8OQjsIrJdY",authDomain:"blestonex-edulab.firebaseapp.com",projectId:"blestonex-edulab",storageBucket:"blestonex-edulab.firebasestorage.app",messagingSenderId:"499765711214",appId:"1:499765711214:web:81114c1e391add78b2717f"},
-  init:async function(){
+  init:function(){
     if(this.initialized)return;
-    if(typeof firebase==='undefined')return;
+    if(typeof firebase==='undefined'){console.warn('Firebase SDKs not loaded');return;}
     try{
       if(!firebase.apps.length)firebase.initializeApp(this.config);
       this.db=firebase.firestore();
-      // Enable persistence but don't let it block initialization
-      try{await this.db.enablePersistence({synchronizeTabs:true});}catch(e){}
-      // Auth FIRST — then mark initialized and flush queue
-      var r=await firebase.auth().signInAnonymously();
-      this.user=r.user;
       this.initialized=true;
+      console.log('[EduLab] Firebase ready');
       var q=this._queue.slice();this._queue=[];
-      q.forEach(function(fn){try{fn();}catch(e){console.warn('FB queue err:',e.message);}});
-    }catch(e){console.warn('FB.init failed:',e.message);}
+      q.forEach(function(fn){try{fn();}catch(e){console.warn('FB queue:',e);}});
+      // Auth in background — non-blocking, not awaited
+      firebase.auth().signInAnonymously()
+        .then(function(r){FB.user=r.user;console.log('[EduLab] Auth OK');})
+        .catch(function(e){console.warn('[EduLab] Auth failed (enable Anonymous Auth in Firebase Console):',e.message);});
+    }catch(e){
+      console.warn('[EduLab] Firebase init error:',e.message);
+    }
   }
 };
-(function(){var sdks=['https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js','https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js','https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js'];var n=0;sdks.forEach(function(src){var s=document.createElement('script');s.src=src;s.onload=function(){if(++n===sdks.length)FB.init();};s.onerror=function(){n++;};document.head.appendChild(s);});})();
+(function(){
+  var n=0;
+  var sdks=[
+    'https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js',
+    'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js',
+    'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js'
+  ];
+  sdks.forEach(function(src){
+    var s=document.createElement('script');
+    s.src=src;
+    s.onload=function(){if(++n===sdks.length)FB.init();};
+    s.onerror=function(){
+      console.warn('[EduLab] SDK failed to load:',src);
+      // Still try to init with whatever loaded — don't block forever
+      if(++n===sdks.length)FB.init();
+    };
+    document.head.appendChild(s);
+  });
+})();
 
 // ════════════════════════════════════════
 // PWA — manifest + service worker (both inline blobs, no extra files needed)
