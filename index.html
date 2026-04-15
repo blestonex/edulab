@@ -361,7 +361,7 @@ body{display:flex;flex-direction:column}
     <div class="subj-card" onclick="openLessonList()">
       <div class="subj-head">
         <div class="subj-icon" style="background:#E0F0FF;color:#1565C0">📖</div>
-        <div class="subj-meta"><div class="subj-name">English</div><div class="subj-desc">Animals · My Body · Food · Colours & Shapes</div></div>
+        <div class="subj-meta"><div class="subj-name">English & General Studies</div><div class="subj-desc">Animals · Body · Food · Colours · Science · Social Studies</div></div>
         <span style="font-size:22px;color:var(--sm)">›</span>
       </div>
       <div class="subj-prog">
@@ -840,6 +840,44 @@ var C={
   tangent:{bg:'linear-gradient(135deg,#A78BFA,#5B21B6)',wc:'#F5F3FF'},vector:{bg:'linear-gradient(135deg,#34D399,#1E3A8A)',wc:'#ECFDF5'},
   scalar:{bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#FFFBEB'},magnitude:{bg:'linear-gradient(135deg,#FB923C,#9A3412)',wc:'#FFF7ED'},
   resultant:{bg:'linear-gradient(135deg,#60A5FA,#7C3AED)',wc:'#EFF6FF'},
+  // Basic Science
+  plant:{bg:'linear-gradient(135deg,#86EFAC,#15803D)',wc:'#052E16'},seed:{bg:'linear-gradient(135deg,#D97706,#78350F)',wc:'#FFDFC0',nc:'#78350F'},
+  root:{bg:'linear-gradient(135deg,#D97706,#92400E)',wc:'#451A03'},leaf:{bg:'linear-gradient(135deg,#4ADE80,#16A34A)',wc:'#052E16'},
+  stem:{bg:'linear-gradient(135deg,#86EFAC,#065F46)',wc:'#ECFDF5'},flower:{bg:'linear-gradient(135deg,#F9A8D4,#DB2777)',wc:'#FDF2F8',nc:'#DB2777'},
+  soil:{bg:'linear-gradient(135deg,#D97706,#4A2810)',wc:'#FFDFC0',nc:'#78350F'},rock:{bg:'linear-gradient(135deg,#9CA3AF,#374151)',wc:'#F9FAFB'},
+  water:{bg:'linear-gradient(135deg,#38BDF8,#0284C7)',wc:'#F0F9FF',nc:'#0284C7'},air:{bg:'linear-gradient(135deg,#BAE6FD,#7DD3FC)',wc:'#0C4A6E'},
+  sun:{bg:'linear-gradient(135deg,#FDE68A,#F59E0B)',wc:'#78350F'},moon:{bg:'linear-gradient(135deg,#312E81,#1E1B4B)',wc:'#E0E7FF',nc:'#4338CA'},
+  cloud:{bg:'linear-gradient(135deg,#E5E7EB,#9CA3AF)',wc:'#1F2937',nc:'#4B5563'},rain:{bg:'linear-gradient(135deg,#38BDF8,#1D4ED8)',wc:'#EFF6FF'},
+  wind:{bg:'linear-gradient(135deg,#BAE6FD,#0EA5E9)',wc:'#0C4A6E'},animal:{bg:'linear-gradient(135deg,#FCD34D,#D97706)',wc:'#451A03'},
+  insect:{bg:'linear-gradient(135deg,#86EFAC,#4ADE80)',wc:'#052E16'},bird:{bg:'linear-gradient(135deg,#60A5FA,#7C3AED)',wc:'#EFF6FF',nc:'#7C3AED'},
+  solid:{bg:'linear-gradient(135deg,#9CA3AF,#1F2937)',wc:'#F9FAFB',nc:'#1F2937'},liquid:{bg:'linear-gradient(135deg,#38BDF8,#0891B2)',wc:'#F0F9FF',nc:'#0891B2'},
+  gas:{bg:'linear-gradient(135deg,#BAE6FD,#38BDF8)',wc:'#0C4A6E'},heat:{bg:'linear-gradient(135deg,#FB923C,#DC2626)',wc:'#450A0A'},
+  light:{bg:'linear-gradient(135deg,#FDE68A,#FCD34D)',wc:'#78350F'},magnet:{bg:'linear-gradient(135deg,#FCA5A5,#DC2626)',wc:'#450A0A'},
+  friction:{bg:'linear-gradient(135deg,#D97706,#78350F)',wc:'#FFDFC0'},force:{bg:'linear-gradient(135deg,#818CF8,#4338CA)',wc:'#E0E7FF'},
+  planet:{bg:'linear-gradient(135deg,#312E81,#7C3AED)',wc:'#E0E7FF',nc:'#7C3AED'},orbit:{bg:'linear-gradient(135deg,#1E1B4B,#4338CA)',wc:'#E0E7FF',nc:'#4338CA'},
+  nutrient:{bg:'linear-gradient(135deg,#86EFAC,#D97706)',wc:'#052E16'},pollution:{bg:'linear-gradient(135deg,#6B7280,#1F2937)',wc:'#F9FAFB'},
+  cell:{bg:'linear-gradient(135deg,#6EE7B7,#0D9488)',wc:'#F0FDFA',nc:'#0D9488'},tissue:{bg:'linear-gradient(135deg,#FCA5A5,#EF4444)',wc:'#FEF2F2',nc:'#DC2626'},
+  organ:{bg:'linear-gradient(135deg,#FCA5A5,#B91C1C)',wc:'#FEF2F2',nc:'#B91C1C'},molecule:{bg:'linear-gradient(135deg,#C084FC,#7C3AED)',wc:'#F5F3FF',nc:'#7C3AED'},
+  atom:{bg:'linear-gradient(135deg,#818CF8,#1E1B4B)',wc:'#E0E7FF',nc:'#4338CA'},element:{bg:'linear-gradient(135deg,#FDE68A,#0D9488)',wc:'#134E4A'},
+  compound:{bg:'linear-gradient(135deg,#6EE7B7,#7C3AED)',wc:'#F5F3FF',nc:'#7C3AED'},reaction:{bg:'linear-gradient(135deg,#FB923C,#7C3AED)',wc:'#FFF7ED',nc:'#7C3AED'},
+  respiration:{bg:'linear-gradient(135deg,#93C5FD,#0D9488)',wc:'#F0FDFA',nc:'#0D9488'},excretion:{bg:'linear-gradient(135deg,#BAE6FD,#6B7280)',wc:'#F0F9FF',nc:'#475569'},
+  // Social Studies
+  family:{bg:'linear-gradient(135deg,#FDE68A,#FB923C)',wc:'#78350F'},home:{bg:'linear-gradient(135deg,#FB923C,#D97706)',wc:'#451A03'},
+  school:{bg:'linear-gradient(135deg,#60A5FA,#1D4ED8)',wc:'#EFF6FF',nc:'#1D4ED8'},teacher:{bg:'linear-gradient(135deg,#818CF8,#4338CA)',wc:'#E0E7FF',nc:'#4338CA'},
+  market:{bg:'linear-gradient(135deg,#FDE68A,#D97706)',wc:'#451A03'},farm:{bg:'linear-gradient(135deg,#86EFAC,#D97706)',wc:'#052E16'},
+  doctor:{bg:'linear-gradient(135deg,#93C5FD,#0D9488)',wc:'#F0FDFA'},police:{bg:'linear-gradient(135deg,#1E3A8A,#1D4ED8)',wc:'#EFF6FF',nc:'#1E3A8A'},
+  farmer:{bg:'linear-gradient(135deg,#D97706,#065F46)',wc:'#ECFDF5'},community:{bg:'linear-gradient(135deg,#FB923C,#15803D)',wc:'#FFF7ED'},
+  Nigeria:{bg:'linear-gradient(135deg,#15803D,#166534)',wc:'#ECFDF5',nc:'#166534'},Lagos:{bg:'linear-gradient(135deg,#1E3A8A,#1D4ED8)',wc:'#EFF6FF',nc:'#1E3A8A'},
+  Abuja:{bg:'linear-gradient(135deg,#15803D,#1D4ED8)',wc:'#ECFDF5',nc:'#1D4ED8'},state:{bg:'linear-gradient(135deg,#FDE68A,#15803D)',wc:'#052E16'},
+  governor:{bg:'linear-gradient(135deg,#818CF8,#15803D)',wc:'#E0E7FF'},president:{bg:'linear-gradient(135deg,#15803D,#1E1B4B)',wc:'#ECFDF5'},
+  citizen:{bg:'linear-gradient(135deg,#60A5FA,#15803D)',wc:'#EFF6FF',nc:'#15803D'},rights:{bg:'linear-gradient(135deg,#FDE68A,#1D4ED8)',wc:'#1E3A8A'},
+  culture:{bg:'linear-gradient(135deg,#F9A8D4,#D97706)',wc:'#78350F'},tradition:{bg:'linear-gradient(135deg,#D97706,#7C3AED)',wc:'#451A03'},
+  government:{bg:'linear-gradient(135deg,#1E3A8A,#15803D)',wc:'#EFF6FF',nc:'#15803D'},election:{bg:'linear-gradient(135deg,#FDE68A,#15803D)',wc:'#052E16'},
+  tax:{bg:'linear-gradient(135deg,#6B7280,#1F2937)',wc:'#F9FAFB'},trade:{bg:'linear-gradient(135deg,#FDE68A,#0D9488)',wc:'#134E4A'},
+  resource:{bg:'linear-gradient(135deg,#D97706,#15803D)',wc:'#ECFDF5'},environment:{bg:'linear-gradient(135deg,#4ADE80,#0D9488)',wc:'#052E16'},
+  occupation:{bg:'linear-gradient(135deg,#818CF8,#D97706)',wc:'#E0E7FF',nc:'#4338CA'},colonialism:{bg:'linear-gradient(135deg,#6B7280,#1E1B4B)',wc:'#F9FAFB'},
+  nationalism:{bg:'linear-gradient(135deg,#15803D,#1E1B4B)',wc:'#ECFDF5',nc:'#15803D'},globalisation:{bg:'linear-gradient(135deg,#1E3A8A,#0D9488)',wc:'#EFF6FF',nc:'#0D9488'},
+  corruption:{bg:'linear-gradient(135deg,#DC2626,#1F2937)',wc:'#FEF2F2'},migration:{bg:'linear-gradient(135deg,#FB923C,#1D4ED8)',wc:'#FFF7ED'},
   // Body P4-P6
   vein:        {bg:'linear-gradient(135deg,#FCA5A5,#DC2626)',wc:'#450A0A'},
   artery:      {bg:'linear-gradient(135deg,#FB7185,#BE123C)',wc:'#4C0519'},
@@ -1149,6 +1187,95 @@ var WORDS={
   magnitude:    {word:'Magnitude',   emoji:'📏',def:'The size or numerical amount of a quantity.',                   sentence:'The magnitude of the earthquake was measured at six point five.',blank:'The _____ of a vector tells you how large or strong it is.', spellAs:'magnitude'},
   resultant:    {word:'Resultant',   emoji:'➡️',def:'The single vector equivalent to two or more combined vectors.',  sentence:'The resultant of two forces shows their combined effect.',  blank:'Add the two vectors to find the _____ force acting on the object.',spellAs:'resultant'},
 
+  // ══ BASIC SCIENCE ══
+  // Nursery/Lower Primary — Nature & Living Things
+  plant:      {word:'Plant',      emoji:'🌱',def:'A living thing that grows in soil and makes its own food.',        sentence:'She watered the plant every morning to keep it healthy.',    blank:'A _____ needs sunlight, water and soil to grow well.',       spellAs:'plant'},
+  seed:       {word:'Seed',       emoji:'🌰',def:'A tiny part of a plant that grows into a new plant.',              sentence:'She buried the seed in the soil and watered it carefully.',  blank:'Every flower begins its life as a tiny _____.',             spellAs:'seed'},
+  root:       {word:'Root',       emoji:'🌿',def:'The part of a plant that grows underground and takes in water.',   sentence:'The root of the tree went deep into the ground.',           blank:'The _____ holds the plant in the soil and absorbs water.',   spellAs:'root'},
+  leaf:       {word:'Leaf',       emoji:'🍃',def:'The flat green part of a plant that makes food from sunlight.',    sentence:'She pressed a green leaf between the pages of her book.',   blank:'Each _____ on the tree is green because it contains chlorophyll.',spellAs:'leaf'},
+  stem:       {word:'Stem',       emoji:'🌿',def:'The tall part of a plant that holds up the leaves and flowers.',  sentence:'The stem of the sunflower was taller than the child.',       blank:'Water travels from the root up through the _____ to the leaves.',spellAs:'stem'},
+  flower:     {word:'Flower',     emoji:'🌸',def:'The colourful part of a plant that produces seeds.',               sentence:'The garden was full of beautiful flowers of every colour.',  blank:'Bees visit every _____ to collect sweet nectar.',            spellAs:'flower'},
+  soil:       {word:'Soil',       emoji:'🪱',def:'The layer of earth in which plants grow.',                         sentence:'She dug her hands into the dark rich soil of the garden.',  blank:'Farmers add manure to the _____ to make crops grow better.',spellAs:'soil'},
+  rock:       {word:'Rock',       emoji:'🪨',def:'A hard natural solid material found in the ground.',               sentence:'He picked up a smooth flat rock from the river bank.',       blank:'The geologist studied the layers of _____ on the hillside.', spellAs:'rock'},
+  water:      {word:'Water',      emoji:'💧',def:'A clear liquid that all living things need to survive.',            sentence:'She poured cold water from the jug into her glass.',         blank:'All living things need _____ to stay alive and healthy.',   spellAs:'water'},
+  air:        {word:'Air',        emoji:'💨',def:'The mixture of gases surrounding the Earth that we breathe.',      sentence:'The air in the mountains felt clean and fresh.',            blank:'We breathe _____ into our lungs with every breath we take.', spellAs:'air'},
+  sun:        {word:'Sun',        emoji:'☀️',def:'The star at the centre of our solar system that gives us heat.',  sentence:'The sun rose early and warmed the cold morning air.',        blank:'Plants use energy from the _____ to make their own food.',   spellAs:'sun'},
+  moon:       {word:'Moon',       emoji:'🌙',def:'The natural satellite that orbits the Earth and shines at night.', sentence:'The moon was full and bright in the clear night sky.',       blank:'The _____ causes the tides of the ocean to rise and fall.',  spellAs:'moon'},
+  cloud:      {word:'Cloud',      emoji:'☁️',def:'A mass of tiny water droplets floating high in the sky.',          sentence:'Dark clouds gathered before the heavy rainstorm.',           blank:'Water vapour rises and forms a _____ high in the sky.',      spellAs:'cloud'},
+  rain:       {word:'Rain',       emoji:'🌧️',def:'Water that falls from clouds down to the ground.',                sentence:'The rain fell heavily on the dry and dusty farmland.',       blank:'Farmers depend on _____ to water their crops in the fields.',spellAs:'rain'},
+  wind:       {word:'Wind',       emoji:'🌬️',def:'Moving air that blows across the surface of the Earth.',          sentence:'The strong wind blew all the leaves off the mango tree.',   blank:'The _____ carried the seeds far away from the parent plant.',spellAs:'wind'},
+  animal:     {word:'Animal',     emoji:'🐾',def:'A living thing that can move and must eat food to survive.',       sentence:'Every animal in the forest depends on the plants for food.', blank:'An _____ must breathe, eat and reproduce to stay alive.',    spellAs:'animal'},
+  insect:     {word:'Insect',     emoji:'🐛',def:'A small animal with six legs and three body parts.',               sentence:'The insect crawled slowly along the surface of the leaf.',  blank:'An _____ has six legs and a body divided into three parts.', spellAs:'insect'},
+  fish:       {word:'Fish',       emoji:'🐟',def:'A cold-blooded animal that lives in water and breathes through gills.',sentence:'The fish swam swiftly through the clear cool water.',    blank:'A _____ uses its gills to breathe underwater.',             spellAs:'fish'},
+  bird:       {word:'Bird',       emoji:'🐦',def:'A warm-blooded animal with feathers, wings and a beak.',           sentence:'The bird built a nest in the branches of the mango tree.',  blank:'Every _____ has feathers and two wings for flying.',         spellAs:'bird'},
+  // Primary 1-3 — Materials & States
+  solid:      {word:'Solid',      emoji:'🪨',def:'A material that has a fixed shape and cannot flow.',               sentence:'A rock is a solid because it keeps its shape always.',       blank:'A _____ has a definite shape that does not change easily.',  spellAs:'solid'},
+  liquid:     {word:'Liquid',     emoji:'💧',def:'A material that flows and takes the shape of its container.',      sentence:'Water is a liquid that flows and fills any container.',      blank:'A _____ flows and takes the shape of whatever holds it.',   spellAs:'liquid'},
+  gas:        {word:'Gas',        emoji:'💨',def:'A material without a fixed shape that spreads to fill any space.',  sentence:'Oxygen is a gas that we cannot see but must breathe.',      blank:'A _____ spreads out to fill the entire container it is in.', spellAs:'gas'},
+  heat:       {word:'Heat',       emoji:'🔥',def:'A form of energy that raises the temperature of objects.',          sentence:'The heat from the sun warms the surface of the Earth.',     blank:'_____ energy from the sun makes the weather warm.',          spellAs:'heat'},
+  light:      {word:'Light',      emoji:'💡',def:'A form of energy that allows us to see things around us.',          sentence:'Light from the sun travels to Earth in about eight minutes.',blank:'We need _____ to see the things that are around us.',        spellAs:'light'},
+  magnet:     {word:'Magnet',     emoji:'🧲',def:'An object that attracts iron and steel objects towards it.',        sentence:'She used a magnet to pick up the iron filings from the tray.',blank:'A _____ pulls iron and steel objects strongly towards it.', spellAs:'magnet'},
+  friction:   {word:'Friction',   emoji:'🛞',def:'A force that slows down moving objects when surfaces rub together.',sentence:'Friction between the brakes and the wheel slows the bicycle.',blank:'_____ between surfaces produces heat and slows down movement.',spellAs:'friction'},
+  force:      {word:'Force',      emoji:'💪',def:'A push or pull that changes the motion or shape of an object.',    sentence:'She applied great force to push the heavy door open.',       blank:'A _____ is needed to start, stop or change the direction of movement.',spellAs:'force'},
+  // Primary 4-6 — Earth & Space
+  planet:     {word:'Planet',     emoji:'🪐',def:'A large round object that orbits a star in space.',                sentence:'Earth is the only planet known to support life.',            blank:'Jupiter is the largest _____ in our solar system.',          spellAs:'planet'},
+  orbit:      {word:'Orbit',      emoji:'🌍',def:'The curved path one object takes around another in space.',         sentence:'The Moon takes twenty-eight days to complete one orbit.',    blank:'The Earth takes one year to complete its _____ around the sun.',spellAs:'orbit'},
+  gravity:    {word:'Gravity',    emoji:'🍎',def:'The force that pulls everything down towards the Earth.',           sentence:'Gravity is why an apple always falls down from a tree.',    blank:'Without _____ we would float off into space.',              spellAs:'gravity'},
+  habitat:    {word:'Habitat',    emoji:'🌿',def:'The natural environment where an animal or plant lives.',           sentence:'The tropical rainforest is the habitat of the gorilla.',    blank:'The ocean is the _____ of whales and dolphins.',            spellAs:'habitat'},
+  nutrient:   {word:'Nutrient',   emoji:'🥗',def:'A substance in food or soil that living things need to grow.',      sentence:'Plants absorb nutrients from the soil through their roots.', blank:'A _____ is essential for healthy growth of plants and animals.',spellAs:'nutrient'},
+  pollution:  {word:'Pollution',  emoji:'🏭',def:'The introduction of harmful substances into the environment.',       sentence:'Air pollution from factory smoke causes breathing problems.', blank:'Water _____ kills fish and makes rivers unsafe to use.',     spellAs:'pollution'},
+  energy:     {word:'Energy',     emoji:'⚡',def:'The power that makes things work, move, or produce heat.',          sentence:'Solar panels convert sunlight into electrical energy.',      blank:'We need _____ from food to run, jump, and think.',          spellAs:'energy'},
+  cell:       {word:'Cell',       emoji:'🔬',def:'The smallest unit of life that makes up all living things.',        sentence:'The human body contains trillions of microscopic cells.',   blank:'Every living organism is made up of at least one _____.',   spellAs:'cell'},
+  tissue:     {word:'Tissue',     emoji:'🔬',def:'A group of similar cells that work together in the body.',          sentence:'Muscle tissue contracts to make our bodies move.',          blank:'A _____ is made up of many similar cells working together.', spellAs:'tissue'},
+  organ:      {word:'Organ',      emoji:'🫀',def:'A group of tissues that work together to perform a specific job.',  sentence:'The heart is an organ that pumps blood around the body.',   blank:'The brain is the most complex _____ in the human body.',    spellAs:'organ'},
+  // JSS level — Advanced Science
+  molecule:   {word:'Molecule',   emoji:'⚗️',def:'The smallest particle of a substance that has all its properties.',sentence:'A water molecule is made of two hydrogen and one oxygen atom.',blank:'A _____ is the smallest particle of any chemical substance.',spellAs:'molecule'},
+  atom:       {word:'Atom',       emoji:'⚛️',def:'The smallest unit of a chemical element that can exist.',           sentence:'Everything in the universe is made of atoms.',              blank:'An _____ is the building block of all chemical elements.',   spellAs:'atom'},
+  element:    {word:'Element',    emoji:'🧪',def:'A pure substance made of only one type of atom.',                   sentence:'Oxygen and iron are both examples of chemical elements.',   blank:'Gold is a chemical _____ found naturally in the Earth.',     spellAs:'element'},
+  compound:   {word:'Compound',   emoji:'🧪',def:'A substance made of two or more elements chemically joined.',       sentence:'Water is a compound of hydrogen and oxygen atoms.',         blank:'Salt is a _____ made of sodium and chlorine combined.',      spellAs:'compound'},
+  reaction:   {word:'Reaction',   emoji:'💥',def:'A process where substances change to form new substances.',         sentence:'A chemical reaction between acid and metal produces gas.',  blank:'A chemical _____ produces new substances with new properties.',spellAs:'reaction'},
+  respiration:{word:'Respiration',emoji:'🫁',def:'The process cells use to release energy from food.',               sentence:'Respiration in cells releases energy from glucose and oxygen.',blank:'Cellular _____ releases energy stored in food molecules.',   spellAs:'respiration'},
+  excretion:  {word:'Excretion',  emoji:'💧',def:'The removal of waste products made by the body\'s chemical processes.',sentence:'Sweating is a form of excretion that removes waste salts.',blank:'_____ removes harmful chemical waste products from the body.',spellAs:'excretion'},
+
+  // ══ SOCIAL STUDIES ══
+  // Nursery/Lower Primary — Family & Community
+  family:     {word:'Family',     emoji:'👨‍👩‍👧‍👦',def:'A group of people related to each other who live and care for each other.',sentence:'Her family gathered together for the Christmas celebration.',blank:'A _____ is the basic unit of society in every culture.',     spellAs:'family'},
+  home:       {word:'Home',       emoji:'🏠',def:'The place where a person or family lives.',                         sentence:'She was happy to return home after the long school day.',    blank:'A _____ is the place where a family lives together.',        spellAs:'home'},
+  school:     {word:'School',     emoji:'🏫',def:'A place where children go to learn and study.',                     sentence:'She walked to school every morning with her friends.',       blank:'Children go to _____ to learn reading, writing and arithmetic.',spellAs:'school'},
+  teacher:    {word:'Teacher',    emoji:'👩‍🏫',def:'A person who teaches students in a school or classroom.',          sentence:'The teacher wrote the new words on the blackboard clearly.', blank:'A _____ explains new ideas and helps students understand them.',spellAs:'teacher'},
+  market:     {word:'Market',     emoji:'🛒',def:'A place where people buy and sell goods and food.',                  sentence:'Mama went to the market early to buy fresh vegetables.',     blank:'She bought fresh tomatoes and onions at the _____.',         spellAs:'market'},
+  farm:       {word:'Farm',       emoji:'🌾',def:'A piece of land where crops are grown and animals are kept.',        sentence:'Grandpa woke up at dawn to work on his yam farm.',           blank:'The farmer grew cassava and maize on his large _____.',      spellAs:'farm'},
+  doctor:     {word:'Doctor',     emoji:'👨‍⚕️',def:'A trained professional who treats sick people.',                  sentence:'The doctor examined the patient and prescribed medicine.',   blank:'She visited the _____ when she had a high fever.',           spellAs:'doctor'},
+  police:     {word:'Police',     emoji:'👮',def:'People whose job is to protect citizens and enforce the law.',       sentence:'The police officer directed the traffic at the junction.',  blank:'The _____ officer helped the lost child find his parents.',  spellAs:'police'},
+  farmer:     {word:'Farmer',     emoji:'🧑‍🌾',def:'A person who grows crops or raises animals for food.',             sentence:'The hardworking farmer harvested his yams in October.',      blank:'The _____ uses a hoe to prepare the soil for planting.',     spellAs:'farmer'},
+  community:  {word:'Community',  emoji:'🏘️',def:'A group of people living in the same area who share resources.',    sentence:'The whole community helped to clean the village square.',    blank:'Every member of the _____ has a role to play in keeping it clean.',spellAs:'community'},
+  // Primary 1-3 — Nigeria & Government
+  Nigeria:    {word:'Nigeria',    emoji:'🇳🇬',def:'A country in West Africa, the most populous country on the continent.',sentence:'Nigeria gained independence from Britain on 1st October 1960.',blank:'_____ is the most populous country in all of Africa.',      spellAs:'nigeria'},
+  Lagos:      {word:'Lagos',      emoji:'🌆',def:'The largest city in Nigeria and the commercial capital.',            sentence:'Lagos is one of the fastest growing cities in the world.',   blank:'_____ is Nigeria\'s busiest and most populated city.',       spellAs:'lagos'},
+  Abuja:      {word:'Abuja',      emoji:'🏛️',def:'The capital city of Nigeria where the federal government is based.', sentence:'The president lives and works in Abuja the capital city.',   blank:'_____ became Nigeria\'s capital city in December 1991.',    spellAs:'abuja'},
+  state:      {word:'State',      emoji:'🗺️',def:'One of the 36 administrative divisions of Nigeria.',                sentence:'Ogun State is famous for its many large industries.',        blank:'Nigeria is divided into thirty-six states and the FCT.',    spellAs:'state'},
+  governor:   {word:'Governor',   emoji:'🏛️',def:'The elected head of government of a Nigerian state.',               sentence:'The governor commissioned the new road in the state capital.',blank:'The _____ of each state is elected by the citizens.',        spellAs:'governor'},
+  president:  {word:'President',  emoji:'👔',def:'The elected head of the Federal Republic of Nigeria.',               sentence:'The president addressed the nation on Independence Day.',    blank:'The _____ is the commander-in-chief of the armed forces.',   spellAs:'president'},
+  citizen:    {word:'Citizen',    emoji:'🪪',def:'A person who belongs to and has rights in a particular country.',    sentence:'Every citizen has the right to vote in a free election.',    blank:'A _____ has both rights and responsibilities in their country.',spellAs:'citizen'},
+  rights:     {word:'Rights',     emoji:'⚖️',def:'The freedoms and protections every person is entitled to by law.',  sentence:'Every child has the right to education and good health.',   blank:'Freedom of speech is one of the basic human _____.',         spellAs:'rights'},
+  culture:    {word:'Culture',    emoji:'🎭',def:'The customs, arts, beliefs and way of life of a particular people.', sentence:'Traditional music and dance are important parts of our culture.',blank:'Nigerian _____ includes over 250 different ethnic languages.', spellAs:'culture'},
+  tradition:  {word:'Tradition',  emoji:'🥁',def:'A custom or practice passed down from generation to generation.',   sentence:'The tradition of the New Yam Festival is celebrated every year.',blank:'The _____ of masquerade dancing is very important in Igbo culture.',spellAs:'tradition'},
+  // Primary 4-6 — Governance & Economics
+  government: {word:'Government', emoji:'🏛️',def:'The group of people who rule and make decisions for a country.',    sentence:'The government is responsible for building schools and hospitals.',blank:'A _____ makes laws and provides services for its citizens.', spellAs:'government'},
+  election:   {word:'Election',   emoji:'🗳️',def:'The process by which citizens vote to choose their leaders.',       sentence:'Nigeria holds a general election every four years.',         blank:'Citizens use an _____ to choose their preferred leaders.',   spellAs:'election'},
+  tax:        {word:'Tax',        emoji:'💰',def:'Money that citizens pay to the government to fund public services.',  sentence:'Income tax is collected by the government from workers.',   blank:'The government uses _____ money to build roads and schools.', spellAs:'tax'},
+  trade:      {word:'Trade',      emoji:'🤝',def:'The buying and selling of goods and services between people.',       sentence:'Nigeria trades oil and gas with many countries of the world.',blank:'International _____ allows countries to sell what they produce.',spellAs:'trade'},
+  resource:   {word:'Resource',   emoji:'⛽',def:'A natural material that people use to meet their needs.',            sentence:'Oil is Nigeria\'s most valuable natural resource.',          blank:'Water is a natural _____ that every country needs.',         spellAs:'resource'},
+  environment:{word:'Environment',emoji:'🌍',def:'The natural world of land, air, water and living things around us.', sentence:'We must protect the environment from pollution and waste.',  blank:'Human activities cause great damage to the natural _____.',  spellAs:'environment'},
+  migration:  {word:'Migration',  emoji:'🚶',def:'The movement of people from one place to another to live or work.',  sentence:'Rural-urban migration has made Lagos grow very rapidly.',    blank:'Economic _____ brings many workers from villages to cities.', spellAs:'migration'},
+  occupation: {word:'Occupation', emoji:'💼',def:'A person\'s regular job or profession.',                             sentence:'Her occupation as a nurse takes her to the hospital daily.',blank:'A doctor and a teacher are both respected occupations.',    spellAs:'occupation'},
+  // JSS level — Advanced Social Studies
+  colonialism:{word:'Colonialism', emoji:'🌍',def:'The practice of a powerful country controlling another country.',  sentence:'British colonialism in Nigeria lasted from 1914 to 1960.',   blank:'_____ ended in Nigeria when independence was declared in 1960.',spellAs:'colonialism'},
+  nationalism:{word:'Nationalism', emoji:'🇳🇬',def:'Pride in and love for one\'s country and the desire for independence.',sentence:'Nationalism inspired Nigerians to fight for independence.',blank:'African _____ grew stronger after the Second World War.',    spellAs:'nationalism'},
+  globalisation:{word:'Globalisation',emoji:'🌐',def:'The process by which the world becomes more connected economically and culturally.',sentence:'Globalisation means Nigerian music is now heard worldwide.',blank:'_____ has made it easier for countries to trade with each other.',spellAs:'globalisation'},
+  democracy:  {word:'Democracy',  emoji:'🗳️',def:'A system where citizens vote to choose their government.',          sentence:'Nigeria practises democracy with regular general elections.',blank:'In a _____ every adult citizen has the right to vote.',       spellAs:'democracy'},
+  corruption: {word:'Corruption', emoji:'⚠️',def:'Dishonest behaviour by people in positions of power for personal gain.',sentence:'Corruption weakens institutions and slows national development.',blank:'Political _____ prevents public money from reaching the poor.',spellAs:'corruption'},
+
   // ══ PRIMARY 4 — ENVIRONMENT & TOOLS ══
   volcano:    {word:'Volcano',    emoji:'🌋',def:'A mountain that can explode and shoot out hot lava.',          sentence:'The volcano erupted and covered the village in ash.',   blank:'Hot lava poured down the side of the _____.',        spellAs:'volcano'},
   glacier:    {word:'Glacier',    emoji:'🏔️',def:'A huge slow-moving river of ice found on mountains.',         sentence:'The glacier moves only a few centimetres every year.',  blank:'Scientists study the _____ to understand climate change.',spellAs:'glacier'},
@@ -1456,12 +1583,104 @@ COLOUR_STAGES['SSS 1']=[
   {id:'cs1-s5',label:'Stage 5 — Master Level',      words:['trigonometry','resultant','probability','statistics'],emoji:'🏆'}
 ];
 
-// ════ UNITS — master list ════
+// ════ UNIT 5: BASIC SCIENCE ════
+var SCIENCE_STAGES={
+  'Nursery 1':[{id:'sc-n1-s1',label:'Stage 1 — Living Things',  words:['plant','animal','water','sun'],    emoji:'🌱'},
+               {id:'sc-n1-s2',label:'Stage 2 — Nature',         words:['rain','wind','cloud','soil'],      emoji:'☁️'}],
+  'Nursery 2':[{id:'sc-n2-s1',label:'Stage 1 — Living Things',  words:['plant','animal','water','sun'],    emoji:'🌱'},
+               {id:'sc-n2-s2',label:'Stage 2 — Nature',         words:['rain','wind','cloud','soil'],      emoji:'☁️'}],
+  'Primary 1':[{id:'sc-p1-s1',label:'Stage 1 — Plants',         words:['seed','root','leaf','stem'],       emoji:'🌿'},
+               {id:'sc-p1-s2',label:'Stage 2 — Animals',        words:['insect','bird','fish','animal'],   emoji:'🐦'},
+               {id:'sc-p1-s3',label:'Stage 3 — Weather',        words:['rain','wind','cloud','flower'],    emoji:'🌧️'}],
+  'Primary 2':[{id:'sc-p2-s1',label:'Stage 1 — Plants',         words:['seed','root','leaf','stem'],       emoji:'🌿'},
+               {id:'sc-p2-s2',label:'Stage 2 — Animals',        words:['insect','bird','fish','animal'],   emoji:'🐦'},
+               {id:'sc-p2-s3',label:'Stage 3 — Materials',      words:['solid','liquid','gas','rock'],     emoji:'🪨'},
+               {id:'sc-p2-s4',label:'Stage 4 — Energy',         words:['heat','light','water','soil'],     emoji:'💡'}],
+  'Primary 3':[{id:'sc-p3-s1',label:'Stage 1 — Plants',         words:['seed','root','leaf','stem'],       emoji:'🌿'},
+               {id:'sc-p3-s2',label:'Stage 2 — Materials',      words:['solid','liquid','gas','rock'],     emoji:'🪨'},
+               {id:'sc-p3-s3',label:'Stage 3 — Forces',         words:['force','friction','magnet','heat'],emoji:'💪'},
+               {id:'sc-p3-s4',label:'Stage 4 — Earth & Space',  words:['planet','orbit','moon','sun'],     emoji:'🪐'},
+               {id:'sc-p3-s5',label:'Stage 5 — Ecology',        words:['habitat','nutrient','pollution','environment'],emoji:'🌍'}],
+  'Primary 4':[{id:'sc-p4-s1',label:'Stage 1 — Forces',         words:['force','friction','magnet','light'],emoji:'💪'},
+               {id:'sc-p4-s2',label:'Stage 2 — Earth & Space',  words:['planet','orbit','gravity','moon'], emoji:'🪐'},
+               {id:'sc-p4-s3',label:'Stage 3 — Living Systems', words:['cell','tissue','organ','nutrient'],emoji:'🔬'}],
+  'Primary 5':[{id:'sc-p5-s1',label:'Stage 1 — Earth & Space',  words:['planet','orbit','gravity','pollution'],emoji:'🪐'},
+               {id:'sc-p5-s2',label:'Stage 2 — Life Science',   words:['cell','tissue','organ','habitat'], emoji:'🔬'},
+               {id:'sc-p5-s3',label:'Stage 3 — Long Words',     words:['environment','pollution','nutrient','friction'],emoji:'📚'},
+               {id:'sc-p5-s4',label:'Stage 4 — Harder Words',   words:['respiration','excretion','organism','photosynthesis'],emoji:'🧬'}],
+  'Primary 6':[{id:'sc-p6-s1',label:'Stage 1 — Life Processes', words:['cell','tissue','organ','organism'], emoji:'🔬'},
+               {id:'sc-p6-s2',label:'Stage 2 — Ecology',        words:['habitat','ecosystem','pollution','environment'],emoji:'🌍'},
+               {id:'sc-p6-s3',label:'Stage 3 — Body Science',   words:['respiration','excretion','photosynthesis','evaporation'],emoji:'🧬'},
+               {id:'sc-p6-s4',label:'Stage 4 — Long Words',     words:['environment','photosynthesis','respiration','excretion'],emoji:'📚'},
+               {id:'sc-p6-s5',label:'Stage 5 — Master Level',   words:['biodiversity','metamorphosis','respiration','excretion'],emoji:'🏆'}],
+};
+['JSS 1','JSS 2','JSS 3'].forEach(function(cl){
+  var i=['JSS 1','JSS 2','JSS 3'].indexOf(cl);
+  var base=[
+    [{id:'sc-j1-s1',label:'Stage 1 — Molecules & Atoms',words:['molecule','atom','element','compound'],emoji:'⚛️'},
+     {id:'sc-j1-s2',label:'Stage 2 — Life Processes',  words:['respiration','excretion','cell','tissue'],emoji:'🔬'},
+     {id:'sc-j1-s3',label:'Stage 3 — Ecology',         words:['habitat','ecosystem','pollution','environment'],emoji:'🌍'}],
+    [{id:'sc-j2-s1',label:'Stage 1 — Chemistry',       words:['reaction','compound','element','molecule'],emoji:'⚗️'},
+     {id:'sc-j2-s2',label:'Stage 2 — Body Systems',    words:['organ','tissue','respiration','excretion'],emoji:'🔬'},
+     {id:'sc-j2-s3',label:'Stage 3 — Long Words',      words:['photosynthesis','respiration','excretion','biodiversity'],emoji:'📚'}],
+    [{id:'sc-j3-s1',label:'Stage 1 — Advanced Chemistry',words:['atom','molecule','reaction','compound'],emoji:'⚗️'},
+     {id:'sc-j3-s2',label:'Stage 2 — Advanced Biology', words:['chromosome','genetics','respiration','excretion'],emoji:'🧬'},
+     {id:'sc-j3-s3',label:'Stage 3 — Master Level',    words:['ecosystem','biodiversity','globalisation','colonialism'],emoji:'🏆'}]
+  ][i];
+  SCIENCE_STAGES[cl]=base;
+});
+SCIENCE_STAGES['SSS 1']=[
+  {id:'sc-s1-s1',label:'Stage 1 — Atomic Theory',    words:['atom','molecule','element','compound'],      emoji:'⚛️'},
+  {id:'sc-s1-s2',label:'Stage 2 — Cell Biology',     words:['cell','tissue','organ','organism'],          emoji:'🔬'},
+  {id:'sc-s1-s3',label:'Stage 3 — Chemical Reactions',words:['reaction','compound','respiration','excretion'],emoji:'⚗️'},
+  {id:'sc-s1-s4',label:'Stage 4 — Ecology',          words:['ecosystem','biodiversity','pollution','environment'],emoji:'🌍'},
+  {id:'sc-s1-s5',label:'Stage 5 — Master Level',     words:['chromosome','genetics','globalisation','nationalism'],emoji:'🏆'}
+];
+
+// ════ UNIT 6: SOCIAL STUDIES ════
+var SOCIAL_STAGES={
+  'Nursery 1':[{id:'ss-n1-s1',label:'Stage 1 — My Family',      words:['family','home','school','teacher'], emoji:'👨‍👩‍👧‍👦'},
+               {id:'ss-n1-s2',label:'Stage 2 — My Community',   words:['market','farm','doctor','police'],  emoji:'🏘️'}],
+  'Nursery 2':[{id:'ss-n2-s1',label:'Stage 1 — My Family',      words:['family','home','school','teacher'], emoji:'👨‍👩‍👧‍👦'},
+               {id:'ss-n2-s2',label:'Stage 2 — My Community',   words:['market','farm','doctor','police'],  emoji:'🏘️'}],
+  'Primary 1':[{id:'ss-p1-s1',label:'Stage 1 — Family & Home',  words:['family','home','community','school'],emoji:'🏠'},
+               {id:'ss-p1-s2',label:'Stage 2 — Workers',        words:['teacher','doctor','farmer','police'],emoji:'👷'},
+               {id:'ss-p1-s3',label:'Stage 3 — Our Country',    words:['Nigeria','Lagos','Abuja','market'],  emoji:'🇳🇬'}],
+  'Primary 2':[{id:'ss-p2-s1',label:'Stage 1 — Family & Home',  words:['family','home','community','school'],emoji:'🏠'},
+               {id:'ss-p2-s2',label:'Stage 2 — Workers',        words:['teacher','doctor','farmer','police'],emoji:'👷'},
+               {id:'ss-p2-s3',label:'Stage 3 — Nigeria',        words:['Nigeria','Lagos','Abuja','state'],   emoji:'🇳🇬'},
+               {id:'ss-p2-s4',label:'Stage 4 — Citizenship',    words:['citizen','rights','culture','tradition'],emoji:'⚖️'}],
+  'Primary 3':[{id:'ss-p3-s1',label:'Stage 1 — Community',      words:['community','market','farm','occupation'],emoji:'🏘️'},
+               {id:'ss-p3-s2',label:'Stage 2 — Nigeria',        words:['Nigeria','Lagos','Abuja','state'],   emoji:'🇳🇬'},
+               {id:'ss-p3-s3',label:'Stage 3 — Citizenship',    words:['citizen','rights','culture','tradition'],emoji:'⚖️'},
+               {id:'ss-p3-s4',label:'Stage 4 — Government',     words:['governor','president','government','election'],emoji:'🏛️'},
+               {id:'ss-p3-s5',label:'Stage 5 — Long Words',     words:['community','tradition','occupation','environment'],emoji:'📚'}],
+  'Primary 4':[{id:'ss-p4-s1',label:'Stage 1 — Government',     words:['government','election','governor','president'],emoji:'🏛️'},
+               {id:'ss-p4-s2',label:'Stage 2 — Economy',        words:['trade','tax','resource','occupation'], emoji:'💰'},
+               {id:'ss-p4-s3',label:'Stage 3 — Environment',    words:['environment','pollution','migration','community'],emoji:'🌍'}],
+  'Primary 5':[{id:'ss-p5-s1',label:'Stage 1 — Government',     words:['government','election','citizen','rights'],emoji:'🏛️'},
+               {id:'ss-p5-s2',label:'Stage 2 — Economy',        words:['trade','tax','resource','migration'],  emoji:'💰'},
+               {id:'ss-p5-s3',label:'Stage 3 — Culture',        words:['culture','tradition','occupation','community'],emoji:'🎭'},
+               {id:'ss-p5-s4',label:'Stage 4 — Long Words',     words:['environment','government','occupation','migration'],emoji:'📚'}],
+  'Primary 6':[{id:'ss-p6-s1',label:'Stage 1 — Governance',     words:['government','election','democracy','constitution'],emoji:'🏛️'},
+               {id:'ss-p6-s2',label:'Stage 2 — Economy',        words:['trade','tax','resource','corruption'],  emoji:'💰'},
+               {id:'ss-p6-s3',label:'Stage 3 — History',        words:['Nigeria','independence','colonialism','nationalism'],emoji:'🇳🇬'},
+               {id:'ss-p6-s4',label:'Stage 4 — Long Words',     words:['government','constitution','colonialism','nationalism'],emoji:'📚'},
+               {id:'ss-p6-s5',label:'Stage 5 — Master Level',   words:['globalisation','nationalism','colonialism','corruption'],emoji:'🏆'}],
+};
+['JSS 1','JSS 2','JSS 3','SSS 1'].forEach(function(cl){
+  var prefix='ss-'+cl.replace(' ','').toLowerCase();
+  SOCIAL_STAGES[cl]=SOCIAL_STAGES['Primary 6'].map(function(s){
+    return Object.assign({},s,{id:s.id.replace('ss-p6',prefix)});
+  });
+});
 var UNITS=[
-  {key:'animals',title:'Animals Around Us',emoji:'🦁',stagesMap:STAGES},
-  {key:'body',   title:'My Body',           emoji:'🫀',stagesMap:BODY_STAGES},
-  {key:'food',   title:'Food & Drinks',     emoji:'🍎',stagesMap:FOOD_STAGES},
-  {key:'colours',title:'Colours & Shapes',  emoji:'🎨',stagesMap:COLOUR_STAGES}
+  {key:'animals', title:'Animals Around Us',  emoji:'🦁',stagesMap:STAGES},
+  {key:'body',    title:'My Body',            emoji:'🫀',stagesMap:BODY_STAGES},
+  {key:'food',    title:'Food & Drinks',      emoji:'🍎',stagesMap:FOOD_STAGES},
+  {key:'colours', title:'Colours & Shapes',   emoji:'🎨',stagesMap:COLOUR_STAGES},
+  {key:'science', title:'Basic Science',      emoji:'🔬',stagesMap:SCIENCE_STAGES},
+  {key:'social',  title:'Social Studies',     emoji:'🌍',stagesMap:SOCIAL_STAGES}
 ];
 
 // ════════════════════════════════════════
@@ -1794,8 +2013,12 @@ function renderLearnCard(){
   document.getElementById('learn-tb').style.background=col.bg;
   document.getElementById('learn-prev').style.display=idx===0?'none':'';
   var nb=document.getElementById('learn-next');
+  // Use nc if defined, else wc, but always ensure button is visible (not near-white)
   var nextBg=col.nc||col.wc;
-  nb.textContent=idx===total-1?'Start Practice →':'Next →';
+  // Safety: if nextBg is very light (starts with #E,#F,#D high-luma), use a fallback
+  var isLight=/^#[EFDCefdcBb]/i.test(nextBg);
+  if(isLight) nextBg='#1E3A8A'; // fallback to dark blue
+  nb.textContent=idx===total-1?'Start Practice \u2192':'Next \u2192';
   nb.style.background=nextBg;nb.style.borderColor=nextBg;nb.style.color='#fff';
   // Smooth fade (RAF-based, no classList jank)
   var card=document.getElementById('learn-card');
