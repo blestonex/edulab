@@ -67,6 +67,7 @@ body{display:flex;flex-direction:column}
 /* ANIMATIONS */
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-6px)}50%{transform:translateX(6px)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
 .fade-in{animation:fadeUp .25s ease both}
 .shake{animation:shake .3s ease}
 
@@ -532,15 +533,17 @@ body{display:flex;flex-direction:column}
       <div id="host-room-code" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:42px;color:#fff;letter-spacing:10px">----</div>
       <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:6px">Students enter this code to join</div>
     </div>
-    <!-- House names -->
+    <!-- House names — dynamic, 2 to 8 houses -->
     <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
-      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#312E81;margin-bottom:12px">🏠 House Names</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div><div style="font-size:11px;font-weight:700;color:#6B7B8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">🔴 House 1</div><input id="h1-name" type="text" value="Red House" style="width:100%;padding:9px 10px;border:1.5px solid #D8E0E8;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:#1E1B4B"></div>
-        <div><div style="font-size:11px;font-weight:700;color:#6B7B8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">🔵 House 2</div><input id="h2-name" type="text" value="Blue House" style="width:100%;padding:9px 10px;border:1.5px solid #D8E0E8;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:#1E1B4B"></div>
-        <div><div style="font-size:11px;font-weight:700;color:#6B7B8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">🟢 House 3</div><input id="h3-name" type="text" value="Green House" style="width:100%;padding:9px 10px;border:1.5px solid #D8E0E8;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:#1E1B4B"></div>
-        <div><div style="font-size:11px;font-weight:700;color:#6B7B8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">🟡 House 4</div><input id="h4-name" type="text" value="Yellow House" style="width:100%;padding:9px 10px;border:1.5px solid #D8E0E8;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:#1E1B4B"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#312E81">🏠 Houses</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="removeHouse()" id="house-remove-btn" style="background:#FEF2F2;border:1.5px solid #FCA5A5;color:#B91C1C;border-radius:8px;padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">− Remove</button>
+          <button onclick="addHouse()" id="house-add-btn" style="background:#EDE9FE;border:1.5px solid #A78BFA;color:#5B21B6;border-radius:8px;padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">+ Add</button>
+        </div>
       </div>
+      <div id="house-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div style="font-size:11px;color:#9CA3AF;text-align:center;margin-top:8px">2 to 8 houses supported</div>
     </div>
     <!-- Unit & class selector -->
     <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
@@ -590,11 +593,15 @@ body{display:flex;flex-direction:column}
       <div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:16px">Tap the house you belong to</div>
       <div id="join-houses" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
-    <div id="join-step3" style="display:none;flex:1;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:12px">
-      <div style="font-size:60px" id="join-house-emoji">🏠</div>
-      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:24px;color:#fff" id="join-house-label">Waiting...</div>
-      <div style="font-size:14px;color:rgba(255,255,255,.6)">Quiz starts when teacher taps Start</div>
-      <div style="font-size:40px;margin-top:10px" id="join-waiting-dots">⏳</div>
+    <div id="join-step3" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:24px">
+      <div style="font-size:72px" id="join-house-emoji">🏠</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:26px;color:#fff" id="join-house-label">Your House</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.65);margin-top:4px">You are in! Waiting for teacher to start…</div>
+      <div style="margin-top:24px;background:rgba(255,255,255,.15);border-radius:14px;padding:18px 24px">
+        <div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Room Code</div>
+        <div id="join-room-code-disp" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:32px;color:#fff;letter-spacing:10px"></div>
+      </div>
+      <div style="font-size:32px;margin-top:16px;animation:pulse 1.5s infinite" id="join-waiting-dots">⏳</div>
     </div>
   </div>
 </div>
@@ -2119,20 +2126,28 @@ window.addEventListener('DOMContentLoaded',init);
 // ════════════════════════════════════════
 var COMP={
   roomCode:null,
-  role:null,          // 'host' | 'player' | 'board'
-  houseIdx:null,      // 0-3 for players
-  houses:[],          // [{name,emoji,color,score}]
-  questions:[],       // shuffled word keys
+  role:null,
+  houseIdx:null,
+  houses:[],
+  questions:[],
   qIdx:0,
   myScore:0,
   timer:null,
-  listener:null,      // Firebase snapshot unsubscribe
+  listener:null,
+  _fromScreen:'splash',
+  // 8 house colour definitions
   HOUSE_DEFS:[
-    {emoji:'🔴',color:'#DC2626',bg:'#FEF2F2',tc:'#7F1D1D'},
-    {emoji:'🔵',color:'#1D4ED8',bg:'#EFF6FF',tc:'#1E3A8A'},
-    {emoji:'🟢',color:'#15803D',bg:'#F0FDF4',tc:'#052E16'},
-    {emoji:'🟡',color:'#CA8A04',bg:'#FEFCE8',tc:'#422006'}
-  ]
+    {emoji:'🔴',color:'#DC2626',bg:'#FEF2F2',tc:'#7F1D1D',name:'Red House'},
+    {emoji:'🔵',color:'#1D4ED8',bg:'#EFF6FF',tc:'#1E3A8A',name:'Blue House'},
+    {emoji:'🟢',color:'#15803D',bg:'#F0FDF4',tc:'#052E16',name:'Green House'},
+    {emoji:'🟡',color:'#CA8A04',bg:'#FEFCE8',tc:'#422006',name:'Yellow House'},
+    {emoji:'🟣',color:'#7C3AED',bg:'#F5F3FF',tc:'#3B0764',name:'Purple House'},
+    {emoji:'🟠',color:'#EA580C',bg:'#FFF7ED',tc:'#431407',name:'Orange House'},
+    {emoji:'⚫',color:'#1F2937',bg:'#F9FAFB',tc:'#111827',name:'Black House'},
+    {emoji:'🩷',color:'#DB2777',bg:'#FDF2F8',tc:'#831843',name:'Pink House'}
+  ],
+  // Currently active house count (default 4)
+  houseCount:4
 };
 
 function openCompMenu(){
@@ -2144,12 +2159,13 @@ function openCompMenu(){
 // ── HOST ──
 function openCompHost(){
   var code='';for(var i=0;i<4;i++)code+='ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random()*23)];
-  COMP.roomCode=code;COMP.role='host';
+  COMP.roomCode=code;COMP.role='host';COMP.houseCount=4;
   // Show connecting state until Firebase confirms write
   var codeEl=document.getElementById('host-room-code');
   if(codeEl)codeEl.textContent='…';
   document.getElementById('host-player-count').textContent='0';
   SS('comp-host');
+  renderHouseList(); // Build dynamic house list
   var houses=getHostHouses();
   // Write room — onReady ensures Firebase is initialized first
   FB.onReady(function(){
@@ -2180,16 +2196,46 @@ function openCompHost(){
   });
 }
 
+function renderHouseList(){
+  var list=document.getElementById('house-list');if(!list)return;
+  list.innerHTML='';
+  var n=COMP.houseCount;
+  for(var i=0;i<n;i++){
+    var hd=COMP.HOUSE_DEFS[i];
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px';
+    row.innerHTML='<div style="font-size:22px;width:32px;text-align:center;flex-shrink:0">'+hd.emoji+'</div>'
+      +'<input id="h'+(i+1)+'-name" type="text" value="'+hd.name+'" style="flex:1;padding:9px 10px;border:1.5px solid '+hd.color+';border-radius:8px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:14px;color:#1E1B4B">';
+    list.appendChild(row);
+  }
+  // Update button states
+  var addBtn=document.getElementById('house-add-btn');
+  var remBtn=document.getElementById('house-remove-btn');
+  if(addBtn)addBtn.disabled=n>=8;
+  if(remBtn)remBtn.disabled=n<=2;
+}
+
+function addHouse(){
+  if(COMP.houseCount>=8)return;
+  COMP.houseCount++;
+  renderHouseList();
+}
+
+function removeHouse(){
+  if(COMP.houseCount<=2)return;
+  COMP.houseCount--;
+  renderHouseList();
+}
+
 function getHostHouses(){
-  return COMP.HOUSE_DEFS.map(function(hd,i){
-    var name=[
-      document.getElementById('h1-name'),
-      document.getElementById('h2-name'),
-      document.getElementById('h3-name'),
-      document.getElementById('h4-name')
-    ][i];
-    return {name:name?name.value.trim()||('House '+(i+1)):'House '+(i+1),emoji:hd.emoji,color:hd.color,bg:hd.bg,tc:hd.tc,score:0};
-  });
+  var houses=[];
+  for(var i=0;i<COMP.houseCount;i++){
+    var hd=COMP.HOUSE_DEFS[i];
+    var inp=document.getElementById('h'+(i+1)+'-name');
+    var name=inp?inp.value.trim()||hd.name:hd.name;
+    houses.push({name:name,emoji:hd.emoji,color:hd.color,bg:hd.bg,tc:hd.tc,score:0});
+  }
+  return houses;
 }
 
 function hostStartQuiz(){
@@ -2197,15 +2243,36 @@ function hostStartQuiz(){
   var uk=document.getElementById('host-unit').value;
   var unit=UNITS.find(function(u){return u.key===uk;})||UNITS[0];
   var stages=unit.stagesMap[cl]||unit.stagesMap['Primary 4']||[];
-  // Pool all words from all stages for this class+unit
-  var pool=[];stages.forEach(function(st){st.words.forEach(function(w){if(pool.indexOf(w)===-1)pool.push(w);});});
-  var qs=shuffle(pool).slice(0,10); // 10 questions max
+  var pool=[];
+  stages.forEach(function(st){
+    st.words.forEach(function(w){if(pool.indexOf(w)===-1)pool.push(w);});
+  });
+  var qs=shuffle(pool).slice(0,10);
   var houses=getHostHouses();
-  compSaveRoom({status:'playing',houses:houses,players:{},qIdx:0,questions:qs,startedAt:Date.now()});
-  // Open scoreboard on host device
-  COMP.questions=qs;COMP.houses=houses;
-  boardShowLive(COMP.roomCode);
-  SS('comp-board');
+
+  // Disable button to prevent double-tap
+  var btn=document.getElementById('host-start-btn');
+  if(btn){btn.textContent='Starting…';btn.disabled=true;}
+
+  // Write playing status to Firestore — this is what triggers all students to start
+  FB.onReady(function(){
+    var ref=FB.db.collection(COMP_COL).doc(COMP.roomCode);
+    ref.update({
+      status:'playing',
+      houses:houses,
+      questions:qs,
+      qIdx:0,
+      startedAt:Date.now()
+    }).then(function(){
+      COMP.questions=qs;COMP.houses=houses;
+      boardShowLive(COMP.roomCode);
+      SS('comp-board');
+    }).catch(function(e){
+      console.warn('Start failed:',e.message);
+      if(btn){btn.textContent='🚀 Start Quiz!';btn.disabled=false;}
+      toast('Could not start. Try again.',2000);
+    });
+  });
 }
 
 // ── JOIN ──
@@ -2267,27 +2334,33 @@ function joinFindRoom(){
 function joinSelectHouse(idx,house){
   COMP.houseIdx=idx;COMP.myScore=0;
   var pid=STU.uid||STU.name||('guest_'+Date.now());
-  // Register as player
   compUpdatePlayer(pid,{name:STU.name||'Guest',houseIdx:idx,score:0,joinedAt:Date.now()});
+
   // Show waiting screen
   document.getElementById('join-step2').style.display='none';
-  document.getElementById('join-step3').style.display='flex';
-  document.getElementById('join-house-emoji').textContent=house.emoji;
-  document.getElementById('join-house-label').textContent=house.name;
-  // Listen for game start
-  if(COMP.listener)COMP.listener();
+  var s3=document.getElementById('join-step3');
+  if(s3)s3.style.display='flex';
+  var he=document.getElementById('join-house-emoji');if(he)he.textContent=house.emoji;
+  var hl=document.getElementById('join-house-label');if(hl)hl.textContent=house.name;
+  var rc=document.getElementById('join-room-code-disp');if(rc)rc.textContent=COMP.roomCode;
+
+  // Cancel any previous listener
+  if(COMP.listener){COMP.listener();COMP.listener=null;}
+
+  // Listen for host to start — only the Firestore snapshot triggers the game
   COMP.listener=compListen(function(data){
     if(!data)return;
-    if(data.status==='playing'&&data.qIdx>=0){
-      COMP.questions=data.questions||[];
+    // Only start if host explicitly set status to 'playing'
+    if(data.status==='playing'&&data.questions&&data.questions.length>0){
+      COMP.questions=data.questions;
       COMP.houses=data.houses||[];
-      COMP.qIdx=data.qIdx;
+      COMP.qIdx=0; // Always start from question 0 for new joiners
       if(COMP.listener){COMP.listener();COMP.listener=null;}
       startCompPlay();
     }
     if(data.status==='ended'){
       if(COMP.listener){COMP.listener();COMP.listener=null;}
-      showCompEnd(data.houses);
+      showCompEnd(data.houses||[]);
     }
   });
 }
