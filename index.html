@@ -564,12 +564,25 @@ body{display:flex;flex-direction:column}
       </select>
     </div>
     <!-- Player count -->
-    <div id="host-players" style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between">
-      <div style="font-size:14px;color:#3D4A5C;font-weight:700">👥 Players joined</div>
-      <div id="host-player-count" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#7C3AED">0</div>
+    <div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:14px;color:#3D4A5C;font-weight:700">👥 Players joined</div>
+        <div id="host-player-count" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#7C3AED">0</div>
+      </div>
+      <div id="host-picked-wrap" style="display:none;display:none;align-items:center;justify-content:space-between">
+        <div style="font-size:14px;color:#15803D;font-weight:700">🏠 Houses picked</div>
+        <div id="host-picked-count" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#15803D">0</div>
+      </div>
     </div>
-    <button id="host-start-btn" onclick="hostStartQuiz()" style="width:100%;padding:16px;background:linear-gradient(135deg,#7C3AED,#4C1D95);color:#fff;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;cursor:pointer">
-      🚀 Start Quiz!
+
+    <!-- Phase 1: Start (sends houses to students) -->
+    <button id="host-start-btn" onclick="hostStartQuiz()" style="width:100%;padding:16px;background:linear-gradient(135deg,#7C3AED,#4C1D95);color:#fff;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;cursor:pointer;margin-bottom:8px">
+      🚀 Start Quiz — Let students pick house
+    </button>
+
+    <!-- Phase 2: Begin (fires questions for everyone simultaneously) — hidden until phase 1 done -->
+    <button id="host-begin-btn" onclick="hostBeginQuiz()" style="width:100%;padding:16px;background:linear-gradient(135deg,#15803D,#166534);color:#fff;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;cursor:pointer;display:none">
+      🎯 Begin! — Start questions for everyone
     </button>
   </div>
 </div>
@@ -2257,28 +2270,64 @@ function hostStartQuiz(){
   var qs=shuffle(pool).slice(0,10);
   var houses=getHostHouses();
 
-  // Disable button to prevent double-tap
   var btn=document.getElementById('host-start-btn');
-  if(btn){btn.textContent='Starting…';btn.disabled=true;}
+  if(btn){btn.textContent='Sending to students\u2026';btn.disabled=true;}
 
-  // Write playing status to Firestore — this is what triggers all students to start
   FB.onReady(function(){
     var ref=FB.db.collection(COMP_COL).doc(COMP.roomCode);
+    // Phase 1: status='picking' — students see house picker, but questions haven't started
     ref.set({
-      status:'playing',
+      status:'picking',
       houses:houses,
       questions:qs,
       qIdx:0,
-      startedAt:Date.now()
+      startedAt:0
     },{merge:true}).then(function(){
       COMP.questions=qs;COMP.houses=houses;
-      boardShowLive(COMP.roomCode);
-      SS('comp-board');
+      // Show Phase 2 begin button, hide Phase 1
+      if(btn)btn.style.display='none';
+      var beginBtn=document.getElementById('host-begin-btn');
+      if(beginBtn)beginBtn.style.display='';
+      var pw=document.getElementById('host-picked-wrap');
+      if(pw)pw.style.display='flex';
+      toast('Students can now pick their house!',2000);
+      // Update picked count in real time
+      if(COMP.listener)COMP.listener();
+      COMP.listener=ref.onSnapshot(function(doc){
+        if(!doc.exists)return;
+        var d=doc.data();
+        var picked=Object.values(d.players||{}).filter(function(p){return p.houseIdx!==undefined;}).length;
+        var joined=Object.keys(d.players||{}).length;
+        var pc=document.getElementById('host-player-count');if(pc)pc.textContent=joined;
+        var hc=document.getElementById('host-picked-count');if(hc)hc.textContent=picked;
+      },function(){});
     }).catch(function(e){
-      console.warn('Start failed:',e.message);
-      if(btn){btn.textContent='🚀 Start Quiz!';btn.disabled=false;}
+      console.warn('Phase 1 failed:',e.message);
+      if(btn){btn.textContent='\uD83D\uDE80 Start Quiz \u2014 Let students pick house';btn.disabled=false;}
       toast('Could not start. Try again.',2000);
     });
+  });
+}
+
+function hostBeginQuiz(){
+  // Phase 2: teacher fires questions for ALL students simultaneously
+  var btn=document.getElementById('host-begin-btn');
+  if(btn){btn.textContent='Starting\u2026';btn.disabled=true;}
+
+  FB.onReady(function(){
+    var ref=FB.db.collection(COMP_COL).doc(COMP.roomCode);
+    ref.set({status:'started',startedAt:Date.now()},{merge:true})
+      .then(function(){
+        // Host moves to scoreboard
+        if(COMP.listener)COMP.listener();COMP.listener=null;
+        boardShowLive(COMP.roomCode);
+        SS('comp-board');
+      })
+      .catch(function(e){
+        console.warn('Begin failed:',e.message);
+        if(btn){btn.textContent='\uD83C\uDFAF Begin! \u2014 Start questions for everyone';btn.disabled=false;}
+        toast('Could not begin. Try again.',2000);
+      });
   });
 }
 
@@ -2322,7 +2371,7 @@ function joinFindRoom(){
       return;
     }
     // Room found — go to waiting screen immediately
-    COMP.roomCode=code;COMP.role='player';
+    COMP.roomCode=code;COMP.role='player';COMP.houseIdx=null;COMP._pendingStart=false;
     document.getElementById('join-step1').style.display='none';
     var s2=document.getElementById('join-step2');
     if(s2)s2.style.display='flex';
@@ -2333,12 +2382,24 @@ function joinFindRoom(){
     if(COMP.listener){COMP.listener();COMP.listener=null;}
     COMP.listener=compListen(function(d){
       if(!d)return;
-      if(d.status==='playing'&&d.houses&&d.houses.length>0){
-        // Teacher started — show house picker with ACTUAL configured houses
+      // Phase 1: teacher opened house picker
+      if(d.status==='picking'&&d.houses&&d.houses.length>0){
         COMP.questions=d.questions||[];
         COMP.houses=d.houses;
-        if(COMP.listener){COMP.listener();COMP.listener=null;}
         showHousePicker(d.houses);
+        // Now listen for phase 2 — teacher fires Begin
+        // (listener continues, don't cancel it)
+      }
+      // Phase 2: teacher fired Begin — all start simultaneously
+      if(d.status==='started'){
+        if(COMP.listener){COMP.listener();COMP.listener=null;}
+        // If student already picked house, go straight to play
+        if(COMP.houseIdx!==null){
+          startCompPlay();
+        }else{
+          // Student hasn't picked yet — make house picker fire play on pick
+          COMP._pendingStart=true;
+        }
       }
       if(d.status==='ended'){
         if(COMP.listener){COMP.listener();COMP.listener=null;}
@@ -2367,8 +2428,27 @@ function joinSelectHouse(idx,house){
   COMP.houseIdx=idx;COMP.myScore=0;
   var pid=STU.uid||STU.name||('guest_'+Date.now());
   compUpdatePlayer(pid,{name:STU.name||'Guest',houseIdx:idx,score:0,joinedAt:Date.now()});
-  // Go straight into play — questions and houses already loaded from Firestore
-  startCompPlay();
+
+  // If teacher already fired Begin before student picked, start immediately
+  if(COMP._pendingStart){
+    COMP._pendingStart=false;
+    startCompPlay();
+    return;
+  }
+
+  // Otherwise show a "waiting for teacher to begin" screen
+  var s3=document.getElementById('join-step3');if(s3)s3.style.display='none';
+  var s2=document.getElementById('join-step2');
+  if(s2){
+    s2.style.display='flex';
+    // Update text to show which house they picked
+    var title=s2.querySelector('div');
+    if(title){
+      title.innerHTML='<div style="font-size:48px;margin-bottom:8px">'+house.emoji+'</div>'
+        +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:22px;color:#fff">'+house.name+'</div>'
+        +'<div style="font-size:14px;color:rgba(255,255,255,.65);margin-top:6px">Waiting for teacher to begin\u2026</div>';
+    }
+  }
 }
 
 // ── PLAY ──
