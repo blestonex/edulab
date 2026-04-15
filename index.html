@@ -2335,9 +2335,12 @@ function hostBeginQuiz(){
 function openCompJoin(){
   COMP._fromScreen=document.querySelector('.screen.active')?document.querySelector('.screen.active').id:'splash';
   if(COMP.listener){COMP.listener();COMP.listener=null;}
+  COMP.houseIdx=null;COMP._pendingStart=false;
   document.getElementById('join-step1').style.display='';
   var s2=document.getElementById('join-step2');if(s2)s2.style.display='none';
-  var s3=document.getElementById('join-step3');if(s3)s3.style.display='none';
+  var s3=document.getElementById('join-step3');
+  if(s3){s3.style.display='none';s3.removeAttribute('data-shown');}
+  var hc=document.getElementById('join-houses');if(hc)hc.innerHTML='';
   document.getElementById('join-code-input').value='';
   var err=document.getElementById('join-error');if(err)err.style.display='none';
   SS('comp-join');
@@ -2382,23 +2385,28 @@ function joinFindRoom(){
     if(COMP.listener){COMP.listener();COMP.listener=null;}
     COMP.listener=compListen(function(d){
       if(!d)return;
-      // Phase 1: teacher opened house picker
+      // Phase 1: teacher opened house picker — only show ONCE
       if(d.status==='picking'&&d.houses&&d.houses.length>0){
         COMP.questions=d.questions||[];
         COMP.houses=d.houses;
-        showHousePicker(d.houses);
-        // Now listen for phase 2 — teacher fires Begin
-        // (listener continues, don't cancel it)
+        // Only build house picker if student hasn't already picked
+        if(COMP.houseIdx===null){
+          var s3=document.getElementById('join-step3');
+          if(!s3||s3.style.display==='none'||s3.style.display===''){
+            showHousePicker(d.houses);
+          }
+        }
       }
       // Phase 2: teacher fired Begin — all start simultaneously
       if(d.status==='started'){
         if(COMP.listener){COMP.listener();COMP.listener=null;}
-        // If student already picked house, go straight to play
         if(COMP.houseIdx!==null){
           startCompPlay();
         }else{
-          // Student hasn't picked yet — make house picker fire play on pick
+          // Student hasn't picked yet — flag so pick triggers immediate start
           COMP._pendingStart=true;
+          // Also show house picker if not shown yet
+          if(COMP.houses&&COMP.houses.length>0)showHousePicker(COMP.houses);
         }
       }
       if(d.status==='ended'){
@@ -2410,11 +2418,14 @@ function joinFindRoom(){
 }
 
 function showHousePicker(houses){
-  // Show step 3 (house picker) with the correct houses from Firestore
   var s2=document.getElementById('join-step2');if(s2)s2.style.display='none';
-  var s3=document.getElementById('join-step3');if(s3)s3.style.display='flex';
+  var s3=document.getElementById('join-step3');
+  if(!s3)return;
+  s3.style.display='flex';
+  s3.setAttribute('data-shown','1'); // mark as shown — prevents rebuild
   var hc=document.getElementById('join-houses');if(!hc)return;
-  hc.innerHTML='';
+  // Don't rebuild if already showing buttons
+  if(hc.children.length>0)return;
   houses.forEach(function(h,i){
     var btn=document.createElement('button');
     btn.style.cssText='width:100%;padding:15px 18px;border:2.5px solid '+h.color+';border-radius:12px;background:'+h.bg+';color:'+h.tc+';font-family:\'Nunito\',sans-serif;font-weight:900;font-size:16px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;flex-shrink:0';
