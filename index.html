@@ -238,6 +238,12 @@ body{display:flex;flex-direction:column}
     <div class="splash-lbl">How is this device used?</div>
     <button class="mode-btn" onclick="pickMode('single')"><span class="mt">👤 My personal device</span><span class="md">One student uses this device</span></button>
     <button class="mode-btn" onclick="pickMode('shared')"><span class="mt">👥 Shared class device</span><span class="md">Multiple students take turns</span></button>
+    <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,.15);padding-top:12px">
+      <button class="mode-btn" onclick="openCompMenu()" style="border-color:rgba(255,200,80,.4);background:rgba(255,200,80,.1)">
+        <span class="mt">🏆 House Competition</span>
+        <span class="md">Host or join a live inter-house quiz</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -260,7 +266,10 @@ body{display:flex;flex-direction:column}
         <h2>Who is learning today? 👋</h2>
         <p>Tap your name to begin · <span id="roster-count" style="opacity:.8"></span></p>
       </div>
-      <button onclick="openAdmin()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);border-radius:10px;color:#fff;padding:8px 12px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;white-space:nowrap">⚙️ Admin</button>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button onclick="openCompMenu()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);border-radius:10px;color:#fff;padding:8px 12px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;white-space:nowrap">🏆</button>
+        <button onclick="openAdmin()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);border-radius:10px;color:#fff;padding:8px 12px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;white-space:nowrap">⚙️ Admin</button>
+      </div>
     </div>
   </div>
   <div class="roster-search">
@@ -361,6 +370,17 @@ body{display:flex;flex-direction:column}
     </div>
     <div class="subj-card" style="opacity:.4;cursor:not-allowed">
       <div class="subj-head"><div class="subj-icon" style="background:#FFF3E0;color:#E65100">➕</div><div class="subj-meta"><div class="subj-name" style="color:var(--sm)">Mathematics</div><div class="subj-desc">Coming soon in Phase 2</div></div></div>
+    </div>
+    <!-- Join Competition — single-user students tap this -->
+    <div class="subj-card" onclick="openCompJoin()" style="background:linear-gradient(135deg,#065F46,#047857);border:none">
+      <div class="subj-head">
+        <div class="subj-icon" style="background:rgba(255,255,255,.15);color:#fff;font-size:24px">🎮</div>
+        <div class="subj-meta">
+          <div class="subj-name" style="color:#fff">Join Competition</div>
+          <div class="subj-desc" style="color:rgba(255,255,255,.6)">Enter room code to play live quiz</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.4)">›</span>
+      </div>
     </div>
   </div>
 </div>
@@ -470,6 +490,157 @@ body{display:flex;flex-direction:column}
 
 <div id="toast"></div>
 
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- HOUSE COMPETITION SCREENS                         -->
+<!-- ═══════════════════════════════════════════════════ -->
+
+<!-- COMP MENU — choose Host or Join -->
+<div id="comp-menu" class="screen" style="background:linear-gradient(145deg,#1E1B4B,#312E81,#4C1D95)">
+  <div class="topbar" style="background:transparent">
+    <button class="tback" onclick="SS(COMP._fromScreen||'splash')">‹</button>
+    <div class="tlogo" style="color:#fff">House <span style="opacity:.5">Competition</span></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;gap:16px">
+    <div style="font-size:64px;margin-bottom:8px">🏆</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:26px;color:#fff;text-align:center">Inter-House Quiz</div>
+    <div style="font-size:14px;color:rgba(255,255,255,.55);text-align:center;margin-bottom:16px">Live real-time competition between houses</div>
+    <button onclick="openCompHost()" style="width:100%;padding:18px;border:2px solid rgba(255,255,255,.25);border-radius:14px;background:rgba(255,255,255,.12);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;cursor:pointer;text-align:left">
+      <span style="font-size:22px">📡</span> Host a Competition
+      <div style="font-size:12px;font-weight:600;opacity:.55;margin-top:4px">Teacher — create a room and control the quiz</div>
+    </button>
+    <button onclick="openCompJoin()" style="width:100%;padding:18px;border:2px solid rgba(255,255,255,.25);border-radius:14px;background:rgba(255,255,255,.12);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;cursor:pointer;text-align:left">
+      <span style="font-size:22px">🎮</span> Join a Competition
+      <div style="font-size:12px;font-weight:600;opacity:.55;margin-top:4px">Student — enter your room code and play</div>
+    </button>
+    <button onclick="openCompBoard()" style="width:100%;padding:18px;border:2px solid rgba(255,255,255,.25);border-radius:14px;background:rgba(255,255,255,.12);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;cursor:pointer;text-align:left">
+      <span style="font-size:22px">📺</span> View Scoreboard
+      <div style="font-size:12px;font-weight:600;opacity:.55;margin-top:4px">Project on big screen — enter room code</div>
+    </button>
+  </div>
+</div>
+
+<!-- COMP HOST — teacher sets up the room -->
+<div id="comp-host" class="screen" style="background:linear-gradient(180deg,#1E1B4B 0%,#1E1B4B 110px,#F0EDFF 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#1E1B4B,#312E81)">
+    <button class="tback" onclick="SS('comp-menu')">‹</button>
+    <div class="tlogo" style="color:#fff">Host <span style="opacity:.5">Setup</span></div>
+  </div>
+  <div class="content" style="padding:16px">
+    <!-- Room code display -->
+    <div style="background:linear-gradient(135deg,#7C3AED,#4C1D95);border-radius:14px;padding:18px;text-align:center;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px">Room Code</div>
+      <div id="host-room-code" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:42px;color:#fff;letter-spacing:10px">----</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:6px">Students enter this code to join</div>
+    </div>
+    <!-- House names -->
+    <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#312E81;margin-bottom:12px">🏠 House Names</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><div style="font-size:11px;font-weight:700;color:#6B7B8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">🔴 House 1</div><input id="h1-name" type="text" value="Red House" style="width:100%;padding:9px 10px;border:1.5px solid #D8E0E8;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:#1E1B4B"></div>
+        <div><div style="font-size:11px;font-weight:700;color:#6B7B8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">🔵 House 2</div><input id="h2-name" type="text" value="Blue House" style="width:100%;padding:9px 10px;border:1.5px solid #D8E0E8;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:#1E1B4B"></div>
+        <div><div style="font-size:11px;font-weight:700;color:#6B7B8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">🟢 House 3</div><input id="h3-name" type="text" value="Green House" style="width:100%;padding:9px 10px;border:1.5px solid #D8E0E8;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:#1E1B4B"></div>
+        <div><div style="font-size:11px;font-weight:700;color:#6B7B8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">🟡 House 4</div><input id="h4-name" type="text" value="Yellow House" style="width:100%;padding:9px 10px;border:1.5px solid #D8E0E8;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:#1E1B4B"></div>
+      </div>
+    </div>
+    <!-- Unit & class selector -->
+    <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#312E81;margin-bottom:10px">📚 Quiz Content</div>
+      <div style="font-size:11px;font-weight:700;color:#6B7B8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Class Level</div>
+      <select id="host-class" style="width:100%;padding:9px 10px;border:1.5px solid #D8E0E8;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;margin-bottom:10px;color:#1E1B4B">
+        <option>Nursery 1</option><option>Nursery 2</option>
+        <option>Primary 1</option><option>Primary 2</option><option>Primary 3</option>
+        <option selected>Primary 4</option><option>Primary 5</option><option>Primary 6</option>
+        <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option><option>SSS 1</option>
+      </select>
+      <div style="font-size:11px;font-weight:700;color:#6B7B8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Unit</div>
+      <select id="host-unit" style="width:100%;padding:9px 10px;border:1.5px solid #D8E0E8;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;color:#1E1B4B">
+        <option value="animals">Animals Around Us</option>
+        <option value="body">My Body</option>
+        <option value="food">Food &amp; Drinks</option>
+        <option value="colours">Colours &amp; Shapes</option>
+      </select>
+    </div>
+    <!-- Player count -->
+    <div id="host-players" style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:14px;color:#3D4A5C;font-weight:700">👥 Players joined</div>
+      <div id="host-player-count" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#7C3AED">0</div>
+    </div>
+    <button id="host-start-btn" onclick="hostStartQuiz()" style="width:100%;padding:16px;background:linear-gradient(135deg,#7C3AED,#4C1D95);color:#fff;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;cursor:pointer">
+      🚀 Start Quiz!
+    </button>
+  </div>
+</div>
+
+<!-- COMP JOIN — student enters room code and picks house -->
+<div id="comp-join" class="screen" style="background:linear-gradient(145deg,#065F46,#047857,#059669)">
+  <div class="topbar" style="background:transparent">
+    <button class="tback" onclick="SS(COMP._fromScreen||'splash')">‹</button>
+    <div class="tlogo" style="color:#fff">Join <span style="opacity:.5">Competition</span></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;padding:24px;gap:16px">
+    <div id="join-step1">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;margin-bottom:6px">Enter Room Code</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:20px">Ask your teacher for the 4-letter code</div>
+      <input id="join-code-input" type="text" maxlength="4" placeholder="e.g. ABCD" oninput="this.value=this.value.toUpperCase()" style="width:100%;padding:18px;border:2px solid rgba(255,255,255,.3);border-radius:14px;background:rgba(255,255,255,.15);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:32px;letter-spacing:12px;text-align:center;outline:none;margin-bottom:14px">
+      <button onclick="joinFindRoom()" style="width:100%;padding:16px;background:#fff;color:#065F46;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;cursor:pointer">Find Room →</button>
+      <div id="join-error" style="text-align:center;color:rgba(255,200,100,1);font-size:14px;font-weight:700;margin-top:10px;display:none">Room not found. Check the code.</div>
+    </div>
+    <div id="join-step2" style="display:none">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;margin-bottom:6px">Pick your House</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:16px">Tap the house you belong to</div>
+      <div id="join-houses" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+    <div id="join-step3" style="display:none;flex:1;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:12px">
+      <div style="font-size:60px" id="join-house-emoji">🏠</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:24px;color:#fff" id="join-house-label">Waiting...</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.6)">Quiz starts when teacher taps Start</div>
+      <div style="font-size:40px;margin-top:10px" id="join-waiting-dots">⏳</div>
+    </div>
+  </div>
+</div>
+
+<!-- COMP PLAY — student answers questions during the live quiz -->
+<div id="comp-play" class="screen" style="background:#F0EDFF">
+  <div class="topbar" style="background:linear-gradient(135deg,#1E1B4B,#312E81)">
+    <div class="tlogo" style="color:#fff">🏆 <span id="play-house-name" style="color:#A78BFA">Your House</span></div>
+    <div style="margin-left:auto;font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;color:#FDE68A" id="play-score-disp">0 pts</div>
+  </div>
+  <div style="padding:10px 16px 0;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--sm)">
+    <span id="play-qnum">Question 1</span>
+    <span id="play-timer" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:18px;color:#7C3AED">10</span>
+  </div>
+  <div class="content" style="padding:16px">
+    <div id="play-card" class="q-card" style="margin-bottom:12px"></div>
+    <div id="play-msg" class="q-msg"></div>
+  </div>
+</div>
+
+<!-- COMP BOARD — projected scoreboard (teacher's big screen) -->
+<div id="comp-board" class="screen" style="background:linear-gradient(145deg,#0F172A,#1E1B4B)">
+  <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;color:#fff">🏆 <span id="board-title">House Competition</span></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div id="board-room-label" style="background:rgba(255,255,255,.1);border-radius:8px;padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:rgba(255,255,255,.6);letter-spacing:3px"></div>
+      <button onclick="SS('comp-menu')" style="background:none;border:2px solid rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.5);padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer">✕ End</button>
+    </div>
+  </div>
+  <!-- Enter code to view board -->
+  <div id="board-entry" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;gap:14px">
+    <div style="font-size:48px">📺</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff">Project Scoreboard</div>
+    <div style="font-size:14px;color:rgba(255,255,255,.5);margin-bottom:8px">Enter room code to view live scores</div>
+    <input id="board-code-input" type="text" maxlength="4" placeholder="Room Code" oninput="this.value=this.value.toUpperCase()" style="padding:14px 20px;border:2px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.1);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:28px;letter-spacing:10px;text-align:center;outline:none;width:220px">
+    <button onclick="boardConnect()" style="width:220px;padding:14px;background:#7C3AED;color:#fff;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;cursor:pointer">Connect →</button>
+    <div id="board-entry-error" style="color:#FCA5A5;font-size:13px;font-weight:700;display:none">Room not found.</div>
+  </div>
+  <!-- Live scores -->
+  <div id="board-live" style="display:none;flex:1;flex-direction:column;padding:12px 16px;gap:10px"></div>
+  <!-- Q display for projected screen -->
+  <div id="board-q" style="display:none;padding:10px 16px;background:rgba(255,255,255,.05);border-top:1px solid rgba(255,255,255,.08)">
+    <div id="board-q-text" style="font-size:16px;color:rgba(255,255,255,.8);text-align:center"></div>
+  </div>
+</div>
+
 <!-- PWA INSTALL BANNER (Android/Chrome) -->
 <div id="install-banner">
   <div class="ib-icon">📚</div>
@@ -488,7 +659,6 @@ body{display:flex;flex-direction:column}
 </div>
 
 <script>
-'use strict';
 
 // ════════════════════════════════════════
 // COLOUR TABLE — one per animal
@@ -1944,6 +2114,401 @@ function resAction2(){document.getElementById('res-btn2').onclick();}
 
 window.addEventListener('DOMContentLoaded',init);
 
+// ════════════════════════════════════════
+// HOUSE COMPETITION MODE
+// ════════════════════════════════════════
+var COMP={
+  roomCode:null,
+  role:null,          // 'host' | 'player' | 'board'
+  houseIdx:null,      // 0-3 for players
+  houses:[],          // [{name,emoji,color,score}]
+  questions:[],       // shuffled word keys
+  qIdx:0,
+  myScore:0,
+  timer:null,
+  listener:null,      // Firebase snapshot unsubscribe
+  HOUSE_DEFS:[
+    {emoji:'🔴',color:'#DC2626',bg:'#FEF2F2',tc:'#7F1D1D'},
+    {emoji:'🔵',color:'#1D4ED8',bg:'#EFF6FF',tc:'#1E3A8A'},
+    {emoji:'🟢',color:'#15803D',bg:'#F0FDF4',tc:'#052E16'},
+    {emoji:'🟡',color:'#CA8A04',bg:'#FEFCE8',tc:'#422006'}
+  ]
+};
+
+function openCompMenu(){
+  // Track where we came from so back button works correctly
+  COMP._fromScreen=document.querySelector('.screen.active')?document.querySelector('.screen.active').id:'splash';
+  SS('comp-menu');
+}
+
+// ── HOST ──
+function openCompHost(){
+  var code='';for(var i=0;i<4;i++)code+='ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random()*23)];
+  COMP.roomCode=code;COMP.role='host';
+  // Show connecting state until Firebase confirms write
+  var codeEl=document.getElementById('host-room-code');
+  if(codeEl)codeEl.textContent='…';
+  document.getElementById('host-player-count').textContent='0';
+  SS('comp-host');
+  var houses=getHostHouses();
+  // Write room — onReady ensures Firebase is initialized first
+  FB.onReady(function(){
+    var ref=FB.db.collection(COMP_COL).doc(code);
+    ref.set({status:'waiting',houses:houses,players:{},qIdx:-1,questions:[]})
+      .then(function(){
+        if(codeEl)codeEl.textContent=code;
+        toast('Room created! Code: '+code,2500);
+      })
+      .catch(function(e){
+        console.warn('Room create failed:',e.message);
+        if(codeEl)codeEl.textContent='ERR';
+        // Firestore permission error = security rules need updating
+        var msg=e.message&&e.message.indexOf('permission')>-1
+          ? '⚠️ Permission denied. Update Firestore rules to allow edulab_competitions.'
+          : '⚠️ Could not create room. Check internet connection.';
+        toast(msg,5000);
+      });
+    // Listen for player joins
+    if(COMP.listener)COMP.listener();
+    COMP.listener=ref.onSnapshot(function(doc){
+      if(!doc.exists)return;
+      var data=doc.data();
+      var count=Object.keys(data.players||{}).length;
+      var el=document.getElementById('host-player-count');
+      if(el)el.textContent=count;
+    },function(e){console.warn('compHostListen:',e.message);});
+  });
+}
+
+function getHostHouses(){
+  return COMP.HOUSE_DEFS.map(function(hd,i){
+    var name=[
+      document.getElementById('h1-name'),
+      document.getElementById('h2-name'),
+      document.getElementById('h3-name'),
+      document.getElementById('h4-name')
+    ][i];
+    return {name:name?name.value.trim()||('House '+(i+1)):'House '+(i+1),emoji:hd.emoji,color:hd.color,bg:hd.bg,tc:hd.tc,score:0};
+  });
+}
+
+function hostStartQuiz(){
+  var cl=document.getElementById('host-class').value;
+  var uk=document.getElementById('host-unit').value;
+  var unit=UNITS.find(function(u){return u.key===uk;})||UNITS[0];
+  var stages=unit.stagesMap[cl]||unit.stagesMap['Primary 4']||[];
+  // Pool all words from all stages for this class+unit
+  var pool=[];stages.forEach(function(st){st.words.forEach(function(w){if(pool.indexOf(w)===-1)pool.push(w);});});
+  var qs=shuffle(pool).slice(0,10); // 10 questions max
+  var houses=getHostHouses();
+  compSaveRoom({status:'playing',houses:houses,players:{},qIdx:0,questions:qs,startedAt:Date.now()});
+  // Open scoreboard on host device
+  COMP.questions=qs;COMP.houses=houses;
+  boardShowLive(COMP.roomCode);
+  SS('comp-board');
+}
+
+// ── JOIN ──
+function openCompJoin(){
+  COMP._fromScreen=document.querySelector('.screen.active')?document.querySelector('.screen.active').id:'splash';
+  document.getElementById('join-step1').style.display='';
+  document.getElementById('join-step2').style.display='none';
+  document.getElementById('join-step3').style.display='none';
+  document.getElementById('join-code-input').value='';
+  document.getElementById('join-error').style.display='none';
+  SS('comp-join');
+}
+
+function joinFindRoom(){
+  var code=(document.getElementById('join-code-input').value||'').toUpperCase().trim();
+  if(code.length!==4){
+    var err=document.getElementById('join-error');
+    if(err){err.textContent='Please enter a 4-letter code.';err.style.display='';}
+    return;
+  }
+  // Show loading while Firebase responds
+  var btn=document.querySelector('#join-step1 button');
+  if(btn){btn.textContent='Searching…';btn.disabled=true;}
+  var err=document.getElementById('join-error');
+  if(err)err.style.display='none';
+
+  compGetRoom(code,function(data){
+    if(btn){btn.textContent='Find Room →';btn.disabled=false;}
+    if(!data||data.status==='ended'){
+      if(err){
+        err.textContent=!data?'Room not found. Check the code and try again.':'That competition has already ended.';
+        err.style.display='';
+      }
+      return;
+    }
+    COMP.roomCode=code;COMP.role='player';
+    if(err)err.style.display='none';
+    // Show house picker
+    document.getElementById('join-step1').style.display='none';
+    document.getElementById('join-step2').style.display='';
+    var hc=document.getElementById('join-houses');hc.innerHTML='';
+    (data.houses||[]).forEach(function(h,i){
+      var btn2=document.createElement('button');
+      btn2.style.cssText='width:100%;padding:15px 18px;border:2px solid '+h.color+';border-radius:12px;background:'+h.bg+';color:'+h.tc+';font-family:\'Nunito\',sans-serif;font-weight:900;font-size:16px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left';
+      btn2.innerHTML='<span style="font-size:28px">'+h.emoji+'</span><span>'+h.name+'</span>';
+      btn2.onclick=function(){joinSelectHouse(i,h);};
+      hc.appendChild(btn2);
+    });
+  });
+}
+
+function joinSelectHouse(idx,house){
+  COMP.houseIdx=idx;COMP.myScore=0;
+  var pid=STU.uid||STU.name||('guest_'+Date.now());
+  // Register as player
+  compUpdatePlayer(pid,{name:STU.name||'Guest',houseIdx:idx,score:0,joinedAt:Date.now()});
+  // Show waiting screen
+  document.getElementById('join-step2').style.display='none';
+  document.getElementById('join-step3').style.display='flex';
+  document.getElementById('join-house-emoji').textContent=house.emoji;
+  document.getElementById('join-house-label').textContent=house.name;
+  // Listen for game start
+  if(COMP.listener)COMP.listener();
+  COMP.listener=compListen(function(data){
+    if(!data)return;
+    if(data.status==='playing'&&data.qIdx>=0){
+      COMP.questions=data.questions||[];
+      COMP.houses=data.houses||[];
+      COMP.qIdx=data.qIdx;
+      if(COMP.listener){COMP.listener();COMP.listener=null;}
+      startCompPlay();
+    }
+    if(data.status==='ended'){
+      if(COMP.listener){COMP.listener();COMP.listener=null;}
+      showCompEnd(data.houses);
+    }
+  });
+}
+
+// ── PLAY ──
+function startCompPlay(){
+  SS('comp-play');
+  var house=COMP.houses[COMP.houseIdx]||{name:'Your House',color:'#7C3AED'};
+  document.getElementById('play-house-name').textContent=house.emoji+' '+house.name;
+  document.getElementById('play-score-disp').textContent='0 pts';
+  renderCompQ();
+  // Listen for game end
+  COMP.listener=compListen(function(data){
+    if(data&&data.status==='ended'){
+      if(COMP.listener){COMP.listener();COMP.listener=null;}
+      showCompEnd(data.houses);
+    }
+  });
+}
+
+function renderCompQ(){
+  if(COMP.qIdx>=COMP.questions.length){showCompEnd(COMP.houses);return;}
+  var key=COMP.questions[COMP.qIdx];
+  var wd=WORDS[key];if(!wd)return;
+  var card=document.getElementById('play-card');
+  var pm=document.getElementById('play-msg');if(pm){pm.textContent='';pm.className='q-msg';}
+  document.getElementById('play-qnum').textContent='Question '+(COMP.qIdx+1)+' of '+COMP.questions.length;
+  // Build 4-option match question
+  var pool=COMP.questions.filter(function(k){return k!==key;});
+  var wrongs=shuffle(pool).slice(0,3);
+  var opts=shuffle([key].concat(wrongs));
+  var html='<span style="font-size:52px;display:block;text-align:center;margin-bottom:8px">'+wd.emoji+'</span>';
+  html+='<div style="font-size:14px;color:var(--sl);text-align:center;margin-bottom:14px;line-height:1.5">'+wd.def+'</div>';
+  html+='<div class="opts">';
+  opts.forEach(function(k){
+    var w=WORDS[k];if(!w)return;
+    html+='<button class="opt" onclick="compPick(\''+k+'\',\''+key+'\')">'+w.word+'</button>';
+  });
+  html+='</div>';
+  card.innerHTML=html;
+  // Timer — 10 seconds
+  var timeLeft=10;
+  var timerEl=document.getElementById('play-timer');
+  if(timerEl)timerEl.textContent=timeLeft;
+  if(COMP.timer)clearInterval(COMP.timer);
+  COMP.timer=setInterval(function(){
+    timeLeft--;
+    if(timerEl)timerEl.textContent=timeLeft;
+    if(timeLeft<=0){
+      clearInterval(COMP.timer);
+      compPick(null,key); // time out = wrong
+    }
+  },1000);
+}
+
+function compPick(chosen,correct){
+  clearInterval(COMP.timer);
+  var isRight=chosen===correct;
+  var pm=document.getElementById('play-msg');
+  var card=document.getElementById('play-card');
+  // Highlight answer
+  if(card)card.querySelectorAll('.opt').forEach(function(b){
+    b.classList.add('dis');
+    if(b.textContent===WORDS[correct].word)b.classList.add('ok');
+    else if(chosen&&b.textContent===WORDS[chosen].word)b.classList.add('no');
+  });
+  if(isRight){
+    COMP.myScore+=10;
+    if(pm){pm.textContent='✅ Correct! +10 pts';pm.className='q-msg ok';}
+    // Update house score in Firebase
+    var pid=STU.uid||STU.name||'guest';
+    compUpdatePlayer(pid,{score:COMP.myScore});
+    var house=COMP.houses[COMP.houseIdx];
+    if(house){house.score=(house.score||0)+10;compUpdateHouseScore(COMP.houseIdx,house.score);}
+    document.getElementById('play-score-disp').textContent=COMP.myScore+' pts';
+  }else{
+    if(pm){pm.textContent='❌ '+(chosen?'Wrong!':'Time up!')+' The answer was '+WORDS[correct].word;pm.className='q-msg no';}
+  }
+  COMP.qIdx++;
+  setTimeout(renderCompQ,1800);
+}
+
+// ── SCOREBOARD ──
+function openCompBoard(){
+  document.getElementById('board-entry').style.display='flex';
+  document.getElementById('board-live').style.display='none';
+  document.getElementById('board-code-input').value='';
+  document.getElementById('board-entry-error').style.display='none';
+  SS('comp-board');
+}
+
+function boardConnect(){
+  var code=(document.getElementById('board-code-input').value||'').toUpperCase().trim();
+  if(code.length!==4){document.getElementById('board-entry-error').style.display='';return;}
+  compGetRoom(code,function(data){
+    if(!data){document.getElementById('board-entry-error').style.display='';return;}
+    COMP.roomCode=code;COMP.role='board';
+    document.getElementById('board-entry-error').style.display='none';
+    boardShowLive(code);
+  });
+}
+
+function boardShowLive(code){
+  document.getElementById('board-entry').style.display='none';
+  document.getElementById('board-live').style.display='flex';
+  document.getElementById('board-room-label').textContent=code;
+  if(COMP.listener)COMP.listener();
+  COMP.listener=compListen(function(data){
+    if(!data)return;
+    renderBoardScores(data.houses||[]);
+    // Show current question on board
+    var qi=data.qIdx||0;
+    var qs=data.questions||[];
+    var bq=document.getElementById('board-q');
+    var bqt=document.getElementById('board-q-text');
+    if(qs.length&&qi<qs.length&&bq&&bqt){
+      var wd=WORDS[qs[qi]];
+      if(wd){bq.style.display='';bqt.textContent=wd.emoji+' '+wd.def;}
+    }
+    if(data.status==='ended')showCompEnd(data.houses||[]);
+  });
+}
+
+function renderBoardScores(houses){
+  var bl=document.getElementById('board-live');if(!bl)return;
+  // Sort by score descending
+  var sorted=houses.slice().sort(function(a,b){return (b.score||0)-(a.score||0);});
+  var maxScore=sorted[0]?(sorted[0].score||1):1;
+  bl.innerHTML='';
+  sorted.forEach(function(h,rank){
+    var pct=Math.round((h.score||0)/maxScore*100);
+    var row=document.createElement('div');
+    row.style.cssText='background:rgba(255,255,255,.06);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:14px';
+    row.innerHTML=[
+      '<div style="font-size:36px;width:44px;text-align:center">'+['🥇','🥈','🥉','4️⃣'][rank]+'</div>',
+      '<div style="flex:1">',
+        '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:20px;color:#fff">'+h.emoji+' '+h.name+'</div>',
+        '<div style="margin-top:6px;height:10px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden">',
+          '<div style="height:10px;border-radius:10px;background:'+h.color+';width:'+pct+'%;transition:width .6s ease"></div>',
+        '</div>',
+      '</div>',
+      '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:28px;color:#FDE68A;min-width:70px;text-align:right">'+(h.score||0)+' pts</div>'
+    ].join('');
+    bl.appendChild(row);
+  });
+}
+
+function showCompEnd(houses){
+  clearInterval(COMP.timer);
+  if(COMP.listener){COMP.listener();COMP.listener=null;}
+  // Show final scores on board
+  var bl=document.getElementById('board-live');
+  if(bl&&document.getElementById('comp-board').classList.contains('active')){
+    renderBoardScores(houses);
+    var bt=document.getElementById('board-title');
+    if(bt)bt.textContent='🎉 Final Results!';
+  }else{
+    // Player sees their result
+    var sorted=houses.slice().sort(function(a,b){return (b.score||0)-(a.score||0);});
+    var winner=sorted[0]||{name:'House 1'};
+    var myHouse=houses[COMP.houseIdx]||{};
+    toast('🏆 '+(myHouse.name||'Your house')+': '+(myHouse.score||0)+' pts · Winner: '+winner.name,4000);
+    setTimeout(function(){SS('comp-menu');},4100);
+  }
+}
+
+// ── FIREBASE HELPERS FOR COMPETITION ──
+var COMP_COL='edulab_competitions';
+
+function compRef(code){
+  if(!FB.initialized||!FB.db)return null;
+  return FB.db.collection(COMP_COL).doc(code||COMP.roomCode);
+}
+
+function compSaveRoom(data){
+  FB.onReady(function(){
+    var ref=compRef();if(!ref)return;
+    ref.set(data).catch(function(e){console.warn('compSave:',e.message);});
+  });
+}
+
+function compUpdatePlayer(pid,data){
+  FB.onReady(function(){
+    var ref=compRef();if(!ref)return;
+    var update={};update['players.'+pid]=Object.assign({},data);
+    ref.update(update).catch(function(e){console.warn('compUpdatePlayer:',e.message);});
+  });
+}
+
+function compUpdateHouseScore(houseIdx,newScore){
+  // Firestore doesn't support dot-notation on array indices
+  // Must read current houses array, update, then write back
+  FB.onReady(function(){
+    var ref=compRef();if(!ref)return;
+    ref.get().then(function(doc){
+      if(!doc.exists)return;
+      var data=doc.data();
+      var houses=(data.houses||[]).slice();
+      if(houses[houseIdx]){
+        houses[houseIdx]=Object.assign({},houses[houseIdx],{score:newScore});
+        ref.update({houses:houses}).catch(function(e){console.warn('compUpdateHouse:',e.message);});
+      }
+    }).catch(function(e){console.warn('compUpdateHouse read:',e.message);});
+  });
+}
+
+function compGetRoom(code,cb){
+  FB.onReady(function(){
+    if(!FB.db){cb(null);return;}
+    FB.db.collection(COMP_COL).doc(code).get()
+      .then(function(doc){cb(doc.exists?doc.data():null);})
+      .catch(function(e){console.warn('compGetRoom:',e.message);cb(null);});
+  });
+}
+
+function compListen(cb){
+  var unsub=null;
+  FB.onReady(function(){
+    var ref=compRef();if(!ref){cb(null);return;}
+    unsub=ref.onSnapshot(
+      function(doc){cb(doc.exists?doc.data():null);},
+      function(e){console.warn('compListen:',e.message);cb(null);}
+    );
+  });
+  // Return a cancel function — works even if called before FB is ready
+  return function(){if(unsub)unsub();};
+}
+
 // ════ SHARED DEVICE AUTO-TIMEOUT ════
 // Returns to roster after 5 minutes of no taps (shared mode only)
 var _inactivityTimer=null;
@@ -1970,9 +2535,10 @@ function resetInactivityTimer(){
 });
 
 // ════════════════════════════════════════
-var FB={initialized:false,db:null,user:null,
-  config:{apiKey:"AIzaSyBI9sSU0xIVr-SOlupPSOi59_lYoyhaCfA",authDomain:"word-heist-964ac.firebaseapp.com",projectId:"word-heist-964ac",storageBucket:"word-heist-964ac.firebasestorage.app",messagingSenderId:"476884243104",appId:"1:476884243104:web:5432f4faa4525e01b7afc5"},
-  init:async function(){if(this.initialized)return;if(typeof firebase==='undefined')return;try{if(!firebase.apps.length)firebase.initializeApp(this.config);this.db=firebase.firestore();this.initialized=true;try{await this.db.enablePersistence({synchronizeTabs:true});}catch(e){}var r=await firebase.auth().signInAnonymously();this.user=r.user;}catch(e){}}
+var FB={initialized:false,db:null,user:null,_queue:[],
+  onReady:function(cb){if(this.initialized)cb();else this._queue.push(cb);},
+  config:{apiKey:"AIzaSyBkFcDVdffmE79rcOZZsLzWD8OQjsIrJdY",authDomain:"blestonex-edulab.firebaseapp.com",projectId:"blestonex-edulab",storageBucket:"blestonex-edulab.firebasestorage.app",messagingSenderId:"499765711214",appId:"1:499765711214:web:81114c1e391add78b2717f"},
+  init:async function(){if(this.initialized)return;if(typeof firebase==='undefined')return;try{if(!firebase.apps.length)firebase.initializeApp(this.config);this.db=firebase.firestore();this.initialized=true;try{await this.db.enablePersistence({synchronizeTabs:true});}catch(e){}var r=await firebase.auth().signInAnonymously();this.user=r.user;var q=this._queue.slice();this._queue=[];q.forEach(function(fn){try{fn();}catch(e){}});}catch(e){}}
 };
 (function(){var sdks=['https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js','https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js','https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js'];var n=0;sdks.forEach(function(src){var s=document.createElement('script');s.src=src;s.onload=function(){if(++n===sdks.length)FB.init();};s.onerror=function(){n++;};document.head.appendChild(s);});})();
 
@@ -2027,14 +2593,13 @@ var FB={initialized:false,db:null,user:null,
     if(el)el.href=URL.createObjectURL(blob);
   });});
 
-  // ── 2. Register service worker via blob URL ──
+  // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
-    var SW_CODE = [
+    var SW_CODE=[
       "var CACHE='edulab-v10';",
-      "var OFFLINE_URLS=['/'];",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
-      "    return c.addAll(OFFLINE_URLS);",
+      "    return c.add(self.location.href.replace(/\\/sw(\\.js|\\?.*)?$/,'/')).catch(function(){});",
       "  }).then(function(){return self.skipWaiting();}));",
       "});",
       "self.addEventListener('activate',function(e){",
@@ -2044,25 +2609,41 @@ var FB={initialized:false,db:null,user:null,
       "});",
       "self.addEventListener('fetch',function(e){",
       "  if(e.request.method!=='GET')return;",
-      "  e.respondWith(",
-      "    caches.match(e.request).then(function(cached){",
-      "      var fresh=fetch(e.request).then(function(res){",
-      "        if(res&&res.status===200&&res.type==='basic'){",
-      "          var clone=res.clone();",
-      "          caches.open(CACHE).then(function(c){c.put(e.request,clone);});",
-      "        }",
-      "        return res;",
-      "      }).catch(function(){return cached;});",
-      "      return cached||fresh;",
-      "    })",
-      "  );",
+      "  e.respondWith(caches.match(e.request).then(function(cached){",
+      "    var net=fetch(e.request).then(function(res){",
+      "      if(res&&res.status===200&&res.type==='basic'){var cl=res.clone();caches.open(CACHE).then(function(c){c.put(e.request,cl);});}",
+      "      return res;",
+      "    }).catch(function(){return cached;});",
+      "    return cached||net;",
+      "  }));",
       "});"
     ].join('\n');
-    var swBlob=new Blob([SW_CODE],{type:'application/javascript'});
-    var swURL=URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swURL,{scope:'./'}).then(function(reg){
-      console.log('[EduLab SW] registered, scope:',reg.scope);
-    }).catch(function(e){console.log('[EduLab SW] failed:',e.message);});
+
+    function tryBlobSW(){
+      return new Promise(function(resolve,reject){
+        try{
+          var blob=new Blob([SW_CODE],{type:'application/javascript'});
+          var url=URL.createObjectURL(blob);
+          navigator.serviceWorker.register(url,{scope:'./'})
+            .then(function(r){resolve(r);})
+            .catch(function(e){URL.revokeObjectURL(url);reject(e);});
+        }catch(e){reject(e);}
+      });
+    }
+
+    function tryDirectCache(){
+      // Fallback: pre-cache the page directly (no SW needed)
+      if(!('caches' in window))return;
+      caches.open('edulab-v10').then(function(c){
+        c.add(window.location.href).catch(function(){});
+      }).catch(function(){});
+    }
+
+    // Strategy 1: blob URL (works in Chrome, Firefox)
+    tryBlobSW().catch(function(){
+      // Strategy 2: direct Cache API pre-cache (works in any browser with Cache API)
+      tryDirectCache();
+    });
   }
 
   // ── 3. Install prompt (Android/Chrome) ──
