@@ -373,6 +373,12 @@ body{display:flex;flex-direction:column}
       <button onclick="openClassPerformance()" style="padding:14px 10px;background:#0284C7;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left">
         📊 Performance<br><span style="font-weight:600;opacity:.8;font-size:11px">Class stage overview</span>
       </button>
+      <button onclick="openCourseOutline()" style="padding:14px 10px;background:#0F766E;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left">
+        📋 Course Outline<br><span style="font-weight:600;opacity:.8;font-size:11px">Set syllabus order</span>
+      </button>
+      <button onclick="openAssignments()" style="padding:14px 10px;background:#7E22CE;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left">
+        📝 Assignments<br><span style="font-weight:600;opacity:.8;font-size:11px">Set homework stages</span>
+      </button>
     </div>
     <button onclick="exportProgressReport()" style="width:100%;padding:14px;background:#15803D;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:12px">
       📄 Export Progress Report (PDF)
@@ -434,6 +440,17 @@ body{display:flex;flex-direction:column}
         <div class="subj-meta">
           <div class="subj-name" style="color:#fff">Join Competition</div>
           <div class="subj-desc" style="color:rgba(255,255,255,.6)">Enter room code to play live quiz</div>
+        </div>
+        <span style="font-size:22px;color:rgba(255,255,255,.4)">›</span>
+      </div>
+    </div>
+    <!-- Leaderboard -->
+    <div class="subj-card" onclick="openLeaderboard()" style="background:linear-gradient(135deg,#0F172A,#1E1B4B);border:none">
+      <div class="subj-head">
+        <div class="subj-icon" style="background:rgba(255,255,255,.15);color:#FDE68A;font-size:24px">🏅</div>
+        <div class="subj-meta">
+          <div class="subj-name" style="color:#fff">School Leaderboard</div>
+          <div class="subj-desc" style="color:rgba(255,255,255,.5)">See top students in your school</div>
         </div>
         <span style="font-size:22px;color:rgba(255,255,255,.4)">›</span>
       </div>
@@ -888,6 +905,103 @@ body{display:flex;flex-direction:column}
   <!-- Q display for projected screen -->
   <div id="board-q" style="display:none;padding:10px 16px;background:rgba(255,255,255,.05);border-top:1px solid rgba(255,255,255,.08)">
     <div id="board-q-text" style="font-size:16px;color:rgba(255,255,255,.8);text-align:center"></div>
+  </div>
+</div>
+
+<!-- ════ D — COURSE OUTLINE ════ -->
+<div id="course-outline" class="screen" style="background:linear-gradient(180deg,#0F766E 0%,#0F766E 110px,#F0FDFA 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#0F766E,#0D9488)">
+    <button class="tback" onclick="SS('admin')">‹</button>
+    <div class="tlogo">Course <span>Outline</span></div>
+    <button onclick="saveCourseOutline()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);border-radius:8px;color:#fff;padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">Save ✓</button>
+  </div>
+  <div style="background:rgba(0,0,0,.1);padding:8px 16px;flex-shrink:0;display:flex;gap:8px;align-items:center">
+    <select id="outline-class" onchange="loadOutlineForClass()" style="flex:1;padding:7px 10px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1E1B4B">
+      <option>Primary 1</option><option>Primary 2</option><option>Primary 3</option>
+      <option>Primary 4</option><option>Primary 5</option><option>Primary 6</option>
+      <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
+      <option>SSS 1</option><option>SSS 2</option><option>WAEC/JAMB</option>
+    </select>
+    <select id="outline-unit" onchange="loadOutlineStages()" style="flex:1;padding:7px 10px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1E1B4B">
+      <option value="animals">Animals</option><option value="body">My Body</option>
+      <option value="food">Food</option><option value="colours">Colours</option>
+      <option value="science">Science</option><option value="social">Social Studies</option>
+      <option value="maths">Mathematics</option>
+    </select>
+  </div>
+  <div style="padding:12px 16px;font-size:12px;color:#0F766E;font-weight:700;background:#CCFBF1;flex-shrink:0">
+    ✏️ Drag stages to reorder · Toggle to hide/show from students
+  </div>
+  <div class="content" id="outline-list" style="padding:12px 16px"></div>
+</div>
+
+<!-- ════ A — ASSIGNMENTS ════ -->
+<div id="assignments" class="screen" style="background:linear-gradient(180deg,#7E22CE 0%,#7E22CE 110px,#FAF5FF 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#7E22CE,#6D28D9)">
+    <button class="tback" onclick="SS('admin')">‹</button>
+    <div class="tlogo">Assignments</div>
+    <button onclick="newAssignment()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);border-radius:8px;color:#fff;padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">+ New</button>
+  </div>
+  <div class="content" id="assignments-list" style="padding:16px"></div>
+</div>
+
+<!-- ════ A — ASSIGNMENT EDITOR ════ -->
+<div id="assignment-edit" class="screen" style="background:linear-gradient(180deg,#7E22CE 0%,#7E22CE 110px,#FAF5FF 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#7E22CE,#6D28D9)">
+    <button class="tback" onclick="SS('assignments')">‹</button>
+    <div class="tlogo" id="ae-title">New Assignment</div>
+    <button onclick="saveAssignment()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);border-radius:8px;color:#fff;padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">Save ✓</button>
+  </div>
+  <div class="content" style="padding:16px;gap:12px">
+    <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#6D28D9;margin-bottom:6px">Title</div>
+      <input id="ae-name" type="text" placeholder="e.g. Complete Animals Stage 1 by Friday" maxlength="60" style="width:100%;padding:10px 12px;border:1.5px solid #DDD6FE;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#6D28D9;margin-bottom:6px">Due Date</div>
+      <input id="ae-due" type="date" style="width:100%;padding:10px 12px;border:1.5px solid #DDD6FE;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#6D28D9;margin-bottom:6px">Target Classes</div>
+      <div id="ae-classes" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer;background:#F3E8FF;border-radius:6px;padding:4px 8px"><input type="checkbox" value="Primary 1"> P1</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer;background:#F3E8FF;border-radius:6px;padding:4px 8px"><input type="checkbox" value="Primary 2"> P2</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer;background:#F3E8FF;border-radius:6px;padding:4px 8px"><input type="checkbox" value="Primary 3"> P3</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer;background:#F3E8FF;border-radius:6px;padding:4px 8px"><input type="checkbox" value="Primary 4"> P4</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer;background:#F3E8FF;border-radius:6px;padding:4px 8px"><input type="checkbox" value="Primary 5"> P5</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer;background:#F3E8FF;border-radius:6px;padding:4px 8px"><input type="checkbox" value="Primary 6"> P6</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer;background:#F3E8FF;border-radius:6px;padding:4px 8px"><input type="checkbox" value="JSS 1"> J1</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer;background:#F3E8FF;border-radius:6px;padding:4px 8px"><input type="checkbox" value="JSS 2"> J2</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer;background:#F3E8FF;border-radius:6px;padding:4px 8px"><input type="checkbox" value="JSS 3"> J3</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer;background:#F3E8FF;border-radius:6px;padding:4px 8px"><input type="checkbox" value="SSS 1"> S1</label>
+      </div>
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#6D28D9;margin-bottom:6px">Stage to Complete</div>
+      <select id="ae-stage" style="width:100%;padding:10px 12px;border:1.5px solid #DDD6FE;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1E1B4B;margin-bottom:12px">
+        <option value="">— Select a stage —</option>
+      </select>
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#6D28D9;margin-bottom:6px">Note (optional)</div>
+      <textarea id="ae-note" placeholder="e.g. Focus on spelling — this will be in Friday's test" rows="2" style="width:100%;padding:10px 12px;border:1.5px solid #DDD6FE;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;resize:none"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ════ B — LEADERBOARD ════ -->
+<div id="leaderboard" class="screen" style="background:linear-gradient(145deg,#0F172A,#1E1B4B)">
+  <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;color:#fff">🏅 School Leaderboard</div>
+    <button onclick="SS('home')" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.6);padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer">✕ Close</button>
+  </div>
+  <div style="padding:0 16px 12px;font-size:12px;color:rgba(255,255,255,.4);flex-shrink:0" id="lb-updated"></div>
+  <div class="content" id="lb-list" style="padding:0 16px 16px;gap:8px"></div>
+</div>
+
+<!-- ════ E — ONBOARDING TOUR ════ -->
+<div id="onboarding" class="screen" style="background:linear-gradient(145deg,#1E1B4B,#312E81,#4C1D95)">
+  <div style="flex:1;display:flex;flex-direction:column;padding:28px 24px;gap:16px;align-items:center;justify-content:center;text-align:center">
+    <div style="font-size:64px" id="ob-emoji">🎓</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:24px;color:#fff" id="ob-title">Welcome to EduLab</div>
+    <div style="font-size:15px;color:rgba(255,255,255,.7);line-height:1.6;max-width:320px" id="ob-body">A smart learning app for Nigerian schools — from Nursery to WAEC/JAMB.</div>
+    <div style="display:flex;gap:6px;margin-top:8px" id="ob-dots"></div>
+    <div style="display:flex;gap:12px;width:100%;max-width:340px;margin-top:8px">
+      <button id="ob-skip" onclick="finishOnboarding()" style="flex:1;padding:14px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:12px;color:rgba(255,255,255,.6);font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer">Skip</button>
+      <button id="ob-next" onclick="obNext()" style="flex:2;padding:14px;background:#fff;color:#4C1D95;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;cursor:pointer">Next →</button>
+    </div>
   </div>
 </div>
 
@@ -2031,6 +2145,7 @@ function sPass(){[440,550,660,880].forEach(function(f,i){tone(f,'sine',.18,.2,i*
 // ════════════════════════════════════════
 function init(){
   rebuildCustomUnits(); // restore from local cache immediately (fast)
+  checkDashboardMode(); // Blestonex management dashboard via URL param
   // Refresh from Firestore in background — updates branding + modules without blocking
   FB.onReady(function(){
     // Re-verify school code still active and pull latest branding
@@ -2327,6 +2442,10 @@ function loadHome(){
   if(dn)dn.style.display=isActivated()?'none':'';
   // Sync this student's profile to Firestore so admin sees them from any device
   syncStudentToFirestore();
+  // Check for teacher assignments, onboarding, and notifications
+  checkAssignments();
+  checkOnboarding();
+  scheduleStudyReminder();
   var p=prog();
   var totalStages=0,doneStages=0;
   UNITS.forEach(function(u){
@@ -3303,7 +3422,9 @@ function renderPerformance(){
     });
   });
 
-  // Build valid stage IDs for the selected class (so we don't show other classes' stages)
+  // Build valid stage IDs for the selected class
+  // For vocab units: use class filter
+  // For maths: also include each student's actual mathLevel (they may study above their class)
   var validStageIds={};
   UNITS.forEach(function(u){
     var stages=classVal==='all'
@@ -3311,11 +3432,20 @@ function renderPerformance(){
       :(u.stagesMap[classVal]||[]);
     stages.forEach(function(st){validStageIds[st.id]=true;});
   });
+  // Math: include stages for class level AND any mathLevel override from students in filtered roster
+  var mathClassesToInclude={};
   if(classVal==='all'){
-    Object.values(MATH_STAGES).forEach(function(stages){stages.forEach(function(st){validStageIds[st.id]=true;});});
+    Object.keys(MATH_STAGES).forEach(function(k){mathClassesToInclude[k]=true;});
   }else{
-    (MATH_STAGES[classVal]||[]).forEach(function(st){validStageIds[st.id]=true;});
+    mathClassesToInclude[classVal]=true;
+    // Include mathLevel of any student in this class
+    filteredRoster.forEach(function(s){
+      if(s.mathLevel&&s.mathLevel!==s.classLabel)mathClassesToInclude[s.mathLevel]=true;
+    });
   }
+  Object.keys(mathClassesToInclude).forEach(function(cl){
+    (MATH_STAGES[cl]||[]).forEach(function(st){validStageIds[st.id]=true;});
+  });
 
   filteredRoster.forEach(function(s){
     var sk=s.uid||s.name;
@@ -3331,7 +3461,7 @@ function renderPerformance(){
       if(v.passed)stageStats[stageId].passed++;
       else stageStats[stageId].failed++;
       if(v.bestScore){stageStats[stageId].totalScore+=v.bestScore;stageStats[stageId].count++;}
-      stageStats[stageId].students.push({name:s.name,emoji:s.emoji||'👤',passed:!!v.passed,score:v.bestScore||0,classLabel:s.classLabel});
+      stageStats[stageId].students.push({name:s.name,emoji:s.emoji||'👤',passed:!!v.passed,score:v.bestScore||0,classLabel:s.classLabel,mathLevel:s.mathLevel||''});
     });
   });
 
@@ -3382,8 +3512,14 @@ function renderPerformance(){
     var badge=passRate>=70?'✅':passRate>=40?'⚠️':'❌';
 
     // Who passed / who failed
-    var passedNames=e.students.filter(function(s){return s.passed;}).map(function(s){return s.emoji+' '+s.name;});
-    var failedNames=e.students.filter(function(s){return !s.passed;}).map(function(s){return s.emoji+' '+s.name;});
+    var passedNames=e.students.filter(function(s){return s.passed;}).map(function(s){
+      var ml=s.mathLevel&&s.mathLevel!==s.classLabel?' 🔢'+s.mathLevel:'';
+      return s.emoji+' '+s.name+ml;
+    });
+    var failedNames=e.students.filter(function(s){return !s.passed;}).map(function(s){
+      var ml=s.mathLevel&&s.mathLevel!==s.classLabel?' 🔢'+s.mathLevel:'';
+      return s.emoji+' '+s.name+ml;
+    });
 
     html+='<div style="background:'+bg+';border-radius:12px;padding:14px;margin-bottom:10px;border-left:4px solid '+barColor+'">'
       // Header
@@ -5086,6 +5222,490 @@ function resetInactivityTimer(){
 });
 
 // ════════════════════════════════════════
+// ════════════════════════════════════════
+// D — COURSE OUTLINE
+// ════════════════════════════════════════
+var LK_OUTLINE='el_outline'; // {classKey: {unitKey: [{id,hidden}]}}
+
+function getCourseOutline(){return lg(LK_OUTLINE)||{};}
+function saveCourseOutlineData(data){
+  ls(LK_OUTLINE,data);
+  // Sync to Firestore under school
+  var school=getSchool();
+  if(school&&school.code){
+    FB.onReady(function(){
+      if(!FB.db)return;
+      FB.db.collection('schools').doc(school.code).collection('settings').doc('outline')
+        .set(data).catch(function(e){console.warn('Outline sync:',e.message);});
+    });
+  }
+}
+
+function openCourseOutline(){
+  SS('course-outline');
+  loadOutlineStages();
+}
+
+function loadOutlineForClass(){loadOutlineStages();}
+
+function loadOutlineStages(){
+  var cl=document.getElementById('outline-class').value||'Primary 1';
+  var uk=document.getElementById('outline-unit').value||'animals';
+  var unit=UNITS.find(function(u){return u.key===uk;})||UNITS[0];
+  var stages=(unit.stagesMap[cl]||unit.stagesMap['Primary 4']||[]).slice();
+  var outline=getCourseOutline();
+  var saved=(outline[cl]||{})[uk]||[];
+  // Apply saved order and hidden flags
+  if(saved.length){
+    var ordered=[];
+    saved.forEach(function(s){
+      var st=stages.find(function(x){return x.id===s.id;});
+      if(st)ordered.push(Object.assign({},st,{hidden:s.hidden}));
+    });
+    // Add any new stages not in saved order
+    stages.forEach(function(st){
+      if(!ordered.find(function(x){return x.id===st.id;}))ordered.push(st);
+    });
+    stages=ordered;
+  }
+  var list=document.getElementById('outline-list');if(!list)return;
+  list.innerHTML='';
+  if(!stages.length){
+    list.innerHTML='<div style="text-align:center;padding:30px;color:#6B7B8D;font-size:13px">No stages for this class/unit combination.</div>';
+    return;
+  }
+  stages.forEach(function(st,i){
+    var row=document.createElement('div');
+    row.setAttribute('data-id',st.id);
+    row.style.cssText='background:'+(st.hidden?'#F1F5F9':'#fff')+';border-radius:12px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 6px rgba(0,0,0,.06);opacity:'+(st.hidden?.5:1);
+    row.innerHTML='<span style="color:#9CA3AF;font-size:18px;cursor:grab;touch-action:none">⠿</span>'
+      +'<div style="flex:1"><div style="font-family:\'Nunito\',sans-serif;font-weight:800;font-size:14px;color:#1E1B4B">'+st.emoji+' '+st.label+'</div>'
+      +'<div style="font-size:11px;color:#9CA3AF;margin-top:2px">'+(st.hidden?'Hidden from students':'Visible to students')+'</div></div>'
+      +'<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:700;color:#6B7B8D">'
+      +'<input type="checkbox" '+(st.hidden?'':'checked')+' style="width:16px;height:16px" onchange="toggleOutlineStage(\''+st.id+'\',this.checked)"> Show</label>';
+    list.appendChild(row);
+    // Drag to reorder
+    makeDraggable(row,list);
+  });
+}
+
+function toggleOutlineStage(id,show){
+  // Update visual immediately
+  var row=document.querySelector('[data-id="'+id+'"]');
+  if(row){
+    row.style.opacity=show?'1':'.5';
+    row.style.background=show?'#fff':'#F1F5F9';
+    var sub=row.querySelector('div > div:last-child');
+    if(sub)sub.textContent=show?'Visible to students':'Hidden from students';
+  }
+}
+
+function makeDraggable(el,container){
+  var handle=el.querySelector('span');
+  if(!handle)return;
+  var startY,startIdx,dragEl;
+  handle.addEventListener('touchstart',function(e){
+    startY=e.touches[0].clientY;startIdx=Array.from(container.children).indexOf(el);
+    el.style.boxShadow='0 8px 24px rgba(0,0,0,.2)';el.style.zIndex=10;el.style.position='relative';
+  },{passive:true});
+  handle.addEventListener('touchmove',function(e){
+    var dy=e.touches[0].clientY-startY;
+    el.style.transform='translateY('+dy+'px)';
+    var rows=Array.from(container.children);
+    rows.forEach(function(r,i){
+      if(r===el)return;
+      var rect=r.getBoundingClientRect();
+      var mid=rect.top+rect.height/2;
+      if(e.touches[0].clientY<mid&&i<startIdx){container.insertBefore(el,r);startIdx=i;}
+      else if(e.touches[0].clientY>mid&&i>startIdx){container.insertBefore(el,r.nextSibling);startIdx=i;}
+    });
+  },{passive:true});
+  handle.addEventListener('touchend',function(){
+    el.style.transform='';el.style.boxShadow='';el.style.zIndex='';el.style.position='';
+  });
+  // Mouse drag
+  handle.addEventListener('mousedown',function(e){
+    dragEl=el;startY=e.clientY;
+    el.style.boxShadow='0 8px 24px rgba(0,0,0,.2)';
+    document.onmousemove=function(ev){
+      var dy=ev.clientY-startY;el.style.transform='translateY('+dy+'px)';
+      var rows=Array.from(container.children);
+      var ci=rows.indexOf(el);
+      rows.forEach(function(r,i){
+        if(r===el)return;
+        var rect=r.getBoundingClientRect();
+        if(ev.clientY<rect.top+rect.height/2&&i<ci){container.insertBefore(el,r);startY=ev.clientY;}
+        else if(ev.clientY>rect.top+rect.height/2&&i>ci){container.insertBefore(el,r.nextSibling);startY=ev.clientY;}
+      });
+    };
+    document.onmouseup=function(){
+      el.style.transform='';el.style.boxShadow='';
+      document.onmousemove=null;document.onmouseup=null;
+    };
+  });
+}
+
+function saveCourseOutline(){
+  var cl=document.getElementById('outline-class').value||'Primary 1';
+  var uk=document.getElementById('outline-unit').value||'animals';
+  var list=document.getElementById('outline-list');
+  if(!list)return;
+  var rows=Array.from(list.querySelectorAll('[data-id]'));
+  var ordered=rows.map(function(r){
+    var cb=r.querySelector('input[type=checkbox]');
+    return {id:r.getAttribute('data-id'),hidden:cb?!cb.checked:false};
+  });
+  var outline=getCourseOutline();
+  if(!outline[cl])outline[cl]={};
+  outline[cl][uk]=ordered;
+  saveCourseOutlineData(outline);
+  toast('\u2705 Course outline saved for '+cl+' \u00b7 '+uk,2000);
+}
+
+// ════════════════════════════════════════
+// A — ASSIGNMENTS
+// ════════════════════════════════════════
+var LK_ASSIGN='el_assignments';
+var CUR_ASSIGN=null;
+
+function getAssignments(){return lg(LK_ASSIGN)||[];}
+function saveAssignmentsData(arr){
+  ls(LK_ASSIGN,arr);
+  var school=getSchool();
+  if(school&&school.code){
+    FB.onReady(function(){
+      if(!FB.db)return;
+      FB.db.collection('schools').doc(school.code).collection('settings').doc('assignments')
+        .set({assignments:arr,updatedAt:Date.now()}).catch(function(e){console.warn('Assign sync:',e.message);});
+    });
+  }
+}
+
+function loadAssignmentsFromFirestore(cb){
+  var school=getSchool();
+  if(!school||!school.code){cb(getAssignments());return;}
+  FB.onReady(function(){
+    if(!FB.db){cb(getAssignments());return;}
+    FB.db.collection('schools').doc(school.code).collection('settings').doc('assignments').get()
+      .then(function(doc){
+        if(doc.exists&&doc.data().assignments){
+          var arr=doc.data().assignments;ls(LK_ASSIGN,arr);cb(arr);
+        }else cb(getAssignments());
+      }).catch(function(){cb(getAssignments());});
+  });
+}
+
+function openAssignments(){
+  SS('assignments');
+  var list=document.getElementById('assignments-list');
+  if(list)list.innerHTML='<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px">Loading\u2026</div>';
+  loadAssignmentsFromFirestore(function(arr){renderAssignmentList(arr);});
+}
+
+function renderAssignmentList(arr){
+  var list=document.getElementById('assignments-list');if(!list)return;
+  if(!arr.length){
+    list.innerHTML='<div style="text-align:center;padding:40px;color:#9CA3AF;font-size:14px"><div style="font-size:40px;margin-bottom:10px">📝</div>No assignments yet.<br>Tap <strong>+ New</strong> to set one.</div>';
+    return;
+  }
+  list.innerHTML='';
+  var today=new Date().toISOString().slice(0,10);
+  arr.forEach(function(a,i){
+    var overdue=a.due&&a.due<today;
+    var card=document.createElement('div');
+    card.style.cssText='background:#fff;border-radius:14px;padding:15px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:4px solid '+(overdue?'#DC2626':'#7E22CE');
+    card.innerHTML='<div style="display:flex;align-items:start;justify-content:space-between;gap:10px">'
+      +'<div style="flex:1"><div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+a.name+'</div>'
+      +'<div style="font-size:12px;color:#6B7B8D;margin-top:4px">'+(a.due?'Due: '+new Date(a.due).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'No due date')+(overdue?' \u26A0\uFE0F Overdue':'')+'</div>'
+      +'<div style="font-size:11px;color:#9CA3AF;margin-top:2px">'+((a.classes||[]).join(', ')||'All classes')+(a.stageLabel?' \u00b7 '+a.stageLabel:'')+'</div>'
+      +(a.note?'<div style="font-size:12px;color:#6B7B8D;margin-top:4px;font-style:italic">'+a.note+'</div>':'')
+      +'</div>'
+      +'<div style="display:flex;gap:6px">'
+      +'<button style="background:#F3E8FF;border:none;border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer;color:#7E22CE;font-weight:800">Edit</button>'
+      +'<button style="background:#FEF2F2;border:none;border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer;color:#DC2626;font-weight:800">\uD83D\uDDD1</button>'
+      +'</div></div>';
+    var btns=card.querySelectorAll('button');
+    btns[0].onclick=function(){editAssignment(i);};
+    btns[1].onclick=function(){deleteAssignment(i);};
+    list.appendChild(card);
+  });
+}
+
+function newAssignment(){
+  CUR_ASSIGN={id:'a_'+Date.now(),name:'',due:'',classes:[],stageId:'',stageLabel:'',note:'',_editIdx:undefined};
+  renderAssignmentEditor();SS('assignment-edit');
+}
+function editAssignment(idx){
+  var arr=getAssignments();
+  CUR_ASSIGN=Object.assign({},arr[idx],{_editIdx:idx});
+  renderAssignmentEditor();SS('assignment-edit');
+}
+function deleteAssignment(idx){
+  if(!confirm('Delete this assignment?'))return;
+  var arr=getAssignments();arr.splice(idx,1);saveAssignmentsData(arr);openAssignments();
+}
+
+function renderAssignmentEditor(){
+  var t=document.getElementById('ae-title');if(t)t.textContent=CUR_ASSIGN._editIdx!==undefined?'Edit Assignment':'New Assignment';
+  var n=document.getElementById('ae-name');if(n)n.value=CUR_ASSIGN.name||'';
+  var d=document.getElementById('ae-due');if(d)d.value=CUR_ASSIGN.due||'';
+  var nt=document.getElementById('ae-note');if(nt)nt.value=CUR_ASSIGN.note||'';
+  var boxes=document.querySelectorAll('#ae-classes input[type=checkbox]');
+  boxes.forEach(function(cb){cb.checked=(CUR_ASSIGN.classes||[]).indexOf(cb.value)>-1;});
+  // Populate stage dropdown
+  populateStageDropdown();
+  var sg=document.getElementById('ae-stage');if(sg)sg.value=CUR_ASSIGN.stageId||'';
+}
+
+function populateStageDropdown(){
+  var sg=document.getElementById('ae-stage');if(!sg)return;
+  sg.innerHTML='<option value="">— No specific stage —</option>';
+  UNITS.forEach(function(u){
+    var grp=document.createElement('optgroup');
+    grp.label=u.emoji+' '+u.title;
+    var sampleStages=u.stagesMap['Primary 4']||u.stagesMap['Primary 1']||[];
+    sampleStages.forEach(function(st){
+      var opt=document.createElement('option');
+      opt.value=st.id;opt.textContent=st.label;
+      grp.appendChild(opt);
+    });
+    if(grp.children.length)sg.appendChild(grp);
+  });
+}
+
+function saveAssignment(){
+  var n=document.getElementById('ae-name');
+  var d=document.getElementById('ae-due');
+  var nt=document.getElementById('ae-note');
+  var sg=document.getElementById('ae-stage');
+  CUR_ASSIGN.name=(n?n.value.trim():'');
+  if(!CUR_ASSIGN.name){toast('Please enter a title.',2000);return;}
+  CUR_ASSIGN.due=d?d.value:'';
+  CUR_ASSIGN.note=nt?nt.value.trim():'';
+  CUR_ASSIGN.stageId=sg?sg.value:'';
+  CUR_ASSIGN.stageLabel=sg&&sg.options[sg.selectedIndex]?sg.options[sg.selectedIndex].text:'';
+  var boxes=document.querySelectorAll('#ae-classes input[type=checkbox]:checked');
+  CUR_ASSIGN.classes=Array.from(boxes).map(function(cb){return cb.value;});
+  var arr=getAssignments();
+  if(CUR_ASSIGN._editIdx!==undefined)arr[CUR_ASSIGN._editIdx]=CUR_ASSIGN;
+  else arr.push(CUR_ASSIGN);
+  saveAssignmentsData(arr);
+  toast('\u2705 Assignment saved.',2000);
+  SS('assignments');openAssignments();
+}
+
+// Show assignment badge on student home screen
+function checkAssignments(){
+  loadAssignmentsFromFirestore(function(arr){
+    if(!arr.length)return;
+    var today=new Date().toISOString().slice(0,10);
+    var myClass=STU.classLabel||'';
+    var active=arr.filter(function(a){
+      var classMatch=!a.classes||!a.classes.length||(a.classes.indexOf(myClass)>-1);
+      var notExpired=!a.due||a.due>=today;
+      return classMatch&&notExpired;
+    });
+    if(!active.length)return;
+    // Show assignment banner on home screen
+    var banner=document.getElementById('assignment-banner');
+    if(!banner){
+      banner=document.createElement('div');banner.id='assignment-banner';
+      banner.style.cssText='background:linear-gradient(135deg,#7E22CE,#6D28D9);border-radius:12px;padding:12px 16px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px';
+      banner.onclick=function(){showAssignmentsBanner(active);};
+      var content=document.getElementById('home-content');
+      if(content)content.insertBefore(banner,content.firstChild);
+      else{var c=document.querySelector('#home .content');if(c)c.insertBefore(banner,c.firstChild);}
+    }
+    banner.innerHTML='<div style="font-size:28px">📝</div>'
+      +'<div style="flex:1"><div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:14px;color:#fff">'+active.length+' Assignment'+(active.length>1?'s':'')+'</div>'
+      +'<div style="font-size:12px;color:rgba(255,255,255,.7)">Tap to view</div></div>'
+      +'<span style="color:rgba(255,255,255,.5);font-size:20px">›</span>';
+  });
+}
+
+function showAssignmentsBanner(active){
+  var msg=active.map(function(a){return '\u2022 '+a.name+(a.due?' (due '+new Date(a.due).toLocaleDateString('en-GB',{day:'numeric',month:'short'})+')':'');}).join('\n');
+  alert('Your Assignments:\n\n'+msg);
+}
+
+// ════════════════════════════════════════
+// B — SCHOOL LEADERBOARD
+// ════════════════════════════════════════
+function openLeaderboard(){
+  SS('leaderboard');
+  var list=document.getElementById('lb-list');
+  if(list)list.innerHTML='<div style="text-align:center;padding:30px;color:rgba(255,255,255,.4);font-size:14px">Loading\u2026</div>';
+  loadSchoolRosterFromFirestore(function(cloudStudents){
+    var allProg=lg(LK_PROG)||{};
+    var merged=ROSTER.slice();
+    cloudStudents.forEach(function(cs){
+      var key=cs.uid||cs.name;
+      var exists=merged.some(function(s){return (s.uid||s.name)===key;});
+      if(!exists&&cs.name)merged.push({name:cs.name,classLabel:cs.classLabel,uid:cs.uid,emoji:cs.emoji||'👤'});
+      if(cs.progress){var k=cs.uid||cs.name;if(!allProg[k])allProg[k]=cs.progress;}
+    });
+    // Score = stages passed × 10 + avg score
+    var scored=merged.map(function(s){
+      var sk=s.uid||s.name;
+      var sp=allProg[sk]||{};
+      var passed=Object.values(sp).filter(function(v){return v&&v.passed;}).length;
+      var scores=Object.values(sp).filter(function(v){return v&&v.bestScore>0;});
+      var avg=scores.length?Math.round(scores.reduce(function(a,v){return a+(v.bestScore||0);},0)/scores.length):0;
+      var stars=Object.values(sp).reduce(function(a,v){return a+(v&&v.stars?v.stars:0);},0);
+      var total=passed*10+Math.round(avg/10)+stars;
+      return {name:s.name,emoji:s.emoji||'👤',classLabel:s.classLabel,passed:passed,avg:avg,stars:stars,total:total,isMe:(sk===(STU.uid||STU.name))};
+    });
+    scored.sort(function(a,b){return b.total-a.total;});
+    var medals=['🥇','🥈','🥉'];
+    var html='';
+    scored.forEach(function(s,i){
+      var isMe=s.isMe;
+      var bg=isMe?'rgba(253,230,138,.15)':'rgba(255,255,255,.05)';
+      var border=isMe?'border:1.5px solid #FDE68A;':'';
+      html+='<div style="'+border+'background:'+bg+';border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px">'
+        +'<div style="font-size:28px;width:36px;text-align:center">'+(i<3?medals[i]:'<span style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:16px;color:rgba(255,255,255,.4)">'+(i+1)+'</span>')+'</div>'
+        +'<div style="font-size:24px">'+s.emoji+'</div>'
+        +'<div style="flex:1">'
+        +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#fff">'+s.name+(isMe?' <span style="font-size:11px;background:#FDE68A;color:#78350F;border-radius:4px;padding:1px 5px">You</span>':'')+'</div>'
+        +'<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px">'+s.classLabel+' \u00b7 '+s.passed+' stages \u00b7 avg '+s.avg+'%</div>'
+        +'</div>'
+        +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:18px;color:#FDE68A">'+s.total+'</div>'
+        +'</div>';
+    });
+    if(!html)html='<div style="text-align:center;padding:40px;color:rgba(255,255,255,.4);font-size:14px">No students yet — complete stages to appear here!</div>';
+    var upd=document.getElementById('lb-updated');
+    if(upd)upd.textContent='Updated '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    if(list)list.innerHTML=html;
+  });
+}
+
+// ════════════════════════════════════════
+// C — PUSH NOTIFICATIONS (Web Push)
+// ════════════════════════════════════════
+// Web Push requires a service worker — handled via the SW blob
+// For now: use local notification scheduling via Notification API
+function requestNotificationPermission(){
+  if(!('Notification' in window)){toast('Notifications not supported on this browser.',2500);return;}
+  Notification.requestPermission().then(function(perm){
+    if(perm==='granted'){
+      toast('\u2705 Notifications enabled! You will be reminded to study.',2500);
+      ls('el_notif_enabled',true);
+      scheduleStudyReminder();
+    }else{
+      toast('Notifications blocked. Enable in browser settings.',3000);
+    }
+  });
+}
+
+function scheduleStudyReminder(){
+  // Show a reminder notification after 24 hours of inactivity
+  var lastSeen=parseInt(ls('el_last_seen')||'0');
+  var now=Date.now();
+  var delay=Math.max(0,(lastSeen+24*60*60*1000)-now);
+  if(lg('el_notif_enabled')&&Notification.permission==='granted'){
+    setTimeout(function(){
+      new Notification('EduLab Reminder \uD83D\uDCDA',{
+        body:'You have not studied today! Open EduLab to continue your progress.',
+        icon:'/favicon.ico',
+        badge:'/favicon.ico'
+      });
+    },delay||60000); // at least 1 min in dev
+  }
+  ls('el_last_seen',String(now));
+}
+
+// ════════════════════════════════════════
+// E — ONBOARDING TOUR
+// ════════════════════════════════════════
+var OB_STEPS=[
+  {emoji:'🎓',title:'Welcome to EduLab',body:'A smart learning app for Nigerian schools — Nursery to WAEC/JAMB. Let us show you around.'},
+  {emoji:'📖',title:'Learn at your level',body:'EduLab automatically sets the right content for your class — from counting for Nursery to quadratics and logarithms for SSS.'},
+  {emoji:'🔢',title:'Maths module',body:'Study mathematics at your own pace. If you\'re ahead of your class, switch to a higher level using the dropdown in Maths.'},
+  {emoji:'🏆',title:'House Competition',body:'Your teacher can host live inter-house quizzes. Join with the room code and compete against your school mates in real time.'},
+  {emoji:'🏅',title:'Leaderboard',body:'Earn points by completing stages and passing tests. See where you rank in your school on the leaderboard.'},
+  {emoji:'📝',title:'Assignments',body:'Your teacher will set assignments here. Complete the stages before the due date to stay on track.'},
+  {emoji:'✅',title:'You\'re ready!',body:'Start with English & General Studies or Mathematics. The more stages you complete, the higher you climb!'}
+];
+var _obStep=0;
+
+function startOnboarding(){
+  _obStep=0;renderObStep();SS('onboarding');
+}
+function renderObStep(){
+  var step=OB_STEPS[_obStep];
+  var em=document.getElementById('ob-emoji');if(em)em.textContent=step.emoji;
+  var ti=document.getElementById('ob-title');if(ti)ti.textContent=step.title;
+  var bo=document.getElementById('ob-body');if(bo)bo.textContent=step.body;
+  var dots=document.getElementById('ob-dots');
+  if(dots){
+    dots.innerHTML='';
+    OB_STEPS.forEach(function(_,i){
+      var d=document.createElement('div');
+      d.style.cssText='width:'+(i===_obStep?'20':'8')+'px;height:8px;border-radius:4px;background:'+(i===_obStep?'#fff':'rgba(255,255,255,.3)');
+      dots.appendChild(d);
+    });
+  }
+  var nxt=document.getElementById('ob-next');
+  var skp=document.getElementById('ob-skip');
+  if(nxt)nxt.textContent=_obStep===OB_STEPS.length-1?'Start Learning \u2192':'Next \u2192';
+  if(skp)skp.style.display=_obStep===OB_STEPS.length-1?'none':'';
+}
+function obNext(){
+  if(_obStep>=OB_STEPS.length-1){finishOnboarding();return;}
+  _obStep++;renderObStep();
+}
+function finishOnboarding(){ls('el_onboarded','1');SS('home');}
+
+// Show onboarding on first-ever home load
+function checkOnboarding(){
+  if(!lg('el_onboarded')){setTimeout(startOnboarding,600);}
+}
+
+// ════════════════════════════════════════
+// F — MANAGEMENT DASHBOARD (Blestonex admin)
+// ════════════════════════════════════════
+// Accessed via special URL param: ?dashboard=blestonex
+function checkDashboardMode(){
+  if(typeof window!=='undefined'&&window.location&&window.location.search.indexOf('dashboard=blestonex')>-1){
+    openBlestonexDashboard();
+  }
+}
+
+function openBlestonexDashboard(){
+  var pin=prompt('Blestonex Dashboard PIN:');
+  if(pin!=='BLX2025'){alert('Wrong PIN.');return;}
+  // Load all schools from Firestore
+  FB.onReady(function(){
+    if(!FB.db){alert('Firebase not available.');return;}
+    FB.db.collection('schools').get().then(function(snap){
+      var rows='';
+      var today=new Date().toISOString().slice(0,10);
+      snap.forEach(function(doc){
+        var d=doc.data();
+        var expired=d.expiry&&d.expiry<today;
+        rows+='<tr style="border-bottom:1px solid #eee">'
+          +'<td style="padding:8px 12px;font-weight:700">'+doc.id+'</td>'
+          +'<td style="padding:8px 12px">'+(d.name||'—')+'</td>'
+          +'<td style="padding:8px 12px">'+(d.expiry||'—')+'</td>'
+          +'<td style="padding:8px 12px"><span style="font-weight:800;color:'+(expired?'#DC2626':d.active===false?'#D97706':'#15803D')+'">'
+          +(expired?'EXPIRED':d.active===false?'INACTIVE':'ACTIVE')+'</span></td>'
+          +'</tr>';
+      });
+      var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Blestonex Dashboard</title>'
+        +'<style>body{font-family:Arial,sans-serif;margin:30px;color:#1E1B4B}h1{color:#7C3AED;margin-bottom:4px}'
+        +'h2{font-size:13px;color:#6B7B8D;font-weight:normal;margin:0 0 20px}'
+        +'table{width:100%;border-collapse:collapse}th{background:#7C3AED;color:#fff;padding:10px 12px;text-align:left;font-size:12px}'
+        +'td{padding:8px 12px}tr:nth-child(even){background:#F9FAFB}</style></head><body>'
+        +'<h1>\uD83D\uDCC8 Blestonex EduLab Dashboard</h1>'
+        +'<h2>All Schools \u00b7 Generated '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+'</h2>'
+        +'<table><thead><tr><th>Code</th><th>School</th><th>Expiry</th><th>Status</th></tr></thead>'
+        +'<tbody>'+rows+'</tbody></table></body></html>';
+      var win=window.open('','_blank');
+      if(win){win.document.write(html);win.document.close();}
+    }).catch(function(e){alert('Error: '+e.message);});
+  });
+}
+
 window.addEventListener('DOMContentLoaded',init);
 
 var FB={initialized:false,db:null,user:null,_queue:[],
