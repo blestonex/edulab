@@ -675,6 +675,23 @@ body{display:flex;flex-direction:column}
   </div>
   <!-- Filter bar -->
   <div style="background:linear-gradient(135deg,#1565C0,#1976D2);padding:0 16px 14px;flex-shrink:0;display:flex;gap:8px;flex-wrap:wrap">
+    <select id="perf-class" onchange="renderPerformance()" style="flex:1;min-width:120px;padding:8px 10px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1E1B4B">
+      <option value="all">All Classes</option>
+      <option value="Nursery 1">Nursery 1</option>
+      <option value="Nursery 2">Nursery 2</option>
+      <option value="Primary 1">Primary 1</option>
+      <option value="Primary 2">Primary 2</option>
+      <option value="Primary 3">Primary 3</option>
+      <option value="Primary 4">Primary 4</option>
+      <option value="Primary 5">Primary 5</option>
+      <option value="Primary 6">Primary 6</option>
+      <option value="JSS 1">JSS 1</option>
+      <option value="JSS 2">JSS 2</option>
+      <option value="JSS 3">JSS 3</option>
+      <option value="SSS 1">SSS 1</option>
+      <option value="SSS 2">SSS 2</option>
+      <option value="WAEC/JAMB">WAEC/JAMB</option>
+    </select>
     <select id="perf-subject" onchange="renderPerformance()" style="flex:1;min-width:120px;padding:8px 10px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1E1B4B">
       <option value="all">All Subjects</option>
       <option value="animals">Animals</option>
@@ -3249,13 +3266,21 @@ function openClassPerformance(){
 function renderPerformance(){
   var content=document.getElementById('class-perf-content');if(!content)return;
   var roster=_perfData.roster,allProg=_perfData.allProg;
+  var classFilter=document.getElementById('perf-class');
   var subjectFilter=document.getElementById('perf-subject');
   var sortFilter=document.getElementById('perf-sort');
+  var classVal=classFilter?classFilter.value:'all';
   var subject=subjectFilter?subjectFilter.value:'all';
   var sortBy=sortFilter?sortFilter.value:'weak';
 
-  if(!roster.length){
-    content.innerHTML='<div style="text-align:center;padding:40px;color:#6B7B8D;font-size:14px"><div style="font-size:36px;margin-bottom:10px">👥</div>No students found.<br>Students appear after they log in.</div>';
+  // Filter roster by class first
+  var filteredRoster=classVal==='all'?roster:roster.filter(function(s){return s.classLabel===classVal;});
+
+  if(!filteredRoster.length){
+    content.innerHTML='<div style="text-align:center;padding:40px;color:#6B7B8D;font-size:14px">'
+      +'<div style="font-size:36px;margin-bottom:10px">👥</div>'
+      +(classVal==='all'?'No students found.':'No students in '+classVal+' yet.')
+      +'<br><span style="font-size:12px">Students appear after they log in.</span></div>';
     return;
   }
 
@@ -3278,11 +3303,26 @@ function renderPerformance(){
     });
   });
 
-  roster.forEach(function(s){
+  // Build valid stage IDs for the selected class (so we don't show other classes' stages)
+  var validStageIds={};
+  UNITS.forEach(function(u){
+    var stages=classVal==='all'
+      ?Object.values(u.stagesMap).reduce(function(a,s){return a.concat(s||[]);},[])
+      :(u.stagesMap[classVal]||[]);
+    stages.forEach(function(st){validStageIds[st.id]=true;});
+  });
+  if(classVal==='all'){
+    Object.values(MATH_STAGES).forEach(function(stages){stages.forEach(function(st){validStageIds[st.id]=true;});});
+  }else{
+    (MATH_STAGES[classVal]||[]).forEach(function(st){validStageIds[st.id]=true;});
+  }
+
+  filteredRoster.forEach(function(s){
     var sk=s.uid||s.name;
     var sp=allProg[sk]||{};
     Object.keys(sp).forEach(function(stageId){
       var v=sp[stageId];if(!v||!v.attempts)return;
+      if(!validStageIds[stageId])return; // skip stages from other classes
       if(!stageStats[stageId]){
         var info=stageLabelMap[stageId]||{label:stageId,unit:'Other',unitKey:'other',emoji:'📝'};
         stageStats[stageId]=Object.assign({id:stageId,passed:0,failed:0,attempts:0,totalScore:0,count:0,students:[]},info);
@@ -3315,12 +3355,14 @@ function renderPerformance(){
     return b.attempts-a.attempts;
   });
 
-  var totalStudents=roster.length;
+  var totalStudents=filteredRoster.length;
+  var classLabel=classVal==='all'?'All Classes':classVal;
   var html='';
 
   // Summary strip
   var totalAttempts=entries.reduce(function(a,e){return a+e.attempts;},0);
   var avgPass=entries.length?Math.round(entries.reduce(function(a,e){return a+e.passed/Math.max(1,e.students.length);},0)/entries.length*100):0;
+  html+='<div style="font-size:12px;font-weight:800;color:#6B7B8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">'+classLabel+' · '+totalStudents+' student'+(totalStudents!==1?'s':'')+'</div>';
   html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">'
     +'<div style="background:#EFF6FF;border-radius:10px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900;color:#1D4ED8;font-family:\'Nunito\',sans-serif">'+totalStudents+'</div><div style="font-size:11px;color:#6B7B8D;font-weight:700">Students</div></div>'
     +'<div style="background:#F0FDF4;border-radius:10px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900;color:#15803D;font-family:\'Nunito\',sans-serif">'+avgPass+'%</div><div style="font-size:11px;color:#6B7B8D;font-weight:700">Avg Pass Rate</div></div>'
