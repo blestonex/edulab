@@ -290,6 +290,16 @@ body{display:flex;flex-direction:column}
       </div>
     </div>
   </div>
+
+  <!-- First-time activation banner — shown until school code is entered -->
+  <div id="roster-activation-banner" style="display:none;background:linear-gradient(135deg,#1E1B4B,#4C1D95);margin:0 16px 12px;border-radius:14px;padding:18px;flex-shrink:0">
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:#fff;margin-bottom:4px">🔑 Activate this device</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:12px">Enter the school code to unlock all features and connect students to the school</div>
+    <div style="display:flex;gap:8px">
+      <input id="shared-code-input" type="text" maxlength="10" placeholder="School Code" oninput="this.value=this.value.toUpperCase()" style="flex:1;padding:10px 12px;border:2px solid rgba(255,255,255,.3);border-radius:8px;background:rgba(255,255,255,.15);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;letter-spacing:3px;outline:none">
+      <button id="shared-activate-btn" onclick="activateSharedDevice()" style="padding:10px 16px;background:#7C3AED;color:#fff;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer;white-space:nowrap">Activate Device</button>
+    </div>
+  </div>
   <div class="roster-search">
     <span style="font-size:16px;opacity:.5">🔍</span>
     <input type="text" id="roster-search-input" placeholder="Search your name…" oninput="filterRoster(this.value)">
@@ -2107,7 +2117,46 @@ function showRoster(){
   var si=document.getElementById('roster-search-input');if(si)si.value='';
   var rc=document.getElementById('roster-count');
   if(rc)rc.textContent=ROSTER.length+' student'+(ROSTER.length!==1?'s':'');
+  applyBranding();
+  // First-time shared device — show activation prompt if no school code yet
+  if(!getSchool()||!getSchool().code){
+    showSharedActivationBanner();
+  }else{
+    hideSharedActivationBanner();
+  }
   SS('roster');
+}
+
+function showSharedActivationBanner(){
+  var banner=document.getElementById('roster-activation-banner');
+  if(banner)banner.style.display='';
+}
+function hideSharedActivationBanner(){
+  var banner=document.getElementById('roster-activation-banner');
+  if(banner)banner.style.display='none';
+}
+function activateSharedDevice(){
+  var inp=document.getElementById('shared-code-input');
+  var code=(inp?inp.value:'').toUpperCase().trim();
+  if(code.length<4){toast('Please enter a valid school code.',2000);return;}
+  var btn=document.getElementById('shared-activate-btn');
+  if(btn){btn.textContent='Checking\u2026';btn.disabled=true;}
+  activateSchoolCode(code,function(result,school){
+    if(btn){btn.textContent='Activate Device';btn.disabled=false;}
+    if(result==='ok'){
+      toast('\u2705 Device activated! Welcome to '+(school.name||code),2500);
+      hideSharedActivationBanner();
+      applyBranding();
+    }else if(result==='invalid'){
+      toast('\u274C Invalid code. Check with Blestonex.',3000);
+    }else if(result==='expired'){
+      toast('\u26A0\uFE0F School subscription expired. Contact Blestonex.',4000);
+    }else if(result==='offline'){
+      toast('\u26A0\uFE0F No internet. Connect and try again.',3000);
+    }else{
+      toast('\u26A0\uFE0F Could not verify. Check internet and try again.',3000);
+    }
+  });
 }
 function renderRoster(list){
   var g=document.getElementById('roster-grid');if(!g)return;
@@ -2172,8 +2221,15 @@ function openAdmin(){
   }
   var school=getSchool();
   if(!school||!school.code){
-    // No school code — no admin access on this device
-    toast('\u26A0\uFE0F Enter a school code first to enable admin access.',3000);
+    // No school code yet — on shared device let teacher in to enter code
+    // Show a simplified prompt explaining what to do
+    if(DMODE==='shared'){
+      if(confirm('No school code yet.\n\nEnter the school code in the activation box on the roster screen, then try Admin again.\n\nTap OK to go back to the roster.')){
+        SS('roster');
+      }
+      return;
+    }
+    toast('\u26A0\uFE0F Complete setup first — enter a school code.',3000);
     return;
   }
   // Fetch adminPin from Firestore — it is never stored on the device
@@ -2187,7 +2243,6 @@ function openAdmin(){
         var data=doc.data();
         var adminPin=data.adminPin;
         if(!adminPin){
-          // No adminPin set in Firestore — block access with instructions
           toast('\u274C Admin PIN not set. Add an "adminPin" field to your school document in Firebase Console.',5000);
           return;
         }
