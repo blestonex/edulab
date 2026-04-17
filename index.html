@@ -528,7 +528,7 @@ body{display:flex;flex-direction:column}
   </div>
   <div style="background:rgba(0,0,0,.15);padding:7px 16px;font-size:12px;color:rgba(255,255,255,.85);flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
     <span id="math-bc">Mathematics · Lower Primary</span>
-    <select id="math-level-pick" onchange="switchMathLevel(this.value)" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;border-radius:6px;padding:3px 8px;cursor:pointer">
+    <select id="math-level-pick" onchange="switchMathLevel(this.value)" style="background:#fff;border:1.5px solid rgba(255,255,255,.4);color:#C2410C;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;border-radius:6px;padding:3px 8px;cursor:pointer">
       <option value="">My level</option>
       <option value="Nursery 1">Nursery 1</option>
       <option value="Nursery 2">Nursery 2</option>
@@ -1927,7 +1927,35 @@ function sPass(){[440,550,660,880].forEach(function(f,i){tone(f,'sine',.18,.2,i*
 // INIT
 // ════════════════════════════════════════
 function init(){
-  rebuildCustomUnits(); // restore custom modules from localStorage
+  rebuildCustomUnits(); // restore from local cache immediately (fast)
+  // Refresh from Firestore in background — updates branding + modules without blocking
+  FB.onReady(function(){
+    // Re-verify school code still active and pull latest branding
+    var school=getSchool();
+    if(school&&school.code){
+      FB.db.collection('schools').doc(school.code).get()
+        .then(function(doc){
+          if(doc.exists){
+            var data=doc.data();
+            if(data.active===false||
+               (data.expiry&&new Date(data.expiry)<new Date())){
+              // School expired — clear and show demo mode
+              ls(LK_SCHOOL,null);
+              var dn=document.getElementById('demo-notice');
+              if(dn)dn.style.display='';
+            }else{
+              // Update cached branding in case it changed
+              ls(LK_SCHOOL,Object.assign({code:school.code},data));
+              applyBranding();
+            }
+          }
+        }).catch(function(){});
+      // Pull latest custom modules
+      loadModulesFromFirestore(function(mods){
+        rebuildCustomUnits(); // rebuild with latest
+      });
+    }
+  });
   var m=lg(LK_MODE);if(!m){SS('splash');return;}
   DMODE=m;
   if(DMODE==='single'){var s=lg(LK_STU);if(!s||!s.name){startSetup();return;}STU=s;loadHome();}
@@ -2559,42 +2587,79 @@ function resAction2(){document.getElementById('res-btn2').onclick();}
 // ════════════════════════════════════════
 // A — TEACHER CUSTOM MODULES
 // ════════════════════════════════════════
-var LK_CUSTOM='el_custom'; // localStorage key
-var CUR_MODULE=null;       // module being edited
+var LK_CUSTOM='el_custom'; // localStorage cache
+var CUR_MODULE=null;
 
 function loadCustomModules(){
   return lg(LK_CUSTOM)||[];
 }
 function saveCustomModules(mods){
-  ls(LK_CUSTOM,mods);
+  ls(LK_CUSTOM,mods); // always cache locally first
+  // Sync to Firestore under school's sub-collection
+  var school=getSchool();
+  if(!school||!school.code)return;
+  FB.onReady(function(){
+    if(!FB.db)return;
+    FB.db.collection('schools').doc(school.code)
+      .collection('modules').doc('data')
+      .set({modules:mods,updatedAt:Date.now()})
+      .catch(function(e){console.warn('Module sync failed:',e.message);});
+  });
+}
+// Pull modules from Firestore and merge with local cache
+function loadModulesFromFirestore(cb){
+  var school=getSchool();
+  if(!school||!school.code){cb(loadCustomModules());return;}
+  FB.onReady(function(){
+    if(!FB.db){cb(loadCustomModules());return;}
+    FB.db.collection('schools').doc(school.code)
+      .collection('modules').doc('data').get()
+      .then(function(doc){
+        if(doc.exists&&doc.data().modules){
+          var mods=doc.data().modules;
+          ls(LK_CUSTOM,mods); // update local cache
+          cb(mods);
+        }else{
+          cb(loadCustomModules());
+        }
+      })
+      .catch(function(){cb(loadCustomModules());});
+  });
 }
 
 function openCustomModules(){
-  var mods=loadCustomModules();
   var list=document.getElementById('custom-modules-list');
   if(!list)return;
+  list.innerHTML='<div style="text-align:center;padding:30px;color:#9CA3AF;font-size:14px">Loading\u2026</div>';
+  SS('custom-modules');
+  loadModulesFromFirestore(function(mods){
+    renderCustomModuleList(mods);
+  });
+}
+function renderCustomModuleList(mods){
+  var list=document.getElementById('custom-modules-list');if(!list)return;
   list.innerHTML='';
   if(!mods.length){
     list.innerHTML='<div style="text-align:center;padding:40px;color:#9CA3AF;font-size:14px"><div style="font-size:40px;margin-bottom:12px">📭</div>No custom modules yet.<br>Tap <strong>+ New</strong> to create one.</div>';
-  }else{
-    mods.forEach(function(m,i){
-      var card=document.createElement('div');
-      card.style.cssText='background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;cursor:pointer';
-      card.innerHTML='<div style="font-size:32px;width:44px;text-align:center;flex-shrink:0">'+(m.emoji||'📘')+'</div>'
-        +'<div style="flex:1"><div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+m.name+'</div>'
-        +'<div style="font-size:12px;color:#9CA3AF;margin-top:2px">'+(m.words||[]).length+' words</div></div>'
-        +'<div style="display:flex;gap:8px">'
-        +'<button style="background:#EDE9FE;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;color:#6D28D9;font-weight:800">Edit</button>'
-        +'<button style="background:#FEF2F2;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;color:#DC2626;font-weight:800">🗑</button>'
-        +'</div>';
-      var btns=card.querySelectorAll('button');
-      btns[0].onclick=function(e){e.stopPropagation();editCustomModule(i);};
-      btns[1].onclick=function(e){e.stopPropagation();deleteCustomModule(i);};
-      card.onclick=function(){editCustomModule(i);};
-      list.appendChild(card);
-    });
+    return;
   }
-  SS('custom-modules');
+  mods.forEach(function(m,i){
+    var card=document.createElement('div');
+    card.style.cssText='background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;cursor:pointer';
+    var classes=(m.targetClasses&&m.targetClasses.length)?m.targetClasses.join(', '):'All classes';
+    card.innerHTML='<div style="font-size:32px;width:44px;text-align:center;flex-shrink:0">'+(m.emoji||'📘')+'</div>'
+      +'<div style="flex:1"><div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+m.name+'</div>'
+      +'<div style="font-size:12px;color:#9CA3AF;margin-top:2px">'+(m.words||[]).length+' words · '+classes+'</div></div>'
+      +'<div style="display:flex;gap:8px">'
+      +'<button style="background:#EDE9FE;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;color:#6D28D9;font-weight:800">Edit</button>'
+      +'<button style="background:#FEF2F2;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;color:#DC2626;font-weight:800">\uD83D\uDDD1</button>'
+      +'</div>';
+    var btns=card.querySelectorAll('button');
+    btns[0].onclick=function(e){e.stopPropagation();editCustomModule(i);};
+    btns[1].onclick=function(e){e.stopPropagation();deleteCustomModule(i);};
+    card.onclick=function(){editCustomModule(i);};
+    list.appendChild(card);
+  });
 }
 
 function newCustomModule(){
