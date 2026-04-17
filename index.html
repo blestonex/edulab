@@ -2086,29 +2086,64 @@ function saveNewStudent(){
 }
 
 // ADMIN PANEL
-var LK_PIN='el_pin';
+// ── Admin authentication — PIN comes from Firestore, never set on device ──
+// Teacher adds adminPin field to school document in Firebase Console
+// e.g. adminPin: "1234" — only teacher knows this, students never see it
+var _adminVerified=false; // session flag — stays true until app reloads
+var _adminVerifyTime=0;   // timestamp of last verify — expires after 30 min
+
 function openAdmin(){
-  var savedPin=lg(LK_PIN);
-  if(!savedPin){
-    // First time — set a PIN
-    var p1=prompt('Set a 4-digit Admin PIN (you will need this every time):');
-    if(!p1||p1.length<4){toast('PIN must be at least 4 digits.',2000);return;}
-    var p2=prompt('Confirm your PIN:');
-    if(p1!==p2){toast('PINs do not match. Try again.',2000);return;}
-    ls(LK_PIN,p1);toast('PIN set! Opening admin panel.',1500);
-  }else{
-    var entered=prompt('Enter Admin PIN:');
-    if(entered===null)return; // cancelled
-    if(String(entered)!==String(savedPin)){toast('❌ Wrong PIN.',2000);return;}
+  // Check if already verified this session (within 30 minutes)
+  if(_adminVerified&&(Date.now()-_adminVerifyTime)<30*60*1000){
+    _doOpenAdmin();return;
   }
+  var school=getSchool();
+  if(!school||!school.code){
+    // No school code — no admin access on this device
+    toast('\u26A0\uFE0F Enter a school code first to enable admin access.',3000);
+    return;
+  }
+  // Fetch adminPin from Firestore — it is never stored on the device
+  FB.onReady(function(){
+    if(!FB.db){
+      toast('\u26A0\uFE0F No internet connection. Admin requires online verification.',3000);return;
+    }
+    FB.db.collection('schools').doc(school.code).get()
+      .then(function(doc){
+        if(!doc.exists){toast('\u274C School not found. Re-enter school code.',3000);return;}
+        var data=doc.data();
+        var adminPin=data.adminPin;
+        if(!adminPin){
+          // No adminPin set in Firestore — block access with instructions
+          toast('\u274C Admin PIN not set. Add an "adminPin" field to your school document in Firebase Console.',5000);
+          return;
+        }
+        var entered=prompt('Enter Admin PIN:');
+        if(entered===null)return;
+        if(String(entered).trim()!==String(adminPin).trim()){
+          toast('\u274C Wrong PIN. Contact Blestonex if you have forgotten it.',3000);return;
+        }
+        _adminVerified=true;
+        _adminVerifyTime=Date.now();
+        _doOpenAdmin();
+      })
+      .catch(function(e){
+        console.warn('Admin verify failed:',e.message);
+        toast('\u26A0\uFE0F Could not verify PIN. Check internet and try again.',3000);
+      });
+  });
+}
+
+function _doOpenAdmin(){
   loadAdminSchoolFields();
-  renderAdminProgress();SS('admin');
+  renderAdminProgress();
+  SS('admin');
 }
-function resetAdminPin(){
-  if(!confirm('Reset PIN? You will be asked to set a new one next time.'))return;
-  ls(LK_PIN,null);toast('PIN reset.',1800);
+
+function adminBack(){
+  _adminVerified=false; // clear session so next open requires PIN again
+  DMODE==='single'?SS('home'):SS('roster');
 }
-function adminBack(){DMODE==='single'?SS('home'):SS('roster');}
 
 function loadHome(){
   document.getElementById('home-sn').textContent=STU.name.split(' ')[0];
@@ -2219,6 +2254,19 @@ function removeStudent(uid){
   if(!confirm('Remove this student? Their progress will also be deleted.'))return;
   ROSTER=ROSTER.filter(function(s){return (s.uid||s.name)!==uid;});ls(LK_ROSTER,ROSTER);
   var p=lg(LK_PROG)||{};delete p[uid];ls(LK_PROG,p);
+  // Only delete from Firestore on shared devices (teacher device)
+  // Single-user devices should not be able to delete other students from the cloud
+  if(DMODE==='shared'){
+    var school=getSchool();
+    if(school&&school.code){
+      FB.onReady(function(){
+        if(!FB.db)return;
+        FB.db.collection('schools').doc(school.code)
+          .collection('students').doc(uid).delete()
+          .catch(function(e){console.warn('Cloud delete failed:',e.message);});
+      });
+    }
+  }
   renderAdminProgress();toast('Student removed',1800);
 }
 function clearAllStudents(){
