@@ -673,6 +673,24 @@ body{display:flex;flex-direction:column}
     <button class="tback" onclick="SS('admin')">‹</button>
     <div class="tlogo">Class <span>Performance</span></div>
   </div>
+  <!-- Filter bar -->
+  <div style="background:linear-gradient(135deg,#1565C0,#1976D2);padding:0 16px 14px;flex-shrink:0;display:flex;gap:8px;flex-wrap:wrap">
+    <select id="perf-subject" onchange="renderPerformance()" style="flex:1;min-width:120px;padding:8px 10px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1E1B4B">
+      <option value="all">All Subjects</option>
+      <option value="animals">Animals</option>
+      <option value="body">My Body</option>
+      <option value="food">Food &amp; Drinks</option>
+      <option value="colours">Colours &amp; Shapes</option>
+      <option value="science">Basic Science</option>
+      <option value="social">Social Studies</option>
+      <option value="maths">Mathematics</option>
+    </select>
+    <select id="perf-sort" onchange="renderPerformance()" style="flex:1;min-width:120px;padding:8px 10px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1E1B4B">
+      <option value="weak">Weakest first</option>
+      <option value="strong">Strongest first</option>
+      <option value="attempts">Most attempted</option>
+    </select>
+  </div>
   <div class="content" id="class-perf-content" style="padding:16px"></div>
 </div>
 
@@ -3201,78 +3219,155 @@ function doExport(encodedSchool){
 // ════════════════════════════════════════
 // E — CLASS PERFORMANCE OVERVIEW
 // ════════════════════════════════════════
+var _perfData={roster:[],allProg:{}}; // cached for filter changes
+
 function openClassPerformance(){
-  var allProg=lg(LK_PROG)||{};
   var content=document.getElementById('class-perf-content');
   if(!content)return;
-  content.innerHTML='';
+  content.innerHTML='<div style="text-align:center;padding:30px;color:#6B7B8D;font-size:14px">Loading\u2026</div>';
+  SS('class-performance');
 
-  if(!ROSTER.length){
-    content.innerHTML='<div style="text-align:center;padding:40px;color:#6B7B8D;font-size:14px">No students on the roster yet.</div>';
-    SS('class-performance');return;
+  // Pull merged roster (local + cloud)
+  var localProg=lg(LK_PROG)||{};
+  loadSchoolRosterFromFirestore(function(cloudStudents){
+    var merged=ROSTER.slice();
+    var cloudProg={};
+    cloudStudents.forEach(function(cs){
+      var key=cs.uid||cs.name;
+      var exists=merged.some(function(s){return (s.uid||s.name)===key;});
+      if(!exists&&cs.name)merged.push({name:cs.name,classLabel:cs.classLabel,uid:cs.uid,emoji:cs.emoji||'👤',mathLevel:cs.mathLevel||''});
+      if(cs.progress)cloudProg[key]=cs.progress;
+    });
+    var allProg={};
+    Object.keys(localProg).forEach(function(k){allProg[k]=Object.assign({},localProg[k]);});
+    Object.keys(cloudProg).forEach(function(k){if(!allProg[k])allProg[k]=cloudProg[k];});
+    _perfData={roster:merged,allProg:allProg};
+    renderPerformance();
+  });
+}
+
+function renderPerformance(){
+  var content=document.getElementById('class-perf-content');if(!content)return;
+  var roster=_perfData.roster,allProg=_perfData.allProg;
+  var subjectFilter=document.getElementById('perf-subject');
+  var sortFilter=document.getElementById('perf-sort');
+  var subject=subjectFilter?subjectFilter.value:'all';
+  var sortBy=sortFilter?sortFilter.value:'weak';
+
+  if(!roster.length){
+    content.innerHTML='<div style="text-align:center;padding:40px;color:#6B7B8D;font-size:14px"><div style="font-size:36px;margin-bottom:10px">👥</div>No students found.<br>Students appear after they log in.</div>';
+    return;
   }
 
-  // For each unit+class combination, find all stages attempted by any student
-  var stageStats={};  // stageId → {label, attempts, passed, totalScore, count}
+  // Build stage stats across ALL students
+  var stageStats={};
 
-  ROSTER.forEach(function(s){
-    var sk=s.uid||s.name;
-    var sp=allProg[sk]||{};
-    Object.keys(sp).forEach(function(stageId){
-      var v=sp[stageId];
-      if(!v)return;
-      if(!stageStats[stageId])stageStats[stageId]={label:stageId,passed:0,attempts:0,totalScore:0,count:0};
-      stageStats[stageId].attempts+=(v.attempts||0);
-      if(v.passed)stageStats[stageId].passed++;
-      if(v.bestScore){stageStats[stageId].totalScore+=v.bestScore;stageStats[stageId].count++;}
-    });
-  });
-
-  // Label stages
+  // Build stage label map
+  var stageLabelMap={};
   UNITS.forEach(function(u){
     Object.values(u.stagesMap).forEach(function(stages){
       (stages||[]).forEach(function(st){
-        if(stageStats[st.id])stageStats[st.id].label=u.title+': '+st.label;
+        stageLabelMap[st.id]={label:st.label,unit:u.title,unitKey:u.key,emoji:u.emoji};
       });
     });
   });
+  // Math stages
+  Object.values(MATH_STAGES).forEach(function(stages){
+    (stages||[]).forEach(function(st){
+      stageLabelMap[st.id]={label:st.label,unit:'Mathematics',unitKey:'maths',emoji:'🔢'};
+    });
+  });
 
-  // Sort by pass rate ascending (weakest first)
-  var entries=Object.values(stageStats).filter(function(e){return e.attempts>0;});
-  entries.sort(function(a,b){
-    var rateA=a.passed/Math.max(1,ROSTER.length);
-    var rateB=b.passed/Math.max(1,ROSTER.length);
-    return rateA-rateB;
+  roster.forEach(function(s){
+    var sk=s.uid||s.name;
+    var sp=allProg[sk]||{};
+    Object.keys(sp).forEach(function(stageId){
+      var v=sp[stageId];if(!v||!v.attempts)return;
+      if(!stageStats[stageId]){
+        var info=stageLabelMap[stageId]||{label:stageId,unit:'Other',unitKey:'other',emoji:'📝'};
+        stageStats[stageId]=Object.assign({id:stageId,passed:0,failed:0,attempts:0,totalScore:0,count:0,students:[]},info);
+      }
+      stageStats[stageId].attempts+=(v.attempts||0);
+      if(v.passed)stageStats[stageId].passed++;
+      else stageStats[stageId].failed++;
+      if(v.bestScore){stageStats[stageId].totalScore+=v.bestScore;stageStats[stageId].count++;}
+      stageStats[stageId].students.push({name:s.name,emoji:s.emoji||'👤',passed:!!v.passed,score:v.bestScore||0,classLabel:s.classLabel});
+    });
+  });
+
+  // Filter by subject
+  var entries=Object.values(stageStats).filter(function(e){
+    if(subject==='all')return true;
+    return e.unitKey===subject;
   });
 
   if(!entries.length){
-    content.innerHTML='<div style="text-align:center;padding:40px;color:#6B7B8D;font-size:14px">No stages attempted yet.</div>';
-    SS('class-performance');return;
+    content.innerHTML='<div style="text-align:center;padding:40px;color:#6B7B8D;font-size:14px">No data for this subject yet.</div>';
+    return;
   }
 
-  var html='<div style="background:#FEF3C7;border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;color:#92400E;font-weight:700">📊 Stages are sorted weakest first — stages at the top need the most attention</div>';
+  // Sort
+  entries.sort(function(a,b){
+    var rA=a.passed/Math.max(1,a.students.length);
+    var rB=b.passed/Math.max(1,b.students.length);
+    if(sortBy==='weak')return rA-rB;
+    if(sortBy==='strong')return rB-rA;
+    return b.attempts-a.attempts;
+  });
 
-  entries.forEach(function(e){
-    var passRate=Math.round(e.passed/ROSTER.length*100);
+  var totalStudents=roster.length;
+  var html='';
+
+  // Summary strip
+  var totalAttempts=entries.reduce(function(a,e){return a+e.attempts;},0);
+  var avgPass=entries.length?Math.round(entries.reduce(function(a,e){return a+e.passed/Math.max(1,e.students.length);},0)/entries.length*100):0;
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">'
+    +'<div style="background:#EFF6FF;border-radius:10px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900;color:#1D4ED8;font-family:\'Nunito\',sans-serif">'+totalStudents+'</div><div style="font-size:11px;color:#6B7B8D;font-weight:700">Students</div></div>'
+    +'<div style="background:#F0FDF4;border-radius:10px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900;color:#15803D;font-family:\'Nunito\',sans-serif">'+avgPass+'%</div><div style="font-size:11px;color:#6B7B8D;font-weight:700">Avg Pass Rate</div></div>'
+    +'<div style="background:#FFF7ED;border-radius:10px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900;color:#C2410C;font-family:\'Nunito\',sans-serif">'+totalAttempts+'</div><div style="font-size:11px;color:#6B7B8D;font-weight:700">Total Attempts</div></div>'
+    +'</div>';
+
+  if(sortBy==='weak'){
+    html+='<div style="background:#FEF3C7;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#92400E;font-weight:700">'
+      +'⚠️ Weakest stages at top — these need the most classroom attention</div>';
+  }
+
+  entries.forEach(function(e,ei){
+    var passRate=Math.round(e.passed/Math.max(1,e.students.length)*100);
     var avgScore=e.count?Math.round(e.totalScore/e.count):0;
     var barColor=passRate>=70?'#15803D':passRate>=40?'#D97706':'#DC2626';
     var bg=passRate>=70?'#F0FDF4':passRate>=40?'#FFFBEB':'#FEF2F2';
-    html+='<div style="background:'+bg+';border-radius:12px;padding:14px;margin-bottom:10px">'
-      +'<div style="font-family:\'Nunito\',sans-serif;font-weight:800;font-size:13px;color:#1E1B4B;margin-bottom:6px">'+e.label+'</div>'
-      +'<div style="display:flex;gap:16px;font-size:12px;color:#6B7B8D;margin-bottom:8px">'
-      +'<span>👥 '+e.passed+'/'+ROSTER.length+' passed</span>'
-      +'<span>📊 Avg: '+avgScore+'%</span>'
+    var badge=passRate>=70?'✅':passRate>=40?'⚠️':'❌';
+
+    // Who passed / who failed
+    var passedNames=e.students.filter(function(s){return s.passed;}).map(function(s){return s.emoji+' '+s.name;});
+    var failedNames=e.students.filter(function(s){return !s.passed;}).map(function(s){return s.emoji+' '+s.name;});
+
+    html+='<div style="background:'+bg+';border-radius:12px;padding:14px;margin-bottom:10px;border-left:4px solid '+barColor+'">'
+      // Header
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+      +'<span style="font-size:16px">'+e.emoji+'</span>'
+      +'<div style="flex:1"><div style="font-family:\'Nunito\',sans-serif;font-weight:800;font-size:13px;color:#1E1B4B">'+e.label+'</div>'
+      +'<div style="font-size:11px;color:#6B7B8D;margin-top:1px">'+e.unit+'</div></div>'
+      +'<span style="font-size:18px">'+badge+'</span>'
+      +'</div>'
+      // Stats row
+      +'<div style="display:flex;gap:12px;font-size:12px;color:#6B7B8D;margin-bottom:8px;flex-wrap:wrap">'
+      +'<span>👥 '+e.passed+'/'+e.students.length+' passed</span>'
+      +'<span>📊 Avg '+avgScore+'%</span>'
       +'<span>🔁 '+e.attempts+' attempts</span>'
       +'</div>'
-      +'<div style="height:8px;background:rgba(0,0,0,.08);border-radius:6px;overflow:hidden">'
-      +'<div style="height:8px;background:'+barColor+';border-radius:6px;width:'+passRate+'%;transition:width .5s ease"></div>'
-      +'</div>'
-      +'<div style="text-align:right;font-size:11px;font-weight:800;color:'+barColor+';margin-top:3px">'+passRate+'% pass rate</div>'
+      // Progress bar
+      +'<div style="height:8px;background:rgba(0,0,0,.08);border-radius:6px;overflow:hidden;margin-bottom:6px">'
+      +'<div style="height:8px;background:'+barColor+';border-radius:6px;width:'+passRate+'%"></div></div>'
+      +'<div style="text-align:right;font-size:11px;font-weight:800;color:'+barColor+'">'+passRate+'% pass rate</div>'
+      // Who passed/failed breakdown
+      +(passedNames.length?'<div style="font-size:11px;color:#15803D;margin-top:8px;font-weight:700">✅ Passed: '+passedNames.join(', ')+'</div>':'')
+      +(failedNames.length?'<div style="font-size:11px;color:#DC2626;margin-top:4px;font-weight:700">❌ Not yet: '+failedNames.join(', ')+'</div>':'')
       +'</div>';
   });
 
   content.innerHTML=html;
-  SS('class-performance');
 }
 
 // ════════════════════════════════════════
