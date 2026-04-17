@@ -1882,7 +1882,47 @@ function saveProg(sid,data){
   var p=lg(LK_PROG)||{};if(!p[sk()])p[sk()]={};
   var prev=p[sk()][sid]||{attempts:0};
   Object.assign(prev,data);
-  p[sk()][sid]=prev;ls(LK_PROG,p);return prev;
+  p[sk()][sid]=prev;ls(LK_PROG,p);
+  // Sync progress to Firestore under school collection
+  syncStudentToFirestore();
+  return prev;
+}
+
+function syncStudentToFirestore(){
+  var school=getSchool();if(!school||!school.code)return;
+  var studentKey=sk();if(!studentKey)return;
+  FB.onReady(function(){
+    if(!FB.db)return;
+    var p=lg(LK_PROG)||{};
+    var studentProg=p[studentKey]||{};
+    var ref=FB.db.collection('schools').doc(school.code)
+      .collection('students').doc(studentKey);
+    ref.set({
+      name:STU.name||'',
+      classLabel:STU.classLabel||'',
+      uid:STU.uid||studentKey,
+      emoji:STU.emoji||'👤',
+      progress:studentProg,
+      lastSeen:Date.now()
+    },{merge:true}).catch(function(e){
+      console.warn('Student sync failed:',e.message);
+    });
+  });
+}
+
+function loadSchoolRosterFromFirestore(cb){
+  var school=getSchool();if(!school||!school.code){cb([]);return;}
+  FB.onReady(function(){
+    if(!FB.db){cb([]);return;}
+    FB.db.collection('schools').doc(school.code)
+      .collection('students').get()
+      .then(function(snap){
+        var students=[];
+        snap.forEach(function(doc){students.push(doc.data());});
+        cb(students);
+      })
+      .catch(function(){cb([]);});
+  });
 }
 function starsStr(n){var s='';for(var i=0;i<3;i++)s+=i<n?'★':'☆';return s;}
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
@@ -2086,6 +2126,8 @@ function loadHome(){
   // Show demo mode notice if not activated
   var dn=document.getElementById('demo-notice');
   if(dn)dn.style.display=isActivated()?'none':'';
+  // Sync this student's profile to Firestore so admin sees them from any device
+  syncStudentToFirestore();
   var p=prog();
   var totalStages=0,doneStages=0;
   UNITS.forEach(function(u){
@@ -2105,13 +2147,42 @@ function loadHome(){
 // ════════════════════════════════════════
 function renderAdminProgress(){
   var list=document.getElementById('admin-progress-list');if(!list)return;
-  var cnt=document.getElementById('admin-student-count');if(cnt)cnt.textContent=ROSTER.length+' students';
-  if(!ROSTER.length){
-    list.innerHTML='<div style="text-align:center;padding:20px;color:var(--sm);font-size:14px">No students added yet</div>';
+  var cnt=document.getElementById('admin-student-count');
+  // Show local roster immediately, then merge Firestore students
+  renderAdminProgressWith(ROSTER,lg(LK_PROG)||{});
+  // Pull cloud students in background
+  loadSchoolRosterFromFirestore(function(cloudStudents){
+    if(!cloudStudents.length)return;
+    // Merge cloud students with local roster (avoid duplicates by uid/name)
+    var merged=ROSTER.slice();
+    var cloudProg={};
+    cloudStudents.forEach(function(cs){
+      var key=cs.uid||cs.name;
+      var exists=merged.some(function(s){return (s.uid||s.name)===key;});
+      if(!exists&&cs.name){
+        merged.push({name:cs.name,classLabel:cs.classLabel,uid:cs.uid,emoji:cs.emoji||'👤'});
+      }
+      if(cs.progress)cloudProg[key]=cs.progress;
+    });
+    // Merge progress — cloud fills in what local doesn't have
+    var localProg=lg(LK_PROG)||{};
+    Object.keys(cloudProg).forEach(function(k){
+      if(!localProg[k])localProg[k]=cloudProg[k];
+    });
+    if(cnt)cnt.textContent=merged.length+' student'+(merged.length!==1?'s':'')+' (incl. other devices)';
+    renderAdminProgressWith(merged,localProg);
+  });
+}
+
+function renderAdminProgressWith(roster,allProg){
+  var list=document.getElementById('admin-progress-list');if(!list)return;
+  var cnt=document.getElementById('admin-student-count');
+  if(cnt&&!cnt.textContent.includes('other'))cnt.textContent=roster.length+' student'+(roster.length!==1?'s':'');
+  if(!roster.length){
+    list.innerHTML='<div style="text-align:center;padding:20px;color:var(--sm);font-size:14px">No students yet. Students appear here after they log in on any device.</div>';
     return;
   }
-  var allProg=lg(LK_PROG)||{};
-  var rows=ROSTER.map(function(s){
+  var rows=roster.map(function(s){
     var sk=s.uid||s.name;
     var sp=allProg[sk]||{};
     var passed=Object.values(sp).filter(function(v){return v&&v.passed;}).length;
@@ -2125,25 +2196,20 @@ function renderAdminProgress(){
       '<td style="padding:9px 10px;color:var(--sm)">'+s.classLabel+'</td>',
       '<td style="padding:9px 10px;text-align:center"><span style="background:var(--gl);color:var(--gm);border-radius:6px;padding:2px 8px;font-weight:800;font-size:12px">'+passed+'</span></td>',
       '<td style="padding:9px 10px;text-align:center"><span style="font-weight:800;color:'+bestColor+'">'+best+'%</span></td>',
-      '<td style="padding:4px 2px;text-align:center"><button id="rm-'+sk+'" style="background:none;border:none;color:var(--err);font-size:16px;cursor:pointer;padding:2px 6px">🗑</button></td>'
+      '<td style="padding:4px 2px;text-align:center"><button id="rm-'+sk+'" style="background:none;border:none;color:var(--err);font-size:16px;cursor:pointer;padding:2px 6px">\uD83D\uDDD1</button></td>'
     ].join('');
-    return {row:row, sk:sk};
+    return {row:row,sk:sk};
   });
-  var wrap=document.createElement('div');
-  wrap.style.overflowX='auto';
-  var tbl=document.createElement('table');
-  tbl.style.cssText='width:100%;border-collapse:collapse;font-size:13px';
+  var wrap=document.createElement('div');wrap.style.overflowX='auto';
+  var tbl=document.createElement('table');tbl.style.cssText='width:100%;border-collapse:collapse;font-size:13px';
   var thead=document.createElement('thead');
   thead.innerHTML='<tr style="background:var(--slt)"><th style="padding:8px 10px;text-align:left;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--sm);border-bottom:1px solid var(--bd)">Student</th><th style="padding:8px 10px;text-align:left;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--sm);border-bottom:1px solid var(--bd)">Class</th><th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--sm);border-bottom:1px solid var(--bd)">Done</th><th style="padding:8px 10px;text-align:center;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--sm);border-bottom:1px solid var(--bd)">Best</th><th style="padding:8px 2px;border-bottom:1px solid var(--bd)"></th></tr>';
   var tbody=document.createElement('tbody');
   rows.forEach(function(item){
     tbody.appendChild(item.row);
-    var btn=document.getElementById('rm-'+item.sk);
-    if(btn)btn.onclick=function(){removeStudent(item.sk);};
   });
   tbl.appendChild(thead);tbl.appendChild(tbody);wrap.appendChild(tbl);
   list.innerHTML='';list.appendChild(wrap);
-  // Attach onclick after DOM insert
   rows.forEach(function(item){
     var btn=list.querySelector('#rm-'+item.sk);
     if(btn)btn.onclick=function(){removeStudent(item.sk);};
@@ -3837,9 +3903,10 @@ function applyBranding(){
   var color=school.color||'#FF6B35';
   var light=lighten(color);
   var grad='linear-gradient(135deg,'+color+','+light+')';
+  var displayName=school.name||(school.code?'School ('+school.code+')':'');
+  var displayEmoji=school.emoji||'\uD83C\uDFEB';
   // Apply to every topbar on the app
   document.querySelectorAll('.topbar').forEach(function(tb){
-    // Skip competition screens (they have their own dark colours)
     var parentId=tb.parentElement?tb.parentElement.id:'';
     if(parentId&&(parentId.indexOf('comp-')===0||parentId==='math-play'||parentId==='math-results'))return;
     tb.style.background=grad;
@@ -3852,13 +3919,16 @@ function applyBranding(){
   if(rhdr)rhdr.style.background=grad;
   // Show school name in home subtitle
   var cls=document.getElementById('home-cls');
-  if(cls&&school.name)cls.textContent=(school.emoji||'\uD83C\uDFEB')+' '+school.name+' \u00b7 '+(window._stuClass||'');
-  // Show live branding preview in admin panel
+  if(cls&&displayName)cls.textContent=displayEmoji+' '+displayName+' \u00b7 '+(window._stuClass||'');
+  // Auto-fill admin name field if empty
+  var nameEl=document.getElementById('admin-school-name');
+  if(nameEl&&!nameEl.value&&displayName)nameEl.value=displayName;
+  // Live branding preview in admin panel
   var preview=document.getElementById('admin-brand-preview');
   if(preview){
     preview.style.background=grad;
     preview.style.display='flex';
-    preview.textContent=(school.emoji||'\uD83C\uDFEB')+' '+school.name+' \u2014 branding active';
+    preview.textContent=displayEmoji+' '+(displayName||'School code active')+' \u2014 branding applied \u2705';
   }
 }
 function lighten(hex){
@@ -3876,14 +3946,28 @@ function activateSchoolCode(code,cb){
   var statusEl=document.getElementById('admin-activation-status');
   if(statusEl){statusEl.textContent='Checking code\u2026';statusEl.style.color='#D97706';}
 
+  var done=false;
+  // 12-second timeout — prevents infinite hang on slow mobile connections
+  var timer=setTimeout(function(){
+    if(done)return;done=true;
+    var cached=getSchool();
+    if(cached&&cached.code===code){
+      applyBranding();cb('ok',cached);
+    }else{
+      cb('offline',null);
+    }
+  },12000);
+
   FB.onReady(function(){
     if(!FB.db){
+      clearTimeout(timer);if(done)return;done=true;
       var cached=getSchool();
       if(cached&&cached.code===code){cb('ok',cached);return;}
       cb('offline',null);return;
     }
     FB.db.collection('schools').doc(code).get()
       .then(function(doc){
+        clearTimeout(timer);if(done)return;done=true;
         if(!doc.exists){cb('invalid',null);return;}
         var data=doc.data();
         if(data.active===false){cb('inactive',null);return;}
@@ -3891,16 +3975,15 @@ function activateSchoolCode(code,cb){
         // Always overwrite cache with fresh Firestore data — clears any stale incomplete version
         var school=Object.assign({code:code},data);
         ls(LK_SCHOOL,school);
-        applyBranding(); // apply immediately on current screen
+        applyBranding();
         cb('ok',school);
       })
       .catch(function(e){
+        clearTimeout(timer);if(done)return;done=true;
         console.warn('School code lookup failed:',e.message);
         var cached=getSchool();
-        if(cached&&cached.code===code){
-          // Use cached but try to refresh fields from what we know
-          cb('ok',cached);
-        }else{cb('error',null);}
+        if(cached&&cached.code===code){cb('ok',cached);}
+        else{cb('error',null);}
       });
   });
 }
