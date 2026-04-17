@@ -337,6 +337,7 @@ body{display:flex;flex-direction:column}
       <input id="admin-school-code" type="text" placeholder="e.g. BLX001" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:15px;font-family:'Nunito',monospace;font-weight:700;letter-spacing:3px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
       <button onclick="saveSchoolSettings()" style="width:100%;margin-top:10px;padding:12px;background:#1565C0;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer">Save Settings</button>
       <div id="admin-activation-status" style="font-size:12px;font-weight:700;margin-top:8px;text-align:center"></div>
+      <div id="admin-brand-preview" style="display:none;margin-top:10px;border-radius:10px;padding:12px 16px;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;align-items:center;gap:8px"></div>
     </div>
 
     <!-- Quick action buttons -->
@@ -368,6 +369,7 @@ body{display:flex;flex-direction:column}
     <div class="tlogo">Edu<span>Lab</span></div>
     <div id="home-sn" class="tsname"></div>
     <button id="home-sw" class="tswitch" style="display:none" onclick="switchStudent()">Switch</button>
+    <button id="home-admin-btn" onclick="openAdmin()" style="display:none;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);border-radius:8px;color:#fff;padding:5px 10px;font-size:14px;cursor:pointer;margin-left:6px">⚙️</button>
   </div>
   <div class="home-banner" style="background:linear-gradient(135deg,#FF6B35,#FF8E53)">
     <h2 id="home-greet">Hello! Ready to learn? 🎉</h2>
@@ -2066,7 +2068,7 @@ function resetAdminPin(){
   if(!confirm('Reset PIN? You will be asked to set a new one next time.'))return;
   ls(LK_PIN,null);toast('PIN reset.',1800);
 }
-function adminBack(){SS('roster');}
+function adminBack(){DMODE==='single'?SS('home'):SS('roster');}
 
 function loadHome(){
   document.getElementById('home-sn').textContent=STU.name.split(' ')[0];
@@ -2075,6 +2077,10 @@ function loadHome(){
   document.getElementById('home-cls').textContent=window._stuClass;
   if(DMODE==='shared'){
     document.getElementById('home-sw').style.display='';
+  }else{
+    // Single-user mode — show ⚙️ settings button
+    var hab=document.getElementById('home-admin-btn');
+    if(hab)hab.style.display='';
   }
   applyBranding(); // apply school colour/name if activated
   // Show demo mode notice if not activated
@@ -3829,12 +3835,31 @@ function isActivated(){
 function applyBranding(){
   var school=getSchool();if(!school)return;
   var color=school.color||'#FF6B35';
-  var htb=document.getElementById('home-tb');
-  if(htb)htb.style.background='linear-gradient(135deg,'+color+','+lighten(color)+')';
+  var light=lighten(color);
+  var grad='linear-gradient(135deg,'+color+','+light+')';
+  // Apply to every topbar on the app
+  document.querySelectorAll('.topbar').forEach(function(tb){
+    // Skip competition screens (they have their own dark colours)
+    var parentId=tb.parentElement?tb.parentElement.id:'';
+    if(parentId&&(parentId.indexOf('comp-')===0||parentId==='math-play'||parentId==='math-results'))return;
+    tb.style.background=grad;
+  });
+  // Apply to home banner
   var hbanner=document.querySelector('#home .home-banner');
-  if(hbanner)hbanner.style.background='linear-gradient(135deg,'+color+','+lighten(color)+')';
+  if(hbanner)hbanner.style.background=grad;
+  // Apply to roster header
+  var rhdr=document.querySelector('.roster-hdr');
+  if(rhdr)rhdr.style.background=grad;
+  // Show school name in home subtitle
   var cls=document.getElementById('home-cls');
-  if(cls&&school.name)cls.textContent=(school.emoji||'\uD83C\uDFEB')+' '+school.name+' \u00b7 '+((window._stuClass)||'');
+  if(cls&&school.name)cls.textContent=(school.emoji||'\uD83C\uDFEB')+' '+school.name+' \u00b7 '+(window._stuClass||'');
+  // Show live branding preview in admin panel
+  var preview=document.getElementById('admin-brand-preview');
+  if(preview){
+    preview.style.background=grad;
+    preview.style.display='flex';
+    preview.textContent=(school.emoji||'\uD83C\uDFEB')+' '+school.name+' \u2014 branding active';
+  }
 }
 function lighten(hex){
   try{
@@ -3847,14 +3872,12 @@ function lighten(hex){
 }
 
 function activateSchoolCode(code,cb){
-  // Look up the code in Firestore — not in local JS
   code=code.toUpperCase().trim();
   var statusEl=document.getElementById('admin-activation-status');
   if(statusEl){statusEl.textContent='Checking code\u2026';statusEl.style.color='#D97706';}
 
   FB.onReady(function(){
     if(!FB.db){
-      // Firebase not available — check local cache first
       var cached=getSchool();
       if(cached&&cached.code===code){cb('ok',cached);return;}
       cb('offline',null);return;
@@ -3865,18 +3888,19 @@ function activateSchoolCode(code,cb){
         var data=doc.data();
         if(data.active===false){cb('inactive',null);return;}
         if(data.expiry&&new Date(data.expiry)<new Date()){cb('expired',null);return;}
-        // Valid — save to localStorage and apply
+        // Always overwrite cache with fresh Firestore data — clears any stale incomplete version
         var school=Object.assign({code:code},data);
         ls(LK_SCHOOL,school);
-        applyBranding();
+        applyBranding(); // apply immediately on current screen
         cb('ok',school);
       })
       .catch(function(e){
         console.warn('School code lookup failed:',e.message);
-        // Fallback: accept if already cached with same code
         var cached=getSchool();
-        if(cached&&cached.code===code){cb('ok',cached);}
-        else{cb('error',null);}
+        if(cached&&cached.code===code){
+          // Use cached but try to refresh fields from what we know
+          cb('ok',cached);
+        }else{cb('error',null);}
       });
   });
 }
