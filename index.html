@@ -185,6 +185,8 @@ body{display:flex;flex-direction:column}
 .ssltr{font-family:'Nunito',sans-serif;font-weight:900;font-size:19px;color:var(--t);line-height:1;pointer-events:none}
 .ss.ok .ssltr{color:#2E7D32}
 .ss.no .ssltr{color:var(--err)}
+.ss.filled{background:#EDE9FE;border-color:#7C3AED;transform:scale(1.05);transition:all .1s ease}
+.ss.filled .ssltr{color:#4C1D95}
 .spell-gap{width:12px;flex-shrink:0}
 .pool{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .lt{width:40px;height:46px;border:2px solid var(--bd);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:18px;color:var(--sl);background:#fff;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.07);transition:transform .1s}
@@ -524,7 +526,26 @@ body{display:flex;flex-direction:column}
     <div class="tlogo">Mathematics</div>
     <button id="math-sw" class="tswitch" style="display:none" onclick="switchStudent()">Switch</button>
   </div>
-  <div style="background:rgba(0,0,0,.08);padding:7px 16px;font-size:12px;color:rgba(255,255,255,.8);flex-shrink:0" id="math-bc">Mathematics · Lower Primary</div>
+  <div style="background:rgba(0,0,0,.15);padding:7px 16px;font-size:12px;color:rgba(255,255,255,.85);flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
+    <span id="math-bc">Mathematics · Lower Primary</span>
+    <select id="math-level-pick" onchange="switchMathLevel(this.value)" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;border-radius:6px;padding:3px 8px;cursor:pointer">
+      <option value="">My level</option>
+      <option value="Nursery 1">Nursery 1</option>
+      <option value="Nursery 2">Nursery 2</option>
+      <option value="Primary 1">Primary 1</option>
+      <option value="Primary 2">Primary 2</option>
+      <option value="Primary 3">Primary 3</option>
+      <option value="Primary 4">Primary 4</option>
+      <option value="Primary 5">Primary 5</option>
+      <option value="Primary 6">Primary 6</option>
+      <option value="JSS 1">JSS 1</option>
+      <option value="JSS 2">JSS 2</option>
+      <option value="JSS 3">JSS 3</option>
+      <option value="SSS 1">SSS 1</option>
+      <option value="SSS 2">SSS 2</option>
+      <option value="WAEC/JAMB">WAEC/JAMB</option>
+    </select>
+  </div>
   <div class="content" id="math-list"></div>
 </div>
 
@@ -590,6 +611,23 @@ body{display:flex;flex-direction:column}
       <input id="cme-name" type="text" placeholder="e.g. Vocabulary Test 3A" maxlength="40" style="width:100%;padding:10px 12px;border:1.5px solid #DDD6FE;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:15px">
       <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#6D28D9;margin-top:12px;margin-bottom:6px">Emoji Icon</div>
       <input id="cme-emoji" type="text" placeholder="📘" maxlength="2" style="width:80px;padding:10px 12px;border:1.5px solid #DDD6FE;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:22px;text-align:center">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#6D28D9;margin-top:12px;margin-bottom:6px">Target Classes <span style="font-weight:600;text-transform:none;font-size:10px;color:#9CA3AF">(tick all that apply)</span></div>
+      <div id="cme-classes" style="display:flex;flex-wrap:wrap;gap:8px">
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="Nursery 1"> Nursery 1</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="Nursery 2"> Nursery 2</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="Primary 1"> Primary 1</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="Primary 2"> Primary 2</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="Primary 3"> Primary 3</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="Primary 4"> Primary 4</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="Primary 5"> Primary 5</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="Primary 6"> Primary 6</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="JSS 1"> JSS 1</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="JSS 2"> JSS 2</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="JSS 3"> JSS 3</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="SSS 1"> SSS 1</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="SSS 2"> SSS 2</label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;cursor:pointer"><input type="checkbox" value="WAEC/JAMB"> WAEC/JAMB</label>
+      </div>
     </div>
     <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
@@ -1978,16 +2016,35 @@ function saveNewStudent(){
 }
 
 // ADMIN PANEL
+var LK_PIN='el_pin';
 function openAdmin(){
+  var savedPin=lg(LK_PIN);
+  if(!savedPin){
+    // First time — set a PIN
+    var p1=prompt('Set a 4-digit Admin PIN (you will need this every time):');
+    if(!p1||p1.length<4){toast('PIN must be at least 4 digits.',2000);return;}
+    var p2=prompt('Confirm your PIN:');
+    if(p1!==p2){toast('PINs do not match. Try again.',2000);return;}
+    ls(LK_PIN,p1);toast('PIN set! Opening admin panel.',1500);
+  }else{
+    var entered=prompt('Enter Admin PIN:');
+    if(entered===null)return; // cancelled
+    if(String(entered)!==String(savedPin)){toast('❌ Wrong PIN.',2000);return;}
+  }
   loadAdminSchoolFields();
   renderAdminProgress();SS('admin');
+}
+function resetAdminPin(){
+  if(!confirm('Reset PIN? You will be asked to set a new one next time.'))return;
+  ls(LK_PIN,null);toast('PIN reset.',1800);
 }
 function adminBack(){SS('roster');}
 
 function loadHome(){
   document.getElementById('home-sn').textContent=STU.name.split(' ')[0];
   document.getElementById('home-greet').textContent='Hello, '+STU.name.split(' ')[0]+'! Ready to learn? 🎉';
-  document.getElementById('home-cls').textContent=(STU.classLabel||'Lower Primary')+' · English';
+  window._stuClass=(STU.classLabel||'Lower Primary')+' · English';
+  document.getElementById('home-cls').textContent=window._stuClass;
   if(DMODE==='shared'){
     document.getElementById('home-sw').style.display='';
   }
@@ -2567,6 +2624,10 @@ function renderModuleEditor(){
   var t=document.getElementById('cme-title');if(t)t.textContent=CUR_MODULE._editIdx!==undefined?'Edit Module':'New Module';
   var n=document.getElementById('cme-name');if(n)n.value=CUR_MODULE.name||'';
   var em=document.getElementById('cme-emoji');if(em)em.value=CUR_MODULE.emoji||'📘';
+  // Tick target class checkboxes
+  var boxes=document.querySelectorAll('#cme-classes input[type=checkbox]');
+  var saved=CUR_MODULE.targetClasses||[];
+  boxes.forEach(function(cb){cb.checked=saved.length===0||saved.indexOf(cb.value)>-1;});
   renderCMEWords();
 }
 
@@ -2616,6 +2677,12 @@ function saveCustomModule(){
   var em=document.getElementById('cme-emoji');
   CUR_MODULE.name=(n?n.value.trim():'')|| 'Unnamed Module';
   CUR_MODULE.emoji=em?em.value.trim():'📘';
+  // Read target classes
+  var boxes=document.querySelectorAll('#cme-classes input[type=checkbox]:checked');
+  CUR_MODULE.targetClasses=Array.from(boxes).map(function(cb){return cb.value;});
+  if(!CUR_MODULE.targetClasses.length){
+    toast('Please select at least one target class.',2500);return;
+  }
   // Validate — need at least 4 words with a word and definition
   var valid=CUR_MODULE.words.filter(function(w){return w.word.trim()&&w.def.trim();});
   if(valid.length<4){
@@ -2667,10 +2734,11 @@ function rebuildCustomUnits(){
       C[key]={bg:'linear-gradient(135deg,#7C3AED,#4C1D95)',wc:'#E0E7FF'};
       stageWords.push(key);
     });
-    // Build stage map — one stage per module, all classes
+    // Build stage map — only for target classes
     var stagesMap={};
     var allClasses=['Nursery 1','Nursery 2','Primary 1','Primary 2','Primary 3','Primary 4','Primary 5','Primary 6','JSS 1','JSS 2','JSS 3','SSS 1','SSS 2','WAEC/JAMB'];
-    allClasses.forEach(function(cl){
+    var targets=m.targetClasses&&m.targetClasses.length?m.targetClasses:allClasses;
+    targets.forEach(function(cl){
       stagesMap[cl]=[{id:m.id+'_'+cl,label:m.name,words:stageWords,emoji:m.emoji||'📘'}];
     });
     UNITS.push({key:m.id,title:m.name,emoji:m.emoji||'📘',stagesMap:stagesMap,isCustom:true});
@@ -3515,14 +3583,21 @@ var MS={
 };
 
 // ── MATH FUNCTIONS ──
-function openMathList(){
+function openMathList(overrideClass){
   if(DMODE==='shared'){var el=document.getElementById('math-sw');if(el)el.style.display='';}
-  var cl=STU.classLabel||'Primary 1';
+  var cl=overrideClass||STU.mathLevel||STU.classLabel||'Primary 1';
   var bc=document.getElementById('math-bc');if(bc)bc.textContent='Mathematics · '+cl;
+  // Set dropdown to show current level
+  var pick=document.getElementById('math-level-pick');
+  if(pick){
+    pick.value=overrideClass||STU.mathLevel||'';
+  }
   var stages=MATH_STAGES[cl]||MATH_STAGES['Primary 1']||[];
   var p=prog();
   var list=document.getElementById('math-list');if(!list)return;
-  list.innerHTML='<div class="unit-lbl">🔢 Mathematics · '+cl+'</div>';
+  var headerNote=overrideClass||STU.mathLevel?
+    '<div style="background:#FEF3C7;border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:13px;color:#92400E;font-weight:700">📐 Studying at '+cl+' level — your class is '+STU.classLabel+'</div>':'';
+  list.innerHTML='<div class="unit-lbl">🔢 Mathematics · '+cl+'</div>'+headerNote;
   stages.forEach(function(st,idx){
     var sp=p[st.id];var passed=sp&&sp.passed;
     var progressUnlocked=idx===0||(p[stages[idx-1].id]&&p[stages[idx-1].id].passed);
@@ -3550,8 +3625,21 @@ function openMathList(){
   SS('math-lessons');
 }
 
+function switchMathLevel(level){
+  if(!level){
+    // Reset to own class
+    STU.mathLevel=null;
+    if(DMODE==='single')ls(LK_STU,STU);
+    openMathList();
+  }else{
+    STU.mathLevel=level;
+    if(DMODE==='single')ls(LK_STU,STU);
+    openMathList(level);
+  }
+}
+
 function startMathStage(idx){
-  var cl=STU.classLabel||'Primary 1';
+  var cl=STU.mathLevel||STU.classLabel||'Primary 1';
   var stages=MATH_STAGES[cl]||MATH_STAGES['Primary 1']||[];
   MS.stage=stages[idx];MS.stageIdx=idx;MS.classLabel=cl;
   MS.questions=shuffle(MS.stage.gen());
@@ -3640,7 +3728,7 @@ function finishMath(){
   var ti=document.getElementById('math-res-title');if(ti)ti.textContent=pct===100?'Perfect!':pct>=80?'Excellent!':passed?'Well done!':'Almost there!';
   var sub=document.getElementById('math-res-sub');
   var cl=MS.classLabel;
-  var stages=MATH_STAGES[cl]||[];
+  var stages=MATH_STAGES[cl]||MATH_STAGES[STU.classLabel]||[];
   var isLast=MS.stageIdx>=stages.length-1;
   if(sub)sub.textContent=passed?(isLast?'All stages complete! 🎊':'Next stage unlocked!'):'You need 70% to pass. Try again!';
 
@@ -3680,8 +3768,8 @@ function applyBranding(){
   if(htb)htb.style.background='linear-gradient(135deg,'+color+','+lighten(color)+')';
   var hbanner=document.querySelector('#home .home-banner');
   if(hbanner)hbanner.style.background='linear-gradient(135deg,'+color+','+lighten(color)+')';
-  var greet=document.getElementById('home-greet');
-  if(greet&&school.name)greet.textContent=(school.emoji||'\uD83C\uDFEB')+' '+school.name;
+  var cls=document.getElementById('home-cls');
+  if(cls&&school.name)cls.textContent=(school.emoji||'\uD83C\uDFEB')+' '+school.name+' \u00b7 '+((window._stuClass)||'');
 }
 function lighten(hex){
   try{
