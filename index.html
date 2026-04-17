@@ -255,7 +255,22 @@ body{display:flex;flex-direction:column}
   <div class="setup-body">
     <div id="sw1"><div class="setup-hdr"><h2>What is your name?</h2><p>Your name shows on your progress</p></div><div class="setup-field"><input id="sw-name" class="setup-input" type="text" placeholder="Type your name…" maxlength="30" oninput="swCheck()"></div></div>
     <div id="sw2" style="display:none"><div class="setup-hdr"><h2>What is your class?</h2><p>This sets the right level for you</p></div><div class="class-grid"><button class="class-btn" onclick="swCls(this,'Nursery 1')">Nursery 1</button><button class="class-btn" onclick="swCls(this,'Nursery 2')">Nursery 2</button><button class="class-btn" onclick="swCls(this,'Primary 1')">Primary 1</button><button class="class-btn" onclick="swCls(this,'Primary 2')">Primary 2</button><button class="class-btn" onclick="swCls(this,'Primary 3')">Primary 3</button><button class="class-btn" onclick="swCls(this,'Primary 4')">Primary 4</button><button class="class-btn" onclick="swCls(this,'Primary 5')">Primary 5</button><button class="class-btn" onclick="swCls(this,'Primary 6')">Primary 6</button><button class="class-btn" onclick="swCls(this,'JSS 1')">JSS 1</button><button class="class-btn" onclick="swCls(this,'JSS 2')">JSS 2</button><button class="class-btn" onclick="swCls(this,'JSS 3')">JSS 3</button><button class="class-btn" onclick="swCls(this,'SSS 1')">SSS 1</button><button class="class-btn" onclick="swCls(this,'SSS 2')">SSS 2</button><button class="class-btn" onclick="swCls(this,'WAEC/JAMB')">WAEC/JAMB</button></div></div>
-    <div id="sw3" style="display:none"><div class="setup-hdr"><h2>School code</h2><p>Ask your teacher. You can skip this.</p></div><div class="setup-field"><input id="sw-code" class="setup-input" type="text" placeholder="e.g. BLX001" maxlength="8" style="text-transform:uppercase;letter-spacing:3px;font-size:22px" oninput="this.value=this.value.toUpperCase()"></div><p style="text-align:center;font-size:12px;color:rgba(255,255,255,.4);margin-top:8px">Optional — works without it</p></div>
+    <div id="sw3" style="display:none">
+      <div class="setup-hdr">
+        <h2>🔑 Teacher Activation</h2>
+        <p>Hand this device to your teacher to enter the school code</p>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:14px;padding:18px;margin-bottom:12px;text-align:center">
+        <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:12px;font-weight:700">STUDENT NAME</div>
+        <div id="sw3-name" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;margin-bottom:4px"></div>
+        <div id="sw3-class" style="font-size:13px;color:rgba(255,255,255,.6)"></div>
+      </div>
+      <div class="setup-field">
+        <input id="sw-code" class="setup-input" type="text" placeholder="School Code" maxlength="10" style="text-transform:uppercase;letter-spacing:4px;font-size:24px;text-align:center" oninput="this.value=this.value.toUpperCase();swCodeCheck()">
+      </div>
+      <div id="sw-code-status" style="text-align:center;font-size:13px;font-weight:700;margin-top:8px;min-height:20px"></div>
+      <p style="text-align:center;font-size:12px;color:rgba(255,255,255,.45);margin-top:8px">Teacher: enter the school code and tap Activate below</p>
+    </div>
     <div class="step-dots"><div class="dot active" id="dot0"></div><div class="dot" id="dot1"></div><div class="dot" id="dot2"></div></div>
   </div>
   <div class="setup-action"><button id="sw-next" class="btn-sw" disabled onclick="swNext()">Continue →</button></div>
@@ -2018,9 +2033,67 @@ function swCheck(){document.getElementById('sw-next').disabled=!document.getElem
 function swCls(btn,cls){document.querySelectorAll('.class-btn').forEach(function(b){b.classList.remove('sel');});btn.classList.add('sel');swClass=cls;document.getElementById('sw-next').disabled=false;}
 function swDots(a){for(var i=0;i<3;i++){var d=document.getElementById('dot'+i);if(d)d.classList.toggle('active',i===a);}}
 function swNext(){
-  if(swStep===0){swName=document.getElementById('sw-name').value.trim();if(!swName)return;document.getElementById('sw1').style.display='none';document.getElementById('sw2').style.display='';swStep=1;swDots(1);document.getElementById('sw-next').disabled=true;}
-  else if(swStep===1){if(!swClass)return;document.getElementById('sw2').style.display='none';document.getElementById('sw3').style.display='';swStep=2;swDots(2);document.getElementById('sw-next').textContent='Start Learning →';document.getElementById('sw-next').disabled=false;}
-  else{STU={name:swName,classLabel:swClass,uid:'su_'+swName.replace(/\s+/g,'_').toLowerCase()+'_'+Date.now()};ls(LK_STU,STU);loadHome();}
+  if(swStep===0){
+    swName=document.getElementById('sw-name').value.trim();
+    if(!swName)return;
+    document.getElementById('sw1').style.display='none';
+    document.getElementById('sw2').style.display='';
+    swStep=1;swDots(1);
+    document.getElementById('sw-next').disabled=true;
+  }else if(swStep===1){
+    if(!swClass)return;
+    document.getElementById('sw2').style.display='none';
+    document.getElementById('sw3').style.display='';
+    // Show student name and class on the teacher handover screen
+    var n3=document.getElementById('sw3-name');if(n3)n3.textContent=swName;
+    var c3=document.getElementById('sw3-class');if(c3)c3.textContent=swClass;
+    document.getElementById('sw-code').value='';
+    var st=document.getElementById('sw-code-status');if(st)st.textContent='';
+    swStep=2;swDots(2);
+    document.getElementById('sw-next').textContent='Activate \u2192';
+    document.getElementById('sw-next').disabled=true; // disabled until valid code entered
+  }else{
+    // Step 3 — teacher enters school code, must be verified before proceeding
+    var code=(document.getElementById('sw-code').value||'').toUpperCase().trim();
+    if(!code){toast('Please enter the school code.',2000);return;}
+    var btn=document.getElementById('sw-next');
+    if(btn){btn.textContent='Checking\u2026';btn.disabled=true;}
+    var st=document.getElementById('sw-code-status');
+    if(st){st.textContent='\u23F3 Verifying code\u2026';st.style.color='rgba(255,255,255,.7)';}
+    // Save student profile first
+    STU={name:swName,classLabel:swClass,uid:'su_'+swName.replace(/\s+/g,'_').toLowerCase()+'_'+Date.now()};
+    ls(LK_STU,STU);
+    // Verify school code — mandatory
+    activateSchoolCode(code,function(result,school){
+      if(btn){btn.textContent='Activate \u2192';btn.disabled=false;}
+      if(result==='ok'){
+        if(st){st.textContent='\u2705 Activated! Welcome to '+(school.name||code);st.style.color='#86EFAC';}
+        setTimeout(function(){loadHome();},1000);
+      }else if(result==='invalid'){
+        if(st){st.textContent='\u274C Invalid code. Ask your teacher for the correct code.';st.style.color='#FCA5A5';}
+        ls(LK_STU,null); // don't save student until code is valid
+      }else if(result==='expired'){
+        if(st){st.textContent='\u26A0\uFE0F School subscription expired. Contact Blestonex.';st.style.color='#FCD34D';}
+        ls(LK_STU,null);
+      }else if(result==='offline'){
+        // Offline — allow entry but mark as unactivated
+        if(st){st.textContent='\u26A0\uFE0F No internet — code not verified. Connect and re-enter later.';st.style.color='#FCD34D';}
+        setTimeout(function(){loadHome();},1500);
+      }else{
+        if(st){st.textContent='\u274C Could not verify. Check internet and try again.';st.style.color='#FCA5A5';}
+        ls(LK_STU,null);
+      }
+    });
+  }
+}
+
+function swCodeCheck(){
+  // Enable activate button only when something is typed
+  var code=(document.getElementById('sw-code').value||'').trim();
+  var btn=document.getElementById('sw-next');
+  if(btn)btn.disabled=code.length<4;
+  var st=document.getElementById('sw-code-status');
+  if(st)st.textContent='';
 }
 
 // ════════════════════════════════════════
