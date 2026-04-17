@@ -1927,6 +1927,7 @@ function syncStudentToFirestore(){
       classLabel:STU.classLabel||'',
       uid:STU.uid||studentKey,
       emoji:STU.emoji||'👤',
+      mathLevel:STU.mathLevel||'',
       progress:studentProg,
       lastSeen:Date.now()
     },{merge:true}).catch(function(e){
@@ -2323,7 +2324,7 @@ function renderAdminProgress(){
       var key=cs.uid||cs.name;
       var exists=merged.some(function(s){return (s.uid||s.name)===key;});
       if(!exists&&cs.name){
-        merged.push({name:cs.name,classLabel:cs.classLabel,uid:cs.uid,emoji:cs.emoji||'👤'});
+        merged.push({name:cs.name,classLabel:cs.classLabel,uid:cs.uid,emoji:cs.emoji||'👤',mathLevel:cs.mathLevel||''});
       }
       if(cs.progress)cloudProg[key]=cs.progress;
     });
@@ -2352,10 +2353,15 @@ function renderAdminProgressWith(roster,allProg){
     var scores=Object.values(sp).filter(function(v){return v&&v.bestScore>0;}).map(function(v){return v.bestScore;});
     var best=scores.length?Math.max.apply(null,scores):0;
     var bestColor=best>=70?'var(--ok)':'var(--sm)';
+    // Maths level indicator — highlight if different from class level
+    var mathLvl=s.mathLevel||'';
+    var mathBadge=mathLvl&&mathLvl!==s.classLabel
+      ?'<span style="font-size:10px;background:#FFF3E0;color:#C2410C;border-radius:4px;padding:1px 5px;font-weight:800;margin-left:4px">\uD83D\uDD22 '+mathLvl+'</span>'
+      :'';
     var row=document.createElement('tr');
     row.style.borderBottom='1px solid var(--bd)';
     row.innerHTML=[
-      '<td style="padding:9px 10px;font-weight:700;color:var(--sl)">'+(s.emoji||'👤')+' '+s.name+'</td>',
+      '<td style="padding:9px 10px;font-weight:700;color:var(--sl)">'+(s.emoji||'👤')+' '+s.name+mathBadge+'</td>',
       '<td style="padding:9px 10px;color:var(--sm)">'+s.classLabel+'</td>',
       '<td style="padding:9px 10px;text-align:center"><span style="background:var(--gl);color:var(--gm);border-radius:6px;padding:2px 8px;font-weight:800;font-size:12px">'+passed+'</span></td>',
       '<td style="padding:9px 10px;text-align:center"><span style="font-weight:800;color:'+bestColor+'">'+best+'%</span></td>',
@@ -3062,58 +3068,133 @@ function rebuildCustomUnits(){
 // B — PROGRESS REPORT EXPORT (PDF)
 // ════════════════════════════════════════
 function exportProgressReport(){
+  // Pull merged roster (local + cloud) then show export options
+  var schoolName=(getSchool()||{}).name||'EduLab School';
+  var list=document.getElementById('admin-progress-list');
+  // Show a selection dialog using the already-merged roster visible in admin
+  showExportDialog(schoolName);
+}
+
+function showExportDialog(schoolName){
+  // Gather all currently displayed students from the merged roster
   var allProg=lg(LK_PROG)||{};
-  var schoolName=(lg('el_school')||{}).name||'EduLab School';
-  var today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  // Build merged list same way as renderAdminProgress
+  loadSchoolRosterFromFirestore(function(cloudStudents){
+    var merged=ROSTER.slice();
+    var cloudProg={};
+    cloudStudents.forEach(function(cs){
+      var key=cs.uid||cs.name;
+      var exists=merged.some(function(s){return (s.uid||s.name)===key;});
+      if(!exists&&cs.name)merged.push({name:cs.name,classLabel:cs.classLabel,uid:cs.uid,emoji:cs.emoji||'👤',mathLevel:cs.mathLevel});
+      if(cs.progress)cloudProg[key]=cs.progress;
+    });
+    Object.keys(cloudProg).forEach(function(k){if(!allProg[k])allProg[k]=cloudProg[k];});
 
-  // Build HTML report
-  var rows='';
-  var allStageIds=[];
-  UNITS.forEach(function(u){
-    var sampleMap=u.stagesMap['Primary 4']||u.stagesMap['Primary 1']||[];
-    sampleMap.forEach(function(st){allStageIds.push({id:st.id,label:u.title+': '+st.label});});
+    if(!merged.length){toast('No students to export.',2000);return;}
+
+    // Build selection UI
+    var opts='<option value="all">All Students ('+merged.length+')</option>';
+    merged.forEach(function(s,i){
+      opts+='<option value="'+i+'">'+(s.emoji||'👤')+' '+s.name+' ('+s.classLabel+')</option>';
+    });
+
+    // Create overlay dialog
+    var overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    overlay.innerHTML='<div style="background:#fff;border-radius:16px;padding:24px;width:100%;max-width:420px;font-family:\'Nunito\',sans-serif">'
+      +'<div style="font-weight:900;font-size:18px;color:#1E1B4B;margin-bottom:6px">📄 Export Progress Report</div>'
+      +'<div style="font-size:13px;color:#6B7B8D;margin-bottom:16px">Choose which students to include</div>'
+      +'<select id="export-select" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:\'Nunito\',sans-serif;font-weight:700;font-size:14px;margin-bottom:16px;color:#1E1B4B">'+opts+'</select>'
+      +'<div style="display:flex;gap:8px">'
+      +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="flex:1;padding:12px;background:#F3F4F6;border:none;border-radius:8px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:14px;cursor:pointer;color:#6B7B8D">Cancel</button>'
+      +'<button onclick="doExport(\''+encodeURIComponent(schoolName)+'\')" style="flex:1;padding:12px;background:#15803D;color:#fff;border:none;border-radius:8px;font-family:\'Nunito\',sans-serif;font-weight:900;font-size:14px;cursor:pointer">Export PDF</button>'
+      +'</div>'
+      +'</div>';
+    // Store merged data for doExport to use
+    window._exportData={merged:merged,allProg:allProg};
+    document.body.appendChild(overlay);
   });
+}
 
-  ROSTER.forEach(function(s){
+function doExport(encodedSchool){
+  var schoolName=decodeURIComponent(encodedSchool);
+  var sel=document.getElementById('export-select');
+  var choice=sel?sel.value:'all';
+  var data=window._exportData||{merged:ROSTER,allProg:lg(LK_PROG)||{}};
+  var merged=data.merged,allProg=data.allProg;
+
+  // Close dialog
+  var overlay=document.querySelector('div[style*="position:fixed"]');
+  if(overlay)overlay.remove();
+
+  var today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  var students=choice==='all'?merged:[merged[parseInt(choice)]];
+
+  // Build detailed report
+  var rows='';
+  students.forEach(function(s){
     var sk=s.uid||s.name;
     var sp=allProg[sk]||{};
     var passed=Object.values(sp).filter(function(v){return v&&v.passed;}).length;
-    var total=Object.keys(sp).length;
-    var avg=total?Math.round(Object.values(sp).filter(function(v){return v&&v.bestScore;}).reduce(function(a,v){return a+(v.bestScore||0);},0)/Math.max(1,Object.values(sp).filter(function(v){return v&&v.bestScore;}).length)):0;
+    var scores=Object.values(sp).filter(function(v){return v&&v.bestScore>0;});
+    var avg=scores.length?Math.round(scores.reduce(function(a,v){return a+(v.bestScore||0);},0)/scores.length):0;
     var stars=Object.values(sp).reduce(function(a,v){return a+(v&&v.stars?v.stars:0);},0);
-    rows+='<tr><td>'+s.emoji+' '+s.name+'</td><td>'+s.classLabel+'</td><td>'+passed+'</td><td>'+avg+'%</td><td>'+stars+' ★</td></tr>';
+    var mathNote=s.mathLevel&&s.mathLevel!==s.classLabel?' (Maths at '+s.mathLevel+' level)':'';
+    rows+='<tr><td>'+(s.emoji||'👤')+' '+s.name+'</td><td>'+s.classLabel+mathNote+'</td><td>'+passed+'</td><td>'+avg+'%</td><td>'+stars+' \u2605</td></tr>';
+
+    // If single student, add stage breakdown
+    if(students.length===1){
+      // Add detailed stage rows
+      var stageRows='';
+      UNITS.forEach(function(u){
+        var stgs=u.stagesMap[s.classLabel]||u.stagesMap['Primary 4']||[];
+        stgs.forEach(function(st){
+          var sv=sp[st.id];if(!sv||!sv.attempts)return;
+          stageRows+='<tr style="background:#F9FAFB"><td style="padding-left:24px;font-size:12px;color:#6B7B8D">'+u.emoji+' '+u.title+' — '+st.label+'</td>'
+            +'<td colspan="2" style="font-size:12px;color:#6B7B8D">'+(sv.passed?'✅ Passed':'❌ Not yet')+' · '+sv.attempts+' attempt'+(sv.attempts!==1?'s':'')+'</td>'
+            +'<td style="font-size:12px;color:#6B7B8D">'+sv.bestScore+'%</td>'
+            +'<td style="font-size:12px;color:#6B7B8D">'+starsStr(sv.stars||0)+'</td></tr>';
+        });
+        // Also add math stages
+        var mstgs=MATH_STAGES[s.mathLevel||s.classLabel]||[];
+        mstgs.forEach(function(st){
+          var sv=sp[st.id];if(!sv||!sv.attempts)return;
+          stageRows+='<tr style="background:#FFF7ED"><td style="padding-left:24px;font-size:12px;color:#C2410C">🔢 Maths — '+st.label+'</td>'
+            +'<td colspan="2" style="font-size:12px;color:#C2410C">'+(sv.passed?'✅ Passed':'❌ Not yet')+' · '+sv.attempts+' attempt'+(sv.attempts!==1?'s':'')+'</td>'
+            +'<td style="font-size:12px;color:#C2410C">'+sv.bestScore+'%</td>'
+            +'<td style="font-size:12px;color:#C2410C">'+starsStr(sv.stars||0)+'</td></tr>';
+        });
+      });
+      rows+=stageRows;
+    }
   });
 
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Progress Report</title>'
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Progress Report — '+schoolName+'</title>'
     +'<style>body{font-family:Arial,sans-serif;margin:30px;color:#1E1B4B}'
     +'h1{color:#1565C0;font-size:22px;margin-bottom:4px}'
     +'h2{font-size:13px;color:#6B7B8D;font-weight:normal;margin:0 0 20px}'
     +'table{width:100%;border-collapse:collapse;font-size:13px}'
     +'th{background:#1565C0;color:#fff;padding:10px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.8px}'
     +'td{padding:9px 12px;border-bottom:1px solid #E5E7EB}'
-    +'tr:nth-child(even){background:#F8F9FF}'
-    +'.footer{margin-top:30px;font-size:11px;color:#9CA3AF;text-align:center}'
+    +'tr:nth-child(even) td{background:#F8F9FF}'
+    +'.footer{margin-top:30px;font-size:11px;color:#9CA3AF;text-align:center;border-top:1px solid #E5E7EB;padding-top:16px}'
+    +'@media print{body{margin:15px}.footer{position:fixed;bottom:0;width:100%}}'
     +'</style></head><body>'
-    +'<h1>📊 EduLab Progress Report</h1>'
-    +'<h2>'+schoolName+' &nbsp;·&nbsp; Generated '+today+'</h2>'
+    +'<h1>\uD83D\uDCCA EduLab Progress Report</h1>'
+    +'<h2>'+schoolName+' &nbsp;\u00b7&nbsp; '+(students.length===1?students[0].name+' &nbsp;\u00b7&nbsp; ':'')+'Generated '+today+'</h2>'
     +'<table><thead><tr><th>Student</th><th>Class</th><th>Stages Passed</th><th>Avg Score</th><th>Stars</th></tr></thead>'
     +'<tbody>'+rows+'</tbody></table>'
-    +'<p class="footer">EduLab by Blestonex Global Services &nbsp;·&nbsp; blestonex.github.io/edulab</p>'
+    +'<p class="footer">EduLab by Blestonex Global Services &nbsp;\u00b7&nbsp; blestonex.github.io/edulab</p>'
     +'</body></html>';
 
-  // Open in new window for printing/saving as PDF
   var win=window.open('','_blank');
-  if(win){
-    win.document.write(html);
-    win.document.close();
-    setTimeout(function(){win.print();},500);
-  }else{
-    // Fallback: download as HTML file
+  if(win){win.document.write(html);win.document.close();setTimeout(function(){win.print();},500);}
+  else{
     var blob=new Blob([html],{type:'text/html'});
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
-    a.href=url;a.download='EduLab_Progress_Report.html';a.click();
-    URL.revokeObjectURL(url);
+    a.href=url;a.download='EduLab_Report_'+(choice==='all'?'All':students[0].name.replace(/\s+/g,'_'))+'.html';
+    a.click();URL.revokeObjectURL(url);
   }
 }
 
