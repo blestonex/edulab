@@ -252,7 +252,7 @@ body{display:flex;flex-direction:column}
 <div id="setup" class="screen">
   <div class="setup-body">
     <div id="sw1"><div class="setup-hdr"><h2>What is your name?</h2><p>Your name shows on your progress</p></div><div class="setup-field"><input id="sw-name" class="setup-input" type="text" placeholder="Type your name…" maxlength="30" oninput="swCheck()"></div></div>
-    <div id="sw2" style="display:none"><div class="setup-hdr"><h2>What is your class?</h2><p>This sets the right level for you</p></div><div class="class-grid"><button class="class-btn" onclick="swCls(this,'Nursery 1')">Nursery 1</button><button class="class-btn" onclick="swCls(this,'Nursery 2')">Nursery 2</button><button class="class-btn" onclick="swCls(this,'Primary 1')">Primary 1</button><button class="class-btn" onclick="swCls(this,'Primary 2')">Primary 2</button><button class="class-btn" onclick="swCls(this,'Primary 3')">Primary 3</button><button class="class-btn" onclick="swCls(this,'Primary 4')">Primary 4</button><button class="class-btn" onclick="swCls(this,'Primary 5')">Primary 5</button><button class="class-btn" onclick="swCls(this,'Primary 6')">Primary 6</button><button class="class-btn" onclick="swCls(this,'JSS 1')">JSS 1</button><button class="class-btn" onclick="swCls(this,'JSS 2')">JSS 2</button><button class="class-btn" onclick="swCls(this,'JSS 3')">JSS 3</button><button class="class-btn" onclick="swCls(this,'SSS 1')">SSS 1</button></div></div>
+    <div id="sw2" style="display:none"><div class="setup-hdr"><h2>What is your class?</h2><p>This sets the right level for you</p></div><div class="class-grid"><button class="class-btn" onclick="swCls(this,'Nursery 1')">Nursery 1</button><button class="class-btn" onclick="swCls(this,'Nursery 2')">Nursery 2</button><button class="class-btn" onclick="swCls(this,'Primary 1')">Primary 1</button><button class="class-btn" onclick="swCls(this,'Primary 2')">Primary 2</button><button class="class-btn" onclick="swCls(this,'Primary 3')">Primary 3</button><button class="class-btn" onclick="swCls(this,'Primary 4')">Primary 4</button><button class="class-btn" onclick="swCls(this,'Primary 5')">Primary 5</button><button class="class-btn" onclick="swCls(this,'Primary 6')">Primary 6</button><button class="class-btn" onclick="swCls(this,'JSS 1')">JSS 1</button><button class="class-btn" onclick="swCls(this,'JSS 2')">JSS 2</button><button class="class-btn" onclick="swCls(this,'JSS 3')">JSS 3</button><button class="class-btn" onclick="swCls(this,'SSS 1')">SSS 1</button><button class="class-btn" onclick="swCls(this,'SSS 2')">SSS 2</button><button class="class-btn" onclick="swCls(this,'WAEC/JAMB')">WAEC/JAMB</button></div></div>
     <div id="sw3" style="display:none"><div class="setup-hdr"><h2>School code</h2><p>Ask your teacher. You can skip this.</p></div><div class="setup-field"><input id="sw-code" class="setup-input" type="text" placeholder="e.g. BLX001" maxlength="8" style="text-transform:uppercase;letter-spacing:3px;font-size:22px" oninput="this.value=this.value.toUpperCase()"></div><p style="text-align:center;font-size:12px;color:rgba(255,255,255,.4);margin-top:8px">Optional — works without it</p></div>
     <div class="step-dots"><div class="dot active" id="dot0"></div><div class="dot" id="dot1"></div><div class="dot" id="dot2"></div></div>
   </div>
@@ -309,6 +309,8 @@ body{display:flex;flex-direction:column}
       <button class="class-btn" onclick="asCls(this,'JSS 2')">JSS 2</button>
       <button class="class-btn" onclick="asCls(this,'JSS 3')">JSS 3</button>
       <button class="class-btn" onclick="asCls(this,'SSS 1')">SSS 1</button>
+      <button class="class-btn" onclick="asCls(this,'SSS 2')">SSS 2</button>
+      <button class="class-btn" onclick="asCls(this,'WAEC/JAMB')">WAEC/JAMB</button>
     </div>
   </div>
   <div style="padding:14px 20px 20px;flex-shrink:0">
@@ -332,9 +334,21 @@ body{display:flex;flex-direction:column}
       <div style="font-size:12px;color:var(--sm);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">School Code</div>
       <input id="admin-school-code" type="text" placeholder="e.g. BLX001" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:15px;font-family:'Nunito',monospace;font-weight:700;letter-spacing:3px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
       <button onclick="saveSchoolSettings()" style="width:100%;margin-top:10px;padding:12px;background:#1565C0;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer">Save Settings</button>
+      <div id="admin-activation-status" style="font-size:12px;font-weight:700;margin-top:8px;text-align:center"></div>
     </div>
 
-    <!-- Student progress table -->
+    <!-- Quick action buttons -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <button onclick="openCustomModules()" style="padding:14px 10px;background:#7C3AED;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left">
+        📚 Custom<br><span style="font-weight:600;opacity:.8;font-size:11px">Build your own modules</span>
+      </button>
+      <button onclick="openClassPerformance()" style="padding:14px 10px;background:#0284C7;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left">
+        📊 Performance<br><span style="font-weight:600;opacity:.8;font-size:11px">Class stage overview</span>
+      </button>
+    </div>
+    <button onclick="exportProgressReport()" style="width:100%;padding:14px;background:#15803D;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:12px">
+      📄 Export Progress Report (PDF)
+    </button>
     <div style="background:#fff;border-radius:var(--r);padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:#1565C0">👥 Student Progress</div>
@@ -358,6 +372,10 @@ body{display:flex;flex-direction:column}
     <p id="home-cls">Lower Primary · English</p>
   </div>
   <div class="content">
+    <!-- Demo mode notice — shown when not activated -->
+    <div id="demo-notice" style="display:none;background:#FEF3C7;border-radius:12px;padding:12px 14px;margin-bottom:4px;font-size:13px;color:#92400E;font-weight:700;text-align:center">
+      🔑 Demo mode — first 2 stages only. Ask your school admin to activate the full app.
+    </div>
     <div class="subj-card" onclick="openLessonList()">
       <div class="subj-head">
         <div class="subj-icon" style="background:#E0F0FF;color:#1565C0">📖</div>
@@ -369,8 +387,16 @@ body{display:flex;flex-direction:column}
         <div class="prog-label"><span id="eng-pt">0 stages complete</span><span id="eng-pp">0%</span></div>
       </div>
     </div>
-    <div class="subj-card" style="opacity:.4;cursor:not-allowed">
-      <div class="subj-head"><div class="subj-icon" style="background:#FFF3E0;color:#E65100">➕</div><div class="subj-meta"><div class="subj-name" style="color:var(--sm)">Mathematics</div><div class="subj-desc">Coming soon in Phase 2</div></div></div>
+    <div class="subj-card" onclick="openMathList()">
+      <div class="subj-head">
+        <div class="subj-icon" style="background:#FFF3E0;color:#E65100">🔢</div>
+        <div class="subj-meta"><div class="subj-name">Mathematics</div><div class="subj-desc">Numbers · Addition · Multiplication · Algebra</div></div>
+        <span style="font-size:22px;color:var(--sm)">›</span>
+      </div>
+      <div class="subj-prog">
+        <div class="prog-wrap"><div class="prog-bar" id="math-pb" style="width:0%;background:#E65100"></div></div>
+        <div class="prog-label"><span id="math-pt">0 stages complete</span><span id="math-pp">0%</span></div>
+      </div>
     </div>
     <!-- Join Competition — single-user students tap this -->
     <div class="subj-card" onclick="openCompJoin()" style="background:linear-gradient(135deg,#065F46,#047857);border:none">
@@ -491,6 +517,100 @@ body{display:flex;flex-direction:column}
 
 <div id="toast"></div>
 
+<!-- MATH STAGE LIST -->
+<div id="math-lessons" class="screen" style="background:linear-gradient(180deg,#EA580C 0%,#EA580C 120px,#FFF7ED 120px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#EA580C,#C2410C)">
+    <button class="tback" onclick="SS('home')">‹</button>
+    <div class="tlogo">Mathematics</div>
+    <button id="math-sw" class="tswitch" style="display:none" onclick="switchStudent()">Switch</button>
+  </div>
+  <div style="background:rgba(0,0,0,.08);padding:7px 16px;font-size:12px;color:rgba(255,255,255,.8);flex-shrink:0" id="math-bc">Mathematics · Lower Primary</div>
+  <div class="content" id="math-list"></div>
+</div>
+
+<!-- MATH QUESTION SCREEN -->
+<div id="math-play" class="screen" style="background:linear-gradient(180deg,#EA580C 0%,#EA580C 100px,#FFF7ED 100px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#EA580C,#C2410C)">
+    <button class="tback" onclick="confirmLeaveMath()">‹</button>
+    <div class="tlogo" id="math-play-title">Maths</div>
+    <button id="math-play-sw" class="tswitch" style="display:none" onclick="switchStudent()">Switch</button>
+  </div>
+  <div style="padding:10px 16px 0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+    <div style="font-size:13px;color:var(--sm);font-weight:700" id="math-qnum">1 / 10</div>
+    <div style="font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:3px 10px;border-radius:6px;background:#FFF3E0;color:#C2410C" id="math-qtype">Number</div>
+  </div>
+  <div style="padding:8px 16px 4px;flex-shrink:0">
+    <div class="prog-wrap"><div class="prog-bar" id="math-prog" style="width:10%;background:#EA580C"></div></div>
+  </div>
+  <div class="content" style="padding:16px">
+    <div id="math-card" class="q-card" style="margin-bottom:10px;text-align:center"></div>
+    <div id="math-msg" class="q-msg"></div>
+  </div>
+  <div class="actionbar">
+    <button class="btn" id="math-next" onclick="mathNext()" disabled style="background:#EA580C;color:#fff">Next →</button>
+  </div>
+</div>
+
+<!-- MATH RESULTS -->
+<div id="math-results" class="screen" style="justify-content:center;align-items:center">
+  <div class="res-wrap">
+    <span class="res-em" id="math-res-em">🏆</span>
+    <div class="res-score" id="math-res-score" style="font-size:52px">8/10</div>
+    <div class="res-lbl" id="math-res-lbl">Stage Test</div>
+    <div class="res-stars" id="math-res-stars">★★★</div>
+    <div class="res-title" id="math-res-title">Well done!</div>
+    <div class="res-sub" id="math-res-sub">You passed!</div>
+    <div style="width:100%;margin-top:8px">
+      <button class="btn-res p" id="math-res-btn1" style="margin-bottom:8px">Next Stage →</button>
+      <button class="btn-res g" id="math-res-btn2">Back to Stages</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM MODULE BUILDER -->
+<div id="custom-modules" class="screen" style="background:linear-gradient(180deg,#7C3AED 0%,#7C3AED 110px,#F5F3FF 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#7C3AED,#6D28D9)">
+    <button class="tback" onclick="SS('admin')">‹</button>
+    <div class="tlogo">Custom <span>Modules</span></div>
+    <button onclick="newCustomModule()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);border-radius:8px;color:#fff;padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">+ New</button>
+  </div>
+  <div class="content" id="custom-modules-list" style="padding:16px"></div>
+</div>
+
+<!-- CUSTOM MODULE EDITOR -->
+<div id="custom-module-edit" class="screen" style="background:linear-gradient(180deg,#7C3AED 0%,#7C3AED 110px,#F5F3FF 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#7C3AED,#6D28D9)">
+    <button class="tback" onclick="SS('custom-modules')">‹</button>
+    <div class="tlogo" id="cme-title">New Module</div>
+    <button onclick="saveCustomModule()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);border-radius:8px;color:#fff;padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">Save ✓</button>
+  </div>
+  <div class="content" style="padding:16px;gap:12px">
+    <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#6D28D9;margin-bottom:6px">Module Name</div>
+      <input id="cme-name" type="text" placeholder="e.g. Vocabulary Test 3A" maxlength="40" style="width:100%;padding:10px 12px;border:1.5px solid #DDD6FE;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:15px">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#6D28D9;margin-top:12px;margin-bottom:6px">Emoji Icon</div>
+      <input id="cme-emoji" type="text" placeholder="📘" maxlength="2" style="width:80px;padding:10px 12px;border:1.5px solid #DDD6FE;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:22px;text-align:center">
+    </div>
+    <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#6D28D9">Words <span id="cme-word-count" style="color:#9CA3AF">(0)</span></div>
+        <button onclick="addCustomWord()" style="background:#EDE9FE;border:1.5px solid #A78BFA;color:#6D28D9;border-radius:8px;padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">+ Add Word</button>
+      </div>
+      <div id="cme-words-list" style="display:flex;flex-direction:column;gap:10px"></div>
+      <div id="cme-empty" style="text-align:center;padding:20px;color:#9CA3AF;font-size:14px">No words yet. Tap + Add Word to begin.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CLASS PERFORMANCE OVERVIEW -->
+<div id="class-performance" class="screen" style="background:linear-gradient(180deg,#1565C0 0%,#1565C0 110px,#EEF3FF 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#1565C0,#1976D2)">
+    <button class="tback" onclick="SS('admin')">‹</button>
+    <div class="tlogo">Class <span>Performance</span></div>
+  </div>
+  <div class="content" id="class-perf-content" style="padding:16px"></div>
+</div>
+
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- HOUSE COMPETITION SCREENS                         -->
 <!-- ═══════════════════════════════════════════════════ -->
@@ -553,7 +673,7 @@ body{display:flex;flex-direction:column}
         <option>Nursery 1</option><option>Nursery 2</option>
         <option>Primary 1</option><option>Primary 2</option><option>Primary 3</option>
         <option selected>Primary 4</option><option>Primary 5</option><option>Primary 6</option>
-        <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option><option>SSS 1</option>
+        <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option><option>SSS 1</option><option>SSS 2</option><option>WAEC/JAMB</option>
       </select>
       <div style="font-size:11px;font-weight:700;color:#6B7B8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Unit</div>
       <select id="host-unit" style="width:100%;padding:9px 10px;border:1.5px solid #D8E0E8;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;color:#1E1B4B">
@@ -561,6 +681,9 @@ body{display:flex;flex-direction:column}
         <option value="body">My Body</option>
         <option value="food">Food &amp; Drinks</option>
         <option value="colours">Colours &amp; Shapes</option>
+        <option value="science">Basic Science</option>
+        <option value="social">Social Studies</option>
+        <option value="maths">🔢 Mathematics</option>
       </select>
     </div>
     <!-- Player count -->
@@ -1674,6 +1797,16 @@ var SOCIAL_STAGES={
     return Object.assign({},s,{id:s.id.replace('ss-p6',prefix)});
   });
 });
+// SSS 2 — same words as SSS 1 but unique IDs (progress tracked separately)
+['SSS 2','WAEC/JAMB'].forEach(function(cl){
+  var prefix=cl.replace(/[^a-zA-Z0-9]/g,'').toLowerCase();
+  STAGES[cl]     =STAGES['SSS 1'].map(function(s){return Object.assign({},s,{id:s.id.replace('s1',prefix)});});
+  BODY_STAGES[cl]=BODY_STAGES['SSS 1'].map(function(s){return Object.assign({},s,{id:s.id.replace('bs1','b'+prefix)});});
+  FOOD_STAGES[cl]=FOOD_STAGES['SSS 1'].map(function(s){return Object.assign({},s,{id:s.id.replace('fs1','f'+prefix)});});
+  COLOUR_STAGES[cl]=COLOUR_STAGES['SSS 1'].map(function(s){return Object.assign({},s,{id:s.id.replace('cs1','c'+prefix)});});
+  SCIENCE_STAGES[cl]=SCIENCE_STAGES['SSS 1'].map(function(s){return Object.assign({},s,{id:s.id.replace('sc-s1','sc-'+prefix)});});
+  SOCIAL_STAGES[cl]=SOCIAL_STAGES['SSS 1'].map(function(s){return Object.assign({},s,{id:s.id.replace('ss-sss1','ss-'+prefix)});});
+});
 var UNITS=[
   {key:'animals', title:'Animals Around Us',  emoji:'🦁',stagesMap:STAGES},
   {key:'body',    title:'My Body',            emoji:'🫀',stagesMap:BODY_STAGES},
@@ -1756,6 +1889,7 @@ function sPass(){[440,550,660,880].forEach(function(f,i){tone(f,'sine',.18,.2,i*
 // INIT
 // ════════════════════════════════════════
 function init(){
+  rebuildCustomUnits(); // restore custom modules from localStorage
   var m=lg(LK_MODE);if(!m){SS('splash');return;}
   DMODE=m;
   if(DMODE==='single'){var s=lg(LK_STU);if(!s||!s.name){startSetup();return;}STU=s;loadHome();}
@@ -1845,17 +1979,39 @@ function saveNewStudent(){
 
 // ADMIN PANEL
 function openAdmin(){
-  var settings=lg('el_school')||{};
-  var sn=document.getElementById('admin-school-name');if(sn)sn.value=settings.name||'';
-  var sc=document.getElementById('admin-school-code');if(sc)sc.value=settings.code||'';
+  loadAdminSchoolFields();
   renderAdminProgress();SS('admin');
 }
 function adminBack(){SS('roster');}
-function saveSchoolSettings(){
-  var name=(document.getElementById('admin-school-name')||{}).value||'';
-  var code=(document.getElementById('admin-school-code')||{}).value||'';
-  ls('el_school',{name:name,code:code});toast('✅ Settings saved',1800);
+
+function loadHome(){
+  document.getElementById('home-sn').textContent=STU.name.split(' ')[0];
+  document.getElementById('home-greet').textContent='Hello, '+STU.name.split(' ')[0]+'! Ready to learn? 🎉';
+  document.getElementById('home-cls').textContent=(STU.classLabel||'Lower Primary')+' · English';
+  if(DMODE==='shared'){
+    document.getElementById('home-sw').style.display='';
+  }
+  applyBranding(); // apply school colour/name if activated
+  // Show demo mode notice if not activated
+  var dn=document.getElementById('demo-notice');
+  if(dn)dn.style.display=isActivated()?'none':'';
+  var p=prog();
+  var totalStages=0,doneStages=0;
+  UNITS.forEach(function(u){
+    var stgs=u.stagesMap[STU.classLabel]||u.stagesMap['Nursery 2']||[];
+    totalStages+=stgs.length;
+    doneStages+=stgs.filter(function(st){return p[st.id]&&p[st.id].passed;}).length;
+  });
+  var pct=totalStages>0?Math.round(doneStages/totalStages*100):0;
+  document.getElementById('eng-pb').style.width=pct+'%';
+  document.getElementById('eng-pt').textContent=doneStages+' of '+totalStages+' stages done';
+  document.getElementById('eng-pp').textContent=pct+'%';
+  SS('home');
 }
+
+// ════════════════════════════════════════
+// ADMIN — PROGRESS TABLE
+// ════════════════════════════════════════
 function renderAdminProgress(){
   var list=document.getElementById('admin-progress-list');if(!list)return;
   var cnt=document.getElementById('admin-student-count');if(cnt)cnt.textContent=ROSTER.length+' students';
@@ -1916,27 +2072,6 @@ function clearAllStudents(){
 // ════════════════════════════════════════
 // HOME
 // ════════════════════════════════════════
-function loadHome(){
-  document.getElementById('home-sn').textContent=STU.name.split(' ')[0];
-  document.getElementById('home-greet').textContent='Hello, '+STU.name.split(' ')[0]+'! Ready to learn? 🎉';
-  document.getElementById('home-cls').textContent=(STU.classLabel||'Lower Primary')+' · English';
-  if(DMODE==='shared'){
-    document.getElementById('home-sw').style.display='';
-  }
-  var p=prog();
-  var totalStages=0,doneStages=0;
-  UNITS.forEach(function(u){
-    var stgs=u.stagesMap[STU.classLabel]||u.stagesMap['Nursery 2']||[];
-    totalStages+=stgs.length;
-    doneStages+=stgs.filter(function(st){return p[st.id]&&p[st.id].passed;}).length;
-  });
-  var pct=totalStages>0?Math.round(doneStages/totalStages*100):0;
-  document.getElementById('eng-pb').style.width=pct+'%';
-  document.getElementById('eng-pt').textContent=doneStages+' of '+totalStages+' stages done';
-  document.getElementById('eng-pp').textContent=pct+'%';
-  SS('home');
-}
-
 // ════════════════════════════════════════
 // LESSON LIST (stage list)
 // ════════════════════════════════════════
@@ -1952,14 +2087,16 @@ function openLessonList(){
     uh.textContent=unit.emoji+' '+unit.title;list.appendChild(uh);
     stages.forEach(function(st,idx){
       var sp=p[st.id];var passed=sp&&sp.passed;
-      var unlocked=idx===0||(p[stages[idx-1].id]&&p[stages[idx-1].id].passed);
+      var progressUnlocked=idx===0||(p[stages[idx-1].id]&&p[stages[idx-1].id].passed);
+      var gateUnlocked=isStageUnlocked(idx);
+      var unlocked=progressUnlocked&&gateUnlocked;
       var row=document.createElement('div');
       row.className='stage-row'+(unlocked?'':' locked');
       var bg=passed?'#E8F5E9':unlocked?'#E0F0FF':'#F0F3F6';
       var fg=passed?'#2E7D32':unlocked?'#1565C0':'#6B7B8D';
       var ic=passed?'✅':unlocked?st.emoji:'🔒';
       var sub=[...new Set(st.words)].map(function(k){return WORDS[k]?WORDS[k].word:k;}).join(', ');
-      var statusTxt=passed?('Best: '+(sp.bestScore||0)+'%'):unlocked?'Tap to start':'Complete the previous stage first';
+      var statusTxt=passed?('Best: '+(sp.bestScore||0)+'%'):!gateUnlocked?'🔑 Activate school code to unlock':unlocked?'Tap to start':'Complete the previous stage first';
       row.innerHTML='<div class="stage-ic" style="background:'+bg+';color:'+fg+'">'+ic+'</div>'
         +'<div class="stage-meta"><div class="stage-name">'+st.label+'</div><div class="stage-words">'+sub+'</div>'
         +'<div class="stage-words" style="margin-top:3px;color:'+fg+'">'+statusTxt+'</div></div>'
@@ -2362,7 +2499,1292 @@ function finishTest(){
 function resAction1(){document.getElementById('res-btn1').onclick();}
 function resAction2(){document.getElementById('res-btn2').onclick();}
 
-window.addEventListener('DOMContentLoaded',init);
+// ════════════════════════════════════════
+// A — TEACHER CUSTOM MODULES
+// ════════════════════════════════════════
+var LK_CUSTOM='el_custom'; // localStorage key
+var CUR_MODULE=null;       // module being edited
+
+function loadCustomModules(){
+  return lg(LK_CUSTOM)||[];
+}
+function saveCustomModules(mods){
+  ls(LK_CUSTOM,mods);
+}
+
+function openCustomModules(){
+  var mods=loadCustomModules();
+  var list=document.getElementById('custom-modules-list');
+  if(!list)return;
+  list.innerHTML='';
+  if(!mods.length){
+    list.innerHTML='<div style="text-align:center;padding:40px;color:#9CA3AF;font-size:14px"><div style="font-size:40px;margin-bottom:12px">📭</div>No custom modules yet.<br>Tap <strong>+ New</strong> to create one.</div>';
+  }else{
+    mods.forEach(function(m,i){
+      var card=document.createElement('div');
+      card.style.cssText='background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;cursor:pointer';
+      card.innerHTML='<div style="font-size:32px;width:44px;text-align:center;flex-shrink:0">'+(m.emoji||'📘')+'</div>'
+        +'<div style="flex:1"><div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+m.name+'</div>'
+        +'<div style="font-size:12px;color:#9CA3AF;margin-top:2px">'+(m.words||[]).length+' words</div></div>'
+        +'<div style="display:flex;gap:8px">'
+        +'<button style="background:#EDE9FE;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;color:#6D28D9;font-weight:800">Edit</button>'
+        +'<button style="background:#FEF2F2;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;color:#DC2626;font-weight:800">🗑</button>'
+        +'</div>';
+      var btns=card.querySelectorAll('button');
+      btns[0].onclick=function(e){e.stopPropagation();editCustomModule(i);};
+      btns[1].onclick=function(e){e.stopPropagation();deleteCustomModule(i);};
+      card.onclick=function(){editCustomModule(i);};
+      list.appendChild(card);
+    });
+  }
+  SS('custom-modules');
+}
+
+function newCustomModule(){
+  CUR_MODULE={id:'cm_'+Date.now(),name:'',emoji:'📘',words:[]};
+  renderModuleEditor();
+  SS('custom-module-edit');
+}
+
+function editCustomModule(idx){
+  var mods=loadCustomModules();
+  CUR_MODULE=JSON.parse(JSON.stringify(mods[idx]));
+  CUR_MODULE._editIdx=idx;
+  renderModuleEditor();
+  SS('custom-module-edit');
+}
+
+function deleteCustomModule(idx){
+  if(!confirm('Delete this module? Students will lose access to it.'))return;
+  var mods=loadCustomModules();
+  mods.splice(idx,1);
+  saveCustomModules(mods);
+  openCustomModules();
+  toast('Module deleted',1800);
+}
+
+function renderModuleEditor(){
+  var t=document.getElementById('cme-title');if(t)t.textContent=CUR_MODULE._editIdx!==undefined?'Edit Module':'New Module';
+  var n=document.getElementById('cme-name');if(n)n.value=CUR_MODULE.name||'';
+  var em=document.getElementById('cme-emoji');if(em)em.value=CUR_MODULE.emoji||'📘';
+  renderCMEWords();
+}
+
+function renderCMEWords(){
+  var list=document.getElementById('cme-words-list');
+  var empty=document.getElementById('cme-empty');
+  var cnt=document.getElementById('cme-word-count');
+  if(!list)return;
+  var words=CUR_MODULE.words||[];
+  if(cnt)cnt.textContent='('+words.length+')';
+  if(empty)empty.style.display=words.length?'none':'';
+  list.innerHTML='';
+  words.forEach(function(w,i){
+    var row=document.createElement('div');
+    row.style.cssText='background:#F5F3FF;border-radius:10px;padding:12px;border:1.5px solid #DDD6FE';
+    row.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+      +'<input placeholder="Emoji" value="'+(w.emoji||'📝')+'" maxlength="2" style="width:50px;padding:6px;border:1.5px solid #DDD6FE;border-radius:6px;font-size:18px;text-align:center;font-family:\'Nunito\',sans-serif" oninput="cmwUpdate('+i+',\'emoji\',this.value)">'
+      +'<input placeholder="Word" value="'+(w.word||'')+'" maxlength="30" style="flex:1;padding:8px 10px;border:1.5px solid #DDD6FE;border-radius:6px;font-family:\'Nunito\',sans-serif;font-weight:700;font-size:14px" oninput="cmwUpdate('+i+',\'word\',this.value)">'
+      +'<button onclick="removeCustomWord('+i+')" style="background:#FEF2F2;border:1.5px solid #FCA5A5;color:#DC2626;border-radius:6px;padding:6px 8px;cursor:pointer;font-size:14px">✕</button>'
+      +'</div>'
+      +'<input placeholder="Definition — what does this word mean?" value="'+(w.def||'').replace(/"/g,'&quot;')+'" style="width:100%;padding:8px 10px;border:1.5px solid #DDD6FE;border-radius:6px;font-family:\'Nunito\',sans-serif;font-size:13px;margin-bottom:6px" oninput="cmwUpdate('+i+',\'def\',this.value)">'
+      +'<input placeholder="Fill-in-the-blank sentence (use _____ for the word)" value="'+(w.blank||'').replace(/"/g,'&quot;')+'" style="width:100%;padding:8px 10px;border:1.5px solid #DDD6FE;border-radius:6px;font-family:\'Nunito\',sans-serif;font-size:13px" oninput="cmwUpdate('+i+',\'blank\',this.value)">';
+    list.appendChild(row);
+  });
+}
+
+function cmwUpdate(idx,field,val){
+  if(!CUR_MODULE.words[idx])return;
+  CUR_MODULE.words[idx][field]=val;
+}
+
+function addCustomWord(){
+  CUR_MODULE.words.push({emoji:'📝',word:'',def:'',blank:''});
+  renderCMEWords();
+  // Scroll to bottom
+  var content=document.querySelector('#custom-module-edit .content');
+  if(content)setTimeout(function(){content.scrollTop=content.scrollHeight;},50);
+}
+
+function removeCustomWord(idx){
+  CUR_MODULE.words.splice(idx,1);
+  renderCMEWords();
+}
+
+function saveCustomModule(){
+  var n=document.getElementById('cme-name');
+  var em=document.getElementById('cme-emoji');
+  CUR_MODULE.name=(n?n.value.trim():'')|| 'Unnamed Module';
+  CUR_MODULE.emoji=em?em.value.trim():'📘';
+  // Validate — need at least 4 words with a word and definition
+  var valid=CUR_MODULE.words.filter(function(w){return w.word.trim()&&w.def.trim();});
+  if(valid.length<4){
+    toast('Add at least 4 words with definitions before saving.',3000);return;
+  }
+  // Clean words
+  CUR_MODULE.words=CUR_MODULE.words.filter(function(w){return w.word.trim()&&w.def.trim();});
+  // Generate spellAs keys and WORDS entries
+  CUR_MODULE.words=CUR_MODULE.words.map(function(w){
+    var key='cm_'+w.word.trim().toLowerCase().replace(/[^a-z0-9]/g,'_')+'_'+CUR_MODULE.id.slice(-6);
+    return Object.assign({},w,{key:key});
+  });
+  var mods=loadCustomModules();
+  if(CUR_MODULE._editIdx!==undefined){
+    mods[CUR_MODULE._editIdx]=CUR_MODULE;
+  }else{
+    mods.push(CUR_MODULE);
+  }
+  saveCustomModules(mods);
+  // Rebuild UNITS and WORDS to include this module
+  rebuildCustomUnits();
+  toast('Module saved!',2000);
+  SS('custom-modules');
+  openCustomModules();
+}
+
+function rebuildCustomUnits(){
+  var mods=loadCustomModules();
+  // Remove old custom units from UNITS
+  while(UNITS.length>6)UNITS.pop(); // Keep the 6 built-in units
+  // Remove old custom words from WORDS
+  Object.keys(WORDS).forEach(function(k){if(k.slice(0,3)==='cm_')delete WORDS[k];});
+  // Add each module back
+  mods.forEach(function(m){
+    if(!m.words||!m.words.length)return;
+    // Add words to WORDS dictionary
+    var stageWords=[];
+    m.words.forEach(function(w){
+      var key=w.key||('cm_'+w.word.trim().toLowerCase().replace(/[^a-z0-9]/g,'_'));
+      WORDS[key]={
+        word:w.word,
+        emoji:w.emoji||'📝',
+        def:w.def,
+        sentence:w.blank||w.def,
+        blank:w.blank||('The word _____ means: '+w.def),
+        spellAs:key.replace(/[^a-z0-9]/g,'')
+      };
+      // Add colour
+      C[key]={bg:'linear-gradient(135deg,#7C3AED,#4C1D95)',wc:'#E0E7FF'};
+      stageWords.push(key);
+    });
+    // Build stage map — one stage per module, all classes
+    var stagesMap={};
+    var allClasses=['Nursery 1','Nursery 2','Primary 1','Primary 2','Primary 3','Primary 4','Primary 5','Primary 6','JSS 1','JSS 2','JSS 3','SSS 1','SSS 2','WAEC/JAMB'];
+    allClasses.forEach(function(cl){
+      stagesMap[cl]=[{id:m.id+'_'+cl,label:m.name,words:stageWords,emoji:m.emoji||'📘'}];
+    });
+    UNITS.push({key:m.id,title:m.name,emoji:m.emoji||'📘',stagesMap:stagesMap,isCustom:true});
+  });
+}
+
+// ════════════════════════════════════════
+// B — PROGRESS REPORT EXPORT (PDF)
+// ════════════════════════════════════════
+function exportProgressReport(){
+  var allProg=lg(LK_PROG)||{};
+  var schoolName=(lg('el_school')||{}).name||'EduLab School';
+  var today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+
+  // Build HTML report
+  var rows='';
+  var allStageIds=[];
+  UNITS.forEach(function(u){
+    var sampleMap=u.stagesMap['Primary 4']||u.stagesMap['Primary 1']||[];
+    sampleMap.forEach(function(st){allStageIds.push({id:st.id,label:u.title+': '+st.label});});
+  });
+
+  ROSTER.forEach(function(s){
+    var sk=s.uid||s.name;
+    var sp=allProg[sk]||{};
+    var passed=Object.values(sp).filter(function(v){return v&&v.passed;}).length;
+    var total=Object.keys(sp).length;
+    var avg=total?Math.round(Object.values(sp).filter(function(v){return v&&v.bestScore;}).reduce(function(a,v){return a+(v.bestScore||0);},0)/Math.max(1,Object.values(sp).filter(function(v){return v&&v.bestScore;}).length)):0;
+    var stars=Object.values(sp).reduce(function(a,v){return a+(v&&v.stars?v.stars:0);},0);
+    rows+='<tr><td>'+s.emoji+' '+s.name+'</td><td>'+s.classLabel+'</td><td>'+passed+'</td><td>'+avg+'%</td><td>'+stars+' ★</td></tr>';
+  });
+
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Progress Report</title>'
+    +'<style>body{font-family:Arial,sans-serif;margin:30px;color:#1E1B4B}'
+    +'h1{color:#1565C0;font-size:22px;margin-bottom:4px}'
+    +'h2{font-size:13px;color:#6B7B8D;font-weight:normal;margin:0 0 20px}'
+    +'table{width:100%;border-collapse:collapse;font-size:13px}'
+    +'th{background:#1565C0;color:#fff;padding:10px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.8px}'
+    +'td{padding:9px 12px;border-bottom:1px solid #E5E7EB}'
+    +'tr:nth-child(even){background:#F8F9FF}'
+    +'.footer{margin-top:30px;font-size:11px;color:#9CA3AF;text-align:center}'
+    +'</style></head><body>'
+    +'<h1>📊 EduLab Progress Report</h1>'
+    +'<h2>'+schoolName+' &nbsp;·&nbsp; Generated '+today+'</h2>'
+    +'<table><thead><tr><th>Student</th><th>Class</th><th>Stages Passed</th><th>Avg Score</th><th>Stars</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody></table>'
+    +'<p class="footer">EduLab by Blestonex Global Services &nbsp;·&nbsp; blestonex.github.io/edulab</p>'
+    +'</body></html>';
+
+  // Open in new window for printing/saving as PDF
+  var win=window.open('','_blank');
+  if(win){
+    win.document.write(html);
+    win.document.close();
+    setTimeout(function(){win.print();},500);
+  }else{
+    // Fallback: download as HTML file
+    var blob=new Blob([html],{type:'text/html'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download='EduLab_Progress_Report.html';a.click();
+    URL.revokeObjectURL(url);
+  }
+}
+
+// ════════════════════════════════════════
+// E — CLASS PERFORMANCE OVERVIEW
+// ════════════════════════════════════════
+function openClassPerformance(){
+  var allProg=lg(LK_PROG)||{};
+  var content=document.getElementById('class-perf-content');
+  if(!content)return;
+  content.innerHTML='';
+
+  if(!ROSTER.length){
+    content.innerHTML='<div style="text-align:center;padding:40px;color:#6B7B8D;font-size:14px">No students on the roster yet.</div>';
+    SS('class-performance');return;
+  }
+
+  // For each unit+class combination, find all stages attempted by any student
+  var stageStats={};  // stageId → {label, attempts, passed, totalScore, count}
+
+  ROSTER.forEach(function(s){
+    var sk=s.uid||s.name;
+    var sp=allProg[sk]||{};
+    Object.keys(sp).forEach(function(stageId){
+      var v=sp[stageId];
+      if(!v)return;
+      if(!stageStats[stageId])stageStats[stageId]={label:stageId,passed:0,attempts:0,totalScore:0,count:0};
+      stageStats[stageId].attempts+=(v.attempts||0);
+      if(v.passed)stageStats[stageId].passed++;
+      if(v.bestScore){stageStats[stageId].totalScore+=v.bestScore;stageStats[stageId].count++;}
+    });
+  });
+
+  // Label stages
+  UNITS.forEach(function(u){
+    Object.values(u.stagesMap).forEach(function(stages){
+      (stages||[]).forEach(function(st){
+        if(stageStats[st.id])stageStats[st.id].label=u.title+': '+st.label;
+      });
+    });
+  });
+
+  // Sort by pass rate ascending (weakest first)
+  var entries=Object.values(stageStats).filter(function(e){return e.attempts>0;});
+  entries.sort(function(a,b){
+    var rateA=a.passed/Math.max(1,ROSTER.length);
+    var rateB=b.passed/Math.max(1,ROSTER.length);
+    return rateA-rateB;
+  });
+
+  if(!entries.length){
+    content.innerHTML='<div style="text-align:center;padding:40px;color:#6B7B8D;font-size:14px">No stages attempted yet.</div>';
+    SS('class-performance');return;
+  }
+
+  var html='<div style="background:#FEF3C7;border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;color:#92400E;font-weight:700">📊 Stages are sorted weakest first — stages at the top need the most attention</div>';
+
+  entries.forEach(function(e){
+    var passRate=Math.round(e.passed/ROSTER.length*100);
+    var avgScore=e.count?Math.round(e.totalScore/e.count):0;
+    var barColor=passRate>=70?'#15803D':passRate>=40?'#D97706':'#DC2626';
+    var bg=passRate>=70?'#F0FDF4':passRate>=40?'#FFFBEB':'#FEF2F2';
+    html+='<div style="background:'+bg+';border-radius:12px;padding:14px;margin-bottom:10px">'
+      +'<div style="font-family:\'Nunito\',sans-serif;font-weight:800;font-size:13px;color:#1E1B4B;margin-bottom:6px">'+e.label+'</div>'
+      +'<div style="display:flex;gap:16px;font-size:12px;color:#6B7B8D;margin-bottom:8px">'
+      +'<span>👥 '+e.passed+'/'+ROSTER.length+' passed</span>'
+      +'<span>📊 Avg: '+avgScore+'%</span>'
+      +'<span>🔁 '+e.attempts+' attempts</span>'
+      +'</div>'
+      +'<div style="height:8px;background:rgba(0,0,0,.08);border-radius:6px;overflow:hidden">'
+      +'<div style="height:8px;background:'+barColor+';border-radius:6px;width:'+passRate+'%;transition:width .5s ease"></div>'
+      +'</div>'
+      +'<div style="text-align:right;font-size:11px;font-weight:800;color:'+barColor+';margin-top:3px">'+passRate+'% pass rate</div>'
+      +'</div>';
+  });
+
+  content.innerHTML=html;
+  SS('class-performance');
+}
+
+// ════════════════════════════════════════
+// MATHEMATICS MODULE
+// ════════════════════════════════════════
+
+// Each math question: {q, a, opts, type, emoji}
+// opts: array of 4 answer choices (strings), a is the correct one
+function makeMathQ(q,a,opts,type,emoji){
+  return {q:q,a:String(a),opts:opts.map(String),type:type,emoji:emoji||'🔢'};
+}
+
+// Generate wrong answers near a number
+function mathWrong(correct,count,range){
+  var wrong=[],n=parseInt(correct),r=range||Math.max(5,Math.ceil(n*0.5));
+  var tries=0;
+  while(wrong.length<count&&tries<100){
+    tries++;
+    var w=n+Math.floor(Math.random()*r*2)-r;
+    if(w<0)w=n+Math.floor(Math.random()*r)+1;
+    if(String(w)!==String(correct)&&wrong.indexOf(String(w))===-1)wrong.push(String(w));
+  }
+  return wrong;
+}
+
+// ── MATH STAGE DEFINITIONS ──
+// Each stage has a generator function that produces 10 questions
+var MATH_STAGES={
+  'Nursery 1':[
+    {id:'m-n1-s1',label:'Stage 1 — Count to 5',     emoji:'🔢',gen:function(){return genCount(1,5);}},
+    {id:'m-n1-s2',label:'Stage 2 — Count to 10',    emoji:'🔢',gen:function(){return genCount(1,10);}}
+  ],
+  'Nursery 2':[
+    {id:'m-n2-s1',label:'Stage 1 — Count to 10',    emoji:'🔢',gen:function(){return genCount(1,10);}},
+    {id:'m-n2-s2',label:'Stage 2 — Number Words',   emoji:'🔤',gen:function(){return genNumWords(1,10);}}
+  ],
+  'Primary 1':[
+    {id:'m-p1-s1',label:'Stage 1 — Count to 20',    emoji:'🔢',gen:function(){return genCount(1,20);}},
+    {id:'m-p1-s2',label:'Stage 2 — Add to 10',      emoji:'➕',gen:function(){return genAdd(1,5,1,5);}},
+    {id:'m-p1-s3',label:'Stage 3 — Subtract to 10', emoji:'➖',gen:function(){return genSub(2,10);}},
+  ],
+  'Primary 2':[
+    {id:'m-p2-s1',label:'Stage 1 — Add to 20',      emoji:'➕',gen:function(){return genAdd(1,10,1,10);}},
+    {id:'m-p2-s2',label:'Stage 2 — Subtract to 20', emoji:'➖',gen:function(){return genSub(2,20);}},
+    {id:'m-p2-s3',label:'Stage 3 — Count in 2s',    emoji:'🔢',gen:function(){return genSkip(2,20);}},
+    {id:'m-p2-s4',label:'Stage 4 — Number Words',   emoji:'🔤',gen:function(){return genNumWords(10,20);}}
+  ],
+  'Primary 3':[
+    {id:'m-p3-s1',label:'Stage 1 — Add to 50',      emoji:'➕',gen:function(){return genAdd(1,25,1,25);}},
+    {id:'m-p3-s2',label:'Stage 2 — Subtract to 50', emoji:'➖',gen:function(){return genSub(5,50);}},
+    {id:'m-p3-s3',label:'Stage 3 — Times 2 & 3',   emoji:'✖️',gen:function(){return genMul([2,3],1,10);}},
+    {id:'m-p3-s4',label:'Stage 4 — Count in 5s & 10s',emoji:'🔢',gen:function(){return genSkip(5,50);}},
+    {id:'m-p3-s5',label:'Stage 5 — Halves & Doubles',emoji:'🔀',gen:function(){return genDoubleHalve(1,12);}}
+  ],
+  'Primary 4':[
+    {id:'m-p4-s1',label:'Stage 1 — Times Tables 2–5',emoji:'✖️',gen:function(){return genMul([2,3,4,5],1,12);}},
+    {id:'m-p4-s2',label:'Stage 2 — Division',        emoji:'➗',gen:function(){return genDiv([2,3,4,5]);}},
+    {id:'m-p4-s3',label:'Stage 3 — Add 3-digit',    emoji:'➕',gen:function(){return genAdd(10,99,10,99);}},
+    {id:'m-p4-s4',label:'Stage 4 — Fractions',       emoji:'🍕',gen:function(){return genFractions();}}
+  ],
+  'Primary 5':[
+    {id:'m-p5-s1',label:'Stage 1 — Times Tables 6–9',emoji:'✖️',gen:function(){return genMul([6,7,8,9],1,12);}},
+    {id:'m-p5-s2',label:'Stage 2 — Long Division',   emoji:'➗',gen:function(){return genDiv([6,7,8,9]);}},
+    {id:'m-p5-s3',label:'Stage 3 — Percentages',     emoji:'%', gen:function(){return genPercent();}},
+    {id:'m-p5-s4',label:'Stage 4 — Area & Perimeter',emoji:'📐',gen:function(){return genArea();}}
+  ],
+  'Primary 6':[
+    {id:'m-p6-s1',label:'Stage 1 — All Times Tables', emoji:'✖️',gen:function(){return genMul([2,3,4,5,6,7,8,9],1,12);}},
+    {id:'m-p6-s2',label:'Stage 2 — Fractions',        emoji:'🍕',gen:function(){return genFractions();}},
+    {id:'m-p6-s3',label:'Stage 3 — Percentages',      emoji:'%', gen:function(){return genPercent();}},
+    {id:'m-p6-s4',label:'Stage 4 — BODMAS',           emoji:'🧮',gen:function(){return genBodmas();}},
+    {id:'m-p6-s5',label:'Stage 5 — Mixed Challenge',  emoji:'🏆',gen:function(){return genMixed('primary');}}
+  ]
+};
+// JSS differentiated maths
+MATH_STAGES['JSS 1']=[
+  {id:'m-j1-s1',label:'Stage 1 — Number & Indices',  emoji:'🔢',gen:function(){return genIndices();}},
+  {id:'m-j1-s2',label:'Stage 2 — LCM & HCF',        emoji:'🔢',gen:function(){return genLCMHCF();}},
+  {id:'m-j1-s3',label:'Stage 3 — Simple Algebra',    emoji:'x', gen:function(){return genAlgebra(1);}},
+  {id:'m-j1-s4',label:'Stage 4 — Basic Geometry',    emoji:'📐',gen:function(){return genGeometry();}}
+];
+MATH_STAGES['JSS 2']=[
+  {id:'m-j2-s1',label:'Stage 1 — Linear Equations',  emoji:'x', gen:function(){return genAlgebra(2);}},
+  {id:'m-j2-s2',label:'Stage 2 — Simultaneous Eqns', emoji:'x', gen:function(){return genSimultaneous();}},
+  {id:'m-j2-s3',label:'Stage 3 — Coordinates',       emoji:'📍',gen:function(){return genCoordinates();}},
+  {id:'m-j2-s4',label:'Stage 4 — Statistics',        emoji:'📊',gen:function(){return genStats();}}
+];
+MATH_STAGES['JSS 3']=[
+  {id:'m-j3-s1',label:'Stage 1 — Factorisation',     emoji:'x²',gen:function(){return genFactorise();}},
+  {id:'m-j3-s2',label:'Stage 2 — Pythagoras',        emoji:'📐',gen:function(){return genPythagoras();}},
+  {id:'m-j3-s3',label:'Stage 3 — Bearings',          emoji:'🧭',gen:function(){return genBearings();}},
+  {id:'m-j3-s4',label:'Stage 4 — Mixed JSS',         emoji:'🏆',gen:function(){return genMixed('jss');}}
+];
+// SSS 1 — WAEC/NECO preparation
+MATH_STAGES['SSS 1']=[
+  {id:'m-s1-s1',label:'Stage 1 — Quadratics',          emoji:'x²',gen:function(){return genQuadratic();}},
+  {id:'m-s1-s2',label:'Stage 2 — Surds & Indices',     emoji:'√', gen:function(){return genSurds();}},
+  {id:'m-s1-s3',label:'Stage 3 — Trigonometry',        emoji:'📐',gen:function(){return genTrig();}},
+  {id:'m-s1-s4',label:'Stage 4 — Circle Theorems',     emoji:'⭕',gen:function(){return genCircleTheorems();}},
+  {id:'m-s1-s5',label:'Stage 5 — Logarithms',          emoji:'㏒', gen:function(){return genLogarithms();}},
+  {id:'m-s1-s6',label:'Stage 6 — Vectors',             emoji:'➡️',gen:function(){return genVectors();}},
+  {id:'m-s1-s7',label:'Stage 7 — Statistics & Prob.',  emoji:'📊',gen:function(){return genStats();}},
+  {id:'m-s1-s8',label:'Stage 8 — WAEC Mixed',          emoji:'🏆',gen:function(){return genWAECMixed();}}
+];
+
+// ── QUESTION GENERATORS ──
+function genCount(min,max){
+  var emojis=['🍎','🌟','🐠','🎈','🍌','🌸','🦋','🏀','🎵','🌍'];
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var n=min+Math.floor(Math.random()*(max-min+1));
+    var em=emojis[Math.floor(Math.random()*emojis.length)];
+    var display=em.repeat(n);
+    var wrong=mathWrong(n,3,3);
+    var opts=shuffle([String(n)].concat(wrong));
+    qs.push(makeMathQ('How many '+em+' can you count?\n'+display,n,opts,'Count',em));
+  }
+  return qs;
+}
+var NUM_WORDS=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
+function genNumWords(min,max){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var n=min+Math.floor(Math.random()*(max-min+1));
+    var allWords=NUM_WORDS.slice(min,max+1);
+    var wrong=shuffle(allWords.filter(function(w){return w!==NUM_WORDS[n];})).slice(0,3);
+    var opts=shuffle([NUM_WORDS[n]].concat(wrong));
+    qs.push(makeMathQ('What is the word for this number?\n\n'+n,NUM_WORDS[n],opts,'Words','🔤'));
+  }
+  return qs;
+}
+function genAdd(min1,max1,min2,max2){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var a=min1+Math.floor(Math.random()*(max1-min1+1));
+    var b=min2+Math.floor(Math.random()*(max2-min2+1));
+    var ans=a+b;
+    var opts=shuffle([String(ans)].concat(mathWrong(ans,3)));
+    qs.push(makeMathQ(a+' + '+b+' = ?',ans,opts,'Add','➕'));
+  }
+  return qs;
+}
+function genSub(min,max){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var b=min+Math.floor(Math.random()*(max-min+1));
+    var a=b+Math.floor(Math.random()*(max-b+1));
+    var ans=a-b;
+    var opts=shuffle([String(ans)].concat(mathWrong(ans,3)));
+    qs.push(makeMathQ(a+' − '+b+' = ?',ans,opts,'Subtract','➖'));
+  }
+  return qs;
+}
+function genMul(tables,min,max){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var t=tables[Math.floor(Math.random()*tables.length)];
+    var n=min+Math.floor(Math.random()*(max-min+1));
+    var ans=t*n;
+    var opts=shuffle([String(ans)].concat(mathWrong(ans,3)));
+    qs.push(makeMathQ(t+' × '+n+' = ?',ans,opts,'Multiply','✖️'));
+  }
+  return qs;
+}
+function genDiv(tables){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var t=tables[Math.floor(Math.random()*tables.length)];
+    var n=1+Math.floor(Math.random()*12);
+    var dividend=t*n;
+    var opts=shuffle([String(n)].concat(mathWrong(n,3,4)));
+    qs.push(makeMathQ(dividend+' ÷ '+t+' = ?',n,opts,'Divide','➗'));
+  }
+  return qs;
+}
+function genSkip(step,max){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var start=step*(1+Math.floor(Math.random()*5));
+    var missing=start+step*(1+Math.floor(Math.random()*3));
+    if(missing>max)missing=step*2;
+    var prev=missing-step;
+    var opts=shuffle([String(missing)].concat(mathWrong(missing,3,step*2)));
+    qs.push(makeMathQ('What comes next?\n'+prev+', ___',missing,opts,'Pattern','🔢'));
+  }
+  return qs;
+}
+function genDoubleHalve(min,max){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var n=min+Math.floor(Math.random()*(max-min+1));
+    var isDouble=Math.random()>0.5;
+    var ans=isDouble?n*2:n;
+    var q=isDouble?'Double '+n+' = ?':'Half of '+(n*2)+' = ?';
+    var opts=shuffle([String(ans)].concat(mathWrong(ans,3,ans)));
+    qs.push(makeMathQ(q,ans,opts,isDouble?'Double':'Halve','🔀'));
+  }
+  return qs;
+}
+function genFractions(){
+  var pairs=[[1,2],[1,3],[1,4],[2,3],[3,4],[1,5],[2,5],[3,5],[1,6],[5,6]];
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var pair=pairs[Math.floor(Math.random()*pairs.length)];
+    var n=pair[0],d=pair[1];
+    var total=d*(2+Math.floor(Math.random()*4));
+    var ans=Math.round((n/d)*total);
+    var opts=shuffle([String(ans)].concat(mathWrong(ans,3,Math.max(3,total/4))));
+    qs.push(makeMathQ(n+'/'+d+' of '+total+' = ?',ans,opts,'Fractions','🍕'));
+  }
+  return qs;
+}
+function genPercent(){
+  var percents=[10,20,25,50,75,5,15,30,40,60];
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var pct=percents[Math.floor(Math.random()*percents.length)];
+    var total=[100,200,50,80,60,40][Math.floor(Math.random()*6)];
+    var ans=Math.round(pct*total/100);
+    var opts=shuffle([String(ans)].concat(mathWrong(ans,3,Math.max(5,ans))));
+    qs.push(makeMathQ(pct+'% of '+total+' = ?',ans,opts,'Percent','%'));
+  }
+  return qs;
+}
+function genArea(){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var isArea=Math.random()>0.5;
+    var l=2+Math.floor(Math.random()*9);
+    var w=2+Math.floor(Math.random()*9);
+    var ans=isArea?l*w:2*(l+w);
+    var q=isArea?'Area of rectangle '+l+' cm × '+w+' cm = ? cm²':'Perimeter of rectangle '+l+' cm × '+w+' cm = ? cm';
+    var opts=shuffle([String(ans)].concat(mathWrong(ans,3,Math.max(5,ans/3))));
+    qs.push(makeMathQ(q,ans,opts,isArea?'Area':'Perimeter','📐'));
+  }
+  return qs;
+}
+function genBodmas(){
+  var qs=[];
+  var templates=[
+    function(){var a=2+Math.floor(Math.random()*5),b=2+Math.floor(Math.random()*5),c=2+Math.floor(Math.random()*5);return {q:'('+a+' + '+b+') × '+c+' = ?',a:(a+b)*c};},
+    function(){var a=2+Math.floor(Math.random()*5),b=2+Math.floor(Math.random()*5),c=2+Math.floor(Math.random()*5);return {q:a+' × '+b+' + '+c+' = ?',a:a*b+c};},
+    function(){var a=2+Math.floor(Math.random()*8),b=2+Math.floor(Math.random()*4),c=1+Math.floor(Math.random()*3);return {q:a+' − '+b+' × '+c+' = ?',a:a-b*c};}
+  ];
+  for(var i=0;i<10;i++){
+    var t=templates[Math.floor(Math.random()*templates.length)]();
+    var opts=shuffle([String(t.a)].concat(mathWrong(t.a,3,10)));
+    qs.push(makeMathQ(t.q,t.a,opts,'BODMAS','🧮'));
+  }
+  return qs;
+}
+function genAlgebra(level){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var x=1+Math.floor(Math.random()*10);
+    var a=1+Math.floor(Math.random()*8);
+    var b=1+Math.floor(Math.random()*10);
+    var q,ans;
+    if(level===1){
+      // x + a = b+a → find x
+      ans=x;q='x + '+a+' = '+(x+a)+'\nFind x';
+    }else{
+      // ax + b = ans → find x
+      ans=x;q=a+'x + '+b+' = '+(a*x+b)+'\nFind x';
+    }
+    var opts=shuffle([String(ans)].concat(mathWrong(ans,3,5)));
+    qs.push(makeMathQ(q,ans,opts,'Algebra','x'));
+  }
+  return qs;
+}
+function genGeometry(){
+  var qs=[];
+  var facts=[
+    {q:'Angles in a triangle add up to?',a:'180°',w:['90°','360°','270°']},
+    {q:'Angles in a quadrilateral add up to?',a:'360°',w:['180°','270°','90°']},
+    {q:'A right angle is?',a:'90°',w:['45°','180°','60°']},
+    {q:'How many sides does a hexagon have?',a:'6',w:['5','7','8']},
+    {q:'How many sides does a pentagon have?',a:'5',w:['4','6','7']},
+    {q:'Area of triangle = ½ × base × height\nBase = 6 cm, Height = 4 cm\nArea = ?',a:'12 cm²',w:['24 cm²','10 cm²','8 cm²']},
+    {q:'Circumference = π × diameter\nDiameter = 7 cm, π ≈ 22/7\nCircumference ≈ ?',a:'22 cm',w:['14 cm','44 cm','11 cm']},
+    {q:'Supplementary angles add up to?',a:'180°',w:['90°','360°','270°']},
+    {q:'Complementary angles add up to?',a:'90°',w:['180°','45°','360°']},
+    {q:'An equilateral triangle has how many equal sides?',a:'3',w:['2','1','4']}
+  ];
+  var pool=shuffle(facts.slice());
+  for(var i=0;i<10;i++){
+    var f=pool[i%pool.length];
+    var opts=shuffle([f.a].concat(f.w));
+    qs.push(makeMathQ(f.q,f.a,opts,'Geometry','📐'));
+  }
+  return qs;
+}
+
+function genTrig(){
+  var qs=[
+    {q:'sin 30° = ?',a:'0.5',w:['1','0.866','0.707']},
+    {q:'cos 60° = ?',a:'0.5',w:['0.866','1','0.707']},
+    {q:'sin 90° = ?',a:'1',w:['0','0.5','0.707']},
+    {q:'cos 0° = ?',a:'1',w:['0','0.5','0.866']},
+    {q:'tan 45° = ?',a:'1',w:['0.5','0.866','undefined']},
+    {q:'sin 45° ≈ ?',a:'0.707',w:['0.5','0.866','1']},
+    {q:'cos 30° ≈ ?',a:'0.866',w:['0.5','0.707','1']},
+    {q:'tan 0° = ?',a:'0',w:['1','0.5','undefined']},
+    {q:'sin 60° ≈ ?',a:'0.866',w:['0.5','0.707','1']},
+    {q:'cos 90° = ?',a:'0',w:['1','0.5','0.707']}
+  ];
+  return shuffle(qs).slice(0,10).map(function(f){
+    return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Trig','📐');
+  });
+}
+function genStats(){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var type=['mean','median','mode','range'][Math.floor(Math.random()*4)];
+    var data,ans;
+    if(type==='mean'){
+      data=[2,4,6,8,10].map(function(){return 1+Math.floor(Math.random()*10);});
+      ans=Math.round(data.reduce(function(a,b){return a+b;})/data.length);
+      qs.push(makeMathQ('Find the mean:\n'+data.join(', '),ans,shuffle([String(ans)].concat(mathWrong(ans,3,5))),'Mean','📊'));
+    }else if(type==='median'){
+      data=[2,4,6,8,9].map(function(){return 1+Math.floor(Math.random()*10);}).sort(function(a,b){return a-b;});
+      ans=data[2];
+      qs.push(makeMathQ('Find the median:\n'+data.join(', '),ans,shuffle([String(ans)].concat(mathWrong(ans,3,4))),'Median','📊'));
+    }else if(type==='mode'){
+      var rep=1+Math.floor(Math.random()*9);
+      data=[rep,rep,1+Math.floor(Math.random()*9),1+Math.floor(Math.random()*9),1+Math.floor(Math.random()*9)];
+      ans=rep;
+      qs.push(makeMathQ('Find the mode:\n'+shuffle(data.slice()).join(', '),ans,shuffle([String(ans)].concat(mathWrong(ans,3,5))),'Mode','📊'));
+    }else{
+      data=[2,4,6,8,10].map(function(){return 1+Math.floor(Math.random()*15);});
+      ans=Math.max.apply(null,data)-Math.min.apply(null,data);
+      qs.push(makeMathQ('Find the range:\n'+data.join(', '),ans,shuffle([String(ans)].concat(mathWrong(ans,3,5))),'Range','📊'));
+    }
+  }
+  return qs;
+}
+function genMixed(level){
+  if(level==='primary')return shuffle(genAdd(10,50,10,50).concat(genMul([2,3,4,5],1,10)).concat(genPercent())).slice(0,10);
+  if(level==='jss')return shuffle(genAlgebra(2).concat(genGeometry()).concat(genPercent())).slice(0,10);
+  return shuffle(genQuadratic().concat(genTrig()).concat(genStats())).slice(0,10);
+}
+
+function genIndices(){
+  var qs=[];
+  var templates=[
+    function(){var b=2+Math.floor(Math.random()*5),e=2+Math.floor(Math.random()*4);return {q:b+'^'+e+' = ?',a:Math.pow(b,e)};},
+    function(){var b=2+Math.floor(Math.random()*4),e=2+Math.floor(Math.random()*3);var r=Math.pow(b,e);return {q:'What is the value of '+b+' to the power '+e+'?',a:r};},
+    function(){var b=Math.floor(Math.random()*3)+2;return {q:b+'^0 = ?',a:1};},
+    function(){var b=2+Math.floor(Math.random()*5);return {q:b+'^1 = ?',a:b};},
+    function(){var n=[4,9,16,25,36,49,64,81,100][Math.floor(Math.random()*9)];return {q:'√'+n+' = ?',a:Math.round(Math.sqrt(n))};}
+  ];
+  for(var i=0;i<10;i++){
+    var t=templates[i%templates.length]();
+    var opts=shuffle([String(t.a)].concat(mathWrong(t.a,3,Math.max(3,t.a/2))));
+    qs.push(makeMathQ(t.q,t.a,opts,'Indices','🔢'));
+  }
+  return qs;
+}
+function gcd(a,b){return b===0?a:gcd(b,a%b);}
+function lcm(a,b){return a*b/gcd(a,b);}
+function genLCMHCF(){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var a=2+Math.floor(Math.random()*10);
+    var b=2+Math.floor(Math.random()*10);
+    var isLCM=Math.random()>0.5;
+    var ans=isLCM?lcm(a,b):gcd(a,b);
+    var q=(isLCM?'LCM':'HCF')+' of '+a+' and '+b+' = ?';
+    var opts=shuffle([String(ans)].concat(mathWrong(ans,3,Math.max(3,ans/2))));
+    qs.push(makeMathQ(q,ans,opts,isLCM?'LCM':'HCF','🔢'));
+  }
+  return qs;
+}
+function genSimultaneous(){
+  var qs=[];
+  // ax + by = c, dx + ey = f — small integer solutions
+  var pairs=[[1,2],[2,3],[1,3],[2,5],[3,4],[1,5],[2,7],[3,5],[4,5],[1,4]];
+  for(var i=0;i<10;i++){
+    var x=1+Math.floor(Math.random()*5);
+    var y=1+Math.floor(Math.random()*5);
+    var a=1+Math.floor(Math.random()*3);
+    var b=1+Math.floor(Math.random()*3);
+    var c=a*x+b*y;
+    var d=1+Math.floor(Math.random()*3);
+    var e=1+Math.floor(Math.random()*3);
+    var f=d*x+e*y;
+    var q=a+'x + '+b+'y = '+c+'\n'+d+'x + '+e+'y = '+f+'\nFind x';
+    var opts=shuffle([String(x)].concat(mathWrong(x,3,4)));
+    qs.push(makeMathQ(q,x,opts,'Simultaneous','x'));
+  }
+  return qs;
+}
+function genCoordinates(){
+  var qs=[
+    {q:'Point A is at (3, 4). Point B is at (7, 4).\nDistance AB = ?',a:'4',w:['3','7','8']},
+    {q:'Midpoint of (2, 4) and (6, 8) = ?',a:'(4, 6)',w:['(3, 5)','(8, 12)','(4, 4)']},
+    {q:'Gradient of line through (0,0) and (3,6) = ?',a:'2',w:['3','6','0.5']},
+    {q:'Gradient of line through (1,2) and (3,6) = ?',a:'2',w:['3','4','1']},
+    {q:'y-intercept of y = 3x + 5 is?',a:'5',w:['3','−5','0']},
+    {q:'Gradient of y = 2x − 7 is?',a:'2',w:['−7','7','−2']},
+    {q:'Point on y = 2x + 1 when x = 3?',a:'7',w:['5','6','8']},
+    {q:'Midpoint of (0,0) and (10,6) = ?',a:'(5, 3)',w:['(10, 6)','(4, 2)','(6, 4)']},
+    {q:'Distance from (0,0) to (3,4) = ?',a:'5',w:['7','4','3']},
+    {q:'Gradient of a horizontal line is?',a:'0',w:['1','undefined','−1']}
+  ];
+  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Coordinates','📍');});
+}
+function genFactorise(){
+  var qs=[];
+  // x² + (a+b)x + ab = (x+a)(x+b)
+  var pairs=[[1,2],[1,3],[2,3],[1,4],[2,4],[1,5],[3,4],[2,5],[1,6],[3,5]];
+  for(var i=0;i<10;i++){
+    var pair=pairs[i%pairs.length];
+    var a=pair[0],b=pair[1];
+    var B=a+b,C=a*b;
+    var q='Factorise: x² + '+B+'x + '+C;
+    var ans='(x+'+a+')(x+'+b+')';
+    var w=['(x+'+B+')(x+'+C+')','(x−'+a+')(x−'+b+')','(x+'+C+')(x+'+B+')'];
+    qs.push(makeMathQ(q,ans,shuffle([ans].concat(w)),'Factorise','x²'));
+  }
+  return qs;
+}
+function genPythagoras(){
+  // Pythagorean triples
+  var triples=[[3,4,5],[5,12,13],[8,15,17],[7,24,25],[6,8,10],[9,12,15],[5,6,null],[8,6,null]];
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var t=triples[i%triples.length];
+    if(t[2]){
+      // Find hypotenuse
+      var ans=t[2];
+      var q='Right-angled triangle:\na = '+t[0]+', b = '+t[1]+'\nFind c (hypotenuse)';
+      var opts=shuffle([String(ans)].concat(mathWrong(ans,3,4)));
+      qs.push(makeMathQ(q,ans,opts,'Pythagoras','📐'));
+    }else{
+      // Find missing shorter side
+      var a=t[0],b=t[1];
+      var c2=a*a+b*b;var c=Math.round(Math.sqrt(c2)*10)/10;
+      var q2='Right triangle: a='+a+', b='+b+'\nc² = a² + b²\nc = ?';
+      var opts2=shuffle([String(c)].concat([String(a+b),String(a*b),String(Math.round(c*2))]));
+      qs.push(makeMathQ(q2,c,opts2,'Pythagoras','📐'));
+    }
+  }
+  return qs;
+}
+function genBearings(){
+  var qs=[
+    {q:'A ship sails on bearing 090°.\nIn which direction is it heading?',a:'East',w:['North','West','South']},
+    {q:'North is 000°. What bearing is South?',a:'180°',w:['090°','270°','360°']},
+    {q:'What bearing is West?',a:'270°',w:['090°','180°','360°']},
+    {q:'What bearing is East?',a:'090°',w:['180°','270°','000°']},
+    {q:'Bearing 045° is which direction?',a:'North-East',w:['North-West','South-East','South-West']},
+    {q:'Bearing 135° is which direction?',a:'South-East',w:['North-East','South-West','North-West']},
+    {q:'Back bearing of 060° is?',a:'240°',w:['120°','300°','180°']},
+    {q:'Back bearing of 150° is?',a:'330°',w:['030°','210°','300°']},
+    {q:'A plane flies 300 km on bearing 000°. How far North?',a:'300 km',w:['0 km','150 km','600 km']},
+    {q:'Back bearing of 270° (West) is?',a:'090°',w:['180°','000°','270°']}
+  ];
+  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Bearings','🧭');});
+}
+function genSurds(){
+  var qs=[
+    {q:'Simplify √50',a:'5√2',w:['25√2','√25','10√5']},
+    {q:'Simplify √72',a:'6√2',w:['8√3','36√2','3√8']},
+    {q:'Simplify √18',a:'3√2',w:['6√3','9√2','2√9']},
+    {q:'√8 × √2 = ?',a:'4',w:['8','√10','2√4']},
+    {q:'(√3)² = ?',a:'3',w:['9','√9','6']},
+    {q:'√100 = ?',a:'10',w:['50','20','5']},
+    {q:'2^(1/2) is the same as?',a:'√2',w:['2','√4','1/2']},
+    {q:'Simplify: 3√2 + 5√2',a:'8√2',w:['15√2','8√4','√30']},
+    {q:'√12 + √3 = ?',a:'3√3',w:['2√3','4√3','√15']},
+    {q:'Rationalise: 1/√2 = ?',a:'√2/2',w:['√2','2/√2','1/2']}
+  ];
+  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Surds','√');});
+}
+function genCircleTheorems(){
+  var qs=[
+    {q:'Angle in a semicircle = ?',a:'90°',w:['45°','180°','60°']},
+    {q:'Angles in the same segment are?',a:'Equal',w:['Supplementary','Complementary','Different']},
+    {q:'Opposite angles of a cyclic quadrilateral add up to?',a:'180°',w:['90°','360°','270°']},
+    {q:'The angle at the centre is _____ the angle at the circumference.',a:'Twice',w:['Half','Equal to','Three times']},
+    {q:'A tangent to a circle is _____ to the radius at that point.',a:'Perpendicular',w:['Parallel','Equal','Bisecting']},
+    {q:'Two tangents from an external point are?',a:'Equal in length',w:['Parallel','Perpendicular','Unequal']},
+    {q:'Angle in alternate segment = angle between?',a:'Tangent and chord',w:['Two tangents','Two chords','Radius and chord']},
+    {q:'An inscribed angle is _____ of its intercepted arc.',a:'Half',w:['Equal to','Twice','A quarter of']},
+    {q:'A chord that passes through the centre is called?',a:'Diameter',w:['Radius','Secant','Arc']},
+    {q:'The perpendicular from the centre to a chord _____ the chord.',a:'Bisects',w:['Doubles','Is parallel to','Triples']}
+  ];
+  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Circles','⭕');});
+}
+function genLogarithms(){
+  var qs=[
+    {q:'log₁₀ 100 = ?',a:'2',w:['10','1','20']},
+    {q:'log₁₀ 1000 = ?',a:'3',w:['100','10','30']},
+    {q:'log₁₀ 10 = ?',a:'1',w:['0','10','100']},
+    {q:'log₁₀ 1 = ?',a:'0',w:['1','−1','10']},
+    {q:'log₂ 8 = ?',a:'3',w:['2','4','8']},
+    {q:'log₂ 16 = ?',a:'4',w:['2','8','3']},
+    {q:'log₃ 27 = ?',a:'3',w:['9','27','6']},
+    {q:'If log x = 2, then x = ?',a:'100',w:['20','10','1000']},
+    {q:'log(a × b) = ?',a:'log a + log b',w:['log a − log b','log a × log b','log(a+b)']},
+    {q:'log(a/b) = ?',a:'log a − log b',w:['log a + log b','log a ÷ log b','log(a−b)']}
+  ];
+  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Logarithms','㏒');});
+}
+function genVectors(){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var ax=Math.floor(Math.random()*8)-3,ay=Math.floor(Math.random()*8)-3;
+    var bx=Math.floor(Math.random()*8)-3,by=Math.floor(Math.random()*8)-3;
+    var isAdd=Math.random()>0.5;
+    var cx=isAdd?ax+bx:ax-bx,cy=isAdd?ay+by:ay-by;
+    var q='a = ('+ax+', '+ay+'), b = ('+bx+', '+by+')\na '+(isAdd?'+':'-')+' b = ?';
+    var ans='('+cx+', '+cy+')';
+    var w=['('+(cx+1)+', '+cy+')','('+cx+', '+(cy+1)+')','('+(cx-1)+', '+(cy-1)+')'];
+    qs.push(makeMathQ(q,ans,shuffle([ans].concat(w)),'Vectors','➡️'));
+  }
+  return qs;
+}
+function genWAECMixed(){
+  return shuffle(
+    genQuadratic().slice(0,2).concat(
+    genTrig().slice(0,2)).concat(
+    genSurds().slice(0,2)).concat(
+    genCircleTheorems().slice(0,2)).concat(
+    genLogarithms().slice(0,2))
+  ).slice(0,10);
+}
+
+// Fix genQuadratic for more variety — mixed positive/negative roots, different coefficients
+function genQuadratic(){
+  var qs=[];
+  var variants=[
+    // x² + bx + c = 0 (positive roots)
+    function(){
+      var r1=1+Math.floor(Math.random()*6),r2=1+Math.floor(Math.random()*6);
+      var b=r1+r2,c=r1*r2;
+      var q='x² + '+b+'x + '+c+' = 0\nSolve for x (both roots)';
+      var ans='x = −'+r1+' or −'+r2;
+      var w=['x = '+r1+' or '+r2,'x = '+r1+' or −'+r2,'x = −'+r1+' only'];
+      return {q,ans,w};
+    },
+    // x² - bx + c = 0 (both positive roots)
+    function(){
+      var r1=1+Math.floor(Math.random()*6),r2=1+Math.floor(Math.random()*6);
+      var b=r1+r2,c=r1*r2;
+      var q='x² − '+b+'x + '+c+' = 0\nSolve for x';
+      var ans='x = '+r1+' or '+r2;
+      var w=['x = −'+r1+' or −'+r2,'x = '+b+' or '+c,'x = '+r1+' only'];
+      return {q,ans,w};
+    },
+    // x² - (a-b)x - ab = 0 (one positive one negative root)
+    function(){
+      var r1=1+Math.floor(Math.random()*5),r2=1+Math.floor(Math.random()*5);
+      var b=r1-r2,c=-r1*r2;
+      var q='x² '+(b>=0?'+ '+b:'− '+Math.abs(b))+'x '+(c>=0?'+ '+c:'− '+Math.abs(c))+' = 0\nSolve for x';
+      var ans='x = '+r1+' or −'+r2;
+      var w=['x = −'+r1+' or '+r2,'x = '+r1+' or '+r2,'x = '+r1+' only'];
+      return {q,ans,w};
+    },
+    // ax² + bx + c using quadratic formula label
+    function(){
+      var r1=1+Math.floor(Math.random()*4),r2=1+Math.floor(Math.random()*4);
+      var a=2,b=-(a*r1+r2),c=-r1*r2; // rough
+      // Simpler: 2x² + 5x + 2 = 0 → (2x+1)(x+2) → x=-1/2 or -2
+      var pairs=[[2,5,2,'x = −½ or −2'],[2,7,3,'x = −½ or −3'],[3,7,2,'x = −⅓ or −2'],[2,3,-2,'x = ½ or −2']];
+      var p=pairs[Math.floor(Math.random()*pairs.length)];
+      var q=p[0]+'x² + '+p[1]+'x + '+p[2]+' = 0\nSolve for x';
+      return {q,ans:p[3],w:['x = '+p[1]+' or '+p[2],'x = '+p[0]+' or '+p[1],'No real roots']};
+    }
+  ];
+  for(var i=0;i<10;i++){
+    var v=variants[i%variants.length]();
+    var opts=shuffle([v.ans].concat(v.w));
+    qs.push(makeMathQ(v.q,v.ans,opts,'Quadratic','x²'));
+  }
+  return qs;
+}
+// SSS 2 — deeper WAEC topics
+MATH_STAGES['SSS 2']=[
+  {id:'m-s2-s1',label:'Stage 1 — Quadratics & Roots',  emoji:'x²',gen:function(){return genQuadratic();}},
+  {id:'m-s2-s2',label:'Stage 2 — Surds & Logarithms',  emoji:'√', gen:function(){return shuffle(genSurds().concat(genLogarithms())).slice(0,10);}},
+  {id:'m-s2-s3',label:'Stage 3 — Advanced Trig',       emoji:'📐',gen:function(){return genTrigAdvanced();}},
+  {id:'m-s2-s4',label:'Stage 4 — Circle Theorems',     emoji:'⭕',gen:function(){return genCircleTheorems();}},
+  {id:'m-s2-s5',label:'Stage 5 — Matrices',            emoji:'🔢',gen:function(){return genMatrices();}},
+  {id:'m-s2-s6',label:'Stage 6 — Probability',         emoji:'🎲',gen:function(){return genProbability();}},
+  {id:'m-s2-s7',label:'Stage 7 — Vectors & Mechanics', emoji:'➡️',gen:function(){return genVectors();}},
+  {id:'m-s2-s8',label:'Stage 8 — WAEC Full Mock',      emoji:'🏆',gen:function(){return genWAECMixed();}}
+];
+MATH_STAGES['WAEC/JAMB']=[
+  {id:'m-wj-s1',label:'Stage 1 — Number & Algebra',    emoji:'🔢',gen:function(){return shuffle(genLCMHCF().concat(genIndices()).concat(genAlgebra(2))).slice(0,10);}},
+  {id:'m-wj-s2',label:'Stage 2 — Quadratics & Logs',   emoji:'x²',gen:function(){return shuffle(genQuadratic().concat(genLogarithms())).slice(0,10);}},
+  {id:'m-wj-s3',label:'Stage 3 — Geometry & Trig',     emoji:'📐',gen:function(){return shuffle(genGeometry().concat(genTrig())).slice(0,10);}},
+  {id:'m-wj-s4',label:'Stage 4 — Surds & Vectors',     emoji:'√', gen:function(){return shuffle(genSurds().concat(genVectors())).slice(0,10);}},
+  {id:'m-wj-s5',label:'Stage 5 — Circle & Bearings',   emoji:'⭕',gen:function(){return shuffle(genCircleTheorems().concat(genBearings())).slice(0,10);}},
+  {id:'m-wj-s6',label:'Stage 6 — Stats & Probability', emoji:'📊',gen:function(){return shuffle(genStats().concat(genProbability())).slice(0,10);}},
+  {id:'m-wj-s7',label:'Stage 7 — JAMB Speed Round',    emoji:'⚡',gen:function(){return genJAMBSpeed();}},
+  {id:'m-wj-s8',label:'Stage 8 — Full Exam Simulation',emoji:'🏆',gen:function(){return genFullExam();}}
+];
+
+function genTrigAdvanced(){
+  var qs=[];
+  var items=[
+    {q:'sin²θ + cos²θ = ?',a:'1',w:['0','2','sinθcosθ']},
+    {q:'1 + tan²θ = ?',a:'sec²θ',w:['cosec²θ','cot²θ','1']},
+    {q:'1 + cot²θ = ?',a:'cosec²θ',w:['sec²θ','tan²θ','1']},
+    {q:'sin(90° − θ) = ?',a:'cosθ',w:['sinθ','tanθ','−cosθ']},
+    {q:'cos(90° − θ) = ?',a:'sinθ',w:['cosθ','−sinθ','tanθ']},
+    {q:'tan θ = ?',a:'sinθ/cosθ',w:['cosθ/sinθ','1/sinθ','1/cosθ']},
+    {q:'sin 2θ = ?',a:'2sinθcosθ',w:['sin²θ−cos²θ','2cosθ','sinθcosθ']},
+    {q:'cos 2θ = ?',a:'cos²θ − sin²θ',w:['2sinθcosθ','sin²θ − cos²θ','cos²θ + sin²θ']},
+    {q:'If sinθ = 3/5, cosθ = 4/5, tanθ = ?',a:'3/4',w:['4/3','5/3','5/4']},
+    {q:'The period of y = sin x is?',a:'360°',w:['180°','90°','720°']}
+  ];
+  return shuffle(items).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Trig','📐');});
+}
+
+function genMatrices(){
+  var qs=[];
+  for(var i=0;i<10;i++){
+    var type=i%4;
+    if(type===0){
+      // 2x2 determinant
+      var a=Math.floor(Math.random()*5)+1,b=Math.floor(Math.random()*4)+1;
+      var c=Math.floor(Math.random()*4)+1,d=Math.floor(Math.random()*5)+1;
+      var det=a*d-b*c;
+      qs.push(makeMathQ('det |'+a+' '+b+'|\n    |'+c+' '+d+'| = ?',det,shuffle([String(det)].concat(mathWrong(det,3,8))),'Matrices','🔢'));
+    }else if(type===1){
+      // Matrix addition
+      var a1=Math.floor(Math.random()*5),a2=Math.floor(Math.random()*5);
+      var b1=Math.floor(Math.random()*5),b2=Math.floor(Math.random()*5);
+      var r1=a1+b1,r2=a2+b2;
+      qs.push(makeMathQ('('+a1+' '+a2+') + ('+b1+' '+b2+') =\nFirst element = ?',r1,shuffle([String(r1)].concat(mathWrong(r1,3,4))),'Matrices','🔢'));
+    }else if(type===2){
+      // Order of matrix
+      var r=[2,3,2,3][Math.floor(Math.random()*4)],c2=[2,2,3,3][Math.floor(Math.random()*4)];
+      qs.push(makeMathQ('A matrix has '+r+' rows and '+c2+' columns.\nIts order is?',r+'×'+c2,shuffle([r+'×'+c2,c2+'×'+r,r+'×'+r,c2+'×'+c2]),'Matrices','🔢'));
+    }else{
+      var items=[
+        {q:'The identity matrix I for 2×2 has diagonal elements equal to?',a:'1',w:['0','2','−1']},
+        {q:'A matrix multiplied by its inverse equals?',a:'Identity matrix I',w:['Zero matrix','Original matrix','Transpose']},
+        {q:'The transpose of a 2×3 matrix has order?',a:'3×2',w:['2×3','3×3','2×2']}
+      ];
+      var f=items[Math.floor(Math.random()*items.length)];
+      qs.push(makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Matrices','🔢'));
+    }
+  }
+  return qs;
+}
+
+function genProbability(){
+  var qs=[];
+  var items=[
+    {q:'P(A) + P(A\') = ?',a:'1',w:['0','0.5','2']},
+    {q:'A fair coin is tossed. P(Heads) = ?',a:'1/2',w:['1/4','1/3','2/3']},
+    {q:'A die is rolled. P(getting 6) = ?',a:'1/6',w:['1/2','1/3','1/4']},
+    {q:'A die is rolled. P(even number) = ?',a:'1/2',w:['1/3','2/3','1/6']},
+    {q:'P(A and B) if A and B are independent = ?',a:'P(A) × P(B)',w:['P(A) + P(B)','P(A) − P(B)','P(A) ÷ P(B)']},
+    {q:'P(A or B) if A and B are mutually exclusive = ?',a:'P(A) + P(B)',w:['P(A) × P(B)','P(A) − P(B)','1']},
+    {q:'A bag has 3 red and 2 blue balls. P(red) = ?',a:'3/5',w:['2/5','1/5','3/2']},
+    {q:'If P(A) = 0.3, P(B) = 0.4 (independent), P(A and B) = ?',a:'0.12',w:['0.7','0.1','0.34']},
+    {q:'Probability of impossible event = ?',a:'0',w:['1','0.5','undefined']},
+    {q:'Probability of certain event = ?',a:'1',w:['0','0.5','2']}
+  ];
+  return shuffle(items).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Probability','🎲');});
+}
+
+function genJAMBSpeed(){
+  // JAMB-style: quick recall, often tricky
+  var items=[
+    {q:'Simplify: (x²−4)/(x−2)',a:'x+2',w:['x−2','x²+2','2x']},
+    {q:'If 2^x = 16, x = ?',a:'4',w:['2','8','6']},
+    {q:'The roots of x²−5x+6=0 are?',a:'2 and 3',w:['−2 and −3','1 and 6','2 and −3']},
+    {q:'log 0.001 = ?',a:'−3',w:['3','−2','−1']},
+    {q:'√(1/4) = ?',a:'1/2',w:['1/4','2','1/16']},
+    {q:'If 3x − 1 = 8, x = ?',a:'3',w:['2','4','7/3']},
+    {q:'Expand (x+3)² = ?',a:'x²+6x+9',w:['x²+9','x²+3x+9','x²+6x+6']},
+    {q:'The sum of roots of x²−7x+10=0 is?',a:'7',w:['10','−7','−10']},
+    {q:'Product of roots of x²−7x+10=0 is?',a:'10',w:['7','−10','−7']},
+    {q:'Simplify: 2^3 × 2^4 = ?',a:'128',w:['64','256','512']}
+  ];
+  return shuffle(items).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'JAMB','⚡');});
+}
+
+function genFullExam(){
+  return shuffle(
+    genQuadratic().slice(0,1).concat(genTrig().slice(0,1)).concat(genSurds().slice(0,1))
+    .concat(genCircleTheorems().slice(0,1)).concat(genLogarithms().slice(0,1))
+    .concat(genVectors().slice(0,1)).concat(genProbability().slice(0,1))
+    .concat(genMatrices().slice(0,1)).concat(genBearings().slice(0,1))
+    .concat(genJAMBSpeed().slice(0,1))
+  );
+}
+
+var MS={
+  stageIdx:0,
+  classLabel:'',
+  questions:[],
+  qIdx:0,
+  answers:[],   // {correct:bool}
+  stage:null
+};
+
+// ── MATH FUNCTIONS ──
+function openMathList(){
+  if(DMODE==='shared'){var el=document.getElementById('math-sw');if(el)el.style.display='';}
+  var cl=STU.classLabel||'Primary 1';
+  var bc=document.getElementById('math-bc');if(bc)bc.textContent='Mathematics · '+cl;
+  var stages=MATH_STAGES[cl]||MATH_STAGES['Primary 1']||[];
+  var p=prog();
+  var list=document.getElementById('math-list');if(!list)return;
+  list.innerHTML='<div class="unit-lbl">🔢 Mathematics · '+cl+'</div>';
+  stages.forEach(function(st,idx){
+    var sp=p[st.id];var passed=sp&&sp.passed;
+    var progressUnlocked=idx===0||(p[stages[idx-1].id]&&p[stages[idx-1].id].passed);
+    var gateUnlocked=isStageUnlocked(idx);
+    var unlocked=progressUnlocked&&gateUnlocked;
+    var row=document.createElement('div');
+    row.className='stage-row'+(unlocked?'':' locked');
+    var bg=passed?'#E8F5E9':unlocked?'#FFF3E0':'#F0F3F6';
+    var fg=passed?'#2E7D32':unlocked?'#C2410C':'#6B7B8D';
+    var ic=passed?'✅':unlocked?st.emoji:'🔒';
+    var statusTxt=passed?('Best: '+(sp.bestScore||0)+'%'):!gateUnlocked?'🔑 Activate school code to unlock':unlocked?'Tap to start':'Complete previous stage';
+    row.innerHTML='<div class="stage-ic" style="background:'+bg+';color:'+fg+';font-size:18px;font-family:\'Nunito\',sans-serif;font-weight:900">'+ic+'</div>'
+      +'<div class="stage-meta"><div class="stage-name">'+st.label+'</div><div class="stage-words" style="margin-top:3px;color:'+fg+'">'+statusTxt+'</div></div>'
+      +(passed?'<div class="stage-stars">'+starsStr(sp.stars||0)+'</div>':'')
+      +'<span style="font-size:20px;color:#9CA3AF">›</span>';
+    if(unlocked)(function(sidx){row.onclick=function(){startMathStage(sidx);};})(idx);
+    list.appendChild(row);
+  });
+  // Update home screen math progress bar
+  var done=stages.filter(function(st){return p[st.id]&&p[st.id].passed;}).length;
+  var pct=stages.length?Math.round(done/stages.length*100):0;
+  var pb=document.getElementById('math-pb');if(pb)pb.style.width=pct+'%';
+  var pt=document.getElementById('math-pt');if(pt)pt.textContent=done+' of '+stages.length+' stages done';
+  var pp=document.getElementById('math-pp');if(pp)pp.textContent=pct+'%';
+  SS('math-lessons');
+}
+
+function startMathStage(idx){
+  var cl=STU.classLabel||'Primary 1';
+  var stages=MATH_STAGES[cl]||MATH_STAGES['Primary 1']||[];
+  MS.stage=stages[idx];MS.stageIdx=idx;MS.classLabel=cl;
+  MS.questions=shuffle(MS.stage.gen());
+  MS.qIdx=0;MS.answers=[];
+  var t=document.getElementById('math-play-title');if(t)t.textContent=MS.stage.label;
+  renderMathQ();
+  SS('math-play');
+}
+
+function renderMathQ(){
+  var q=MS.questions[MS.qIdx];
+  var total=MS.questions.length;
+  var n=document.getElementById('math-qnum');if(n)n.textContent=(MS.qIdx+1)+' / '+total;
+  var pb=document.getElementById('math-prog');if(pb)pb.style.width=Math.round((MS.qIdx+1)/total*100)+'%';
+  var tp=document.getElementById('math-qtype');if(tp)tp.textContent=q.type;
+  var mm=document.getElementById('math-msg');if(mm){mm.textContent='';mm.className='q-msg';}
+  var nx=document.getElementById('math-next');if(nx)nx.disabled=true;
+  var card=document.getElementById('math-card');if(!card)return;
+  // Question display
+  var lines=q.q.split('\n');
+  var html='';
+  if(q.type==='Count'){
+    // Show emoji array large
+    html='<div style="font-size:28px;line-height:1.6;word-break:break-all;margin-bottom:12px">'+lines[1]+'</div>';
+    html+='<div style="font-size:16px;color:var(--sl);margin-bottom:14px">'+lines[0]+'</div>';
+  }else if(lines.length>1){
+    html='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:28px;color:#EA580C;margin-bottom:10px;letter-spacing:-0.5px">'+lines[0]+'</div>';
+    for(var i=1;i<lines.length;i++) html+='<div style="font-size:14px;color:var(--sl);margin-bottom:4px">'+lines[i]+'</div>';
+  }else{
+    html='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:32px;color:#EA580C;margin:12px 0">'+q.q+'</div>';
+  }
+  html+='<div class="opts" style="margin-top:14px">';
+  q.opts.forEach(function(opt){
+    html+='<button class="opt" onclick="mathPick(this,\''+opt.replace(/'/g,"\\'")+'\')" data-opt="'+opt.replace(/"/g,'&quot;')+'">'+opt+'</button>';
+  });
+  html+='</div>';
+  card.innerHTML=html;
+}
+
+function mathPick(btn,chosen){
+  var q=MS.questions[MS.qIdx];
+  var isRight=chosen===q.a;
+  // Highlight all options
+  var card=document.getElementById('math-card');
+  if(card)card.querySelectorAll('.opt').forEach(function(b){
+    b.classList.add('dis');
+    if(b.getAttribute('data-opt')===q.a)b.classList.add('ok');
+    else if(b===btn&&!isRight)b.classList.add('no');
+  });
+  var mm=document.getElementById('math-msg');
+  if(mm){
+    mm.textContent=isRight?'✅ Correct!':'❌ Answer: '+q.a;
+    mm.className='q-msg '+(isRight?'ok':'no');
+  }
+  MS.answers.push({correct:isRight});
+  var nx=document.getElementById('math-next');if(nx)nx.disabled=false;
+}
+
+function mathNext(){
+  MS.qIdx++;
+  if(MS.qIdx>=MS.questions.length){finishMath();return;}
+  renderMathQ();
+}
+
+function confirmLeaveMath(){if(confirm('Leave this stage?'))SS('math-lessons');}
+
+function finishMath(){
+  var correct=MS.answers.filter(function(a){return a.correct;}).length;
+  var total=MS.answers.length;
+  var pct=Math.round(correct/total*100);
+  var passed=pct>=70;
+  var stars=pct===100?3:pct>=80?2:pct>=70?1:0;
+  var prev=saveProg(MS.stage.id,{})||{};
+  saveProg(MS.stage.id,{passed:passed,bestScore:Math.max(pct,prev.bestScore||0),stars:Math.max(stars,prev.stars||0),attempts:(prev.attempts||0)+1});
+
+  var res=document.getElementById('math-results');
+  if(res)res.className='screen active '+(passed?'pass':'fail');
+  SS('math-results');
+
+  var tc=passed?'#451A03':'#1E1B4B';
+  var ri=document.querySelector('#math-results .res-wrap');if(ri)ri.style.color=tc;
+  var em=document.getElementById('math-res-em');if(em)em.textContent=pct===100?'🏆':pct>=80?'🌟':passed?'👍':'📚';
+  var sc=document.getElementById('math-res-score');if(sc){sc.textContent=correct+'/'+total;sc.style.color=tc;}
+  var lb=document.getElementById('math-res-lbl');if(lb)lb.textContent=MS.stage.label;
+  var st=document.getElementById('math-res-stars');if(st)st.textContent=starsStr(stars);
+  var ti=document.getElementById('math-res-title');if(ti)ti.textContent=pct===100?'Perfect!':pct>=80?'Excellent!':passed?'Well done!':'Almost there!';
+  var sub=document.getElementById('math-res-sub');
+  var cl=MS.classLabel;
+  var stages=MATH_STAGES[cl]||[];
+  var isLast=MS.stageIdx>=stages.length-1;
+  if(sub)sub.textContent=passed?(isLast?'All stages complete! 🎊':'Next stage unlocked!'):'You need 70% to pass. Try again!';
+
+  var b1=document.getElementById('math-res-btn1');
+  var b2=document.getElementById('math-res-btn2');
+  if(b1){
+    if(passed&&!isLast){b1.textContent='Next Stage →';b1.style.color=tc;b1.onclick=function(){startMathStage(MS.stageIdx+1);};}
+    else{b1.textContent='Try Again';b1.style.color=tc;b1.onclick=function(){startMathStage(MS.stageIdx);};}
+  }
+  if(b2){b2.textContent='Back to Stages';b2.onclick=function(){openMathList();};}
+}
+
+// ════════════════════════════════════════
+// C — SCHOOL CODE GATE + D — BRANDING
+// ════════════════════════════════════════
+var LK_SCHOOL='el_school';
+
+// ── School code lookup — Firestore is the single source of truth ──
+// No codes are stored in this file.
+// You manage all schools from Firebase Console → Firestore → schools collection.
+// Each document ID = the school code (e.g. "AGUDA01")
+// Document fields: name (string), color (string), emoji (string), expiry (string YYYY-MM-DD), active (bool)
+
+function getSchool(){return lg(LK_SCHOOL)||null;}
+
+function isActivated(){
+  var school=getSchool();
+  if(!school||!school.code)return false;
+  if(school.expiry&&new Date(school.expiry)<new Date())return false;
+  return school.active!==false; // default true if field missing
+}
+
+function applyBranding(){
+  var school=getSchool();if(!school)return;
+  var color=school.color||'#FF6B35';
+  var htb=document.getElementById('home-tb');
+  if(htb)htb.style.background='linear-gradient(135deg,'+color+','+lighten(color)+')';
+  var hbanner=document.querySelector('#home .home-banner');
+  if(hbanner)hbanner.style.background='linear-gradient(135deg,'+color+','+lighten(color)+')';
+  var greet=document.getElementById('home-greet');
+  if(greet&&school.name)greet.textContent=(school.emoji||'\uD83C\uDFEB')+' '+school.name;
+}
+function lighten(hex){
+  try{
+    var n=parseInt(hex.slice(1),16);
+    var r=Math.min(255,((n>>16)&0xFF)+40);
+    var g=Math.min(255,((n>>8)&0xFF)+40);
+    var b=Math.min(255,(n&0xFF)+40);
+    return '#'+[r,g,b].map(function(x){return x.toString(16).padStart(2,'0');}).join('');
+  }catch(e){return hex;}
+}
+
+function activateSchoolCode(code,cb){
+  // Look up the code in Firestore — not in local JS
+  code=code.toUpperCase().trim();
+  var statusEl=document.getElementById('admin-activation-status');
+  if(statusEl){statusEl.textContent='Checking code\u2026';statusEl.style.color='#D97706';}
+
+  FB.onReady(function(){
+    if(!FB.db){
+      // Firebase not available — check local cache first
+      var cached=getSchool();
+      if(cached&&cached.code===code){cb('ok',cached);return;}
+      cb('offline',null);return;
+    }
+    FB.db.collection('schools').doc(code).get()
+      .then(function(doc){
+        if(!doc.exists){cb('invalid',null);return;}
+        var data=doc.data();
+        if(data.active===false){cb('inactive',null);return;}
+        if(data.expiry&&new Date(data.expiry)<new Date()){cb('expired',null);return;}
+        // Valid — save to localStorage and apply
+        var school=Object.assign({code:code},data);
+        ls(LK_SCHOOL,school);
+        applyBranding();
+        cb('ok',school);
+      })
+      .catch(function(e){
+        console.warn('School code lookup failed:',e.message);
+        // Fallback: accept if already cached with same code
+        var cached=getSchool();
+        if(cached&&cached.code===code){cb('ok',cached);}
+        else{cb('error',null);}
+      });
+  });
+}
+
+function saveSchoolSettings(){
+  var nameEl=document.getElementById('admin-school-name');
+  var codeEl=document.getElementById('admin-school-code');
+  var name=nameEl?nameEl.value.trim():'';
+  var code=codeEl?codeEl.value.trim().toUpperCase():'';
+
+  if(code){
+    var btn=document.querySelector('[onclick="saveSchoolSettings()"]');
+    if(btn){btn.textContent='Checking\u2026';btn.disabled=true;}
+    activateSchoolCode(code,function(result,school){
+      if(btn){btn.textContent='Save Settings';btn.disabled=false;}
+      if(result==='ok'){
+        toast('\u2705 School activated! Branding applied.',2500);
+      }else if(result==='invalid'){
+        toast('\u274C Invalid code. Contact Blestonex for a valid school code.',4000);
+      }else if(result==='expired'){
+        toast('\u26A0\uFE0F This school code has expired. Contact Blestonex to renew.',4000);
+      }else if(result==='inactive'){
+        toast('\u26A0\uFE0F This school account is inactive. Contact Blestonex.',4000);
+      }else if(result==='offline'){
+        toast('\u26A0\uFE0F Cannot verify code — no internet connection.',3000);
+      }else{
+        toast('\u26A0\uFE0F Could not verify code. Check internet and try again.',3000);
+      }
+      loadAdminSchoolFields();
+    });
+  }else if(name){
+    var ex=getSchool()||{};ex.name=name;ls(LK_SCHOOL,ex);
+    toast('School name saved.',1800);
+    applyBranding();
+    loadAdminSchoolFields();
+  }
+}
+
+function loadAdminSchoolFields(){
+  var school=getSchool();
+  var nameEl=document.getElementById('admin-school-name');
+  var codeEl=document.getElementById('admin-school-code');
+  if(school&&school.name&&nameEl)nameEl.value=school.name;
+  if(school&&school.code&&codeEl)codeEl.value=school.code;
+  var statusEl=document.getElementById('admin-activation-status');
+  if(statusEl){
+    if(isActivated()){
+      var exp=(getSchool()||{}).expiry||'never';
+      statusEl.textContent='\u2705 Activated \u2014 expires '+exp;
+      statusEl.style.color='#15803D';
+    }else{
+      statusEl.textContent='\u26A0\uFE0F Not activated \u2014 demo mode (2 stages per unit)';
+      statusEl.style.color='#D97706';
+    }
+  }
+}
+
+// Gate: demo mode = first 2 stages only
+function isStageUnlocked(idx){
+  return isActivated()||idx<2;
+}
 
 // ════════════════════════════════════════
 // HOUSE COMPETITION MODE
@@ -2484,37 +3906,52 @@ function getHostHouses(){
 function hostStartQuiz(){
   var cl=document.getElementById('host-class').value;
   var uk=document.getElementById('host-unit').value;
-  var unit=UNITS.find(function(u){return u.key===uk;})||UNITS[0];
-  var stages=unit.stagesMap[cl]||unit.stagesMap['Primary 4']||[];
-  var pool=[];
-  stages.forEach(function(st){
-    st.words.forEach(function(w){if(pool.indexOf(w)===-1)pool.push(w);});
-  });
-  var qs=shuffle(pool).slice(0,10);
-  var houses=getHostHouses();
+  var isMath=uk==='maths';
+  var qs=[];
 
+  if(isMath){
+    // Generate math questions from MATH_STAGES for this class
+    var mstages=MATH_STAGES[cl]||MATH_STAGES['Primary 4']||[];
+    // Mix from all stages, 10 questions
+    var allQs=[];
+    mstages.forEach(function(st){
+      try{var gen=st.gen();allQs=allQs.concat(gen);}catch(e){}
+    });
+    qs=shuffle(allQs).slice(0,10).map(function(q){
+      // Serialize math question for Firestore
+      return {isMath:true,q:q.q,a:q.a,opts:q.opts,type:q.type,emoji:q.emoji||'🔢'};
+    });
+  }else{
+    var unit=UNITS.find(function(u){return u.key===uk;})||UNITS[0];
+    var stages=unit.stagesMap[cl]||unit.stagesMap['Primary 4']||[];
+    var pool=[];
+    stages.forEach(function(st){
+      st.words.forEach(function(w){if(pool.indexOf(w)===-1)pool.push(w);});
+    });
+    qs=shuffle(pool).slice(0,10);
+  }
+
+  var houses=getHostHouses();
   var btn=document.getElementById('host-start-btn');
   if(btn){btn.textContent='Sending to students\u2026';btn.disabled=true;}
 
   FB.onReady(function(){
     var ref=FB.db.collection(COMP_COL).doc(COMP.roomCode);
-    // Phase 1: status='picking' — students see house picker, but questions haven't started
     ref.set({
       status:'picking',
       houses:houses,
       questions:qs,
+      isMath:isMath,
       qIdx:0,
       startedAt:0
     },{merge:true}).then(function(){
-      COMP.questions=qs;COMP.houses=houses;
-      // Show Phase 2 begin button, hide Phase 1
+      COMP.questions=qs;COMP.houses=houses;COMP.isMath=isMath;
       if(btn)btn.style.display='none';
       var beginBtn=document.getElementById('host-begin-btn');
       if(beginBtn)beginBtn.style.display='';
       var pw=document.getElementById('host-picked-wrap');
       if(pw)pw.style.display='flex';
       toast('Students can now pick their house!',2000);
-      // Update picked count in real time
       if(COMP.listener)COMP.listener();
       COMP.listener=ref.onSnapshot(function(doc){
         if(!doc.exists)return;
@@ -2612,6 +4049,7 @@ function joinFindRoom(){
       if(d.status==='picking'&&d.houses&&d.houses.length>0){
         COMP.questions=d.questions||[];
         COMP.houses=d.houses;
+        COMP.isMath=d.isMath||false;
         // Only build house picker if student hasn't already picked
         if(COMP.houseIdx===null){
           var s3=document.getElementById('join-step3');
@@ -2703,26 +4141,43 @@ function startCompPlay(){
 
 function renderCompQ(){
   if(COMP.qIdx>=COMP.questions.length){showCompEnd(COMP.houses);return;}
-  var key=COMP.questions[COMP.qIdx];
-  var wd=WORDS[key];if(!wd)return;
+  var q=COMP.questions[COMP.qIdx];
   var card=document.getElementById('play-card');
   var pm=document.getElementById('play-msg');if(pm){pm.textContent='';pm.className='q-msg';}
   document.getElementById('play-qnum').textContent='Question '+(COMP.qIdx+1)+' of '+COMP.questions.length;
-  // Build 4-option match question
-  var pool=COMP.questions.filter(function(k){return k!==key;});
-  var wrongs=shuffle(pool).slice(0,3);
-  var opts=shuffle([key].concat(wrongs));
-  var html='<span style="font-size:52px;display:block;text-align:center;margin-bottom:8px">'+wd.emoji+'</span>';
-  html+='<div style="font-size:14px;color:var(--sl);text-align:center;margin-bottom:14px;line-height:1.5">'+wd.def+'</div>';
-  html+='<div class="opts">';
-  opts.forEach(function(k){
-    var w=WORDS[k];if(!w)return;
-    html+='<button class="opt" onclick="compPick(\''+k+'\',\''+key+'\')">'+w.word+'</button>';
-  });
-  html+='</div>';
-  card.innerHTML=html;
-  // Timer — 10 seconds
-  var timeLeft=10;
+
+  if(q&&q.isMath){
+    // ── Math question ──
+    var lines=(q.q||'').split('\n');
+    var html='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:26px;color:#EA580C;margin-bottom:10px">'+lines[0]+'</div>';
+    for(var i=1;i<lines.length;i++) html+='<div style="font-size:14px;color:var(--sl);margin-bottom:4px">'+lines[i]+'</div>';
+    html+='<div class="opts" style="margin-top:14px">';
+    (q.opts||[]).forEach(function(opt){
+      var safeOpt=String(opt).replace(/'/g,"\\'");
+      html+='<button class="opt" data-opt="'+String(opt).replace(/"/g,'&quot;')+'" onclick="compPickMath(this,\''+safeOpt+'\')">'+opt+'</button>';
+    });
+    html+='</div>';
+    card.innerHTML=html;
+  }else{
+    // ── Vocab question ──
+    var key=q;
+    var wd=WORDS[key];if(!wd)return;
+    var pool=COMP.questions.filter(function(k){return typeof k==='string'&&k!==key;});
+    var wrongs=shuffle(pool).slice(0,3);
+    var opts=shuffle([key].concat(wrongs));
+    var html='<span style="font-size:52px;display:block;text-align:center;margin-bottom:8px">'+wd.emoji+'</span>';
+    html+='<div style="font-size:14px;color:var(--sl);text-align:center;margin-bottom:14px;line-height:1.5">'+wd.def+'</div>';
+    html+='<div class="opts">';
+    opts.forEach(function(k){
+      var w=WORDS[k];if(!w)return;
+      html+='<button class="opt" onclick="compPick(\''+k+'\',\''+key+'\')">'+w.word+'</button>';
+    });
+    html+='</div>';
+    card.innerHTML=html;
+  }
+
+  // Timer — 15 seconds for maths, 10 for vocab
+  var timeLeft=q&&q.isMath?15:10;
   var timerEl=document.getElementById('play-timer');
   if(timerEl)timerEl.textContent=timeLeft;
   if(COMP.timer)clearInterval(COMP.timer);
@@ -2731,9 +4186,37 @@ function renderCompQ(){
     if(timerEl)timerEl.textContent=timeLeft;
     if(timeLeft<=0){
       clearInterval(COMP.timer);
-      compPick(null,key); // time out = wrong
+      var qc=COMP.questions[COMP.qIdx];
+      if(qc&&qc.isMath)compPickMath(null,null);
+      else compPick(null,qc);
     }
   },1000);
+}
+
+function compPickMath(btn,chosen){
+  clearInterval(COMP.timer);
+  var q=COMP.questions[COMP.qIdx];
+  var isRight=chosen!==null&&chosen===q.a;
+  var card=document.getElementById('play-card');
+  if(card)card.querySelectorAll('.opt').forEach(function(b){
+    b.classList.add('dis');
+    if(b.getAttribute('data-opt')===String(q.a))b.classList.add('ok');
+    else if(b===btn&&!isRight)b.classList.add('no');
+  });
+  var pm=document.getElementById('play-msg');
+  if(isRight){
+    COMP.myScore+=10;
+    if(pm){pm.textContent='✅ Correct! +10 pts';pm.className='q-msg ok';}
+    var pid=STU.uid||STU.name||'guest';
+    compUpdatePlayer(pid,{score:COMP.myScore});
+    var house=COMP.houses[COMP.houseIdx];
+    if(house){house.score=(house.score||0)+10;compUpdateHouseScore(COMP.houseIdx,house.score);}
+    document.getElementById('play-score-disp').textContent=COMP.myScore+' pts';
+  }else{
+    if(pm){pm.textContent='❌ '+(chosen===null?'Time up!':'Wrong!')+' Answer: '+q.a;pm.className='q-msg no';}
+  }
+  COMP.qIdx++;
+  setTimeout(renderCompQ,1800);
 }
 
 function compPick(chosen,correct){
@@ -2949,6 +4432,8 @@ function resetInactivityTimer(){
 });
 
 // ════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',init);
+
 var FB={initialized:false,db:null,user:null,_queue:[],
   onReady:function(cb){if(this.initialized)cb();else this._queue.push(cb);},
   config:{apiKey:"AIzaSyBkFcDVdffmE79rcOZZsLzWD8OQjsIrJdY",authDomain:"blestonex-edulab.firebaseapp.com",projectId:"blestonex-edulab",storageBucket:"blestonex-edulab.firebasestorage.app",messagingSenderId:"499765711214",appId:"1:499765711214:web:81114c1e391add78b2717f"},
