@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="EduLab">
 <meta name="application-name" content="EduLab">
 <meta name="description" content="Blestonex EduLab — vocabulary learning for Nigerian primary schools">
-<link id="pwa-manifest" rel="manifest">
+<link rel="manifest" href="manifest.json">
 <title>Blestonex EduLab</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -286,6 +286,7 @@ body{display:flex;flex-direction:column}
       </div>
       <div style="display:flex;gap:8px;flex-shrink:0">
         <button onclick="openCompMenu()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);border-radius:10px;color:#fff;padding:8px 12px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;white-space:nowrap">🏆</button>
+        <button onclick="openLeaderboard()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);border-radius:10px;color:#fff;padding:8px 12px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;white-space:nowrap">🏅</button>
         <button onclick="openAdmin()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);border-radius:10px;color:#fff;padding:8px 12px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;white-space:nowrap">⚙️ Admin</button>
       </div>
     </div>
@@ -414,7 +415,7 @@ body{display:flex;flex-direction:column}
     <div class="subj-card" onclick="openLessonList()">
       <div class="subj-head">
         <div class="subj-icon" style="background:#E0F0FF;color:#1565C0">📖</div>
-        <div class="subj-meta"><div class="subj-name">English & General Studies</div><div class="subj-desc">Animals · Body · Food · Colours · Science · Social Studies</div></div>
+        <div class="subj-meta"><div class="subj-name">English & General Studies</div><div class="subj-desc">Animals · Body · Food · Colours · Science · Social · Verbal · Quantitative</div></div>
         <span style="font-size:22px;color:var(--sm)">›</span>
       </div>
       <div class="subj-prog">
@@ -439,7 +440,7 @@ body{display:flex;flex-direction:column}
         <div class="subj-icon" style="background:rgba(255,255,255,.15);color:#fff;font-size:24px">🎮</div>
         <div class="subj-meta">
           <div class="subj-name" style="color:#fff">Join Competition</div>
-          <div class="subj-desc" style="color:rgba(255,255,255,.6)">Enter room code to play live quiz</div>
+          <div class="subj-desc" style="color:rgba(255,255,255,.6)">Animals · Body · Food · Colours · Science · Social · Verbal · Quantitative</div>
         </div>
         <span style="font-size:22px;color:rgba(255,255,255,.4)">›</span>
       </div>
@@ -717,6 +718,8 @@ body{display:flex;flex-direction:column}
       <option value="colours">Colours &amp; Shapes</option>
       <option value="science">Basic Science</option>
       <option value="social">Social Studies</option>
+      <option value="verbal">Verbal Reasoning</option>
+      <option value="quantitative">Quantitative Reasoning</option>
       <option value="maths">Mathematics</option>
     </select>
     <select id="perf-sort" onchange="renderPerformance()" style="flex:1;min-width:120px;padding:8px 10px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1E1B4B">
@@ -917,6 +920,7 @@ body{display:flex;flex-direction:column}
   </div>
   <div style="background:rgba(0,0,0,.1);padding:8px 16px;flex-shrink:0;display:flex;gap:8px;align-items:center">
     <select id="outline-class" onchange="loadOutlineForClass()" style="flex:1;padding:7px 10px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1E1B4B">
+      <option>Nursery 1</option><option>Nursery 2</option>
       <option>Primary 1</option><option>Primary 2</option><option>Primary 3</option>
       <option>Primary 4</option><option>Primary 5</option><option>Primary 6</option>
       <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
@@ -926,6 +930,8 @@ body{display:flex;flex-direction:column}
       <option value="animals">Animals</option><option value="body">My Body</option>
       <option value="food">Food</option><option value="colours">Colours</option>
       <option value="science">Science</option><option value="social">Social Studies</option>
+      <option value="verbal">Verbal Reasoning</option>
+      <option value="quantitative">Quantitative Reasoning</option>
       <option value="maths">Mathematics</option>
     </select>
   </div>
@@ -985,7 +991,7 @@ body{display:flex;flex-direction:column}
 <div id="leaderboard" class="screen" style="background:linear-gradient(145deg,#0F172A,#1E1B4B)">
   <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
     <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:20px;color:#fff">🏅 School Leaderboard</div>
-    <button onclick="SS('home')" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.6);padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer">✕ Close</button>
+    <button onclick="SS(DMODE==='shared'?'roster':'home')" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.6);padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer">✕ Close</button>
   </div>
   <div style="padding:0 16px 12px;font-size:12px;color:rgba(255,255,255,.4);flex-shrink:0" id="lb-updated"></div>
   <div class="content" id="lb-list" style="padding:0 16px 16px;gap:8px"></div>
@@ -2021,13 +2027,115 @@ var SOCIAL_STAGES={
   SCIENCE_STAGES[cl]=SCIENCE_STAGES['SSS 1'].map(function(s){return Object.assign({},s,{id:s.id.replace('sc-s1','sc-'+prefix)});});
   SOCIAL_STAGES[cl]=SOCIAL_STAGES['SSS 1'].map(function(s){return Object.assign({},s,{id:s.id.replace('ss-sss1','ss-'+prefix)});});
 });
+// ════════════════════════════════════════
+// VERBAL REASONING STAGES
+// ════════════════════════════════════════
+var VERBAL_STAGES={
+  'Primary 3':[
+    {id:'vr-p3-s1',label:'Stage 1 — Word Groups',      emoji:'🔤',words:['similar','opposite','related','different']},
+    {id:'vr-p3-s2',label:'Stage 2 — Odd One Out',      emoji:'🔍',words:['classify','category','belong','exclude']},
+    {id:'vr-p3-s3',label:'Stage 3 — Analogies',        emoji:'🔗',words:['analogy','pattern','pair','compare']}
+  ],
+  'Primary 4':[
+    {id:'vr-p4-s1',label:'Stage 1 — Synonyms',         emoji:'🔤',words:['synonym','similar','equivalent','alike']},
+    {id:'vr-p4-s2',label:'Stage 2 — Antonyms',         emoji:'↔️', words:['antonym','opposite','contrary','reverse']},
+    {id:'vr-p4-s3',label:'Stage 3 — Word Completion',  emoji:'📝',words:['complete','missing','letter','sequence']},
+    {id:'vr-p4-s4',label:'Stage 4 — Analogies',        emoji:'🔗',words:['analogy','relationship','pattern','link']}
+  ],
+  'Primary 5':[
+    {id:'vr-p5-s1',label:'Stage 1 — Synonyms & Antonyms',emoji:'🔤',words:['synonym','antonym','similar','opposite']},
+    {id:'vr-p5-s2',label:'Stage 2 — Word Series',      emoji:'📊',words:['series','sequence','pattern','order']},
+    {id:'vr-p5-s3',label:'Stage 3 — Classifications',  emoji:'🗂️', words:['classify','category','group','sort']},
+    {id:'vr-p5-s4',label:'Stage 4 — Coding',           emoji:'🔐',words:['code','cipher','substitute','decode']},
+    {id:'vr-p5-s5',label:'Stage 5 — Logical Reasoning',emoji:'🧠',words:['logic','conclusion','premise','argument']}
+  ],
+  'Primary 6':[
+    {id:'vr-p6-s1',label:'Stage 1 — Synonyms & Antonyms',emoji:'🔤',words:['synonym','antonym','similar','opposite']},
+    {id:'vr-p6-s2',label:'Stage 2 — Analogies',         emoji:'🔗',words:['analogy','proportion','relationship','correlation']},
+    {id:'vr-p6-s3',label:'Stage 3 — Odd One Out',       emoji:'🔍',words:['classify','category','exception','exclude']},
+    {id:'vr-p6-s4',label:'Stage 4 — Coding & Decoding', emoji:'🔐',words:['cipher','decode','encode','substitute']},
+    {id:'vr-p6-s5',label:'Stage 5 — Sequences',         emoji:'📊',words:['sequence','series','pattern','consecutive']}
+  ],
+  'JSS 1':[
+    {id:'vr-j1-s1',label:'Stage 1 — Synonyms',         emoji:'🔤',words:['synonym','similar','equivalent','identical']},
+    {id:'vr-j1-s2',label:'Stage 2 — Antonyms',         emoji:'↔️', words:['antonym','opposite','contrary','contradictory']},
+    {id:'vr-j1-s3',label:'Stage 3 — Analogies',        emoji:'🔗',words:['analogy','proportion','correspondence','relationship']},
+    {id:'vr-j1-s4',label:'Stage 4 — Classification',   emoji:'🗂️', words:['classification','taxonomy','category','hierarchy']}
+  ],
+  'JSS 2':[
+    {id:'vr-j2-s1',label:'Stage 1 — Word Relationships',emoji:'🔗',words:['relationship','connection','link','association']},
+    {id:'vr-j2-s2',label:'Stage 2 — Logical Sequence', emoji:'📊',words:['sequence','logical','deduction','inference']},
+    {id:'vr-j2-s3',label:'Stage 3 — Mixed Verbal',     emoji:'🧠',words:['analogy','synonym','antonym','classification']}
+  ],
+  'JSS 3':[
+    {id:'vr-j3-s1',label:'Stage 1 — Advanced Analogies',emoji:'🔗',words:['analogy','metaphor','simile','correlation']},
+    {id:'vr-j3-s2',label:'Stage 2 — Critical Reasoning',emoji:'🧠',words:['inference','deduction','conclusion','premise']},
+    {id:'vr-j3-s3',label:'Stage 3 — BECE Prep',        emoji:'🎓',words:['comprehension','vocabulary','reasoning','analysis']}
+  ]
+};
+// Fill lower classes from Primary 4 as default
+['Primary 1','Primary 2','Nursery 1','Nursery 2'].forEach(function(cl){
+  VERBAL_STAGES[cl]=VERBAL_STAGES['Primary 3'];
+});
+
+// ════════════════════════════════════════
+// QUANTITATIVE REASONING STAGES
+// ════════════════════════════════════════
+var QUANT_STAGES={
+  'Primary 3':[
+    {id:'qr-p3-s1',label:'Stage 1 — Number Patterns',  emoji:'🔢',words:['pattern','sequence','next','missing']},
+    {id:'qr-p3-s2',label:'Stage 2 — Simple Operations',emoji:'➕',words:['addition','subtraction','operation','result']},
+    {id:'qr-p3-s3',label:'Stage 3 — Shape Patterns',   emoji:'🔷',words:['shape','pattern','repeat','identify']}
+  ],
+  'Primary 4':[
+    {id:'qr-p4-s1',label:'Stage 1 — Number Series',    emoji:'🔢',words:['series','sequence','consecutive','difference']},
+    {id:'qr-p4-s2',label:'Stage 2 — Missing Numbers',  emoji:'❓',words:['missing','substitute','calculate','value']},
+    {id:'qr-p4-s3',label:'Stage 3 — Simple Fractions', emoji:'🍕',words:['fraction','numerator','denominator','half']},
+    {id:'qr-p4-s4',label:'Stage 4 — Shape Reasoning',  emoji:'🔷',words:['square','triangle','pattern','rotation']}
+  ],
+  'Primary 5':[
+    {id:'qr-p5-s1',label:'Stage 1 — Number Series',    emoji:'🔢',words:['arithmetic','geometric','series','progression']},
+    {id:'qr-p5-s2',label:'Stage 2 — Fraction Problems',emoji:'🍕',words:['fraction','percentage','ratio','proportion']},
+    {id:'qr-p5-s3',label:'Stage 3 — Problem Solving',  emoji:'🧩',words:['problem','solution','method','strategy']},
+    {id:'qr-p5-s4',label:'Stage 4 — Pattern Recognition',emoji:'🔷',words:['pattern','symmetry','rotation','reflection']},
+    {id:'qr-p5-s5',label:'Stage 5 — Speed & Accuracy', emoji:'⚡',words:['speed','accuracy','calculation','mental']}
+  ],
+  'Primary 6':[
+    {id:'qr-p6-s1',label:'Stage 1 — Number Series',    emoji:'🔢',words:['arithmetic','geometric','fibonacci','progression']},
+    {id:'qr-p6-s2',label:'Stage 2 — Ratios & Proportion',emoji:'⚖️',words:['ratio','proportion','fraction','percentage']},
+    {id:'qr-p6-s3',label:'Stage 3 — Problem Solving',  emoji:'🧩',words:['equation','unknown','variable','solution']},
+    {id:'qr-p6-s4',label:'Stage 4 — Data Interpretation',emoji:'📊',words:['graph','table','data','interpret']},
+    {id:'qr-p6-s5',label:'Stage 5 — Common Entrance Prep',emoji:'🎓',words:['comprehension','reasoning','quantitative','aptitude']}
+  ],
+  'JSS 1':[
+    {id:'qr-j1-s1',label:'Stage 1 — Number Bases',     emoji:'🔢',words:['binary','decimal','octal','hexadecimal']},
+    {id:'qr-j1-s2',label:'Stage 2 — Algebra',          emoji:'🔣',words:['variable','expression','equation','substitute']},
+    {id:'qr-j1-s3',label:'Stage 3 — Geometry',         emoji:'📐',words:['angle','parallel','perpendicular','polygon']}
+  ],
+  'JSS 2':[
+    {id:'qr-j2-s1',label:'Stage 1 — Data & Statistics',emoji:'📊',words:['mean','median','mode','frequency']},
+    {id:'qr-j2-s2',label:'Stage 2 — Graphs',           emoji:'📈',words:['axis','coordinate','gradient','intercept']},
+    {id:'qr-j2-s3',label:'Stage 3 — Mixed Quantitative',emoji:'🧩',words:['quantitative','reasoning','estimate','calculate']}
+  ],
+  'JSS 3':[
+    {id:'qr-j3-s1',label:'Stage 1 — BECE Numbers',     emoji:'🔢',words:['integer','fraction','decimal','percentage']},
+    {id:'qr-j3-s2',label:'Stage 2 — BECE Algebra',     emoji:'🔣',words:['equation','inequality','expression','factorisation']},
+    {id:'qr-j3-s3',label:'Stage 3 — BECE Geometry',    emoji:'📐',words:['theorem','angle','triangle','circle']}
+  ]
+};
+['Primary 1','Primary 2','Nursery 1','Nursery 2'].forEach(function(cl){
+  QUANT_STAGES[cl]=QUANT_STAGES['Primary 3'];
+});
+
 var UNITS=[
-  {key:'animals', title:'Animals Around Us',  emoji:'🦁',stagesMap:STAGES},
-  {key:'body',    title:'My Body',            emoji:'🫀',stagesMap:BODY_STAGES},
-  {key:'food',    title:'Food & Drinks',      emoji:'🍎',stagesMap:FOOD_STAGES},
-  {key:'colours', title:'Colours & Shapes',   emoji:'🎨',stagesMap:COLOUR_STAGES},
-  {key:'science', title:'Basic Science',      emoji:'🔬',stagesMap:SCIENCE_STAGES},
-  {key:'social',  title:'Social Studies',     emoji:'🌍',stagesMap:SOCIAL_STAGES}
+  {key:'animals',     title:'Animals Around Us',         emoji:'🦁',stagesMap:STAGES},
+  {key:'body',        title:'My Body',                   emoji:'🫀',stagesMap:BODY_STAGES},
+  {key:'food',        title:'Food & Drinks',             emoji:'🍎',stagesMap:FOOD_STAGES},
+  {key:'colours',     title:'Colours & Shapes',          emoji:'🎨',stagesMap:COLOUR_STAGES},
+  {key:'science',     title:'Basic Science',             emoji:'🔬',stagesMap:SCIENCE_STAGES},
+  {key:'social',      title:'Social Studies',            emoji:'🌍',stagesMap:SOCIAL_STAGES},
+  {key:'verbal',      title:'Verbal Reasoning',          emoji:'🔤',stagesMap:VERBAL_STAGES},
+  {key:'quantitative',title:'Quantitative Reasoning',   emoji:'🔢',stagesMap:QUANT_STAGES}
 ];
 
 // ════════════════════════════════════════
@@ -2172,6 +2280,16 @@ function init(){
       loadModulesFromFirestore(function(mods){
         rebuildCustomUnits(); // rebuild with latest
       });
+      // Pull course outline from Firestore so students see teacher's ordering
+      FB.db.collection('schools').doc(school.code).collection('settings').doc('outline').get()
+        .then(function(doc){
+          if(doc.exists){ls(LK_OUTLINE,doc.data());}
+        }).catch(function(){});
+      // Pull assignments so student sees them immediately
+      FB.db.collection('schools').doc(school.code).collection('settings').doc('assignments').get()
+        .then(function(doc){
+          if(doc.exists&&doc.data().assignments){ls(LK_ASSIGN,doc.data().assignments);}
+        }).catch(function(){});
     }
   });
   var m=lg(LK_MODE);if(!m){SS('splash');return;}
@@ -2572,10 +2690,24 @@ function openLessonList(){
   if(DMODE==='shared')document.getElementById('lessons-sw').style.display='';
   document.getElementById('lessons-bc').textContent='English › '+STU.classLabel+' — All Units';
   var p=prog();
+  var outline=getCourseOutline();
+  var cl=STU.classLabel;
   var list=document.getElementById('lessons-list');list.innerHTML='';
   UNITS.forEach(function(unit){
-    var stages=unit.stagesMap[STU.classLabel]||unit.stagesMap['Nursery 2']||[];
+    var stages=unit.stagesMap[cl]||unit.stagesMap['Nursery 2']||[];
     if(!stages.length)return;
+    // Apply teacher outline: order and visibility
+    var savedUnit=(outline[cl]||{})[unit.key]||[];
+    if(savedUnit.length){
+      var ordered=[];
+      savedUnit.forEach(function(s){
+        var st=stages.find(function(x){return x.id===s.id;});
+        if(st&&!s.hidden)ordered.push(st); // only show non-hidden stages
+      });
+      // If teacher hid all stages for this unit, skip the unit header too
+      if(!ordered.length)return;
+      stages=ordered;
+    }
     var uh=document.createElement('div');uh.className='unit-lbl';
     uh.textContent=unit.emoji+' '+unit.title;list.appendChild(uh);
     stages.forEach(function(st,idx){
@@ -3421,6 +3553,18 @@ function renderPerformance(){
       stageLabelMap[st.id]={label:st.label,unit:'Mathematics',unitKey:'maths',emoji:'🔢'};
     });
   });
+  // Verbal Reasoning stages
+  Object.values(VERBAL_STAGES).forEach(function(stages){
+    (stages||[]).forEach(function(st){
+      stageLabelMap[st.id]={label:st.label,unit:'Verbal Reasoning',unitKey:'verbal',emoji:'🔤'};
+    });
+  });
+  // Quantitative Reasoning stages
+  Object.values(QUANT_STAGES).forEach(function(stages){
+    (stages||[]).forEach(function(st){
+      stageLabelMap[st.id]={label:st.label,unit:'Quantitative Reasoning',unitKey:'quantitative',emoji:'🔢'};
+    });
+  });
 
   // Build valid stage IDs for the selected class
   // For vocab units: use class filter
@@ -3445,6 +3589,8 @@ function renderPerformance(){
   }
   Object.keys(mathClassesToInclude).forEach(function(cl){
     (MATH_STAGES[cl]||[]).forEach(function(st){validStageIds[st.id]=true;});
+    (VERBAL_STAGES[cl]||[]).forEach(function(st){validStageIds[st.id]=true;});
+    (QUANT_STAGES[cl]||[]).forEach(function(st){validStageIds[st.id]=true;});
   });
 
   filteredRoster.forEach(function(s){
@@ -4260,6 +4406,17 @@ function openMathList(overrideClass){
     pick.value=overrideClass||STU.mathLevel||'';
   }
   var stages=MATH_STAGES[cl]||MATH_STAGES['Primary 1']||[];
+  // Apply teacher course outline for maths
+  var _mOutline=getCourseOutline();
+  var _mSaved=(_mOutline[cl]||{})['maths']||[];
+  if(_mSaved.length){
+    var _mOrdered=[];
+    _mSaved.forEach(function(s){
+      var st=stages.find(function(x){return x.id===s.id;});
+      if(st&&!s.hidden)_mOrdered.push(st);
+    });
+    if(_mOrdered.length)stages=_mOrdered;
+  }
   var p=prog();
   var list=document.getElementById('math-list');if(!list)return;
   var headerNote=overrideClass||STU.mathLevel?
@@ -5251,8 +5408,17 @@ function loadOutlineForClass(){loadOutlineStages();}
 function loadOutlineStages(){
   var cl=document.getElementById('outline-class').value||'Primary 1';
   var uk=document.getElementById('outline-unit').value||'animals';
-  var unit=UNITS.find(function(u){return u.key===uk;})||UNITS[0];
-  var stages=(unit.stagesMap[cl]||unit.stagesMap['Primary 4']||[]).slice();
+  var stages=[];
+  if(uk==='maths'){
+    stages=(MATH_STAGES[cl]||MATH_STAGES['Primary 1']||[]).slice();
+  }else if(uk==='verbal'){
+    stages=(VERBAL_STAGES[cl]||VERBAL_STAGES['Primary 1']||[]).slice();
+  }else if(uk==='quantitative'){
+    stages=(QUANT_STAGES[cl]||QUANT_STAGES['Primary 1']||[]).slice();
+  }else{
+    var unit=UNITS.find(function(u){return u.key===uk;})||UNITS[0];
+    stages=(unit.stagesMap[cl]||unit.stagesMap['Nursery 2']||[]).slice();
+  }
   var outline=getCourseOutline();
   var saved=(outline[cl]||{})[uk]||[];
   // Apply saved order and hidden flags
@@ -5751,34 +5917,10 @@ var FB={initialized:false,db:null,user:null,_queue:[],
 })();
 
 // ════════════════════════════════════════
-// PWA — manifest + service worker (both inline blobs, no extra files needed)
+// PWA — service worker registration
 // ════════════════════════════════════════
 (function(){
-  // ── 1. Inject manifest via blob URL ──
-  var MANIFEST = {
-    name: 'Blestonex EduLab',
-    short_name: 'EduLab',
-    description: 'Vocabulary learning for Nigerian primary schools',
-    start_url: '/',
-    display: 'standalone',
-    orientation: 'portrait',
-    background_color: '#7C3AED',
-    theme_color: '#7C3AED',
-    icons: [
-      // SVG icon works on all modern Android/Chrome versions
-      {
-        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%237C3AED'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' font-family='sans-serif'%3E📚%3C/text%3E%3C/svg%3E",
-        sizes: 'any',
-        type: 'image/svg+xml',
-        purpose: 'any maskable'
-      },
-      // PNG fallback generated from canvas at runtime
-      {src:'__PNG192__', sizes:'192x192', type:'image/png', purpose:'any maskable'},
-      {src:'__PNG512__', sizes:'512x512', type:'image/png', purpose:'any maskable'}
-    ]
-  };
-
-  // Generate PNG icons via canvas so we don't need external files
+  // ── Generate PNG icons for splash / meta (not needed for manifest anymore) ──
   function makeIcon(size, cb){
     try{
       var cv=document.createElement('canvas');cv.width=size;cv.height=size;
@@ -5791,15 +5933,13 @@ var FB={initialized:false,db:null,user:null,_queue:[],
       cb(cv.toDataURL('image/png'));
     }catch(e){cb(null);}
   }
-
-  makeIcon(192,function(p192){makeIcon(512,function(p512){
-    var m=JSON.parse(JSON.stringify(MANIFEST));
-    if(p192)m.icons[1].src=p192; else m.icons.splice(1,1);
-    if(p512)m.icons[m.icons.length-1].src=p512; else m.icons.splice(-1,1);
-    var blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
-    var el=document.getElementById('pwa-manifest');
-    if(el)el.href=URL.createObjectURL(blob);
-  });});
+  // Set apple-touch-icon dynamically for iOS
+  makeIcon(192,function(p192){
+    if(!p192)return;
+    var link=document.querySelector('link[rel="apple-touch-icon"]')||document.createElement('link');
+    link.rel='apple-touch-icon';link.href=p192;
+    if(!link.parentNode)document.head.appendChild(link);
+  });
 
   // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
