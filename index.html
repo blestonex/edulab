@@ -179,14 +179,13 @@ body{display:flex;flex-direction:column}
 .spell-display{display:flex;justify-content:center;align-items:center;gap:5px;min-height:58px;border:2px dashed var(--bd);border-radius:var(--rs);padding:10px;margin-bottom:10px;flex-wrap:wrap;background:var(--slt)}
 .ss{width:38px;height:46px;border:2.5px solid var(--t);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;flex-shrink:0}
 .ss:not(.filled){background:rgba(255,255,255,.7);border-style:dashed}
-.ss.filled{background:var(--tl);border-style:solid}
-.ss.ok{border-color:#2E7D32;background:#E8F5E9}
-.ss.no{border-color:var(--err);background:var(--errl)}
+.ss.filled{background:#EDE9FE;border-color:#7C3AED;border-style:solid;transform:scale(1.06);transition:background .1s ease,transform .1s ease}
+.ss.filled .ssltr{color:#4C1D95;font-size:20px}
+.ss.ok{border-color:#2E7D32!important;background:#E8F5E9!important;transform:none}
+.ss.no{border-color:var(--err)!important;background:var(--errl)!important;transform:none}
 .ssltr{font-family:'Nunito',sans-serif;font-weight:900;font-size:19px;color:var(--t);line-height:1;pointer-events:none}
 .ss.ok .ssltr{color:#2E7D32}
 .ss.no .ssltr{color:var(--err)}
-.ss.filled{background:#EDE9FE;border-color:#7C3AED;transform:scale(1.05);transition:all .1s ease}
-.ss.filled .ssltr{color:#4C1D95}
 .spell-gap{width:12px;flex-shrink:0}
 .pool{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .lt{width:40px;height:46px;border:2px solid var(--bd);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:18px;color:var(--sl);background:#fff;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.07);transition:transform .1s}
@@ -379,6 +378,9 @@ body{display:flex;flex-direction:column}
       </button>
       <button onclick="openAssignments()" style="padding:14px 10px;background:#7E22CE;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left">
         📝 Assignments<br><span style="font-weight:600;opacity:.8;font-size:11px">Set homework stages</span>
+      </button>
+      <button onclick="openLessonNotes()" style="padding:14px 10px;background:#0369A1;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left;grid-column:1/-1">
+        📖 Lesson Notes<br><span style="font-weight:600;opacity:.8;font-size:11px">Write reading content for students — definitions, examples, extra notes</span>
       </button>
     </div>
     <button onclick="exportProgressReport()" style="width:100%;padding:14px;background:#15803D;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:12px">
@@ -1007,6 +1009,66 @@ body{display:flex;flex-direction:column}
     <div style="display:flex;gap:12px;width:100%;max-width:340px;margin-top:8px">
       <button id="ob-skip" onclick="finishOnboarding()" style="flex:1;padding:14px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:12px;color:rgba(255,255,255,.6);font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer">Skip</button>
       <button id="ob-next" onclick="obNext()" style="flex:2;padding:14px;background:#fff;color:#4C1D95;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;cursor:pointer">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ LESSON NOTES EDITOR (admin) ════ -->
+<div id="lesson-notes" class="screen" style="background:linear-gradient(180deg,#0369A1 0%,#0369A1 110px,#F0F9FF 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#0369A1,#0284C7)">
+    <button class="tback" onclick="SS('admin')">‹</button>
+    <div class="tlogo">Lesson <span>Notes</span></div>
+    <button onclick="saveLessonNote()" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);border-radius:8px;color:#fff;padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">Save ✓</button>
+  </div>
+  <div style="background:rgba(0,0,0,.1);padding:8px 16px;flex-shrink:0;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <select id="ln-class" onchange="loadLessonNoteStages()" style="flex:1;min-width:110px;padding:7px 10px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1E1B4B">
+      <option>Nursery 1</option><option>Nursery 2</option>
+      <option>Primary 1</option><option>Primary 2</option><option>Primary 3</option>
+      <option>Primary 4</option><option>Primary 5</option><option>Primary 6</option>
+      <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
+      <option>SSS 1</option><option>SSS 2</option><option>WAEC/JAMB</option>
+    </select>
+    <select id="ln-unit" onchange="loadLessonNoteStages()" style="flex:1;min-width:110px;padding:7px 10px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1E1B4B">
+      <option value="animals">Animals</option><option value="body">My Body</option>
+      <option value="food">Food</option><option value="colours">Colours</option>
+      <option value="science">Science</option><option value="social">Social Studies</option>
+      <option value="verbal">Verbal Reasoning</option>
+      <option value="quantitative">Quantitative Reasoning</option>
+      <option value="maths">Mathematics</option>
+    </select>
+    <select id="ln-stage" onchange="loadLessonNoteForStage()" style="flex:1;min-width:110px;padding:7px 10px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1E1B4B"></select>
+  </div>
+  <div class="content" style="padding:16px;gap:12px">
+    <div style="background:#DBEAFE;border-radius:10px;padding:10px 14px;font-size:12px;color:#1D4ED8;font-weight:700;flex-shrink:0">
+      📖 Write a lesson note for students to read before they start this stage. Use blank lines to separate paragraphs. Start a line with • for bullet points.
+    </div>
+    <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08);flex:1;display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#0369A1;margin-bottom:6px">Note Title</div>
+        <input id="ln-title" type="text" placeholder="e.g. Introduction to Enzymes" maxlength="80" style="width:100%;padding:10px 12px;border:1.5px solid #BAE6FD;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:15px">
+      </div>
+      <div style="flex:1">
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#0369A1;margin-bottom:6px">Lesson Content</div>
+        <textarea id="ln-body" placeholder="Write your lesson note here...&#10;&#10;Use blank lines between paragraphs.&#10;Start a line with • for bullet points.&#10;&#10;Example:&#10;Enzymes are biological catalysts that speed up chemical reactions in living organisms.&#10;&#10;Key facts:&#10;• Enzymes are made of protein&#10;• Each enzyme works on a specific substrate&#10;• Temperature and pH affect enzyme activity" style="width:100%;min-height:280px;padding:12px;border:1.5px solid #BAE6FD;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:600;font-size:14px;line-height:1.7;resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div id="ln-status" style="flex:1;font-size:12px;color:#0369A1;font-weight:700"></div>
+        <button onclick="deleteLessonNote()" style="padding:8px 14px;background:#FEF2F2;border:1.5px solid #FCA5A5;color:#DC2626;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">🗑 Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ LESSON NOTE READER (student) ════ -->
+<div id="lesson-reader" class="screen" style="background:linear-gradient(180deg,#0369A1 0%,#0369A1 110px,#F8FAFF 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#0369A1,#0284C7)">
+    <button class="tback" onclick="SS('lessons')">‹</button>
+    <div class="tlogo">📖 Lesson <span>Note</span></div>
+  </div>
+  <div class="content" style="padding:0">
+    <div id="reader-body" style="flex:1;overflow-y:auto;padding:20px 18px;font-family:'Nunito',sans-serif;color:#1E1B4B;line-height:1.8"></div>
+    <div style="padding:14px 16px;background:#fff;border-top:1.5px solid #E5E7EB;flex-shrink:0;display:flex;gap:10px">
+      <button onclick="startStageFromReader()" style="flex:1;padding:14px;background:linear-gradient(135deg,#1565C0,#1976D2);color:#fff;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;cursor:pointer">Start Learning →</button>
     </div>
   </div>
 </div>
@@ -2290,6 +2352,11 @@ function init(){
         .then(function(doc){
           if(doc.exists&&doc.data().assignments){ls(LK_ASSIGN,doc.data().assignments);}
         }).catch(function(){});
+      // Pull lesson notes so students see 📖 badges immediately
+      FB.db.collection('schools').doc(school.code).collection('notes').get()
+        .then(function(snap){
+          snap.forEach(function(doc){_LN_CACHE[doc.id]=doc.data();});
+        }).catch(function(){});
     }
   });
   var m=lg(LK_MODE);if(!m){SS('splash');return;}
@@ -2722,12 +2789,22 @@ function openLessonList(){
       var ic=passed?'✅':unlocked?st.emoji:'🔒';
       var sub=[...new Set(st.words)].map(function(k){return WORDS[k]?WORDS[k].word:k;}).join(', ');
       var statusTxt=passed?('Best: '+(sp.bestScore||0)+'%'):!gateUnlocked?'🔑 Activate school code to unlock':unlocked?'Tap to start':'Complete the previous stage first';
+      var hasNote=_LN_CACHE[st.id]&&_LN_CACHE[st.id].body;
+      var noteBadge=hasNote?'<span style="font-size:11px;background:#DBEAFE;color:#1D4ED8;border-radius:4px;padding:1px 5px;font-weight:800;margin-left:6px">📖 Note</span>':'';
       row.innerHTML='<div class="stage-ic" style="background:'+bg+';color:'+fg+'">'+ic+'</div>'
-        +'<div class="stage-meta"><div class="stage-name">'+st.label+'</div><div class="stage-words">'+sub+'</div>'
+        +'<div class="stage-meta"><div class="stage-name">'+st.label+noteBadge+'</div><div class="stage-words">'+sub+'</div>'
         +'<div class="stage-words" style="margin-top:3px;color:'+fg+'">'+statusTxt+'</div></div>'
         +(passed?'<div class="stage-stars">'+starsStr(sp.stars||0)+'</div>':'')
         +'<span style="font-size:20px;color:#9CA3AF">›</span>';
-      if(unlocked)(function(ukey,sidx){row.onclick=function(){startStage(ukey,sidx);};})(unit.key,idx);
+      if(unlocked)(function(ukey,sidx){
+        row.onclick=function(){
+          if(_LN_CACHE[stages[sidx].id]&&_LN_CACHE[stages[sidx].id].body){
+            openLessonReader(ukey,sidx);
+          }else{
+            startStage(ukey,sidx);
+          }
+        };
+      })(unit.key,idx);
       list.appendChild(row);
     });
   });
@@ -2898,17 +2975,21 @@ function optPick(btn,correctKey,isTest){
 // ── SPELL ──
 var SS2={};// spell state (named SS2 to avoid clash with screen switcher SS)
 var spellPending=false; // prevents double-fire of auto-check timeout
+var _spellEpoch=0;      // increments each new spell question — stale timeouts bail if epoch changed
+
 function renderSpell(card,wd,q,isTest){
+  _spellEpoch++;         // new question = new epoch, kills any pending resetSpell/checkSpell
+  spellPending=false;
   var sa=wd.spellAs||wd.word.toLowerCase().replace(/\s+/g,'');
   var letters=sa.split('');
   var pool=letters.slice();
-  if((STU.classLabel||'').match(/Primary [3-6]/)){
+  if((STU.classLabel||'').match(/Primary [3-6]|JSS|SSS|WAEC/)){
     var dec='bcdfghjklmnpqrstvwxyz'.split('').filter(function(c){return !letters.includes(c);});
     pool=pool.concat(shuffle(dec).slice(0,2));
   }
   pool=shuffle(pool);
   var twoW=!!(wd.spellDisplay&&wd.spellDisplay.length===2);
-  SS2={answer:letters,placed:new Array(letters.length).fill(null),pool:pool,poolUsed:{},isTest:isTest,twoW:twoW,spellDisplay:wd.spellDisplay||null,key:q.key};
+  SS2={answer:letters,placed:new Array(letters.length).fill(null),pool:pool,poolUsed:{},isTest:isTest,twoW:twoW,spellDisplay:wd.spellDisplay||null,key:q.key,epoch:_spellEpoch};
 
   var slots='<div class="spell-display" id="sdis">';
   if(twoW&&wd.spellDisplay){
@@ -2927,7 +3008,6 @@ function renderSpell(card,wd,q,isTest){
   card.innerHTML='<span class="q-em">'+wd.emoji+'</span><div class="q-def">'+wd.def+'</div>'+slots+poolHtml;
 
   if(isTest){
-    // Show the "Check Answer" action bar, hide hint
     document.getElementById('t-action').style.display='';
     document.getElementById('t-submit').disabled=true;
     document.getElementById('t-hint-wrap').style.display='';
@@ -2936,40 +3016,77 @@ function renderSpell(card,wd,q,isTest){
   }
 }
 
+// ── Spell helpers — always scope to active card to avoid cross-card DOM collision ──
+function ssCard(){
+  // Returns the currently active spell card container
+  return SS2.isTest
+    ? document.getElementById('t-card')
+    : document.getElementById('pr-card');
+}
+function ssSlot(i){
+  var c=ssCard();
+  return c?c.querySelector('#ss'+i):null;
+}
+function ssPoolTile(pi){
+  var c=ssCard();
+  return c?c.querySelector('#lt'+pi):null;
+}
+
 function ssPlace(letter,pi){
+  if(!SS2||!SS2.placed)return;
   if(SS2.poolUsed[pi])return;
   var ei=-1;for(var i=0;i<SS2.placed.length;i++){if(SS2.placed[i]===null){ei=i;break;}}
   if(ei===-1)return;
   SS2.placed[ei]=letter;SS2.poolUsed[pi]=true;
-  var lt=document.getElementById('lt'+pi);if(lt)lt.classList.add('used');
-  var slot=document.getElementById('ss'+ei);
+  var lt=ssPoolTile(pi);if(lt)lt.classList.add('used');
+  var slot=ssSlot(ei);
   if(slot){
-    var sp=slot.querySelector('.ssltr');if(sp)sp.textContent=letter.toUpperCase();
-    slot.classList.add('filled');slot.setAttribute('data-pi',pi);
+    var sp=slot.querySelector('.ssltr');
+    if(sp)sp.textContent=letter.toUpperCase();
+    slot.classList.add('filled');
+    slot.setAttribute('data-pi',pi);
   }
   if(SS2.placed.indexOf(null)===-1){
     if(SS2.isTest){
       var sb=document.getElementById('t-submit');if(sb)sb.disabled=false;
     }else if(!spellPending){
-      spellPending=true;setTimeout(checkSpell,150);
+      spellPending=true;
+      var _ep=SS2.epoch; // capture epoch NOW
+      setTimeout(function(){
+        if(_ep!==_spellEpoch)return; // question changed — bail
+        checkSpell();
+      },150);
     }
   }
 }
+
 function ssRemove(i){
-  if(SS2.placed[i]===null)return;
-  var slot=document.getElementById('ss'+i);if(!slot||!slot.classList.contains('filled'))return;
+  if(!SS2||!SS2.placed||SS2.placed[i]===null)return;
+  var slot=ssSlot(i);if(!slot||!slot.classList.contains('filled'))return;
   var pi=slot.getAttribute('data-pi');
-  if(pi!==null){delete SS2.poolUsed[pi];var lt=document.getElementById('lt'+pi);if(lt)lt.classList.remove('used');}
+  if(pi!==null){
+    delete SS2.poolUsed[pi];
+    var lt=ssPoolTile(pi);if(lt)lt.classList.remove('used');
+  }
   SS2.placed[i]=null;
   var sp=slot.querySelector('.ssltr');if(sp)sp.textContent='';
   slot.classList.remove('filled','ok','no');slot.removeAttribute('data-pi');
   if(SS2.isTest){var sb=document.getElementById('t-submit');if(sb)sb.disabled=true;}
 }
+
 function checkSpell(){
-  spellPending=false; // clear flag so future placements can re-queue
-  if(!SS2||!SS2.answer)return; // guard: SS2 may have been reset by screen switch
+  spellPending=false;
+  if(!SS2||!SS2.answer)return;
   var ok=true;
-  SS2.placed.forEach(function(l,i){var s=document.getElementById('ss'+i);if(l&&l.toLowerCase()===SS2.answer[i].toLowerCase()){if(s)s.classList.add('ok');}else{if(s)s.classList.add('no');ok=false;}});
+  SS2.placed.forEach(function(l,i){
+    var s=ssSlot(i);
+    if(l&&l.toLowerCase()===SS2.answer[i].toLowerCase()){
+      if(s)s.classList.add('ok');
+    }else{
+      if(s)s.classList.add('no');
+      ok=false;
+    }
+  });
   if(ok){
     sOk();
     if(SS2.isTest){recordTAnswer(true);}
@@ -2982,22 +3099,30 @@ function checkSpell(){
     sFail();
     if(!SS2.isTest){
       setPMsg(false,'❌ Not quite — try again!');
-      setTimeout(resetSpell,1100);
+      var _resetEp=SS2.epoch; // capture epoch before timeout
+      setTimeout(function(){
+        if(_resetEp!==_spellEpoch)return; // question changed — don't reset new question's state
+        resetSpell();
+      },1100);
     }else{
       recordTAnswer(false);
     }
   }
 }
+
 function resetSpell(){
   spellPending=false;
   if(!SS2||!SS2.answer)return;
-  SS2.placed=new Array(SS2.answer.length).fill(null);SS2.poolUsed={};
-  for(var i=0;i<SS2.answer.length;i++){
-    var s=document.getElementById('ss'+i);
-    if(s){var sp=s.querySelector('.ssltr');if(sp)sp.textContent='';s.classList.remove('filled','ok','no');s.removeAttribute('data-pi');}
-  }
-  for(var p=0;p<SS2.pool.length;p++){var lt=document.getElementById('lt'+p);if(lt)lt.classList.remove('used');}
+  SS2.placed.forEach(function(_,i){
+    var s=ssSlot(i);
+    if(s){s.classList.remove('filled','ok','no');s.removeAttribute('data-pi');var sp=s.querySelector('.ssltr');if(sp)sp.textContent='';}
+  });
+  SS2.placed=new Array(SS2.answer.length).fill(null);
+  SS2.poolUsed={};
+  var c=ssCard();
+  if(c)c.querySelectorAll('.lt').forEach(function(lt){lt.classList.remove('used');});
 }
+
 function spellHint(){
   var first=SS2.answer[0];if(SS2.placed[0]!==null)return;
   for(var i=0;i<SS2.pool.length;i++){if(!SS2.poolUsed[i]&&SS2.pool[i].toLowerCase()===first.toLowerCase()){ssPlace(SS2.pool[i],i);document.getElementById('pr-hint').style.display='none';toast('💡 Hint used!');break;}}
@@ -5380,8 +5505,199 @@ function resetInactivityTimer(){
 
 // ════════════════════════════════════════
 // ════════════════════════════════════════
-// D — COURSE OUTLINE
+// LESSON NOTES — teacher writes, student reads
 // ════════════════════════════════════════
+var _LN_CACHE={}; // stageId → {title, body} — local cache
+var _LN_CURRENT_STAGE=null; // stage info when reader is open
+
+function loadLessonNotesCache(cb){
+  var school=getSchool();
+  if(!school||!school.code){cb({});return;}
+  FB.onReady(function(){
+    if(!FB.db){cb(_LN_CACHE);return;}
+    FB.db.collection('schools').doc(school.code).collection('notes').get()
+      .then(function(snap){
+        snap.forEach(function(doc){_LN_CACHE[doc.id]=doc.data();});
+        cb(_LN_CACHE);
+      }).catch(function(){cb(_LN_CACHE);});
+  });
+}
+
+function openLessonNotes(){
+  SS('lesson-notes');
+  loadLessonNoteStages();
+}
+
+function loadLessonNoteStages(){
+  var cl=document.getElementById('ln-class').value||'Primary 1';
+  var uk=document.getElementById('ln-unit').value||'animals';
+  var stagesSel=document.getElementById('ln-stage');if(!stagesSel)return;
+  var stages=[];
+  if(uk==='maths'){
+    stages=(MATH_STAGES[cl]||MATH_STAGES['Primary 1']||[]);
+  }else if(uk==='verbal'){
+    stages=(VERBAL_STAGES[cl]||VERBAL_STAGES['Primary 3']||[]);
+  }else if(uk==='quantitative'){
+    stages=(QUANT_STAGES[cl]||QUANT_STAGES['Primary 3']||[]);
+  }else{
+    var unit=UNITS.find(function(u){return u.key===uk;})||UNITS[0];
+    stages=(unit.stagesMap[cl]||unit.stagesMap['Nursery 2']||[]);
+  }
+  stagesSel.innerHTML=stages.map(function(st){
+    return '<option value="'+st.id+'">'+st.emoji+' '+st.label+'</option>';
+  }).join('');
+  loadLessonNoteForStage();
+}
+
+function loadLessonNoteForStage(){
+  var stagesSel=document.getElementById('ln-stage');
+  var stageId=stagesSel?stagesSel.value:'';
+  if(!stageId)return;
+  var ti=document.getElementById('ln-title');
+  var bo=document.getElementById('ln-body');
+  var st=document.getElementById('ln-status');
+  // Load from cache or Firestore
+  if(_LN_CACHE[stageId]){
+    if(ti)ti.value=_LN_CACHE[stageId].title||'';
+    if(bo)bo.value=_LN_CACHE[stageId].body||'';
+    if(st)st.textContent='\u2705 Note exists — students will see this before starting';
+  }else{
+    // Try Firestore
+    var school=getSchool();
+    if(school&&school.code){
+      FB.onReady(function(){
+        if(!FB.db){resetLNFields(ti,bo,st);return;}
+        FB.db.collection('schools').doc(school.code).collection('notes').doc(stageId).get()
+          .then(function(doc){
+            if(doc.exists){
+              _LN_CACHE[stageId]=doc.data();
+              if(ti)ti.value=doc.data().title||'';
+              if(bo)bo.value=doc.data().body||'';
+              if(st)st.textContent='\u2705 Note exists — students will see this before starting';
+            }else{
+              resetLNFields(ti,bo,st);
+            }
+          }).catch(function(){resetLNFields(ti,bo,st);});
+      });
+    }else resetLNFields(ti,bo,st);
+  }
+}
+
+function resetLNFields(ti,bo,st){
+  if(ti)ti.value='';
+  if(bo)bo.value='';
+  if(st)st.textContent='No note yet — write one and tap Save';
+}
+
+function saveLessonNote(){
+  var stagesSel=document.getElementById('ln-stage');
+  var stageId=stagesSel?stagesSel.value:'';
+  if(!stageId){toast('Select a stage first.',2000);return;}
+  var title=(document.getElementById('ln-title')||{}).value||'';
+  var body=(document.getElementById('ln-body')||{}).value||'';
+  if(!body.trim()){toast('Write some content before saving.',2000);return;}
+  var data={title:title,body:body,updatedAt:Date.now()};
+  _LN_CACHE[stageId]=data;
+  var school=getSchool();
+  if(!school||!school.code){toast('\u274C No school code — note saved locally only.',2500);return;}
+  var btn=document.querySelector('[onclick="saveLessonNote()"]');
+  if(btn){btn.textContent='Saving\u2026';btn.disabled=true;}
+  FB.onReady(function(){
+    if(!FB.db){if(btn){btn.textContent='Save \u2713';btn.disabled=false;}toast('Saved locally (offline).',2000);return;}
+    FB.db.collection('schools').doc(school.code).collection('notes').doc(stageId)
+      .set(data)
+      .then(function(){
+        if(btn){btn.textContent='Save \u2713';btn.disabled=false;}
+        var st=document.getElementById('ln-status');
+        if(st)st.textContent='\u2705 Note saved — students will see this before starting';
+        toast('\u2705 Lesson note saved!',2000);
+      })
+      .catch(function(e){
+        if(btn){btn.textContent='Save \u2713';btn.disabled=false;}
+        toast('\u26A0\uFE0F Save failed: '+e.message,3000);
+      });
+  });
+}
+
+function deleteLessonNote(){
+  var stagesSel=document.getElementById('ln-stage');
+  var stageId=stagesSel?stagesSel.value:'';
+  if(!stageId||!_LN_CACHE[stageId]){toast('No note to delete.',2000);return;}
+  if(!confirm('Delete this lesson note? Students will no longer see it.'))return;
+  delete _LN_CACHE[stageId];
+  var school=getSchool();
+  if(school&&school.code){
+    FB.onReady(function(){
+      if(!FB.db)return;
+      FB.db.collection('schools').doc(school.code).collection('notes').doc(stageId).delete()
+        .catch(function(e){console.warn('Delete note:',e.message);});
+    });
+  }
+  var ti=document.getElementById('ln-title');var bo=document.getElementById('ln-body');var st=document.getElementById('ln-status');
+  resetLNFields(ti,bo,st);
+  toast('Note deleted.',1800);
+}
+
+// Called from lesson list stage row — open note reader before stage
+function openLessonReader(unitKey,stageIdx){
+  var unit=UNITS.find(function(u){return u.key===unitKey;})||UNITS[0];
+  var cl=STU.classLabel;
+  var stages=unit.stagesMap[cl]||unit.stagesMap['Nursery 2']||[];
+  var st=stages[stageIdx];
+  if(!st)return;
+  var note=_LN_CACHE[st.id];
+  if(!note||!note.body){
+    // No note — go straight to stage
+    startStage(unitKey,stageIdx);return;
+  }
+  _LN_CURRENT_STAGE={unitKey:unitKey,stageIdx:stageIdx};
+  // Render the note
+  var rb=document.getElementById('reader-body');
+  if(rb){
+    var html='<h2 style="font-size:20px;font-weight:900;margin-bottom:16px;color:#0369A1">'
+      +(note.title||st.label)+'</h2>';
+    var lines=note.body.split('\n');
+    var inBullet=false;
+    lines.forEach(function(line){
+      var trimmed=line.trim();
+      if(!trimmed){
+        if(inBullet){html+='</ul>';inBullet=false;}
+        html+='<div style="height:10px"></div>';
+      }else if(trimmed.startsWith('•')||trimmed.startsWith('-')){
+        if(!inBullet){html+='<ul style="margin:0 0 8px 20px;padding:0">';inBullet=true;}
+        html+='<li style="margin-bottom:6px;font-size:15px">'+trimmed.slice(1).trim()+'</li>';
+      }else if(trimmed.startsWith('#')){
+        if(inBullet){html+='</ul>';inBullet=false;}
+        html+='<h3 style="font-size:16px;font-weight:900;color:#0369A1;margin:12px 0 6px">'+trimmed.replace(/^#+\s*/,'')+'</h3>';
+      }else{
+        if(inBullet){html+='</ul>';inBullet=false;}
+        html+='<p style="font-size:15px;margin:0 0 8px;line-height:1.7">'+trimmed+'</p>';
+      }
+    });
+    if(inBullet)html+='</ul>';
+    rb.innerHTML=html;
+  }
+  SS('lesson-reader');
+}
+
+function startStageFromReader(){
+  if(!_LN_CURRENT_STAGE)return;
+  startStage(_LN_CURRENT_STAGE.unitKey,_LN_CURRENT_STAGE.stageIdx);
+}
+
+// Load all notes from Firestore on init so students see them
+function loadAllNotesFromFirestore(cb){
+  var school=getSchool();
+  if(!school||!school.code){cb&&cb();return;}
+  FB.onReady(function(){
+    if(!FB.db){cb&&cb();return;}
+    FB.db.collection('schools').doc(school.code).collection('notes').get()
+      .then(function(snap){
+        snap.forEach(function(doc){_LN_CACHE[doc.id]=doc.data();});
+        cb&&cb();
+      }).catch(function(){cb&&cb();});
+  });
+}
 var LK_OUTLINE='el_outline'; // {classKey: {unitKey: [{id,hidden}]}}
 
 function getCourseOutline(){return lg(LK_OUTLINE)||{};}
