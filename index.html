@@ -254,6 +254,12 @@ body{display:flex;flex-direction:column}
   <div class="setup-body">
     <div id="sw1"><div class="setup-hdr"><h2>What is your name?</h2><p>Your name shows on your progress</p></div><div class="setup-field"><input id="sw-name" class="setup-input" type="text" placeholder="Type your name…" maxlength="30" oninput="swCheck()"></div></div>
     <div id="sw2" style="display:none"><div class="setup-hdr"><h2>What is your class?</h2><p>This sets the right level for you</p></div><div class="class-grid"><button class="class-btn" onclick="swCls(this,'Nursery 1')">Nursery 1</button><button class="class-btn" onclick="swCls(this,'Nursery 2')">Nursery 2</button><button class="class-btn" onclick="swCls(this,'Primary 1')">Primary 1</button><button class="class-btn" onclick="swCls(this,'Primary 2')">Primary 2</button><button class="class-btn" onclick="swCls(this,'Primary 3')">Primary 3</button><button class="class-btn" onclick="swCls(this,'Primary 4')">Primary 4</button><button class="class-btn" onclick="swCls(this,'Primary 5')">Primary 5</button><button class="class-btn" onclick="swCls(this,'Primary 6')">Primary 6</button><button class="class-btn" onclick="swCls(this,'JSS 1')">JSS 1</button><button class="class-btn" onclick="swCls(this,'JSS 2')">JSS 2</button><button class="class-btn" onclick="swCls(this,'JSS 3')">JSS 3</button><button class="class-btn" onclick="swCls(this,'SSS 1')">SSS 1</button><button class="class-btn" onclick="swCls(this,'SSS 2')">SSS 2</button><button class="class-btn" onclick="swCls(this,'WAEC/JAMB')">WAEC/JAMB</button></div></div>
+    <div id="sw2b" style="display:none">
+      <div class="setup-hdr"><h2>Parent's WhatsApp <span style="opacity:.55;font-size:15px;font-weight:700">(optional)</span></h2><p>Your parent gets a free weekly progress update every Friday. Skip if you don't have it now.</p></div>
+      <div class="setup-field"><input id="sw-pwa" class="setup-input" type="tel" placeholder="e.g. 08012345678" maxlength="15" oninput="swPwaCheck()"></div>
+      <div style="font-size:12px;color:rgba(255,255,255,.55);text-align:center;margin-top:6px">Nigerian number. We accept 080… or +2348… formats.</div>
+      <button onclick="swSkipParent()" style="margin-top:14px;width:100%;padding:12px;background:transparent;border:1.5px solid rgba(255,255,255,.28);color:rgba(255,255,255,.85);border-radius:var(--r);font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer">Skip for now</button>
+    </div>
     <div id="sw3" style="display:none">
       <div class="setup-hdr">
         <h2>🔑 Teacher Activation</h2>
@@ -270,7 +276,7 @@ body{display:flex;flex-direction:column}
       <div id="sw-code-status" style="text-align:center;font-size:13px;font-weight:700;margin-top:8px;min-height:20px"></div>
       <p style="text-align:center;font-size:12px;color:rgba(255,255,255,.45);margin-top:8px">Teacher: enter the school code and tap Activate below</p>
     </div>
-    <div class="step-dots"><div class="dot active" id="dot0"></div><div class="dot" id="dot1"></div><div class="dot" id="dot2"></div></div>
+    <div class="step-dots"><div class="dot active" id="dot0"></div><div class="dot" id="dot1"></div><div class="dot" id="dot2"></div><div class="dot" id="dot3"></div></div>
   </div>
   <div class="setup-action"><button id="sw-next" class="btn-sw" disabled onclick="swNext()">Continue →</button></div>
 </div>
@@ -339,6 +345,8 @@ body{display:flex;flex-direction:column}
       <button class="class-btn" onclick="asCls(this,'SSS 2')">SSS 2</button>
       <button class="class-btn" onclick="asCls(this,'WAEC/JAMB')">WAEC/JAMB</button>
     </div>
+    <div class="setup-hdr" style="margin-top:4px"><h2>Parent's WhatsApp <span style="opacity:.55;font-size:15px;font-weight:700">(optional)</span></h2><p>Send weekly progress to this number every Friday. Leave blank to skip.</p></div>
+    <div class="setup-field"><input id="as-pwa" class="setup-input" type="tel" placeholder="e.g. 08012345678" maxlength="15"></div>
   </div>
   <div style="padding:14px 20px 20px;flex-shrink:0">
     <button id="as-save" class="btn-sw" disabled onclick="saveNewStudent()">Save Student →</button>
@@ -365,6 +373,18 @@ body{display:flex;flex-direction:column}
       <div id="admin-brand-preview" style="display:none;margin-top:10px;border-radius:10px;padding:12px 16px;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;align-items:center;gap:8px"></div>
     </div>
 
+    <!-- Teacher details — used in Friday WhatsApp Reports -->
+    <div style="background:#fff;border-radius:var(--r);padding:18px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:#15803D;margin-bottom:4px">👩🏽‍🏫 Your details <span style="font-size:11px;color:var(--sm);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-left:4px">for Friday Reports</span></div>
+      <div style="font-size:12px;color:var(--sm);margin-bottom:12px;line-height:1.5">Your name and contact appear on weekly reports sent to parents. Stored on this device only.</div>
+      <div style="font-size:12px;color:var(--sm);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Teacher name</div>
+      <input id="admin-teacher-name" type="text" placeholder="e.g. Mrs. Grace Adebayo" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:15px;font-family:'Nunito',sans-serif;font-weight:700;margin-bottom:10px" maxlength="50">
+      <div style="font-size:12px;color:var(--sm);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">Reply WhatsApp <span style="opacity:.7;font-weight:500">(optional)</span></div>
+      <input id="admin-teacher-wa" type="tel" placeholder="School or your own, e.g. 08012345678" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:15px;font-family:'Nunito',sans-serif;font-weight:700;margin-bottom:10px" maxlength="15">
+      <div style="font-size:11px;color:var(--sm);line-height:1.5;margin-bottom:10px">💡 Parents will see "Reply to [this number] for any questions". Leave blank to omit.</div>
+      <button onclick="saveTeacherDetails()" style="width:100%;padding:12px;background:#15803D;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer">Save My Details</button>
+    </div>
+
     <!-- Quick action buttons -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
       <button onclick="openCustomModules()" style="padding:14px 10px;background:#7C3AED;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left">
@@ -381,6 +401,9 @@ body{display:flex;flex-direction:column}
       </button>
       <button onclick="openLessonNotes()" style="padding:14px 10px;background:#0369A1;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left;grid-column:1/-1">
         📖 Lesson Notes<br><span style="font-weight:600;opacity:.8;font-size:11px">Write reading content for students — definitions, examples, extra notes</span>
+      </button>
+      <button onclick="openFridayReports()" style="padding:14px 10px;background:#16A34A;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left;grid-column:1/-1">
+        📱 Friday WhatsApp Reports<br><span style="font-weight:600;opacity:.85;font-size:11px">Send parents a weekly progress update — tap, review, send</span>
       </button>
     </div>
     <button onclick="exportProgressReport()" style="width:100%;padding:14px;background:#15803D;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:12px">
@@ -1070,6 +1093,68 @@ body{display:flex;flex-direction:column}
     <div style="padding:14px 16px;background:#fff;border-top:1.5px solid #E5E7EB;flex-shrink:0;display:flex;gap:10px">
       <button onclick="startStageFromReader()" style="flex:1;padding:14px;background:linear-gradient(135deg,#1565C0,#1976D2);color:#fff;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;cursor:pointer">Start Learning →</button>
     </div>
+  </div>
+</div>
+
+<!-- ════ FRIDAY REPORTS (teacher) ════ -->
+<div id="friday-reports" class="screen" style="background:linear-gradient(180deg,#16A34A 0%,#16A34A 110px,#F0FDF4 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#15803D,#16A34A)">
+    <button class="tback" onclick="SS('admin')">‹</button>
+    <div class="tlogo">📱 Friday <span>Reports</span></div>
+  </div>
+  <div class="content" id="fr-content" style="padding:14px 14px 80px">
+    <div style="background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.06)">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:#14532D;margin-bottom:4px">Weekly update for parents</div>
+      <div style="font-size:13px;color:#4B5563;line-height:1.55">Tap a student to preview. Then tap <b>Send via WhatsApp</b> — your WhatsApp opens with the message already written.</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <select id="fr-class-filter" onchange="renderFridayReportList()" style="flex:1;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;background:#fff;color:#1E1B4B">
+        <option value="">All classes</option>
+      </select>
+      <select id="fr-activity-filter" onchange="renderFridayReportList()" style="flex:1;padding:10px 12px;border:1.5px solid var(--bd);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;background:#fff;color:#1E1B4B">
+        <option value="active">Active this week</option>
+        <option value="all">All students</option>
+        <option value="inactive">Inactive this week</option>
+      </select>
+    </div>
+    <div id="fr-stats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div style="background:#fff;border-radius:10px;padding:10px;text-align:center">
+        <div id="fr-stat-eligible" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#14532D">0</div>
+        <div style="font-size:11px;color:#6B7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Ready to send</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:10px;text-align:center">
+        <div id="fr-stat-nowa" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#B45309">0</div>
+        <div style="font-size:11px;color:#6B7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px">No WhatsApp</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:10px;text-align:center">
+        <div id="fr-stat-inactive" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#6B7280">0</div>
+        <div style="font-size:11px;color:#6B7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Inactive</div>
+      </div>
+    </div>
+    <div id="fr-list"></div>
+  </div>
+</div>
+
+<!-- ════ FRIDAY REPORT PREVIEW (teacher) ════ -->
+<div id="friday-preview" class="screen" style="background:linear-gradient(180deg,#15803D 0%,#15803D 110px,#F0FDF4 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#15803D,#16A34A)">
+    <button class="tback" onclick="SS('friday-reports')">‹</button>
+    <div class="tlogo">Preview <span>&amp; Send</span></div>
+  </div>
+  <div class="content" style="padding:14px 14px 20px">
+    <div id="fp-header" style="background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,.06)"></div>
+    <div style="background:#E5FDED;border-radius:14px;padding:16px 14px;margin-bottom:12px;border:1.5px dashed #16A34A">
+      <div style="font-size:11px;font-weight:800;letter-spacing:1px;color:#14532D;text-transform:uppercase;margin-bottom:8px">WhatsApp message preview</div>
+      <pre id="fp-message" style="font-family:'Nunito Sans',sans-serif;font-size:14px;color:#1E1B4B;white-space:pre-wrap;word-wrap:break-word;line-height:1.55;margin:0"></pre>
+    </div>
+    <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#6B7280;line-height:1.6">
+      💡 Tip: if the parent's WhatsApp number is wrong, edit it in the Roster first. The report is based on this student's activity between <b><span id="fp-range"></span></b>.
+    </div>
+    <button id="fp-send" onclick="fpSend()" style="width:100%;padding:16px;background:#25D366;color:#fff;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;cursor:pointer;margin-bottom:9px;display:flex;align-items:center;justify-content:center;gap:10px">
+      <span style="font-size:22px">📱</span> Send via WhatsApp
+    </button>
+    <button onclick="fpCopy()" style="width:100%;padding:13px;background:#F3F4F6;color:#1E1B4B;border:1.5px solid var(--bd);border-radius:12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;margin-bottom:9px">📋 Copy message to clipboard</button>
+    <button onclick="fpMarkSent()" style="width:100%;padding:13px;background:#fff;color:#15803D;border:1.5px solid #15803D;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer">✓ Mark as sent (no WhatsApp)</button>
   </div>
 </div>
 
@@ -2226,6 +2311,19 @@ function saveProg(sid,data){
   var p=lg(LK_PROG)||{};if(!p[sk()])p[sk()]={};
   var prev=p[sk()][sid]||{attempts:0};
   Object.assign(prev,data);
+  // Track when this stage was last touched, so the Friday Report can compute
+  // "this week vs last week" activity. Only stamp on real progress saves
+  // (ones that include at least one tracked field), not no-op saveProg({}) reads.
+  if(data&&(data.passed!==undefined||data.bestScore!==undefined||data.stars!==undefined||data.attempts!==undefined)){
+    prev.lastAttemptAt=Date.now();
+    // Keep a rolling log of the last 10 attempts with score + timestamp.
+    // Used to show trend arrows in the weekly parent report.
+    prev.history=(prev.history||[]);
+    if(data.bestScore!==undefined){
+      prev.history.push({at:Date.now(),score:data.bestScore,passed:!!data.passed});
+      if(prev.history.length>10)prev.history=prev.history.slice(-10);
+    }
+  }
   p[sk()][sid]=prev;ls(LK_PROG,p);
   // Sync progress to Firestore under school collection
   syncStudentToFirestore();
@@ -2246,6 +2344,7 @@ function syncStudentToFirestore(){
       classLabel:STU.classLabel||'',
       uid:STU.uid||studentKey,
       emoji:STU.emoji||'👤',
+      parentWA:STU.parentWA||'',
       mathLevel:STU.mathLevel||'',
       progress:studentProg,
       lastSeen:Date.now()
@@ -2332,9 +2431,18 @@ function init(){
               var dn=document.getElementById('demo-notice');
               if(dn)dn.style.display='';
             }else{
-              // Update cached branding in case it changed
-              ls(LK_SCHOOL,Object.assign({code:school.code},data));
+              // Strip sensitive fields before caching
+              var safe=Object.assign({},data);
+              delete safe.adminPin;
+              delete safe.adminPinHash;
+              // Stamp a fresh verifiedAt so the MAX_OFFLINE_DAYS window resets
+              ls(LK_SCHOOL,Object.assign({code:school.code,verifiedAt:Date.now()},safe));
               applyBranding();
+              // Touch the device's lastSeen so Blestonex sees it as active
+              var deviceId=getDeviceId();
+              FB.db.collection('schools').doc(school.code).collection('devices').doc(deviceId)
+                .set({lastSeen:firebase.firestore.FieldValue.serverTimestamp(),mode:DMODE||'unknown'},{merge:true})
+                .catch(function(){});
             }
           }
         }).catch(function(){});
@@ -2373,11 +2481,60 @@ function pickMode(m){DMODE=m;ls(LK_MODE,m);if(m==='single')startSetup();else sho
 // ════════════════════════════════════════
 // SETUP
 // ════════════════════════════════════════
-var swStep=0,swName='',swClass='';
-function startSetup(){swStep=0;swName='';swClass='';['sw1','sw2','sw3'].forEach(function(id,i){document.getElementById(id).style.display=i===0?'':'none';});document.getElementById('sw-name').value='';swDots(0);document.getElementById('sw-next').disabled=true;SS('setup');}
+var swStep=0,swName='',swClass='',swParentWA='';
+function startSetup(){
+  swStep=0;swName='';swClass='';swParentWA='';
+  ['sw1','sw2','sw2b','sw3'].forEach(function(id,i){
+    var el=document.getElementById(id);if(el)el.style.display=i===0?'':'none';
+  });
+  document.getElementById('sw-name').value='';
+  var pwa=document.getElementById('sw-pwa');if(pwa)pwa.value='';
+  swDots(0);
+  document.getElementById('sw-next').disabled=true;
+  document.getElementById('sw-next').textContent='Continue \u2192';
+  SS('setup');
+}
 function swCheck(){document.getElementById('sw-next').disabled=!document.getElementById('sw-name').value.trim();}
-function swCls(btn,cls){document.querySelectorAll('.class-btn').forEach(function(b){b.classList.remove('sel');});btn.classList.add('sel');swClass=cls;document.getElementById('sw-next').disabled=false;}
-function swDots(a){for(var i=0;i<3;i++){var d=document.getElementById('dot'+i);if(d)d.classList.toggle('active',i===a);}}
+function swCls(btn,cls){document.querySelectorAll('#sw2 .class-btn').forEach(function(b){b.classList.remove('sel');});btn.classList.add('sel');swClass=cls;document.getElementById('sw-next').disabled=false;}
+function swDots(a){for(var i=0;i<4;i++){var d=document.getElementById('dot'+i);if(d)d.classList.toggle('active',i===a);}}
+
+// Normalise Nigerian phone to E.164 (+234…). Returns '' if unrecognisable.
+function normalizeNaijaPhone(raw){
+  var s=String(raw||'').replace(/[^0-9+]/g,'');
+  if(!s)return '';
+  if(s.indexOf('+234')===0)s=s.slice(1);        // +2348… → 2348…
+  else if(s.indexOf('234')===0&&s.length===13){}// 2348… OK
+  else if(s.indexOf('0')===0&&s.length===11)s='234'+s.slice(1); // 080… → 23480…
+  else if(s.length===10)s='234'+s;              // 80…   → 234 80…
+  else return '';
+  if(s.length!==13)return '';
+  return '+'+s;
+}
+function swPwaCheck(){
+  // Enable the Continue button when either blank (user will skip) or a valid number
+  var v=document.getElementById('sw-pwa').value.trim();
+  var btn=document.getElementById('sw-next');
+  if(!v){btn.disabled=false;btn.textContent='Continue \u2192';return;}
+  var norm=normalizeNaijaPhone(v);
+  btn.disabled=!norm;
+  btn.textContent=norm?'Continue \u2192':'Invalid number';
+}
+function swSkipParent(){
+  var pwa=document.getElementById('sw-pwa');if(pwa)pwa.value='';
+  swParentWA='';
+  _swAdvanceToActivation();
+}
+function _swAdvanceToActivation(){
+  document.getElementById('sw2b').style.display='none';
+  document.getElementById('sw3').style.display='';
+  var n3=document.getElementById('sw3-name');if(n3)n3.textContent=swName;
+  var c3=document.getElementById('sw3-class');if(c3)c3.textContent=swClass;
+  document.getElementById('sw-code').value='';
+  var st=document.getElementById('sw-code-status');if(st)st.textContent='';
+  swStep=3;swDots(3);
+  document.getElementById('sw-next').textContent='Activate \u2192';
+  document.getElementById('sw-next').disabled=true;
+}
 function swNext(){
   if(swStep===0){
     swName=document.getElementById('sw-name').value.trim();
@@ -2389,15 +2546,22 @@ function swNext(){
   }else if(swStep===1){
     if(!swClass)return;
     document.getElementById('sw2').style.display='none';
-    document.getElementById('sw3').style.display='';
-    // Show student name and class on the teacher handover screen
-    var n3=document.getElementById('sw3-name');if(n3)n3.textContent=swName;
-    var c3=document.getElementById('sw3-class');if(c3)c3.textContent=swClass;
-    document.getElementById('sw-code').value='';
-    var st=document.getElementById('sw-code-status');if(st)st.textContent='';
+    document.getElementById('sw2b').style.display='';
     swStep=2;swDots(2);
-    document.getElementById('sw-next').textContent='Activate \u2192';
-    document.getElementById('sw-next').disabled=true; // disabled until valid code entered
+    // Parent phone optional — Continue enabled by default; swPwaCheck disables on invalid input
+    document.getElementById('sw-next').disabled=false;
+    document.getElementById('sw-next').textContent='Continue \u2192';
+    var pwa=document.getElementById('sw-pwa');if(pwa)pwa.focus();
+  }else if(swStep===2){
+    var pwaRaw=(document.getElementById('sw-pwa').value||'').trim();
+    if(pwaRaw){
+      var norm=normalizeNaijaPhone(pwaRaw);
+      if(!norm){toast('Please enter a valid Nigerian number, or tap Skip.',2500);return;}
+      swParentWA=norm;
+    }else{
+      swParentWA='';
+    }
+    _swAdvanceToActivation();
   }else{
     // Step 3 — teacher enters school code, must be verified before proceeding
     var code=(document.getElementById('sw-code').value||'').toUpperCase().trim();
@@ -2407,7 +2571,7 @@ function swNext(){
     var st=document.getElementById('sw-code-status');
     if(st){st.textContent='\u23F3 Verifying code\u2026';st.style.color='rgba(255,255,255,.7)';}
     // Save student profile first
-    STU={name:swName,classLabel:swClass,uid:'su_'+swName.replace(/\s+/g,'_').toLowerCase()+'_'+Date.now()};
+    STU={name:swName,classLabel:swClass,parentWA:swParentWA,uid:'su_'+swName.replace(/\s+/g,'_').toLowerCase()+'_'+Date.now()};
     ls(LK_STU,STU);
     // Verify school code — mandatory
     activateSchoolCode(code,function(result,school){
@@ -2533,10 +2697,44 @@ function saveNewStudent(){
   var nameEl=document.getElementById('as-name');
   var name=(nameEl&&nameEl.value.trim())||'';
   if(!name||!asClass)return;
+  var pwaEl=document.getElementById('as-pwa');
+  var pwaRaw=(pwaEl&&pwaEl.value.trim())||'';
+  var parentWA='';
+  if(pwaRaw){
+    parentWA=normalizeNaijaPhone(pwaRaw);
+    if(!parentWA){toast('Invalid parent number. Leave blank or fix it.',2500);return;}
+  }
   var EMOJIS=['🌟','📚','🎯','🌿','💫','🔮','🦁','🌈','⭐','🎨','🔥','💎'];
-  ROSTER.push({name:name,classLabel:asClass,uid:'s_'+name.replace(/\s+/g,'_').toLowerCase()+'_'+Date.now(),emoji:EMOJIS[ROSTER.length%EMOJIS.length]});
+  ROSTER.push({
+    name:name,
+    classLabel:asClass,
+    parentWA:parentWA,
+    uid:'s_'+name.replace(/\s+/g,'_').toLowerCase()+'_'+Date.now(),
+    emoji:EMOJIS[ROSTER.length%EMOJIS.length]
+  });
   ls(LK_ROSTER,ROSTER);
-  if(nameEl)nameEl.value='';asClass='';
+  // Sync this new student to Firestore immediately so other devices (and the
+  // Friday Report generator) see it without waiting for the student to open the app.
+  var school=getSchool();
+  if(school&&school.code){
+    FB.onReady(function(){
+      if(!FB.db)return;
+      var justAdded=ROSTER[ROSTER.length-1];
+      FB.db.collection('schools').doc(school.code).collection('students').doc(justAdded.uid)
+        .set({
+          name:justAdded.name,
+          classLabel:justAdded.classLabel,
+          parentWA:justAdded.parentWA||'',
+          uid:justAdded.uid,
+          emoji:justAdded.emoji||'👤',
+          createdAt:Date.now(),
+          lastSeen:Date.now()
+        },{merge:true}).catch(function(e){console.warn('New student sync:',e.message);});
+    });
+  }
+  if(nameEl)nameEl.value='';
+  if(pwaEl)pwaEl.value='';
+  asClass='';
   document.querySelectorAll('#add-student .class-btn').forEach(function(b){b.classList.remove('sel');});
   var sb=document.getElementById('as-save');if(sb)sb.disabled=true;
   toast('✅ '+name+' added!',2000);
@@ -2544,21 +2742,60 @@ function saveNewStudent(){
 }
 
 // ADMIN PANEL
-// ── Admin authentication — PIN comes from Firestore, never set on device ──
-// Teacher adds adminPin field to school document in Firebase Console
-// e.g. adminPin: "1234" — only teacher knows this, students never see it
+// ── Admin authentication ──
+// The Firestore document should contain `adminPinHash` — a SHA-256 hex of the PIN.
+// The previous `adminPin` (plaintext) field is still supported for backward
+// compatibility, but when detected we warn the proprietor and auto-migrate to
+// adminPinHash on successful first login. Deploy firestore.rules so students
+// cannot read adminPinHash.
 var _adminVerified=false; // session flag — stays true until app reloads
 var _adminVerifyTime=0;   // timestamp of last verify — expires after 30 min
+var _adminFailCount=0;    // brute-force rate limit
+var _adminLockUntil=0;    // timestamp until which prompts are blocked
+
+// SHA-256 hex — uses Web Crypto if available, fallback to a small pure-JS impl
+function sha256Hex(str){
+  if(window.crypto&&window.crypto.subtle){
+    var buf=new TextEncoder().encode(String(str));
+    return window.crypto.subtle.digest('SHA-256',buf).then(function(h){
+      return Array.prototype.map.call(new Uint8Array(h),function(b){
+        return b.toString(16).padStart(2,'0');
+      }).join('');
+    });
+  }
+  // No Web Crypto (very old browsers) — fall back to pure-JS sha256
+  return Promise.resolve(_sha256Fallback(String(str)));
+}
+// Pure-JS SHA-256 (compact, based on public-domain jsSHA). Only used when SubtleCrypto absent.
+function _sha256Fallback(ascii){
+  function rightRotate(n,x){return(x>>>n)|(x<<(32-n));}
+  var K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  var H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  var bytes=[],i,j;for(i=0;i<ascii.length;i++){var c=ascii.charCodeAt(i);if(c<128)bytes.push(c);else if(c<2048){bytes.push(192|(c>>6),128|(c&63));}else{bytes.push(224|(c>>12),128|((c>>6)&63),128|(c&63));}}
+  var len=bytes.length*8;bytes.push(0x80);while((bytes.length%64)!==56)bytes.push(0);
+  for(i=7;i>=0;i--)bytes.push((len>>>(i*8))&0xff);
+  for(i=0;i<bytes.length;i+=64){
+    var w=new Array(64);for(j=0;j<16;j++)w[j]=(bytes[i+j*4]<<24)|(bytes[i+j*4+1]<<16)|(bytes[i+j*4+2]<<8)|bytes[i+j*4+3];
+    for(j=16;j<64;j++){var s0=rightRotate(7,w[j-15])^rightRotate(18,w[j-15])^(w[j-15]>>>3);var s1=rightRotate(17,w[j-2])^rightRotate(19,w[j-2])^(w[j-2]>>>10);w[j]=(w[j-16]+s0+w[j-7]+s1)|0;}
+    var a=H[0],b=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+    for(j=0;j<64;j++){var S1=rightRotate(6,e)^rightRotate(11,e)^rightRotate(25,e);var ch=(e&f)^((~e)&g);var t1=(h+S1+ch+K[j]+w[j])|0;var S0=rightRotate(2,a)^rightRotate(13,a)^rightRotate(22,a);var mj=(a&b)^(a&c)^(b&c);var t2=(S0+mj)|0;h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;}
+    H[0]=(H[0]+a)|0;H[1]=(H[1]+b)|0;H[2]=(H[2]+c)|0;H[3]=(H[3]+d)|0;H[4]=(H[4]+e)|0;H[5]=(H[5]+f)|0;H[6]=(H[6]+g)|0;H[7]=(H[7]+h)|0;
+  }
+  return H.map(function(x){return ('00000000'+(x>>>0).toString(16)).slice(-8);}).join('');
+}
 
 function openAdmin(){
   // Check if already verified this session (within 30 minutes)
   if(_adminVerified&&(Date.now()-_adminVerifyTime)<30*60*1000){
     _doOpenAdmin();return;
   }
+  // Rate-limit lockout from too many wrong attempts
+  if(Date.now()<_adminLockUntil){
+    var secs=Math.ceil((_adminLockUntil-Date.now())/1000);
+    toast('\u274C Too many wrong attempts. Wait '+secs+'s.',3000);return;
+  }
   var school=getSchool();
   if(!school||!school.code){
-    // No school code yet — on shared device let teacher in to enter code
-    // Show a simplified prompt explaining what to do
     if(DMODE==='shared'){
       if(confirm('No school code yet.\n\nEnter the school code in the activation box on the roster screen, then try Admin again.\n\nTap OK to go back to the roster.')){
         SS('roster');
@@ -2568,7 +2805,6 @@ function openAdmin(){
     toast('\u26A0\uFE0F Complete setup first — enter a school code.',3000);
     return;
   }
-  // Fetch adminPin from Firestore — it is never stored on the device
   FB.onReady(function(){
     if(!FB.db){
       toast('\u26A0\uFE0F No internet connection. Admin requires online verification.',3000);return;
@@ -2577,19 +2813,42 @@ function openAdmin(){
       .then(function(doc){
         if(!doc.exists){toast('\u274C School not found. Re-enter school code.',3000);return;}
         var data=doc.data();
-        var adminPin=data.adminPin;
-        if(!adminPin){
-          toast('\u274C Admin PIN not set. Add an "adminPin" field to your school document in Firebase Console.',5000);
+        var adminPinHash=data.adminPinHash;
+        var legacyPlaintextPin=data.adminPin; // backward compat — to be migrated on first success
+        if(!adminPinHash&&!legacyPlaintextPin){
+          toast('\u274C Admin PIN not set. In Firebase Console, open this school and add an adminPinHash field (SHA-256 of your PIN).',6000);
           return;
         }
         var entered=prompt('Enter Admin PIN:');
         if(entered===null)return;
-        if(String(entered).trim()!==String(adminPin).trim()){
-          toast('\u274C Wrong PIN. Contact Blestonex if you have forgotten it.',3000);return;
-        }
-        _adminVerified=true;
-        _adminVerifyTime=Date.now();
-        _doOpenAdmin();
+        var enteredTrim=String(entered).trim();
+        sha256Hex(enteredTrim).then(function(enteredHash){
+          var correct=false;
+          if(adminPinHash&&enteredHash===String(adminPinHash).toLowerCase()){
+            correct=true;
+          }else if(!adminPinHash&&legacyPlaintextPin&&enteredTrim===String(legacyPlaintextPin).trim()){
+            correct=true;
+            // Auto-migrate: save the hash, remove the plaintext field on next save
+            FB.db.collection('schools').doc(school.code).set({adminPinHash:enteredHash},{merge:true})
+              .catch(function(e){console.warn('Admin PIN migration failed:',e.message);});
+            console.info('[EduLab] Admin PIN migrated to hash. Ask Blestonex to delete the legacy adminPin field from Firestore.');
+          }
+          if(!correct){
+            _adminFailCount++;
+            if(_adminFailCount>=5){
+              _adminLockUntil=Date.now()+60*1000; // 60-second lockout after 5 misses
+              _adminFailCount=0;
+              toast('\u274C Wrong PIN. Locked for 60 seconds.',4000);
+            }else{
+              toast('\u274C Wrong PIN. '+(5-_adminFailCount)+' attempts left.',3000);
+            }
+            return;
+          }
+          _adminFailCount=0;
+          _adminVerified=true;
+          _adminVerifyTime=Date.now();
+          _doOpenAdmin();
+        });
       })
       .catch(function(e){
         console.warn('Admin verify failed:',e.message);
@@ -2663,7 +2922,7 @@ function renderAdminProgress(){
       var key=cs.uid||cs.name;
       var exists=merged.some(function(s){return (s.uid||s.name)===key;});
       if(!exists&&cs.name){
-        merged.push({name:cs.name,classLabel:cs.classLabel,uid:cs.uid,emoji:cs.emoji||'👤',mathLevel:cs.mathLevel||''});
+        merged.push({name:cs.name,classLabel:cs.classLabel,uid:cs.uid,emoji:cs.emoji||'👤',mathLevel:cs.mathLevel||'',parentWA:cs.parentWA||''});
       }
       if(cs.progress)cloudProg[key]=cs.progress;
     });
@@ -2697,10 +2956,15 @@ function renderAdminProgressWith(roster,allProg){
     var mathBadge=mathLvl&&mathLvl!==s.classLabel
       ?'<span style="font-size:10px;background:#FFF3E0;color:#C2410C;border-radius:4px;padding:1px 5px;font-weight:800;margin-left:4px">\uD83D\uDD22 '+mathLvl+'</span>'
       :'';
+    // Parent WhatsApp badge — shows current value (or red "add" prompt) and is tappable to edit
+    var pwa=s.parentWA||'';
+    var pwaBadge=pwa
+      ? '<span style="font-size:10px;background:#DCFCE7;color:#166534;border-radius:4px;padding:1px 5px;font-weight:800;margin-left:4px;cursor:pointer" onclick="event.stopPropagation();editParentWA(\''+sk.replace(/'/g,"\\'")+'\')">📱 '+pwa+'</span>'
+      : '<span style="font-size:10px;background:#FEE2E2;color:#991B1B;border-radius:4px;padding:1px 5px;font-weight:800;margin-left:4px;cursor:pointer" onclick="event.stopPropagation();editParentWA(\''+sk.replace(/'/g,"\\'")+'\')">+ Add parent WhatsApp</span>';
     var row=document.createElement('tr');
     row.style.borderBottom='1px solid var(--bd)';
     row.innerHTML=[
-      '<td style="padding:9px 10px;font-weight:700;color:var(--sl)">'+(s.emoji||'👤')+' '+s.name+mathBadge+'</td>',
+      '<td style="padding:9px 10px;font-weight:700;color:var(--sl)">'+(s.emoji||'👤')+' '+s.name+mathBadge+'<br>'+pwaBadge+'</td>',
       '<td style="padding:9px 10px;color:var(--sm)">'+s.classLabel+'</td>',
       '<td style="padding:9px 10px;text-align:center"><span style="background:var(--gl);color:var(--gm);border-radius:6px;padding:2px 8px;font-weight:800;font-size:12px">'+passed+'</span></td>',
       '<td style="padding:9px 10px;text-align:center"><span style="font-weight:800;color:'+bestColor+'">'+best+'%</span></td>',
@@ -2741,6 +3005,48 @@ function removeStudent(uid){
     }
   }
   renderAdminProgress();toast('Student removed',1800);
+}
+
+// Edit a student's parent WhatsApp number from the admin panel. Prompts the
+// teacher for a new number, normalises it, saves locally + to Firestore.
+function editParentWA(uid){
+  // Find the student in the roster (local first, then try merged view)
+  var student=ROSTER.find(function(s){return (s.uid||s.name)===uid;});
+  var scope='local';
+  if(!student){
+    // Not in local roster — must be a cloud-only student (appeared via Firestore sync)
+    // We'll write the update to Firestore; the next admin refresh will pick it up.
+    scope='cloud';
+    student={uid:uid,name:uid,parentWA:''};
+  }
+  var current=student.parentWA||'';
+  var entered=prompt('Parent WhatsApp number for '+student.name+':\n\n(Nigerian format: 08012345678 or +2348012345678)\n\nLeave blank and OK to remove.',current);
+  if(entered===null)return; // cancelled
+  entered=String(entered).trim();
+  var norm='';
+  if(entered){
+    norm=normalizeNaijaPhone(entered);
+    if(!norm){toast('Invalid Nigerian number. Try again.',2500);return;}
+  }
+  // Update local roster if present
+  if(scope==='local'){
+    student.parentWA=norm;
+    ls(LK_ROSTER,ROSTER);
+  }
+  // Always push to Firestore so other teacher devices + the Friday Report see it
+  var school=getSchool();
+  if(school&&school.code){
+    FB.onReady(function(){
+      if(!FB.db){toast('Saved locally. Connect to internet to sync.',2200);renderAdminProgress();return;}
+      FB.db.collection('schools').doc(school.code).collection('students').doc(uid)
+        .set({parentWA:norm,uid:uid,name:student.name,classLabel:student.classLabel||''},{merge:true})
+        .then(function(){toast(norm?'✅ WhatsApp saved':'✅ WhatsApp cleared',1800);renderAdminProgress();})
+        .catch(function(e){toast('Sync failed: '+e.message,3000);renderAdminProgress();});
+    });
+  }else{
+    toast(norm?'✅ Saved':'✅ Cleared',1500);
+    renderAdminProgress();
+  }
 }
 function clearAllStudents(){
   if(!confirm('Remove ALL students and their progress? This cannot be undone.'))return;
@@ -4703,11 +5009,36 @@ var LK_SCHOOL='el_school';
 
 function getSchool(){return lg(LK_SCHOOL)||null;}
 
+// Persistent device ID — generated once per install, used for activation tracking
+var LK_DEVICE_ID='el_device_id';
+function getDeviceId(){
+  var id=lg(LK_DEVICE_ID);
+  if(!id){
+    // 16 random bytes → base36 string, prefixed with short timestamp
+    id='d_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10);
+    ls(LK_DEVICE_ID,id);
+  }
+  return id;
+}
+
+// Maximum number of days activation stays valid between Firestore re-verifications.
+// After this window, the app MUST re-contact Firestore to confirm the code is still valid,
+// the subscription hasn't expired, and the school hasn't been deactivated.
+// Note: in-client checks can always be DevTools-bypassed. The real enforcement lives in
+// firestore.rules (shipped alongside this file) — rules block reads of school content
+// unless the requester's Firebase Auth claims match an active school.
+var MAX_OFFLINE_DAYS=7;
+
 function isActivated(){
   var school=getSchool();
   if(!school||!school.code)return false;
+  if(school.active===false)return false;
   if(school.expiry&&new Date(school.expiry)<new Date())return false;
-  return school.active!==false; // default true if field missing
+  // Require recent Firestore re-verification — shrinks the offline bypass window
+  var verifiedAt=school.verifiedAt||0;
+  var ageMs=Date.now()-verifiedAt;
+  if(ageMs>MAX_OFFLINE_DAYS*24*60*60*1000)return false;
+  return true;
 }
 
 function applyBranding(){
@@ -4717,6 +5048,7 @@ function applyBranding(){
   var grad='linear-gradient(135deg,'+color+','+light+')';
   var displayName=school.name||(school.code?'School ('+school.code+')':'');
   var displayEmoji=school.emoji||'\uD83C\uDFEB';
+  var logoUrl=school.logoUrl||''; // optional image URL for custom school logo
   // Apply to every topbar on the app
   document.querySelectorAll('.topbar').forEach(function(tb){
     var parentId=tb.parentElement?tb.parentElement.id:'';
@@ -4731,7 +5063,27 @@ function applyBranding(){
   if(rhdr)rhdr.style.background=grad;
   // Show school name in home subtitle
   var cls=document.getElementById('home-cls');
-  if(cls&&displayName)cls.textContent=displayEmoji+' '+displayName+' \u00b7 '+(window._stuClass||'');
+  if(cls&&displayName){
+    // When a real logo is set, show name without the emoji prefix (logo carries the brand)
+    cls.textContent=(logoUrl?'':displayEmoji+' ')+displayName+' \u00b7 '+(window._stuClass||'');
+  }
+  // Render logo on Home banner when logoUrl is set
+  var homeBanner=document.querySelector('#home .home-banner');
+  if(homeBanner){
+    // Remove any previously-rendered logo so we don't double-stack
+    var old=homeBanner.querySelector('.school-logo-img');
+    if(old)old.parentNode.removeChild(old);
+    if(logoUrl){
+      var img=document.createElement('img');
+      img.className='school-logo-img';
+      img.src=logoUrl;
+      img.alt=displayName;
+      img.style.cssText='position:absolute;top:14px;right:16px;width:48px;height:48px;border-radius:10px;object-fit:cover;background:rgba(255,255,255,.9);padding:4px;box-shadow:0 2px 8px rgba(0,0,0,.15)';
+      img.onerror=function(){this.style.display='none';}; // silently hide if logo URL broken
+      homeBanner.style.position='relative';
+      homeBanner.appendChild(img);
+    }
+  }
   // Auto-fill admin name field if empty
   var nameEl=document.getElementById('admin-school-name');
   if(nameEl&&!nameEl.value&&displayName)nameEl.value=displayName;
@@ -4740,7 +5092,7 @@ function applyBranding(){
   if(preview){
     preview.style.background=grad;
     preview.style.display='flex';
-    preview.textContent=displayEmoji+' '+(displayName||'School code active')+' \u2014 branding applied \u2705';
+    preview.innerHTML=(logoUrl?'<img src="'+logoUrl+'" style="width:28px;height:28px;border-radius:6px;object-fit:cover;background:#fff;padding:2px;margin-right:8px" onerror="this.style.display=\'none\'">':displayEmoji+' ')+(displayName||'School code active')+' \u2014 branding applied \u2705';
   }
 }
 function lighten(hex){
@@ -4763,8 +5115,10 @@ function activateSchoolCode(code,cb){
   var timer=setTimeout(function(){
     if(done)return;done=true;
     var cached=getSchool();
-    if(cached&&cached.code===code){
-      applyBranding();cb('ok',cached);
+    // Honor the offline grace window: if cached code matches and was verified recently, accept.
+    // Otherwise fail closed — don't let a cached-forever activation unlock the app.
+    if(cached&&cached.code===code&&cached.verifiedAt&&(Date.now()-cached.verifiedAt)<MAX_OFFLINE_DAYS*24*60*60*1000){
+      cb('ok',cached);
     }else{
       cb('offline',null);
     }
@@ -4774,7 +5128,7 @@ function activateSchoolCode(code,cb){
     if(!FB.db){
       clearTimeout(timer);if(done)return;done=true;
       var cached=getSchool();
-      if(cached&&cached.code===code){cb('ok',cached);return;}
+      if(cached&&cached.code===code&&cached.verifiedAt&&(Date.now()-cached.verifiedAt)<MAX_OFFLINE_DAYS*24*60*60*1000){cb('ok',cached);return;}
       cb('offline',null);return;
     }
     FB.db.collection('schools').doc(code).get()
@@ -4784,9 +5138,23 @@ function activateSchoolCode(code,cb){
         var data=doc.data();
         if(data.active===false){cb('inactive',null);return;}
         if(data.expiry&&new Date(data.expiry)<new Date()){cb('expired',null);return;}
-        // Always overwrite cache with fresh Firestore data — clears any stale incomplete version
-        var school=Object.assign({code:code},data);
+        // Strip sensitive fields before caching — adminPinHash must never sit in localStorage
+        var safeData=Object.assign({},data);
+        delete safeData.adminPin;
+        delete safeData.adminPinHash;
+        var school=Object.assign({code:code,verifiedAt:Date.now()},safeData);
         ls(LK_SCHOOL,school);
+        // Register this device under the school — lets Blestonex see which devices
+        // are in use and, later, enforce a per-license device cap via firestore.rules
+        var deviceId=getDeviceId();
+        FB.db.collection('schools').doc(code).collection('devices').doc(deviceId)
+          .set({
+            firstSeen:firebase.firestore.FieldValue.serverTimestamp(),
+            lastSeen:firebase.firestore.FieldValue.serverTimestamp(),
+            mode:DMODE||'unknown',
+            userAgent:(navigator.userAgent||'').slice(0,200)
+          },{merge:true})
+          .catch(function(e){console.warn('Device register failed:',e.message);});
         applyBranding();
         cb('ok',school);
       })
@@ -4794,7 +5162,7 @@ function activateSchoolCode(code,cb){
         clearTimeout(timer);if(done)return;done=true;
         console.warn('School code lookup failed:',e.message);
         var cached=getSchool();
-        if(cached&&cached.code===code){cb('ok',cached);}
+        if(cached&&cached.code===code&&cached.verifiedAt&&(Date.now()-cached.verifiedAt)<MAX_OFFLINE_DAYS*24*60*60*1000){cb('ok',cached);}
         else{cb('error',null);}
       });
   });
@@ -4834,12 +5202,23 @@ function saveSchoolSettings(){
   }
 }
 
+// Teacher details are stored per-device (each teacher has their own phone),
+// not on the school doc. Used only to personalise the Friday WhatsApp report.
+var LK_TEACHER='el_teacher'; // {name, wa}
+function getTeacher(){return lg(LK_TEACHER)||{name:'',wa:''};}
+
 function loadAdminSchoolFields(){
   var school=getSchool();
   var nameEl=document.getElementById('admin-school-name');
   var codeEl=document.getElementById('admin-school-code');
   if(school&&school.name&&nameEl)nameEl.value=school.name;
   if(school&&school.code&&codeEl)codeEl.value=school.code;
+  // Load teacher details
+  var t=getTeacher();
+  var tn=document.getElementById('admin-teacher-name');
+  var twa=document.getElementById('admin-teacher-wa');
+  if(tn)tn.value=t.name||'';
+  if(twa)twa.value=t.wa||'';
   var statusEl=document.getElementById('admin-activation-status');
   if(statusEl){
     if(isActivated()){
@@ -4851,6 +5230,21 @@ function loadAdminSchoolFields(){
       statusEl.style.color='#D97706';
     }
   }
+}
+
+function saveTeacherDetails(){
+  var nameEl=document.getElementById('admin-teacher-name');
+  var waEl=document.getElementById('admin-teacher-wa');
+  var name=nameEl?nameEl.value.trim():'';
+  var waRaw=waEl?waEl.value.trim():'';
+  var wa='';
+  if(waRaw){
+    wa=normalizeNaijaPhone(waRaw);
+    if(!wa){toast('Invalid reply WhatsApp. Use 080… format or leave blank.',3000);return;}
+    if(waEl)waEl.value=wa; // show normalised
+  }
+  ls(LK_TEACHER,{name:name,wa:wa});
+  toast('\u2705 Your details saved. Used on Friday Reports.',2200);
 }
 
 // Gate: demo mode = first 2 stages only
@@ -5698,6 +6092,443 @@ function loadAllNotesFromFirestore(cb){
       }).catch(function(){cb&&cb();});
   });
 }
+
+// ════════════════════════════════════════
+// FRIDAY WHATSAPP REPORTS (teacher-driven)
+// ════════════════════════════════════════
+// The report is generated on-device from the merged roster+progress data the
+// admin panel already loads. No server, no WhatsApp Business API, no approval
+// queue. Teacher taps a student → sees a preview → taps "Send via WhatsApp" →
+// their own WhatsApp opens with the message pre-filled. Parents see it come
+// from their child's teacher, which is the message they actually trust.
+//
+// Data sources:
+//   - ROSTER (local) merged with schools/{code}/students (Firestore)
+//   - progress per student with prev.history = [{at, score, passed}, …]
+//   - WORDS / MATH_STAGES / VERBAL_STAGES / QUANT_STAGES for stage labels
+//
+// Weekly window = last 7 days, rolling. NOT Monday-to-Friday — we take the
+// activity from the past 7 days counting back from NOW. A Friday teacher gets
+// the right answer; a Wednesday teacher catching up also gets the right answer.
+
+var LK_FR_SENT='el_fr_sent'; // {studentUid: {weekKey: timestamp}}
+var _FR_DATA={roster:[],allProg:{}};
+
+function openFridayReports(){
+  SS('friday-reports');
+  var school=getSchool();
+  if(!school||!school.code){
+    document.getElementById('fr-list').innerHTML=_frEmptyState('🔑 Activate this device first — the report uses your school roster.');
+    return;
+  }
+  document.getElementById('fr-list').innerHTML=_frEmptyState('<span class="el-dot"></span> Loading this week\'s activity…');
+  // Pull roster and progress exactly the way admin already does, so numbers match
+  loadSchoolRosterFromFirestore(function(cloudStudents){
+    var merged=ROSTER.slice();
+    var cloudProg={};
+    cloudStudents.forEach(function(cs){
+      var key=cs.uid||cs.name;
+      var exists=merged.some(function(s){return (s.uid||s.name)===key;});
+      if(!exists&&cs.name){
+        merged.push({name:cs.name,classLabel:cs.classLabel,uid:cs.uid,emoji:cs.emoji||'👤',mathLevel:cs.mathLevel||'',parentWA:cs.parentWA||''});
+      }else if(exists&&cs.parentWA){
+        // Cloud parentWA wins if local doesn't have one
+        merged.forEach(function(s){if((s.uid||s.name)===key&&!s.parentWA)s.parentWA=cs.parentWA;});
+      }
+      if(cs.progress)cloudProg[key]=cs.progress;
+    });
+    var localProg=lg(LK_PROG)||{};
+    // Merge: local wins if present (most recent device that student used),
+    // cloud fills in missing students
+    var allProg={};
+    merged.forEach(function(s){
+      var k=s.uid||s.name;
+      allProg[k]=localProg[k]||cloudProg[k]||{};
+    });
+    _FR_DATA={roster:merged,allProg:allProg};
+    _frPopulateClassFilter(merged);
+    renderFridayReportList();
+  });
+}
+
+function _frEmptyState(html){
+  return '<div style="text-align:center;padding:32px 20px;color:#4B5563;font-size:14px;background:#fff;border-radius:14px">'+html+'</div>';
+}
+
+function _frPopulateClassFilter(roster){
+  var sel=document.getElementById('fr-class-filter');
+  if(!sel)return;
+  var classes={};
+  roster.forEach(function(s){if(s.classLabel)classes[s.classLabel]=true;});
+  var current=sel.value;
+  sel.innerHTML='<option value="">All classes</option>'+Object.keys(classes).sort().map(function(c){
+    return '<option value="'+c+'">'+c+'</option>';
+  }).join('');
+  if(current)sel.value=current;
+}
+
+// Build a weekly snapshot for one student. Returns null if student has no activity.
+function _frBuildReport(student,allProg){
+  var key=student.uid||student.name;
+  var prog=allProg[key]||{};
+  var now=Date.now();
+  var weekAgo=now-7*24*60*60*1000;
+
+  // Walk every stage and bucket attempts by (unit type × this-week vs previous-week)
+  // Subjects collapsed into 3 buckets that map to parent-facing labels:
+  //   vocab   = animals/body/food/colours/science/social
+  //   maths   = MATH_STAGES ids (prefix 'm-')
+  //   reason  = verbal + quantitative
+  var SUBJ_BUCKETS={vocab:'📖 Vocabulary',maths:'🔢 Mathematics',reason:'🔤 Reasoning'};
+  var stats={vocab:{attempts:0,sum:0,count:0,prevSum:0,prevCount:0,stages:[],weakStage:null,weakScore:101},
+             maths:{attempts:0,sum:0,count:0,prevSum:0,prevCount:0,stages:[],weakStage:null,weakScore:101},
+             reason:{attempts:0,sum:0,count:0,prevSum:0,prevCount:0,stages:[],weakStage:null,weakScore:101}};
+  var daysActive={};
+  var totalAttempts=0;
+  var stagesPassedThisWeek=0;
+
+  function bucketFor(stageId){
+    if(!stageId)return null;
+    if(stageId.indexOf('m-')===0)return 'maths';
+    if(stageId.indexOf('vr-')===0||stageId.indexOf('qr-')===0)return 'reason';
+    return 'vocab';
+  }
+  function stageLabel(stageId){
+    // Check WORDS-based units first
+    for(var i=0;i<UNITS.length;i++){
+      var stMap=UNITS[i].stagesMap;
+      for(var cl in stMap){
+        var found=(stMap[cl]||[]).find(function(s){return s.id===stageId;});
+        if(found)return UNITS[i].title+' — '+(found.label||'').replace(/^Stage\s+\d+\s*—\s*/,'');
+      }
+    }
+    // Maths
+    for(var cl in MATH_STAGES){
+      var m=(MATH_STAGES[cl]||[]).find(function(s){return s.id===stageId;});
+      if(m)return 'Maths — '+(m.label||'').replace(/^Stage\s+\d+\s*—\s*/,'');
+    }
+    for(var cl in VERBAL_STAGES){
+      var v=(VERBAL_STAGES[cl]||[]).find(function(s){return s.id===stageId;});
+      if(v)return 'Verbal — '+(v.label||'').replace(/^Stage\s+\d+\s*—\s*/,'');
+    }
+    for(var cl in QUANT_STAGES){
+      var q=(QUANT_STAGES[cl]||[]).find(function(s){return s.id===stageId;});
+      if(q)return 'Quantitative — '+(q.label||'').replace(/^Stage\s+\d+\s*—\s*/,'');
+    }
+    return stageId;
+  }
+
+  Object.keys(prog).forEach(function(stageId){
+    var p=prog[stageId];if(!p||!p.history)return;
+    var bucket=bucketFor(stageId);if(!bucket)return;
+    var thisWeekScores=[];
+    var prevWeekScores=[];
+    p.history.forEach(function(h){
+      if(h.at>=weekAgo){
+        thisWeekScores.push(h.score||0);
+        totalAttempts++;
+        stats[bucket].attempts++;
+        daysActive[new Date(h.at).toISOString().slice(0,10)]=true;
+        if(h.passed)stagesPassedThisWeek++;
+      }else if(h.at>=weekAgo-7*24*60*60*1000){
+        prevWeekScores.push(h.score||0);
+      }
+    });
+    if(thisWeekScores.length){
+      var best=Math.max.apply(null,thisWeekScores);
+      stats[bucket].sum+=best;stats[bucket].count++;
+      stats[bucket].stages.push({id:stageId,score:best});
+      if(best<stats[bucket].weakScore){stats[bucket].weakScore=best;stats[bucket].weakStage=stageId;}
+    }
+    if(prevWeekScores.length){
+      var pbest=Math.max.apply(null,prevWeekScores);
+      stats[bucket].prevSum+=pbest;stats[bucket].prevCount++;
+    }
+  });
+
+  if(totalAttempts===0)return null; // no activity, no report
+
+  var daysCount=Object.keys(daysActive).length;
+  // Rough minutes estimate: 3 min per attempt. Honest label: "practised about N min."
+  var minutesEstimate=totalAttempts*3;
+
+  // Build subject summary with trend arrows
+  var subjects=[];
+  Object.keys(SUBJ_BUCKETS).forEach(function(b){
+    var s=stats[b];if(!s.count)return;
+    var avg=Math.round(s.sum/s.count);
+    var prevAvg=s.prevCount?Math.round(s.prevSum/s.prevCount):null;
+    var trend='';
+    if(prevAvg!==null){
+      var diff=avg-prevAvg;
+      if(diff>=5)trend=' *(up from '+prevAvg+'%)*';
+      else if(diff<=-5)trend=' *(down from '+prevAvg+'%)*';
+      else trend=' *(steady)*';
+    }
+    subjects.push({
+      label:SUBJ_BUCKETS[b],
+      score:avg,
+      trend:trend,
+      warn:avg<55,
+      weakStage:s.weakStage,
+      weakScore:s.weakScore
+    });
+  });
+
+  // Find the single weakest stage across all subjects for "practise this weekend"
+  var overallWeak=null;
+  subjects.forEach(function(s){
+    if(s.weakStage&&(!overallWeak||s.weakScore<overallWeak.score)){
+      overallWeak={id:s.weakStage,score:s.weakScore,label:stageLabel(s.weakStage)};
+    }
+  });
+
+  // Class rank: compare against classmates on total stages passed this term
+  var classmates=_FR_DATA.roster.filter(function(s){return s.classLabel===student.classLabel;});
+  var rankRows=classmates.map(function(s){
+    var k=s.uid||s.name;
+    var sp=_FR_DATA.allProg[k]||{};
+    var passed=Object.values(sp).filter(function(v){return v&&v.passed;}).length;
+    return {key:k,passed:passed};
+  }).sort(function(a,b){return b.passed-a.passed;});
+  var rank=1+rankRows.findIndex(function(r){return r.key===key});
+  var rankTotal=rankRows.length;
+
+  return {
+    totalAttempts:totalAttempts,
+    daysCount:daysCount,
+    minutesEstimate:minutesEstimate,
+    subjects:subjects,
+    overallWeak:overallWeak,
+    rank:rank,
+    rankTotal:rankTotal,
+    stagesPassedThisWeek:stagesPassedThisWeek,
+    weekStart:new Date(weekAgo),
+    weekEnd:new Date(now)
+  };
+}
+
+function _frFormatDate(d){
+  var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate()+' '+months[d.getMonth()];
+}
+
+function _frBuildMessage(student,report,schoolName){
+  var firstName=(student.name||'').split(' ')[0]||student.name;
+  var encouragement='';
+  if(report.daysCount>=4)encouragement='Strong week of practice! 💪';
+  else if(report.daysCount>=2)encouragement='Good effort this week. ✅';
+  else encouragement='Some practice this week — a little more next week would help.';
+  var teacher=getTeacher();
+
+  var lines=[];
+  lines.push('📊 *Weekly Update — '+student.name+'*');
+  lines.push('🏫 '+(schoolName||'EduLab')+' · '+(student.classLabel||'')+' · '+_frFormatDate(report.weekStart)+'–'+_frFormatDate(report.weekEnd));
+  lines.push('');
+  lines.push(firstName+' practised for about *'+report.minutesEstimate+' minutes* across *'+report.daysCount+' day'+(report.daysCount!==1?'s':'')+'* this week. '+encouragement);
+  lines.push('');
+  report.subjects.forEach(function(s){
+    var warn=s.warn?' ⚠️ needs support':'';
+    lines.push(s.label+': *'+s.score+'%*'+s.trend+warn);
+  });
+  lines.push('');
+  if(report.overallWeak&&report.overallWeak.score<70){
+    lines.push('*Weak topic this week:* '+report.overallWeak.label+' — 10 minutes of practice this weekend would really help.');
+    lines.push('');
+  }
+  if(report.stagesPassedThisWeek>0){
+    lines.push('✅ '+firstName+' passed *'+report.stagesPassedThisWeek+' new stage'+(report.stagesPassedThisWeek!==1?'s':'')+'* this week.');
+  }
+  if(report.rankTotal>1){
+    lines.push('🏅 '+firstName+' is currently *rank '+report.rank+' of '+report.rankTotal+'* in '+student.classLabel+' this term.');
+  }
+  lines.push('');
+  // Signature — personalise with teacher name + optional reply number
+  var sig='_Sent by ';
+  sig += teacher.name?teacher.name:'your class teacher';
+  sig += ' via EduLab.';
+  if(teacher.wa){
+    sig += ' Reply to '+teacher.wa+' for any questions.';
+  }
+  sig += ' Reply STOP to unsubscribe._';
+  lines.push(sig);
+  return lines.join('\n');
+}
+
+function _frWeekKey(){
+  // ISO week-ish: YYYY-Www. Good enough to avoid double-sending in the same week.
+  var d=new Date();
+  var year=d.getFullYear();
+  var oneJan=new Date(year,0,1);
+  var week=Math.ceil((((d-oneJan)/86400000)+oneJan.getDay()+1)/7);
+  return year+'-W'+String(week).padStart(2,'0');
+}
+function _frIsSentThisWeek(uid){
+  var log=lg(LK_FR_SENT)||{};
+  var w=_frWeekKey();
+  return !!(log[uid]&&log[uid][w]);
+}
+function _frMarkSent(uid){
+  var log=lg(LK_FR_SENT)||{};
+  var w=_frWeekKey();
+  if(!log[uid])log[uid]={};
+  log[uid][w]=Date.now();
+  ls(LK_FR_SENT,log);
+}
+
+function renderFridayReportList(){
+  var data=_FR_DATA;
+  var listEl=document.getElementById('fr-list');
+  if(!listEl)return;
+  if(!data.roster.length){
+    listEl.innerHTML=_frEmptyState('No students in the roster yet. Add students first.');
+    _frUpdateStats(0,0,0);
+    return;
+  }
+  var classFilter=document.getElementById('fr-class-filter').value;
+  var activityFilter=document.getElementById('fr-activity-filter').value;
+  var schoolName=(getSchool()||{}).name||'';
+
+  // Build one row per student
+  var rows=[];
+  var counts={eligible:0,nowa:0,inactive:0};
+  data.roster.forEach(function(student){
+    if(classFilter&&student.classLabel!==classFilter)return;
+    var report=_frBuildReport(student,data.allProg);
+    var hasWA=!!student.parentWA;
+    var active=!!report;
+    if(active&&hasWA)counts.eligible++;
+    else if(active&&!hasWA)counts.nowa++;
+    else counts.inactive++;
+    if(activityFilter==='active'&&!active)return;
+    if(activityFilter==='inactive'&&active)return;
+    rows.push({student:student,report:report,hasWA:hasWA,schoolName:schoolName});
+  });
+
+  _frUpdateStats(counts.eligible,counts.nowa,counts.inactive);
+
+  if(!rows.length){
+    listEl.innerHTML=_frEmptyState('No matching students. Try a different filter.');
+    return;
+  }
+
+  listEl.innerHTML=rows.map(function(r){
+    var s=r.student,rep=r.report;
+    var uid=s.uid||s.name;
+    var sentThisWeek=_frIsSentThisWeek(uid);
+    var statusPill='',statusColor='';
+    if(!rep){
+      statusPill='No activity';statusColor='#6B7280;background:#F3F4F6';
+    }else if(!r.hasWA){
+      statusPill='Missing parent WhatsApp';statusColor='#B45309;background:#FEF3C7';
+    }else if(sentThisWeek){
+      statusPill='✓ Sent this week';statusColor='#166534;background:#DCFCE7';
+    }else{
+      statusPill='Ready to send';statusColor='#14532D;background:#BBF7D0';
+    }
+    var subjectPreview=rep?rep.subjects.map(function(sub){return sub.label.split(' ')[0]+' '+sub.score+'%';}).join(' · '):'';
+    var clickable=rep&&r.hasWA;
+    var pressStyle=clickable?'cursor:pointer':'cursor:default;opacity:.75';
+    return '<div onclick="'+(clickable?"openFridayPreview('"+uid.replace(/'/g,"\\'")+"')":'void 0')+'" style="background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 6px rgba(0,0,0,.05);'+pressStyle+'">'
+      +'<div style="width:42px;height:42px;border-radius:10px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">'+(s.emoji||'👤')+'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+s.name+'</div>'
+      +  '<div style="font-size:12px;color:#6B7280;margin-top:2px">'+s.classLabel+(subjectPreview?' · '+subjectPreview:'')+'</div>'
+      +  '<div style="margin-top:5px"><span style="font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:2px 8px;border-radius:6px;color:'+statusColor+'">'+statusPill+'</span></div>'
+      +'</div>'
+      +(clickable?'<div style="font-size:22px;color:#16A34A;flex-shrink:0">›</div>':'')
+      +'</div>';
+  }).join('');
+}
+
+function _frUpdateStats(eligible,nowa,inactive){
+  var a=document.getElementById('fr-stat-eligible');if(a)a.textContent=eligible;
+  var b=document.getElementById('fr-stat-nowa');if(b)b.textContent=nowa;
+  var c=document.getElementById('fr-stat-inactive');if(c)c.textContent=inactive;
+}
+
+var _FR_CURRENT=null; // {student, report, message, schoolName}
+
+function openFridayPreview(uid){
+  var student=_FR_DATA.roster.find(function(s){return (s.uid||s.name)===uid;});
+  if(!student){toast('Student not found.',2000);return;}
+  var report=_frBuildReport(student,_FR_DATA.allProg);
+  if(!report){toast('This student has no activity this week.',2500);return;}
+  if(!student.parentWA){toast('No parent WhatsApp for this student. Edit in Roster.',2800);return;}
+  var schoolName=(getSchool()||{}).name||'';
+  var message=_frBuildMessage(student,report,schoolName);
+  _FR_CURRENT={student:student,report:report,message:message,schoolName:schoolName,uid:uid};
+  var hdr=document.getElementById('fp-header');
+  if(hdr){
+    hdr.innerHTML='<div style="display:flex;align-items:center;gap:12px">'
+      +'<div style="width:46px;height:46px;border-radius:12px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;font-size:26px">'+(student.emoji||'👤')+'</div>'
+      +'<div style="flex:1">'
+      +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:17px;color:#1E1B4B">'+student.name+'</div>'
+      +  '<div style="font-size:12px;color:#6B7280;margin-top:2px">'+student.classLabel+' · Parent WhatsApp: '+student.parentWA+'</div>'
+      +'</div></div>';
+  }
+  var pre=document.getElementById('fp-message');
+  if(pre)pre.textContent=message;
+  var range=document.getElementById('fp-range');
+  if(range)range.textContent=_frFormatDate(report.weekStart)+' and '+_frFormatDate(report.weekEnd);
+  SS('friday-preview');
+}
+
+function fpSend(){
+  if(!_FR_CURRENT)return;
+  var phone=(_FR_CURRENT.student.parentWA||'').replace(/[^0-9]/g,'');
+  if(!phone){toast('No parent WhatsApp on file.',2500);return;}
+  var url='https://wa.me/'+phone+'?text='+encodeURIComponent(_FR_CURRENT.message);
+  // Mark as sent BEFORE opening, so even if the teacher closes WhatsApp without
+  // sending, the list doesn't nag them all day. They can un-check later if needed.
+  _frMarkSent(_FR_CURRENT.uid);
+  // Also log to Firestore so Blestonex and other teacher devices see the send
+  var school=getSchool();
+  if(school&&school.code){
+    FB.onReady(function(){
+      if(!FB.db)return;
+      FB.db.collection('schools').doc(school.code).collection('reports_sent')
+        .add({
+          studentUid:_FR_CURRENT.uid,
+          studentName:_FR_CURRENT.student.name,
+          weekKey:_frWeekKey(),
+          sentAt:Date.now(),
+          channel:'whatsapp',
+          phone:_FR_CURRENT.student.parentWA
+        }).catch(function(e){console.warn('Report log failed:',e.message);});
+    });
+  }
+  window.open(url,'_blank');
+  toast('📱 Opening WhatsApp…',2000);
+}
+
+function fpCopy(){
+  if(!_FR_CURRENT)return;
+  var txt=_FR_CURRENT.message;
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){toast('✅ Copied to clipboard',1800);},function(){_frCopyFallback(txt);});
+    }else{
+      _frCopyFallback(txt);
+    }
+  }catch(e){_frCopyFallback(txt);}
+}
+function _frCopyFallback(txt){
+  var ta=document.createElement('textarea');
+  ta.value=txt;ta.style.position='fixed';ta.style.left='-9999px';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');toast('✅ Copied',1800);}catch(e){toast('Long-press the preview to copy',2500);}
+  document.body.removeChild(ta);
+}
+
+function fpMarkSent(){
+  if(!_FR_CURRENT)return;
+  _frMarkSent(_FR_CURRENT.uid);
+  toast('✓ Marked as sent',1800);
+  SS('friday-reports');
+  renderFridayReportList();
+}
+
 var LK_OUTLINE='el_outline'; // {classKey: {unitKey: [{id,hidden}]}}
 
 function getCourseOutline(){return lg(LK_OUTLINE)||{};}
@@ -6153,9 +6984,61 @@ function checkDashboardMode(){
   }
 }
 
+// ── Blestonex master dashboard — now uses Firebase Auth, not a client-side PIN ──
+// The previous version hardcoded "BLX2025" in client JS, visible via View Source.
+// This version requires an email+password that matches a doc in Firestore:
+//   config/admins  →  { allowedEmails: ['you@blestonex.com', ...] }
+// Only email addresses in that list can sign in and view the dashboard.
+// To lock down Firestore so ONLY these admins can read the schools collection,
+// deploy the firestore.rules file shipped alongside this app.
 function openBlestonexDashboard(){
-  var pin=prompt('Blestonex Dashboard PIN:');
-  if(pin!=='BLX2025'){alert('Wrong PIN.');return;}
+  FB.onReady(function(){
+    if(!FB.db||typeof firebase==='undefined'||!firebase.auth){
+      alert('Dashboard unavailable — no internet or Firebase not loaded.');return;
+    }
+    var currentUser=firebase.auth().currentUser;
+    // If already signed in with an email (not anonymous), go straight to load
+    if(currentUser&&currentUser.email&&!currentUser.isAnonymous){
+      _loadBlestonexDashboard(currentUser.email);return;
+    }
+    var email=prompt('Blestonex admin email:');
+    if(!email)return;
+    var password=prompt('Password:');
+    if(!password)return;
+    // Sign out the anonymous session first so signInWithEmailAndPassword has a clean slate
+    firebase.auth().signOut().catch(function(){}).finally(function(){
+      firebase.auth().signInWithEmailAndPassword(email.trim().toLowerCase(),password)
+        .then(function(cred){
+          _loadBlestonexDashboard(cred.user.email);
+        })
+        .catch(function(e){
+          alert('Sign-in failed: '+e.message+'\n\nIf this is the first time, create the admin account in Firebase Console → Authentication → Users, then add the email to Firestore → config/admins.allowedEmails.');
+          // Return to anonymous so the rest of the app still works
+          firebase.auth().signInAnonymously().catch(function(){});
+        });
+    });
+  });
+}
+
+function _loadBlestonexDashboard(signedInEmail){
+  // Second check: even if sign-in succeeded, only proceed if the email is in the allowlist
+  FB.db.collection('config').doc('admins').get()
+    .then(function(adminDoc){
+      var allowed=(adminDoc.exists&&adminDoc.data().allowedEmails)||[];
+      if(allowed.map(function(e){return String(e).toLowerCase();}).indexOf(signedInEmail.toLowerCase())===-1){
+        alert('This account is not authorised for the Blestonex dashboard.');
+        firebase.auth().signOut().catch(function(){});
+        firebase.auth().signInAnonymously().catch(function(){});
+        return;
+      }
+      _renderBlestonexDashboard();
+    })
+    .catch(function(e){
+      alert('Could not verify admin access: '+e.message);
+    });
+}
+
+function _renderBlestonexDashboard(){
   // Load all schools from Firestore
   FB.onReady(function(){
     if(!FB.db){alert('Firebase not available.');return;}
