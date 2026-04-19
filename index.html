@@ -437,6 +437,10 @@ body{display:flex;flex-direction:column}
     <div id="demo-notice" style="display:none;background:#FEF3C7;border-radius:12px;padding:12px 14px;margin-bottom:4px;font-size:13px;color:#92400E;font-weight:700;text-align:center">
       🔑 Demo mode — first 2 stages only. Ask your school admin to activate the full app.
     </div>
+    <!-- Subscription expiry warning — shows in the last 14 days before expiry -->
+    <div id="expiry-notice" style="display:none;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;font-size:13px;font-weight:700;text-align:center">
+      <span id="expiry-notice-text"></span>
+    </div>
     <div class="subj-card" onclick="openLessonList()">
       <div class="subj-head">
         <div class="subj-icon" style="background:#E0F0FF;color:#1565C0">📖</div>
@@ -2325,9 +2329,45 @@ function saveProg(sid,data){
     }
   }
   p[sk()][sid]=prev;ls(LK_PROG,p);
-  // Sync progress to Firestore under school collection
-  syncStudentToFirestore();
+  // Debounced sync — reduces Firestore writes from 1-per-question to 1-per-session
+  debouncedSyncStudentToFirestore();
   return prev;
+}
+
+// ── Firestore write debounce ────────────────────────────────────────────
+// Without this, a 10-question test produces 10 Firestore writes. At 300
+// students × 5 tests/day × 10 writes = 15,000/day — uncomfortably close to
+// Spark's 20,000/day free quota. Debouncing collapses that 10x.
+//
+// Strategy: coalesce writes within a 10-second window. Flush immediately when
+// the app goes to background (pagehide) or the student switches screens via
+// SS() — so progress is never lost more than 10s behind reality.
+var _syncPending=false;
+var _syncTimer=null;
+var _SYNC_DEBOUNCE_MS=10000;
+function debouncedSyncStudentToFirestore(){
+  _syncPending=true;
+  if(_syncTimer)clearTimeout(_syncTimer);
+  _syncTimer=setTimeout(function(){
+    if(!_syncPending)return;
+    _syncPending=false;
+    _syncTimer=null;
+    syncStudentToFirestore();
+  },_SYNC_DEBOUNCE_MS);
+}
+function flushSyncNow(){
+  if(!_syncPending)return;
+  if(_syncTimer)clearTimeout(_syncTimer);
+  _syncPending=false;
+  _syncTimer=null;
+  syncStudentToFirestore();
+}
+// Flush on page hide so progress doesn't sit in debounce when the user closes the tab
+if(typeof window!=='undefined'){
+  window.addEventListener('pagehide',flushSyncNow);
+  window.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='hidden')flushSyncNow();
+  });
 }
 
 function syncStudentToFirestore(){
@@ -2383,7 +2423,13 @@ function getDistractors(key,count){
 // ════════════════════════════════════════
 // SCREEN SWITCH
 // ════════════════════════════════════════
-function SS(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});var t=document.getElementById(id);if(t)t.classList.add('active');}
+function SS(id){
+  // If progress writes are pending, flush them before the user navigates away —
+  // so even if they close the tab immediately, their last few questions are saved.
+  if(typeof _syncPending!=='undefined'&&_syncPending)flushSyncNow();
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  var t=document.getElementById(id);if(t)t.classList.add('active');
+}
 
 // ════════════════════════════════════════
 // TOAST
@@ -2884,6 +2930,8 @@ function loadHome(){
   // Show demo mode notice if not activated
   var dn=document.getElementById('demo-notice');
   if(dn)dn.style.display=isActivated()?'none':'';
+  // Show expiry warning banner if subscription ends soon
+  checkExpiryWarning();
   // Sync this student's profile to Firestore so admin sees them from any device
   syncStudentToFirestore();
   // Check for teacher assignments, onboarding, and notifications
@@ -5041,6 +5089,58 @@ function isActivated(){
   return true;
 }
 
+// Days remaining on the school's subscription. Negative means expired. Null
+// means no expiry set (either unactivated, or lifetime licence).
+function daysUntilExpiry(){
+  var school=getSchool();
+  if(!school||!school.expiry)return null;
+  var exp=new Date(school.expiry);
+  if(isNaN(exp.getTime()))return null;
+  // Normalise to end-of-day so "expiry today" doesn't show as "0 days left"
+  exp.setHours(23,59,59,999);
+  var diffMs=exp-new Date();
+  return Math.ceil(diffMs/(24*60*60*1000));
+}
+
+// Show an amber banner on the Home screen when the subscription is in its
+// last 14 days. Amber at 14→8 days, red at 7→0 days, deep red after expiry.
+// The banner links to the renewal WhatsApp so proprietors can contact us.
+function checkExpiryWarning(){
+  var el=document.getElementById('expiry-notice');
+  var txt=document.getElementById('expiry-notice-text');
+  if(!el||!txt)return;
+  if(!isActivated()){el.style.display='none';return;}
+  var days=daysUntilExpiry();
+  if(days===null||days>14){el.style.display='none';return;}
+  var msg,grad;
+  if(days<0){
+    msg='⚠️ Your subscription expired '+Math.abs(days)+' day'+(Math.abs(days)!==1?'s':'')+' ago. Renew now to keep full access.';
+    grad='linear-gradient(135deg,#DC2626,#991B1B)';
+  }else if(days===0){
+    msg='⚠️ Your subscription expires today. Tap here to renew.';
+    grad='linear-gradient(135deg,#DC2626,#B91C1C)';
+  }else if(days<=7){
+    msg='⚠️ Your subscription expires in '+days+' day'+(days!==1?'s':'')+'. Tap here to renew.';
+    grad='linear-gradient(135deg,#EF4444,#DC2626)';
+  }else{
+    msg='⏰ Your subscription expires in '+days+' days. Plan your renewal soon.';
+    grad='linear-gradient(135deg,#F59E0B,#D97706)';
+  }
+  txt.textContent=msg;
+  el.style.background=grad;
+  el.style.display='';
+  el.style.cursor='pointer';
+  el.onclick=function(){
+    // Open WhatsApp to the Blestonex renewal number. Change this number to
+    // your real sales number before production deploy.
+    var blxNumber='2347032078669'; // Blestonex renewal / support WhatsApp
+    var school=getSchool()||{};
+    var schoolTag=school.name||school.code||'School';
+    var renewalMsg='Hi Blestonex, I would like to renew my EduLab subscription for '+schoolTag+' (code: '+(school.code||'?')+').';
+    window.open('https://wa.me/'+blxNumber+'?text='+encodeURIComponent(renewalMsg),'_blank');
+  };
+}
+
 function applyBranding(){
   var school=getSchool();if(!school)return;
   var color=school.color||'#FF6B35';
@@ -5222,9 +5322,24 @@ function loadAdminSchoolFields(){
   var statusEl=document.getElementById('admin-activation-status');
   if(statusEl){
     if(isActivated()){
+      var days=daysUntilExpiry();
       var exp=(getSchool()||{}).expiry||'never';
-      statusEl.textContent='\u2705 Activated \u2014 expires '+exp;
-      statusEl.style.color='#15803D';
+      if(days===null){
+        statusEl.textContent='\u2705 Activated';
+        statusEl.style.color='#15803D';
+      }else if(days<0){
+        statusEl.textContent='\u26A0\uFE0F Expired '+Math.abs(days)+' day'+(Math.abs(days)!==1?'s':'')+' ago — contact Blestonex to renew';
+        statusEl.style.color='#DC2626';
+      }else if(days<=7){
+        statusEl.textContent='\u26A0\uFE0F Expires in '+days+' day'+(days!==1?'s':'')+' ('+exp+') — renew soon';
+        statusEl.style.color='#DC2626';
+      }else if(days<=14){
+        statusEl.textContent='\u23F0 Expires in '+days+' days ('+exp+') — plan your renewal';
+        statusEl.style.color='#D97706';
+      }else{
+        statusEl.textContent='\u2705 Activated \u2014 expires '+exp+' ('+days+' days)';
+        statusEl.style.color='#15803D';
+      }
     }else{
       statusEl.textContent='\u26A0\uFE0F Not activated \u2014 demo mode (2 stages per unit)';
       statusEl.style.color='#D97706';
