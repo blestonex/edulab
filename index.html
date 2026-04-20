@@ -5231,40 +5231,53 @@ function activateSchoolCode(code,cb){
       if(cached&&cached.code===code&&cached.verifiedAt&&(Date.now()-cached.verifiedAt)<MAX_OFFLINE_DAYS*24*60*60*1000){cb('ok',cached);return;}
       cb('offline',null);return;
     }
-    FB.db.collection('schools').doc(code).get()
-      .then(function(doc){
-        clearTimeout(timer);if(done)return;done=true;
-        if(!doc.exists){cb('invalid',null);return;}
-        var data=doc.data();
-        if(data.active===false){cb('inactive',null);return;}
-        if(data.expiry&&new Date(data.expiry)<new Date()){cb('expired',null);return;}
-        // Strip sensitive fields before caching — adminPinHash must never sit in localStorage
-        var safeData=Object.assign({},data);
-        delete safeData.adminPin;
-        delete safeData.adminPinHash;
-        var school=Object.assign({code:code,verifiedAt:Date.now()},safeData);
-        ls(LK_SCHOOL,school);
-        // Register this device under the school — lets Blestonex see which devices
-        // are in use and, later, enforce a per-license device cap via firestore.rules
-        var deviceId=getDeviceId();
-        FB.db.collection('schools').doc(code).collection('devices').doc(deviceId)
-          .set({
-            firstSeen:firebase.firestore.FieldValue.serverTimestamp(),
-            lastSeen:firebase.firestore.FieldValue.serverTimestamp(),
-            mode:DMODE||'unknown',
-            userAgent:(navigator.userAgent||'').slice(0,200)
-          },{merge:true})
-          .catch(function(e){console.warn('Device register failed:',e.message);});
-        applyBranding();
-        cb('ok',school);
-      })
-      .catch(function(e){
-        clearTimeout(timer);if(done)return;done=true;
-        console.warn('School code lookup failed:',e.message);
-        var cached=getSchool();
-        if(cached&&cached.code===code&&cached.verifiedAt&&(Date.now()-cached.verifiedAt)<MAX_OFFLINE_DAYS*24*60*60*1000){cb('ok',cached);}
-        else{cb('error',null);}
-      });
+    function attemptLookup(isRetry){
+      FB.db.collection('schools').doc(code).get()
+        .then(function(doc){
+          clearTimeout(timer);if(done)return;done=true;
+          if(!doc.exists){cb('invalid',null);return;}
+          var data=doc.data();
+          if(data.active===false){cb('inactive',null);return;}
+          if(data.expiry&&new Date(data.expiry)<new Date()){cb('expired',null);return;}
+          // Strip sensitive fields before caching — adminPinHash must never sit in localStorage
+          var safeData=Object.assign({},data);
+          delete safeData.adminPin;
+          delete safeData.adminPinHash;
+          var school=Object.assign({code:code,verifiedAt:Date.now()},safeData);
+          ls(LK_SCHOOL,school);
+          // Register this device under the school — lets Blestonex see which devices
+          // are in use and, later, enforce a per-license device cap via firestore.rules
+          var deviceId=getDeviceId();
+          FB.db.collection('schools').doc(code).collection('devices').doc(deviceId)
+            .set({
+              firstSeen:firebase.firestore.FieldValue.serverTimestamp(),
+              lastSeen:firebase.firestore.FieldValue.serverTimestamp(),
+              mode:DMODE||'unknown',
+              userAgent:(navigator.userAgent||'').slice(0,200)
+            },{merge:true})
+            .catch(function(e){console.warn('Device register failed:',e.message);});
+          applyBranding();
+          cb('ok',school);
+        })
+        .catch(function(e){
+          // If this is a permission-denied on the FIRST attempt, retry once after
+          // a short delay — auth may have been pending at the moment we fired.
+          // Real permission problems (inactive school, bad rules) will also fail
+          // the retry and land in the error branch below.
+          var isPermDenied=(e&&e.code==='permission-denied')||/permission/i.test(e&&e.message||'');
+          if(isPermDenied && !isRetry){
+            console.warn('[EduLab] Lookup denied on first try, retrying in 1.5s after auth settles…');
+            setTimeout(function(){attemptLookup(true);},1500);
+            return;
+          }
+          clearTimeout(timer);if(done)return;done=true;
+          console.warn('School code lookup failed:',e.message);
+          var cached=getSchool();
+          if(cached&&cached.code===code&&cached.verifiedAt&&(Date.now()-cached.verifiedAt)<MAX_OFFLINE_DAYS*24*60*60*1000){cb('ok',cached);}
+          else{cb('error',null);}
+        });
+    }
+    attemptLookup(false);
   });
 }
 
@@ -7206,53 +7219,100 @@ var FB={initialized:false,db:null,user:null,_queue:[],
       // actually a timing bug. Gate the queue on auth resolving (or failing).
       var self=this;
       function flushQueue(){
+        if(self.initialized)return;
         self.initialized=true;
         console.log('[EduLab] Firebase ready (auth='+(self.user?'ok':'none')+')');
         var q=self._queue.slice();self._queue=[];
         q.forEach(function(fn){try{fn();}catch(e){console.warn('FB queue:',e);}});
       }
-      // Reuse existing signed-in user if there is one (PWA reopen, etc.)
-      var existing=firebase.auth().currentUser;
-      if(existing){
-        self.user=existing;
+      // Guard: if the auth SDK didn't load, skip auth and flush the queue anyway.
+      // Firestore calls will fail under the new rules but the UI handles that.
+      if(typeof firebase.auth!=='function'){
+        console.warn('[EduLab] firebase.auth SDK not available — continuing without auth');
         flushQueue();
         return;
       }
-      firebase.auth().signInAnonymously()
-        .then(function(r){
-          self.user=r.user;
-          console.log('[EduLab] Anonymous auth OK');
+      // Attempt in-memory auth persistence first as a fallback for browsers
+      // with Tracking Prevention (Edge, Safari) that block third-party storage.
+      // If persistence setup itself fails, we still try sign-in anyway.
+      function doSignIn(){
+        // Reuse existing signed-in user if there is one (PWA reopen, etc.)
+        var existing=firebase.auth().currentUser;
+        if(existing){
+          self.user=existing;
           flushQueue();
-        })
-        .catch(function(e){
-          console.warn('[EduLab] Auth failed (enable Anonymous Auth in Firebase Console):',e.message);
-          // Still flush the queue so the app doesn't hang. Firestore calls will
-          // error with permission-denied — the UI already handles that gracefully.
+          return;
+        }
+        firebase.auth().signInAnonymously()
+          .then(function(r){
+            self.user=r.user;
+            console.log('[EduLab] Anonymous auth OK');
+            flushQueue();
+          })
+          .catch(function(e){
+            console.warn('[EduLab] Auth failed:',e.message);
+            // Still flush the queue so the app doesn't hang forever.
+            // Downstream Firestore calls will error with permission-denied
+            // and the UI already shows "Could not verify" — better UX than a
+            // silent infinite spinner.
+            flushQueue();
+          });
+      }
+      // Try to set auth persistence. LOCAL is default (uses IndexedDB, can be
+      // blocked by Tracking Prevention). NONE keeps auth in memory only —
+      // user re-signs-in on page reload but works even when storage is blocked.
+      if(firebase.auth().setPersistence&&firebase.auth.Auth&&firebase.auth.Auth.Persistence){
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+          .then(doSignIn)
+          .catch(function(e){
+            console.warn('[EduLab] LOCAL persistence blocked (likely Tracking Prevention), falling back to in-memory:',e.message);
+            firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
+              .then(doSignIn)
+              .catch(function(){doSignIn();}); // last resort
+          });
+      }else{
+        doSignIn();
+      }
+      // Safety net: if auth is still pending after 8 seconds, fire the queue
+      // anyway so the app doesn't block forever. Firestore calls will retry
+      // with whatever auth state exists at that point.
+      setTimeout(function(){
+        if(!self.initialized){
+          console.warn('[EduLab] Auth took >8s, flushing queue anyway');
           flushQueue();
-        });
+        }
+      },8000);
     }catch(e){
       console.warn('[EduLab] Firebase init error:',e.message);
     }
   }
 };
 (function(){
-  var n=0;
+  // Load Firebase SDKs SEQUENTIALLY. firebase-auth-compat and firebase-firestore-compat
+  // both depend on firebase-app-compat having registered itself on the global
+  // `firebase` object BEFORE they execute. Loading them in parallel via forEach
+  // sometimes lets auth run first, which throws:
+  //   "Cannot read properties of undefined (reading 'INTERNAL')"
+  // because firebase.app is still undefined when auth initializes. Sequential
+  // loading avoids this race entirely.
   var sdks=[
     'https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js',
     'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js',
     'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js'
   ];
-  sdks.forEach(function(src){
+  function loadNext(i){
+    if(i>=sdks.length){FB.init();return;}
     var s=document.createElement('script');
-    s.src=src;
-    s.onload=function(){if(++n===sdks.length)FB.init();};
+    s.src=sdks[i];
+    s.onload=function(){loadNext(i+1);};
     s.onerror=function(){
-      console.warn('[EduLab] SDK failed to load:',src);
-      // Still try to init with whatever loaded — don't block forever
-      if(++n===sdks.length)FB.init();
+      console.warn('[EduLab] SDK failed to load:',sdks[i]);
+      // Continue anyway — FB.init() will handle missing pieces gracefully
+      loadNext(i+1);
     };
     document.head.appendChild(s);
-  });
+  }
+  loadNext(0);
 })();
 
 // ════════════════════════════════════════
