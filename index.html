@@ -6441,44 +6441,91 @@ function _frFormatDate(d){
   return d.getDate()+' '+months[d.getMonth()];
 }
 
+// Turn a raw database UID (like "s_ur_babe_1776682387660" or "su_chidi_okonkwo_1776000000")
+// back into something human-readable if the student's actual name wasn't saved.
+// Strips the "s_" / "su_" prefix, strips the trailing timestamp, replaces underscores
+// with spaces, and title-cases each word. Returns '' if the input doesn't look like
+// a UID we can prettify.
+function _prettifyUid(uid){
+  if(!uid||typeof uid!=='string')return '';
+  // Match our known UID shape: prefix_letters_maybe_more_numericTimestamp
+  // e.g. s_ur_babe_1776682387660 → "ur babe"
+  // e.g. su_chidi_okonkwo_1776000000 → "chidi okonkwo"
+  var m=uid.match(/^s[u]?_(.+?)_\d{10,}$/);
+  if(!m)return '';
+  var parts=m[1].split('_').filter(Boolean);
+  if(!parts.length)return '';
+  return parts.map(function(p){return p.charAt(0).toUpperCase()+p.slice(1).toLowerCase();}).join(' ');
+}
+
+// Returns a safe, parent-facing name for a student record. Prefers the saved
+// display name, falls back to a prettified UID, finally to a generic label.
+// Critical: we should NEVER let a raw UID like "s_xxx_123456789" appear in a
+// WhatsApp message. If we can't produce something reasonable, we skip this
+// student entirely in _frBuildReport.
+function _safeStudentName(student){
+  if(!student)return '';
+  var name=(student.name||'').trim();
+  // Detect a UID masquerading as a name (has the prefix pattern)
+  if(!name||/^s[u]?_.+_\d{10,}$/.test(name)){
+    var pretty=_prettifyUid(name||student.uid||'');
+    return pretty; // may be '' — caller handles that
+  }
+  return name;
+}
+
 function _frBuildMessage(student,report,schoolName){
-  var firstName=(student.name||'').split(' ')[0]||student.name;
+  var fullName=_safeStudentName(student);
+  var firstName=fullName.split(' ')[0]||fullName;
   var encouragement='';
-  if(report.daysCount>=4)encouragement='Strong week of practice! 💪';
-  else if(report.daysCount>=2)encouragement='Good effort this week. ✅';
+  if(report.daysCount>=4)encouragement='Strong week of practice!';
+  else if(report.daysCount>=2)encouragement='Good effort this week.';
   else encouragement='Some practice this week — a little more next week would help.';
   var teacher=getTeacher();
+  var classLabel=(student.classLabel||'').trim();
 
   var lines=[];
-  lines.push('📊 *Weekly Update — '+student.name+'*');
-  lines.push('🏫 '+(schoolName||'EduLab')+' · '+(student.classLabel||'')+' · '+_frFormatDate(report.weekStart)+'–'+_frFormatDate(report.weekEnd));
+  // Header — use School emoji as the lead icon so no corrupt emoji appears at the start
+  lines.push('*Weekly Progress Update*');
+  lines.push('');
+  lines.push('Student: *'+fullName+'*');
+  // Only show class line if we actually have a class — no dangling "· ·"
+  if(classLabel){
+    lines.push('Class: '+classLabel);
+  }
+  lines.push('School: '+(schoolName||'EduLab'));
+  lines.push('Period: '+_frFormatDate(report.weekStart)+' – '+_frFormatDate(report.weekEnd));
   lines.push('');
   lines.push(firstName+' practised for about *'+report.minutesEstimate+' minutes* across *'+report.daysCount+' day'+(report.daysCount!==1?'s':'')+'* this week. '+encouragement);
   lines.push('');
+  lines.push('*Scores this week:*');
   report.subjects.forEach(function(s){
-    var warn=s.warn?' ⚠️ needs support':'';
-    lines.push(s.label+': *'+s.score+'%*'+s.trend+warn);
+    // Strip emoji prefix from subject labels so the bullet is clean
+    var cleanLabel=s.label.replace(/^[^\w\d]+\s*/,'');
+    var warn=s.warn?' (needs support)':'';
+    lines.push('• '+cleanLabel+': *'+s.score+'%*'+s.trend+warn);
   });
   lines.push('');
   if(report.overallWeak&&report.overallWeak.score<70){
-    lines.push('*Weak topic this week:* '+report.overallWeak.label+' — 10 minutes of practice this weekend would really help.');
+    lines.push('*Weak topic:* '+report.overallWeak.label);
+    lines.push('A short 10-minute practice this weekend would really help.');
     lines.push('');
   }
   if(report.stagesPassedThisWeek>0){
-    lines.push('✅ '+firstName+' passed *'+report.stagesPassedThisWeek+' new stage'+(report.stagesPassedThisWeek!==1?'s':'')+'* this week.');
+    lines.push(firstName+' passed *'+report.stagesPassedThisWeek+' new stage'+(report.stagesPassedThisWeek!==1?'s':'')+'* this week.');
   }
-  if(report.rankTotal>1){
-    lines.push('🏅 '+firstName+' is currently *rank '+report.rank+' of '+report.rankTotal+'* in '+student.classLabel+' this term.');
+  if(report.rankTotal>1 && classLabel){
+    lines.push(firstName+' is currently *rank '+report.rank+' of '+report.rankTotal+'* in '+classLabel+' this term.');
   }
   lines.push('');
   // Signature — personalise with teacher name + optional reply number
-  var sig='_Sent by ';
+  var sig='— Sent by ';
   sig += teacher.name?teacher.name:'your class teacher';
   sig += ' via EduLab.';
   if(teacher.wa){
     sig += ' Reply to '+teacher.wa+' for any questions.';
   }
-  sig += ' Reply STOP to unsubscribe._';
+  sig += ' Reply STOP to unsubscribe.';
   lines.push(sig);
   return lines.join('\n');
 }
@@ -6544,8 +6591,18 @@ function renderFridayReportList(){
     var s=r.student,rep=r.report;
     var uid=s.uid||s.name;
     var sentThisWeek=_frIsSentThisWeek(uid);
+    // Figure out the best name we can render. If we cannot produce anything
+    // reasonable, mark this student as "needs name fix" and make the row
+    // non-clickable so we can't send a bad message.
+    var rawName=(s.name||'').trim();
+    var nameIsUid=(!rawName||/^s[u]?_.+_\d{10,}$/.test(rawName));
+    var displayName=nameIsUid?(_prettifyUid(rawName||s.uid||'')||''):rawName;
+    var nameBroken=!displayName; // truly can't produce a usable name
+
     var statusPill='',statusColor='';
-    if(!rep){
+    if(nameBroken){
+      statusPill='⚠️ Needs name fix';statusColor='#991B1B;background:#FEE2E2';
+    }else if(!rep){
       statusPill='No activity';statusColor='#6B7280;background:#F3F4F6';
     }else if(!r.hasWA){
       statusPill='Missing parent WhatsApp';statusColor='#B45309;background:#FEF3C7';
@@ -6554,14 +6611,19 @@ function renderFridayReportList(){
     }else{
       statusPill='Ready to send';statusColor='#14532D;background:#BBF7D0';
     }
-    var subjectPreview=rep?rep.subjects.map(function(sub){return sub.label.split(' ')[0]+' '+sub.score+'%';}).join(' · '):'';
-    var clickable=rep&&r.hasWA;
+    var subjectPreview=rep?rep.subjects.map(function(sub){
+      var cleanLabel=sub.label.replace(/^[^\w\d]+\s*/,'').split(' ')[0];
+      return cleanLabel+' '+sub.score+'%';
+    }).join(' · '):'';
+    var clickable=rep&&r.hasWA&&!nameBroken;
     var pressStyle=clickable?'cursor:pointer':'cursor:default;opacity:.75';
+    // Display the prettified name OR a warning label if the raw name leaked through
+    var renderedName=displayName||('⚠️ '+(rawName||'Unknown')+' — fix in Roster');
     return '<div onclick="'+(clickable?"openFridayPreview('"+uid.replace(/'/g,"\\'")+"')":'void 0')+'" style="background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 6px rgba(0,0,0,.05);'+pressStyle+'">'
       +'<div style="width:42px;height:42px;border-radius:10px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">'+(s.emoji||'👤')+'</div>'
       +'<div style="flex:1;min-width:0">'
-      +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+s.name+'</div>'
-      +  '<div style="font-size:12px;color:#6B7280;margin-top:2px">'+s.classLabel+(subjectPreview?' · '+subjectPreview:'')+'</div>'
+      +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:'+(nameBroken?'#991B1B':'#1E1B4B')+'">'+renderedName+'</div>'
+      +  '<div style="font-size:12px;color:#6B7280;margin-top:2px">'+(s.classLabel||'(no class set)')+(subjectPreview?' · '+subjectPreview:'')+'</div>'
       +  '<div style="margin-top:5px"><span style="font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:2px 8px;border-radius:6px;color:'+statusColor+'">'+statusPill+'</span></div>'
       +'</div>'
       +(clickable?'<div style="font-size:22px;color:#16A34A;flex-shrink:0">›</div>':'')
@@ -6580,6 +6642,12 @@ var _FR_CURRENT=null; // {student, report, message, schoolName}
 function openFridayPreview(uid){
   var student=_FR_DATA.roster.find(function(s){return (s.uid||s.name)===uid;});
   if(!student){toast('Student not found.',2000);return;}
+  // Guard: never open the preview for a student whose name would render as a UID
+  var displayName=_safeStudentName(student);
+  if(!displayName){
+    toast('⚠️ This student has no proper name. Edit their record in Roster first.',3500);
+    return;
+  }
   var report=_frBuildReport(student,_FR_DATA.allProg);
   if(!report){toast('This student has no activity this week.',2500);return;}
   if(!student.parentWA){toast('No parent WhatsApp for this student. Edit in Roster.',2800);return;}
@@ -6591,8 +6659,8 @@ function openFridayPreview(uid){
     hdr.innerHTML='<div style="display:flex;align-items:center;gap:12px">'
       +'<div style="width:46px;height:46px;border-radius:12px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;font-size:26px">'+(student.emoji||'👤')+'</div>'
       +'<div style="flex:1">'
-      +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:17px;color:#1E1B4B">'+student.name+'</div>'
-      +  '<div style="font-size:12px;color:#6B7280;margin-top:2px">'+student.classLabel+' · Parent WhatsApp: '+student.parentWA+'</div>'
+      +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:17px;color:#1E1B4B">'+displayName+'</div>'
+      +  '<div style="font-size:12px;color:#6B7280;margin-top:2px">'+(student.classLabel||'(no class set)')+' · Parent WhatsApp: '+student.parentWA+'</div>'
       +'</div></div>';
   }
   var pre=document.getElementById('fp-message');
