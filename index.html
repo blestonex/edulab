@@ -4985,6 +4985,9 @@ function renderMathQ(){
 function mathPick(btn,chosen){
   var q=MS.questions[MS.qIdx];
   var isRight=chosen===q.a;
+  // Play feedback sound — same as the vocab module via optPick. Previously
+  // silent, which made the maths module feel less responsive than the rest.
+  if(isRight)sOk();else sFail();
   // Highlight all options
   var card=document.getElementById('math-card');
   if(card)card.querySelectorAll('.opt').forEach(function(b){
@@ -5015,6 +5018,8 @@ function finishMath(){
   var pct=Math.round(correct/total*100);
   var passed=pct>=70;
   var stars=pct===100?3:pct>=80?2:pct>=70?1:0;
+  // End-of-stage feedback — matches vocab module's sPass()/sFail() behaviour
+  if(passed)sPass();else sFail();
   var prev=saveProg(MS.stage.id,{})||{};
   saveProg(MS.stage.id,{passed:passed,bestScore:Math.max(pct,prev.bestScore||0),stars:Math.max(stars,prev.stars||0),attempts:(prev.attempts||0)+1});
 
@@ -7033,8 +7038,78 @@ function checkAssignments(){
 }
 
 function showAssignmentsBanner(active){
-  var msg=active.map(function(a){return '\u2022 '+a.name+(a.due?' (due '+new Date(a.due).toLocaleDateString('en-GB',{day:'numeric',month:'short'})+')':'');}).join('\n');
-  alert('Your Assignments:\n\n'+msg);
+  // Build a proper modal with each assignment's full details + action button.
+  // Previous version showed only an alert() with names and dates — no stage,
+  // no teacher's note, no way to start the assigned work.
+  var overlay=document.createElement('div');
+  overlay.id='assignment-modal-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  overlay.onclick=function(e){if(e.target===overlay)overlay.remove();};
+
+  var items=active.map(function(a){
+    var dueStr=a.due?new Date(a.due).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'No due date';
+    var stageLabel=a.stageLabel||'';
+    var note=a.note||'';
+    var canStart=!!a.stageId;
+    // Escape single quotes so we can pass the ID into an onclick string
+    var safeStageId=(a.stageId||'').replace(/'/g,"\\'");
+    return '<div style="background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1.5px solid #E5E7EB">'
+      + '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:16px;color:#1E1B4B;margin-bottom:4px">📝 '+ (a.name||'Assignment') +'</div>'
+      + '<div style="font-size:12px;color:#6B7280;margin-bottom:'+(stageLabel||note?'8px':'0')+'">Due '+dueStr+'</div>'
+      + (stageLabel?'<div style="font-size:13px;color:#1E1B4B;margin-bottom:'+(note?'8px':'0')+'"><b>Stage:</b> '+stageLabel+'</div>':'')
+      + (note?'<div style="font-size:13px;color:#4B5563;background:#F9FAFB;border-radius:8px;padding:8px 10px;margin-bottom:8px;line-height:1.55;white-space:pre-wrap">'+_escapeHtml(note)+'</div>':'')
+      + (canStart
+          ? '<button onclick="startAssignmentStage(\''+safeStageId+'\')" style="width:100%;padding:11px;background:#7C3AED;color:#fff;border:none;border-radius:8px;font-family:\'Nunito\',sans-serif;font-weight:900;font-size:14px;cursor:pointer">Start this stage →</button>'
+          : '<div style="font-size:12px;color:#B45309;background:#FEF3C7;border-radius:8px;padding:8px 10px;text-align:center">Teacher did not link a specific stage. Practice as usual.</div>'
+        )
+      + '</div>';
+  }).join('');
+
+  overlay.innerHTML=
+    '<div style="background:#F9FAFB;border-radius:16px;padding:20px;max-width:420px;width:100%;max-height:86vh;overflow-y:auto">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+        +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:18px;color:#1E1B4B">Your Assignments</div>'
+        +'<button onclick="document.getElementById(\'assignment-modal-overlay\').remove()" style="background:none;border:none;font-size:22px;color:#6B7280;cursor:pointer;padding:0 4px;line-height:1">✕</button>'
+      +'</div>'
+      +items
+      +'<button onclick="document.getElementById(\'assignment-modal-overlay\').remove()" style="width:100%;padding:12px;background:#fff;color:#4B5563;border:1.5px solid #D1D5DB;border-radius:10px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:14px;cursor:pointer;margin-top:6px">Close</button>'
+    +'</div>';
+  document.body.appendChild(overlay);
+}
+
+// HTML-escape helper — used to safely embed user-authored assignment notes
+function _escapeHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Start a stage from an assignment — resolves the stageId back to a unit+index
+// pair and launches it. Handles vocab, maths, verbal, and quant stages.
+function startAssignmentStage(stageId){
+  if(!stageId)return;
+  var modal=document.getElementById('assignment-modal-overlay');
+  if(modal)modal.remove();
+  var cl=STU.classLabel;
+
+  // Search vocab UNITS (animals/body/food/etc.)
+  for(var i=0;i<UNITS.length;i++){
+    var stages=UNITS[i].stagesMap[cl]||[];
+    for(var j=0;j<stages.length;j++){
+      if(stages[j].id===stageId){
+        startStage(UNITS[i].key,j);
+        return;
+      }
+    }
+  }
+  // Search maths stages
+  var mstages=MATH_STAGES[STU.mathLevel||cl]||MATH_STAGES[cl]||[];
+  for(var k=0;k<mstages.length;k++){
+    if(mstages[k].id===stageId){
+      openMathList();
+      setTimeout(function(){startMathStage(k);},200);
+      return;
+    }
+  }
+  toast('Assignment stage not found. Ask your teacher to check.',3000);
 }
 
 // ════════════════════════════════════════
