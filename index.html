@@ -1606,64 +1606,116 @@ function wc(key){return C[key]||{bg:'linear-gradient(135deg,#60A5FA,#3B82F6)',wc
 // the original emoji. Drop-in replacement for emoji rendering everywhere.
 var CUSTOM_ICONS={
   yam:function(size){
-    // Nigerian yam — long brown tuber, lighter brown patches, cut showing white flesh.
-    // Drawn as a horizontal oblong with a lighter cut end on the right.
-    return '<svg viewBox="0 0 100 60" width="'+size+'" height="'+(size*0.6)+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="yam">'
-      +'<defs><linearGradient id="yamSkin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8B5A2B"/><stop offset="1" stop-color="#5A3818"/></linearGradient></defs>'
-      +'<ellipse cx="42" cy="30" rx="38" ry="18" fill="url(#yamSkin)"/>'
-      // Bark-line texture
-      +'<path d="M10 28 Q25 22 45 28 T75 30" stroke="#3F2410" stroke-width="1.2" fill="none" opacity=".6"/>'
-      +'<path d="M12 35 Q30 32 50 36 T78 35" stroke="#3F2410" stroke-width="1.2" fill="none" opacity=".5"/>'
-      // Lighter brown patches
-      +'<ellipse cx="22" cy="24" rx="6" ry="3" fill="#A5703A" opacity=".55"/>'
-      +'<ellipse cx="55" cy="36" rx="5" ry="2.5" fill="#A5703A" opacity=".55"/>'
-      // Cut end on the right showing white flesh (so kids see it IS food)
-      +'<ellipse cx="78" cy="30" rx="5" ry="14" fill="#F5EFD9" stroke="#5A3818" stroke-width="1.5"/>'
-      +'<ellipse cx="78" cy="30" rx="3" ry="9" fill="#FFFCEE" opacity=".7"/>'
+    // Real yam: long irregular tuber, bark-textured dark grey-brown skin,
+    // with a clean white circular cut end revealing pale flesh.
+    // viewBox is wider (3:1 ratio) to match the actual proportions of a yam tuber.
+    return '<svg viewBox="0 0 120 50" width="'+size+'" height="'+(size*0.42)+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="yam">'
+      +'<defs>'
+        +'<linearGradient id="yamBark" x1="0" y1="0" x2="0" y2="1">'
+          +'<stop offset="0" stop-color="#7A5C3E"/>'
+          +'<stop offset=".55" stop-color="#5C4226"/>'
+          +'<stop offset="1" stop-color="#3D2914"/>'
+        +'</linearGradient>'
+        +'<radialGradient id="yamFlesh" cx=".5" cy=".5" r=".55">'
+          +'<stop offset="0" stop-color="#FFFFFF"/>'
+          +'<stop offset=".6" stop-color="#FAF4DD"/>'
+          +'<stop offset="1" stop-color="#E8DFB8"/>'
+        +'</radialGradient>'
+      +'</defs>'
+      // Main tuber body — irregular elongated shape
+      +'<path d="M14 22 C 8 22 6 28 8 32 C 10 38 18 40 30 40 C 50 41 75 39 88 36 C 92 35 94 30 92 26 C 89 22 80 18 60 17 C 40 16 22 18 14 22 Z" fill="url(#yamBark)"/>'
+      // Bark texture lines — short horizontal strokes give that rough-bark look
+      +'<g stroke="#2A1B0A" stroke-width="0.6" fill="none" opacity=".55" stroke-linecap="round">'
+        +'<path d="M16 25 L19 25.5"/><path d="M22 23 L25 23.4"/><path d="M28 26 L31 26.2"/>'
+        +'<path d="M34 24 L37 24.3"/><path d="M40 27 L43 27.5"/><path d="M46 25 L49 25.2"/>'
+        +'<path d="M52 28 L55 28.3"/><path d="M58 26 L61 26.4"/><path d="M64 29 L67 29.1"/>'
+        +'<path d="M70 27 L73 27.5"/><path d="M76 30 L79 30.2"/><path d="M20 32 L23 32.3"/>'
+        +'<path d="M28 34 L31 34.5"/><path d="M38 35 L41 35.2"/><path d="M48 33 L51 33.4"/>'
+        +'<path d="M58 36 L61 36.3"/><path d="M68 34 L71 34.5"/><path d="M78 33 L81 33.2"/>'
+      +'</g>'
+      // Light highlight on top to give 3D form
+      +'<path d="M28 19 C 45 17 65 17.5 80 19" stroke="#A07952" stroke-width="1.2" fill="none" opacity=".5"/>'
+      // Cut end on the right — large, clean white circle showing flesh
+      +'<ellipse cx="92" cy="29" rx="14" ry="11" fill="#3D2914"/>'           // dark rim (skin thickness)
+      +'<ellipse cx="93" cy="29" rx="11.5" ry="9" fill="url(#yamFlesh)"/>'    // white flesh
+      +'<ellipse cx="93" cy="29" rx="11.5" ry="9" fill="none" stroke="#7A5C3E" stroke-width=".8"/>'
+      // Subtle radial fibres on the cut face (very faint)
+      +'<g stroke="#D6C796" stroke-width=".4" fill="none" opacity=".5">'
+        +'<path d="M93 22 L93 36"/><path d="M86 27 L100 31"/><path d="M86 31 L100 27"/>'
+      +'</g>'
       +'</svg>';
   },
   soil:function(size){
-    // Soil — dark brown ground with two layers (topsoil darker, subsoil lighter)
-    // and a small green seedling sprouting. Distinct from any animal shape.
+    // Soil — clear cross-section: dark topsoil layer, lighter subsoil below,
+    // a small green seedling growing up. Designed to be unmistakable.
     return '<svg viewBox="0 0 100 60" width="'+size+'" height="'+(size*0.6)+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="soil">'
-      +'<defs><linearGradient id="topSoil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6B3F1B"/><stop offset="1" stop-color="#4A2810"/></linearGradient></defs>'
-      // Subsoil (lighter, lower)
-      +'<rect x="0" y="40" width="100" height="20" fill="#8B5E34"/>'
-      // Topsoil (darker, upper) — natural wavy edge
-      +'<path d="M0 25 Q15 20 30 24 T60 22 T100 26 L100 45 L0 45 Z" fill="url(#topSoil)"/>'
-      // Specks of organic matter
-      +'<circle cx="18" cy="34" r="1.5" fill="#2A1605"/>'
-      +'<circle cx="42" cy="38" r="1.2" fill="#2A1605"/>'
-      +'<circle cx="68" cy="32" r="1.4" fill="#2A1605"/>'
-      +'<circle cx="85" cy="40" r="1.3" fill="#2A1605"/>'
-      // Seedling sprouting — makes context clear (this is what plants grow in)
-      +'<path d="M50 25 L50 8" stroke="#2D7A2D" stroke-width="2" fill="none"/>'
-      +'<path d="M50 14 Q42 10 40 4 Q48 6 50 14" fill="#3FA53F"/>'
-      +'<path d="M50 18 Q58 14 60 8 Q52 10 50 18" fill="#3FA53F"/>'
+      +'<defs>'
+        +'<linearGradient id="topSoil" x1="0" y1="0" x2="0" y2="1">'
+          +'<stop offset="0" stop-color="#5C3A1E"/>'
+          +'<stop offset="1" stop-color="#3D2410"/>'
+        +'</linearGradient>'
+        +'<linearGradient id="subSoil" x1="0" y1="0" x2="0" y2="1">'
+          +'<stop offset="0" stop-color="#9A6B3F"/>'
+          +'<stop offset="1" stop-color="#7A5230"/>'
+        +'</linearGradient>'
+      +'</defs>'
+      // Subsoil layer (lighter, lower)
+      +'<rect x="0" y="38" width="100" height="22" fill="url(#subSoil)"/>'
+      // Topsoil layer with natural wavy top edge
+      +'<path d="M0 22 Q12 18 22 22 Q35 26 50 22 Q65 18 78 23 Q90 27 100 24 L100 42 L0 42 Z" fill="url(#topSoil)"/>'
+      // Organic specks scattered through soil
+      +'<g fill="#1A0F05">'
+        +'<circle cx="14" cy="32" r="1.2"/><circle cx="26" cy="36" r="1"/>'
+        +'<circle cx="38" cy="30" r="1.3"/><circle cx="50" cy="34" r="1"/>'
+        +'<circle cx="64" cy="32" r="1.1"/><circle cx="78" cy="36" r="1"/>'
+        +'<circle cx="88" cy="30" r="1.2"/><circle cx="20" cy="46" r="1"/>'
+        +'<circle cx="44" cy="48" r="1"/><circle cx="68" cy="46" r="1.2"/>'
+        +'<circle cx="84" cy="50" r="1"/>'
+      +'</g>'
+      // A small worm visible on the surface (left side) to add realism
+      +'<path d="M6 26 Q10 24 14 26 Q18 28 22 26" stroke="#8B5A3C" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/>'
+      // Seedling — clearly a sprouting plant
+      +'<line x1="55" y1="22" x2="55" y2="4" stroke="#2D7A2D" stroke-width="2" stroke-linecap="round"/>'
+      +'<path d="M55 12 Q47 8 44 2 Q53 4 55 12 Z" fill="#3FA53F"/>'
+      +'<path d="M55 16 Q63 12 66 6 Q57 8 55 16 Z" fill="#3FA53F"/>'
+      +'<circle cx="55" cy="3" r="1.4" fill="#5BC75B"/>'
       +'</svg>';
   },
   cassava:function(size){
-    // Cassava root — long, slimmer than yam, white/cream flesh with brown skin
-    return '<svg viewBox="0 0 100 60" width="'+size+'" height="'+(size*0.6)+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="cassava">'
-      +'<defs><linearGradient id="casSkin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A87852"/><stop offset="1" stop-color="#6E4A2C"/></linearGradient></defs>'
-      // Long tapered tuber
-      +'<path d="M10 32 Q20 22 50 26 Q80 30 90 32 Q80 38 50 36 Q20 40 10 32 Z" fill="url(#casSkin)"/>'
-      +'<path d="M15 30 Q40 26 65 30" stroke="#3F2410" stroke-width=".8" fill="none" opacity=".5"/>'
-      // Tip on right showing white flesh
-      +'<ellipse cx="88" cy="32" rx="3" ry="5" fill="#FAF6E8" stroke="#5A3818" stroke-width="1"/>'
+    // Cassava root — long tapered tuber, light brown skin, white flesh at cut end
+    return '<svg viewBox="0 0 100 50" width="'+size+'" height="'+(size*0.5)+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="cassava">'
+      +'<defs>'
+        +'<linearGradient id="casSkin" x1="0" y1="0" x2="0" y2="1">'
+          +'<stop offset="0" stop-color="#A87852"/>'
+          +'<stop offset="1" stop-color="#5E3F22"/>'
+        +'</linearGradient>'
+      +'</defs>'
+      // Long tapered tuber — narrower than yam, more cone-like
+      +'<path d="M8 26 Q14 18 35 21 Q60 23 82 26 Q88 28 90 28 Q88 30 82 32 Q60 35 35 33 Q14 30 8 26 Z" fill="url(#casSkin)"/>'
+      // Bark grain
+      +'<g stroke="#3F2410" stroke-width=".5" fill="none" opacity=".55">'
+        +'<path d="M14 24 L18 24"/><path d="M24 23 L28 23"/><path d="M34 25 L38 25"/>'
+        +'<path d="M44 23 L48 23"/><path d="M54 26 L58 26"/><path d="M64 24 L68 24"/>'
+        +'<path d="M74 27 L78 27"/>'
+      +'</g>'
+      // White flesh at right tip
+      +'<ellipse cx="89" cy="28" rx="3" ry="4" fill="#5E3F22"/>'
+      +'<ellipse cx="90" cy="28" rx="2" ry="3" fill="#FAF6E8"/>'
       +'</svg>';
   },
   egusi:function(size){
-    // Egusi (melon seed) - pale flat oval seeds clustered
+    // Egusi — pale flat melon seeds clustered together
     return '<svg viewBox="0 0 100 60" width="'+size+'" height="'+(size*0.6)+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="egusi">'
-      +'<ellipse cx="35" cy="35" rx="9" ry="6" fill="#F4E5B8" stroke="#A07F2B" stroke-width="1"/>'
-      +'<ellipse cx="55" cy="28" rx="9" ry="6" fill="#F4E5B8" stroke="#A07F2B" stroke-width="1" transform="rotate(-15 55 28)"/>'
-      +'<ellipse cx="68" cy="40" rx="9" ry="6" fill="#F4E5B8" stroke="#A07F2B" stroke-width="1" transform="rotate(20 68 40)"/>'
-      +'<ellipse cx="48" cy="45" rx="9" ry="6" fill="#F4E5B8" stroke="#A07F2B" stroke-width="1" transform="rotate(-30 48 45)"/>'
+      +'<g stroke="#A07F2B" stroke-width="1" fill="#F4E5B8">'
+        +'<ellipse cx="30" cy="30" rx="9" ry="6"/>'
+        +'<ellipse cx="50" cy="22" rx="9" ry="6" transform="rotate(-15 50 22)"/>'
+        +'<ellipse cx="65" cy="35" rx="9" ry="6" transform="rotate(20 65 35)"/>'
+        +'<ellipse cx="42" cy="42" rx="9" ry="6" transform="rotate(-30 42 42)"/>'
+        +'<ellipse cx="72" cy="20" rx="9" ry="6" transform="rotate(35 72 20)"/>'
+        +'<ellipse cx="20" cy="42" rx="9" ry="6" transform="rotate(-40 20 42)"/>'
+      +'</g>'
       +'</svg>';
   },
-  // Add more as we identify other emoji that read wrong to Nigerian children
-  // Examples for future: 'gari', 'amala', 'ogbono', 'okra' (🥒 cucumber is wrong)
 };
 
 // renderIcon(key, fallbackEmoji, sizePx)
@@ -3505,7 +3557,18 @@ function renderLearnCard(){
   document.getElementById('learn-prog').style.width=Math.round((idx+1)/total*100)+'%';
   document.getElementById('learn-prog').style.background=col.wc;
   document.getElementById('wc-top').style.background=col.bg;
-  document.getElementById('lc-em').textContent=wd.emoji;
+  // If we have a custom SVG icon for this word (yam, soil, cassava, egusi),
+  // render the SVG directly. Otherwise show the Unicode emoji as text.
+  var lcEm=document.getElementById('lc-em');
+  if(lcEm){
+    if(CUSTOM_ICONS[key]){
+      lcEm.textContent=''; // clear any prior text node
+      lcEm.innerHTML=CUSTOM_ICONS[key](90); // larger size for the Learn screen hero card
+    }else{
+      lcEm.innerHTML='';
+      lcEm.textContent=wd.emoji;
+    }
+  }
   document.getElementById('lc-word').textContent=wd.word;
   document.getElementById('lc-word').style.color=col.wc;
   document.getElementById('lc-def').textContent=wd.def;
@@ -5734,6 +5797,414 @@ var WAEC_MATHS_TOPICS=[
   {key:'calculus',label:'Introductory Calculus'}
 ];
 
+// English topic taxonomy aligned to JAMB UTME English structure
+var WAEC_ENGLISH_TOPICS=[
+  {key:'lexis',     label:'Lexis & Structure'},
+  {key:'comprehension', label:'Comprehension'},
+  {key:'cloze',     label:'Cloze Passage'},
+  {key:'idioms',    label:'Idioms & Sentence Meaning'},
+  {key:'oral',      label:'Oral English'}
+];
+
+// ── Comprehension & cloze passages ──
+// Stored separately so multiple questions can share a passage. Each question
+// that uses a passage references it by `passageId`. Passages are original
+// content written for this app — not lifted from any past paper.
+var WAEC_ENGLISH_PASSAGES={
+  // Comprehension passage 1 (used by e26–e30)
+  comp1:'Across rural Nigeria, a quiet revolution is taking root in farming. Where farmers once relied entirely on the timing of seasonal rains, many are now turning to drip irrigation — a system in which water is delivered slowly, drop by drop, directly to the roots of each plant. The technology is not new; it has been used in Israel since the 1960s. What is new is its arrival in the hands of smallholder farmers in Kano, Kaduna, and Sokoto, who have begun to install simple plastic-tube versions on plots as small as half a hectare.\n\nThe results have surprised even the most cautious observers. A 2023 study by the Federal Ministry of Agriculture found that tomato yields on drip-irrigated plots were nearly double those on rain-fed plots, while water consumption fell by roughly 40 per cent. Farmers report that they now harvest two crops a year instead of one, and that pest infestations have decreased because the leaves of the plants stay dry. However, the system is not without its difficulties: the initial cost of equipment, though falling, remains beyond the reach of the poorest farmers, and the plastic tubes are vulnerable to rodents and to the heat of the dry-season sun.\n\nIf the technology continues to spread, agricultural economists believe it could reshape the country\u2019s food security in ways that no policy intervention has managed to achieve in the past two decades.',
+
+  // Comprehension passage 2 (used by e31–e35)
+  comp2:'When Adaeze opened the small bakery on the quiet end of Marina Street, her friends called it a brave decision; her parents called it reckless. She had given up a stable job at a bank, used three years of savings, and signed a two-year lease on a building that smelled, on her first inspection, of stale paint and abandonment. For the first six months, she worked from four in the morning until ten at night, doing every task herself. The bread was good — everyone agreed on that — but customers were few. By the end of the first year she had drained her account and was beginning to wonder whether her parents had been right after all.\n\nWhat saved the bakery was not, in the end, the quality of the bread but a single decision Adaeze made on a Wednesday afternoon. She walked into the offices of three small companies on her street and offered to deliver fresh bread to their staff every morning at a price slightly below what those staff already paid at the supermarket. Two of the three accepted. Within three months, word had spread, and she had contracts with eleven offices. By the time her lease came up for renewal, the bakery was profitable enough that she was able to hire two assistants and stop coming in at four o\u2019clock.',
+
+  // Cloze passage (used by e36–e41)
+  cloze1:'A good leader does not rely on _____(1)_____ alone. Knowledge of the work, _____(2)_____ for the people who do it, and the _____(3)_____ to admit a mistake when one has been made are equally important. The leader who shouts loudest is rarely the one whose team _____(4)_____ best. In fact, the most _____(5)_____ leaders are often quiet listeners who allow others to speak before they themselves _____(6)_____ a decision.'
+};
+
+// ── 50 English Language Practice Questions ──
+// Each one self-verified: answer is provably in options, distractors reflect
+// genuine student errors. Marked as "Practice — written for SS3 / JAMB UTME prep"
+var WAEC_ENGLISH_QS=[
+  // ═══════════════ LEXIS & STRUCTURE (25) ═══════════════
+  // — Synonyms (5) —
+  {id:'e01',topic:'lexis',diff:'easy',
+   q:'Choose the option NEAREST in meaning to the underlined word:\n\nThe minister gave a *brief* speech.',
+   opts:['boring','short','important','formal'],
+   a:'short',
+   why:'"Brief" means short or concise. The other options describe other possible qualities of a speech but do not match the meaning of "brief".'},
+
+  {id:'e02',topic:'lexis',diff:'easy',
+   q:'Choose the option NEAREST in meaning to the underlined word:\n\nThe student was *diligent* in her studies.',
+   opts:['careless','slow','hard-working','clever'],
+   a:'hard-working',
+   why:'"Diligent" means showing care and effort in one\'s work — i.e., hard-working. "Clever" describes intelligence, not effort.'},
+
+  {id:'e03',topic:'lexis',diff:'mid',
+   q:'Choose the option NEAREST in meaning to the underlined word:\n\nThe witness gave a *candid* account of what he saw.',
+   opts:['lengthy','honest','confused','reluctant'],
+   a:'honest',
+   why:'"Candid" means open, frank, and truthful — i.e., honest.'},
+
+  {id:'e04',topic:'lexis',diff:'mid',
+   q:'Choose the option NEAREST in meaning to the underlined word:\n\nThe new policy was met with *fierce* opposition.',
+   opts:['intense','unexpected','peaceful','organised'],
+   a:'intense',
+   why:'"Fierce" here describes the strength of the opposition — intense, severe. It is not used in its "wild animal" sense.'},
+
+  {id:'e05',topic:'lexis',diff:'hard',
+   q:'Choose the option NEAREST in meaning to the underlined word:\n\nHis arguments, though *cogent*, failed to convince the panel.',
+   opts:['lengthy','well-reasoned','emotional','badly-prepared'],
+   a:'well-reasoned',
+   why:'"Cogent" means clear, logical, and convincing — i.e., well-reasoned. The sentence still makes sense: even well-reasoned arguments can fail to persuade a panel.'},
+
+  // — Antonyms (5) —
+  {id:'e06',topic:'lexis',diff:'easy',
+   q:'Choose the option OPPOSITE in meaning to the underlined word:\n\nThe room was *spacious*.',
+   opts:['cramped','tidy','warm','silent'],
+   a:'cramped',
+   why:'"Spacious" means having plenty of room. Its opposite is "cramped" — having too little room.'},
+
+  {id:'e07',topic:'lexis',diff:'easy',
+   q:'Choose the option OPPOSITE in meaning to the underlined word:\n\nHer manner was *humble*.',
+   opts:['shy','proud','quiet','formal'],
+   a:'proud',
+   why:'"Humble" means modest, not thinking too highly of oneself. Its opposite is "proud" (here in the negative sense of arrogant).'},
+
+  {id:'e08',topic:'lexis',diff:'mid',
+   q:'Choose the option OPPOSITE in meaning to the underlined word:\n\nThe judge was praised for his *impartial* ruling.',
+   opts:['unjust','firm','biased','quick'],
+   a:'biased',
+   why:'"Impartial" means fair, treating all sides equally. Its direct opposite is "biased" — favouring one side. "Unjust" is related but means morally wrong, which is broader.'},
+
+  {id:'e09',topic:'lexis',diff:'mid',
+   q:'Choose the option OPPOSITE in meaning to the underlined word:\n\nFood is *abundant* this season.',
+   opts:['scarce','expensive','sweet','plentiful'],
+   a:'scarce',
+   why:'"Abundant" means existing in large quantities. The opposite is "scarce" — in short supply. "Plentiful" is a synonym, not an antonym.'},
+
+  {id:'e10',topic:'lexis',diff:'hard',
+   q:'Choose the option OPPOSITE in meaning to the underlined word:\n\nHis behaviour was *reprehensible*.',
+   opts:['praiseworthy','careless','expected','harmless'],
+   a:'praiseworthy',
+   why:'"Reprehensible" means deserving of strong criticism or condemnation. Its direct antonym is "praiseworthy" — deserving of praise.'},
+
+  // — Sentence completion / structure (10) —
+  {id:'e11',topic:'lexis',diff:'easy',
+   q:'Complete the sentence with the correct option:\n\nNeither the teacher nor the students _____ ready for the test.',
+   opts:['was','were','have been','is being'],
+   a:'were',
+   why:'With "neither...nor", the verb agrees with the closer subject — here "the students" (plural), so the verb is "were".'},
+
+  {id:'e12',topic:'lexis',diff:'easy',
+   q:'Complete the sentence with the correct option:\n\nIf I _____ enough money, I would buy a new phone.',
+   opts:['have','had','will have','am having'],
+   a:'had',
+   why:'A second-conditional sentence (unreal/hypothetical present) takes the past simple in the if-clause: "If I had ... I would buy ...".'},
+
+  {id:'e13',topic:'lexis',diff:'easy',
+   q:'Complete the sentence with the correct option:\n\nThe meeting has been postponed _____ next Friday.',
+   opts:['on','to','until','for'],
+   a:'until',
+   why:'"Postpone until [a future date]" is the standard collocation. "Postpone to" is also possible but less idiomatic; in JAMB-style questions "until" is the standard answer.'},
+
+  {id:'e14',topic:'lexis',diff:'mid',
+   q:'Complete the sentence with the correct option:\n\nThe report _____ by the committee tomorrow.',
+   opts:['will discuss','will be discussed','is discussing','has discussed'],
+   a:'will be discussed',
+   why:'The report is the THING being discussed (it does not discuss itself), so the verb must be passive — "will be discussed".'},
+
+  {id:'e15',topic:'lexis',diff:'mid',
+   q:'Complete the sentence with the correct option:\n\nShe is one of those people who _____ always cheerful.',
+   opts:['is','are','was','has been'],
+   a:'are',
+   why:'In "one of those who..." constructions, the verb in the relative clause refers back to the plural noun ("those people"), so the verb is "are".'},
+
+  {id:'e16',topic:'lexis',diff:'mid',
+   q:'Complete the sentence with the correct option:\n\nBy the time we arrived, the show _____ already.',
+   opts:['started','has started','had started','was starting'],
+   a:'had started',
+   why:'Two past actions: arriving + the show starting BEFORE the arrival. The earlier action takes the past perfect ("had started").'},
+
+  {id:'e17',topic:'lexis',diff:'mid',
+   q:'Choose the correctly punctuated sentence:',
+   opts:[
+     'My brother who lives in Lagos is a doctor.',
+     'My brother, who lives in Lagos, is a doctor.',
+     'My brother who lives in Lagos, is a doctor.',
+     'My brother, who lives in Lagos is a doctor.'
+   ],
+   a:'My brother, who lives in Lagos, is a doctor.',
+   why:'A non-defining (extra-information) relative clause is set off by commas on BOTH sides.'},
+
+  {id:'e18',topic:'lexis',diff:'mid',
+   q:'Complete the sentence with the correct option:\n\nThe boy whom you saw yesterday is the one _____ won the prize.',
+   opts:['who','whom','which','whose'],
+   a:'who',
+   why:'The relative pronoun is the SUBJECT of "won the prize", so it must be "who" (subject form), not "whom" (object form).'},
+
+  {id:'e19',topic:'lexis',diff:'hard',
+   q:'Complete the sentence with the correct option:\n\nNot only _____ the homework, but he also helped his friends with theirs.',
+   opts:['he completed','did he complete','he did complete','completed he'],
+   a:'did he complete',
+   why:'When a sentence begins with "Not only" for emphasis, the subject and auxiliary verb invert: "did he complete".'},
+
+  {id:'e20',topic:'lexis',diff:'hard',
+   q:'Choose the sentence with NO grammatical error:',
+   opts:[
+     'Each of the students have submitted their assignment.',
+     'Each of the students has submitted their assignment.',
+     'Each of the students have submitted his or her assignment.',
+     'Each of the students has submitted his or her assignment.'
+   ],
+   a:'Each of the students has submitted his or her assignment.',
+   why:'"Each" is singular, so the verb is "has". The pronoun must also be singular, so "his or her" is correct rather than "their" in formal usage.'},
+
+  // — Word usage / collocations (5) —
+  {id:'e21',topic:'lexis',diff:'easy',
+   q:'Choose the option that BEST completes the sentence:\n\nThe minister was _____ of any wrongdoing by the tribunal.',
+   opts:['acquitted','convicted','accused','charged'],
+   a:'acquitted',
+   why:'"Acquitted of" means cleared of charges. "Convicted of" and "accused of" mean the opposite. "Charged with" uses a different preposition.'},
+
+  {id:'e22',topic:'lexis',diff:'mid',
+   q:'Choose the option that BEST completes the sentence:\n\nThe new policy will take _____ from the first of next month.',
+   opts:['place','effect','part','over'],
+   a:'effect',
+   why:'"Take effect" is the standard idiom for a policy/law/rule becoming operative. "Take place" means happen; "take part" means participate; "take over" means assume control.'},
+
+  {id:'e23',topic:'lexis',diff:'mid',
+   q:'Choose the option that BEST completes the sentence:\n\nThe government should _____ measures to control inflation.',
+   opts:['do','take','make','give'],
+   a:'take',
+   why:'The standard collocation is "take measures". "Take steps", "take action" follow the same pattern.'},
+
+  {id:'e24',topic:'lexis',diff:'hard',
+   q:'Choose the option that BEST completes the sentence:\n\nThe old building was demolished to make _____ for the new hospital.',
+   opts:['way','room','space','place'],
+   a:'way',
+   why:'The fixed expression is "make way for" — meaning to clear space so something else can take its place. "Make room for" is also used but is less formal; "make way for" is the standard answer in JAMB-style usage.'},
+
+  {id:'e25',topic:'lexis',diff:'hard',
+   q:'Choose the option that BEST completes the sentence:\n\nThe two countries reached an _____ on trade after months of negotiation.',
+   opts:['accord','accordance','according','accordingly'],
+   a:'accord',
+   why:'"Reach an accord" means reach an agreement. "Accordance" appears in "in accordance with"; "according" needs "to"; "accordingly" is an adverb.'},
+
+  // ═══════════════ COMPREHENSION (10) — two passages, 5 questions each ═══════════════
+  {id:'e26',topic:'comprehension',diff:'mid',passageId:'comp1',
+   q:'According to the passage, what is the main reason drip irrigation has become popular in northern Nigeria?',
+   opts:[
+     'It is a new technology never seen before.',
+     'It has been promoted by the Israeli government.',
+     'It produces higher yields while using less water.',
+     'It is the only system that works in the dry season.'
+   ],
+   a:'It produces higher yields while using less water.',
+   why:'Paragraph 2 directly states yields nearly doubled while water use fell by 40 per cent. The passage notes the technology is NOT new (it dates to 1960s Israel), so the first option is wrong.'},
+
+  {id:'e27',topic:'comprehension',diff:'mid',passageId:'comp1',
+   q:'The phrase "a quiet revolution is taking root" in the first sentence is an example of:',
+   opts:['simile','metaphor','personification','hyperbole'],
+   a:'metaphor',
+   why:'A revolution does not literally have roots. The phrase compares the spread of drip irrigation to a plant taking root — a metaphor (no "like" or "as", which would make it a simile).'},
+
+  {id:'e28',topic:'comprehension',diff:'mid',passageId:'comp1',
+   q:'Which of the following is NOT mentioned in the passage as a difficulty with drip irrigation?',
+   opts:[
+     'The cost of equipment.',
+     'Damage from rodents.',
+     'A shortage of skilled installers.',
+     'The heat of the sun damaging the tubes.'
+   ],
+   a:'A shortage of skilled installers.',
+   why:'The passage names cost, rodents, and sun damage as difficulties (paragraph 2). It does not mention skilled installers anywhere.'},
+
+  {id:'e29',topic:'comprehension',diff:'hard',passageId:'comp1',
+   q:'The author\'s overall attitude towards drip irrigation can be described as:',
+   opts:['hostile','sceptical','cautiously positive','uncritically enthusiastic'],
+   a:'cautiously positive',
+   why:'The author reports clear benefits but also flags genuine difficulties (cost, rodents, heat). This balance is "cautiously positive" — neither hostile, sceptical, nor uncritically enthusiastic.'},
+
+  {id:'e30',topic:'comprehension',diff:'hard',passageId:'comp1',
+   q:'The word "smallholder" in paragraph 1 most likely refers to:',
+   opts:[
+     'farmers who own small areas of land',
+     'farmers who own small irrigation tubes',
+     'temporary or seasonal workers',
+     'farmers who hold land for short periods'
+   ],
+   a:'farmers who own small areas of land',
+   why:'The passage clarifies the meaning by saying these farmers operate "on plots as small as half a hectare" — i.e. small landholdings. "Smallholder" is a standard agricultural term for owners of small plots.'},
+
+  {id:'e31',topic:'comprehension',diff:'mid',passageId:'comp2',
+   q:'Why did Adaeze\'s parents call her decision "reckless"?',
+   opts:[
+     'They thought she was a poor baker.',
+     'She had no experience working in a bakery.',
+     'She gave up a secure job for an uncertain venture.',
+     'The Marina Street area was dangerous.'
+   ],
+   a:'She gave up a secure job for an uncertain venture.',
+   why:'Paragraph 1 says she "had given up a stable job at a bank" and used her savings on a doubtful venture — that\'s why parents would call it reckless. The passage doesn\'t mention her experience or the area\'s safety.'},
+
+  {id:'e32',topic:'comprehension',diff:'mid',passageId:'comp2',
+   q:'What does the passage suggest was the REAL reason the bakery struggled in its first year?',
+   opts:[
+     'The bread was poor quality.',
+     'There was no clear customer base.',
+     'Adaeze did not work hard enough.',
+     'The lease was too expensive.'
+   ],
+   a:'There was no clear customer base.',
+   why:'The passage states that "the bread was good — everyone agreed on that" but "customers were few" — so quality and effort were not the problem. The struggle was attracting customers, i.e. lack of a customer base.'},
+
+  {id:'e33',topic:'comprehension',diff:'mid',passageId:'comp2',
+   q:'What single decision saved the bakery?',
+   opts:[
+     'Hiring assistants.',
+     'Lowering her prices generally.',
+     'Offering office delivery contracts.',
+     'Renewing the lease.'
+   ],
+   a:'Offering office delivery contracts.',
+   why:'Paragraph 2 explicitly identifies the turning point: she walked into three offices and offered delivery — two accepted, and word spread.'},
+
+  {id:'e34',topic:'comprehension',diff:'hard',passageId:'comp2',
+   q:'The phrase "drained her account" in paragraph 1 means:',
+   opts:[
+     'her bank reduced her balance to zero',
+     'she had spent almost all of her savings',
+     'her account was closed by the bank',
+     'someone had stolen money from her account'
+   ],
+   a:'she had spent almost all of her savings',
+   why:'In context, "drained her account" idiomatically means she emptied/spent down her savings. The other options describe different events not implied by the text.'},
+
+  {id:'e35',topic:'comprehension',diff:'hard',passageId:'comp2',
+   q:'What is the main lesson of Adaeze\'s story?',
+   opts:[
+     'Quality alone is not enough; finding the right customers matters.',
+     'It is dangerous to leave a stable job.',
+     'Bakeries are difficult businesses to run.',
+     'Parents are usually right about their children\'s decisions.'
+   ],
+   a:'Quality alone is not enough; finding the right customers matters.',
+   why:'The passage emphasises that good bread alone wasn\'t enough — what saved the business was a strategic decision about distribution. That\'s the central message; the other options are either narrow details or contradicted by the ending.'},
+
+  // ═══════════════ CLOZE (6) — single passage with 6 blanks ═══════════════
+  {id:'e36',topic:'cloze',diff:'mid',passageId:'cloze1',
+   q:'Choose the BEST option for blank (1):\n\n"A good leader does not rely on _____(1)_____ alone."',
+   opts:['authority','commands','strength','permission'],
+   a:'authority',
+   why:'The blank requires a noun describing what a leader might rely on. "Authority" fits the formal register and is the most natural collocation in this context.'},
+
+  {id:'e37',topic:'cloze',diff:'mid',passageId:'cloze1',
+   q:'Choose the BEST option for blank (2):\n\n"Knowledge of the work, _____(2)_____ for the people who do it, and..."',
+   opts:['fear','respect','sympathy','suspicion'],
+   a:'respect',
+   why:'The list is enumerating positive leadership qualities — knowledge, _____, humility. "Respect for the people" fits the positive-quality theme.'},
+
+  {id:'e38',topic:'cloze',diff:'mid',passageId:'cloze1',
+   q:'Choose the BEST option for blank (3):\n\n"...and the _____(3)_____ to admit a mistake when one has been made..."',
+   opts:['fear','willingness','difficulty','reluctance'],
+   a:'willingness',
+   why:'The phrase needs a positive trait that enables admitting mistakes — "willingness". "Reluctance" and "difficulty" are negative; "fear" doesn\'t fit because fear of admitting mistakes is the OPPOSITE of what good leaders show.'},
+
+  {id:'e39',topic:'cloze',diff:'mid',passageId:'cloze1',
+   q:'Choose the BEST option for blank (4):\n\n"The leader who shouts loudest is rarely the one whose team _____(4)_____ best."',
+   opts:['shouts','performs','listens','obeys'],
+   a:'performs',
+   why:'The contrast is between shouting (a loud leader\'s style) and effective team output. "Performs best" describes team effectiveness — the natural completion.'},
+
+  {id:'e40',topic:'cloze',diff:'mid',passageId:'cloze1',
+   q:'Choose the BEST option for blank (5):\n\n"...the most _____(5)_____ leaders are often quiet listeners..."',
+   opts:['effective','annoying','famous','wealthy'],
+   a:'effective',
+   why:'The passage is about what makes leadership work, so the missing word characterises leadership QUALITY — "effective". The other options describe unrelated traits.'},
+
+  {id:'e41',topic:'cloze',diff:'hard',passageId:'cloze1',
+   q:'Choose the BEST option for blank (6):\n\n"...quiet listeners who allow others to speak before they themselves _____(6)_____ a decision."',
+   opts:['take','make','do','have'],
+   a:'make',
+   why:'The standard collocation is "make a decision". "Take a decision" is sometimes heard but is non-standard in formal English. "Do" and "have" do not collocate with "a decision".'},
+
+  // ═══════════════ IDIOMS / SENTENCE INTERPRETATION (5) ═══════════════
+  {id:'e42',topic:'idioms',diff:'easy',
+   q:'What does the underlined idiom mean?\n\nWhen the headmaster announced surprise tests, my friend told me to *break a leg*.',
+   opts:['hurt myself','do my best','run away','be quiet'],
+   a:'do my best',
+   why:'"Break a leg" is a common English idiom meaning "good luck / do your best", traditionally said before a performance or test. It does NOT mean to literally hurt oneself.'},
+
+  {id:'e43',topic:'idioms',diff:'mid',
+   q:'What does the underlined idiom mean?\n\nThe new manager *hit the ground running* on her first day.',
+   opts:[
+     'fell down at the office',
+     'started working effectively immediately',
+     'was rude to her colleagues',
+     'arrived late to work'
+   ],
+   a:'started working effectively immediately',
+   why:'"Hit the ground running" means to start a new task with energy and effectiveness from the very beginning, with no slow start or learning lag.'},
+
+  {id:'e44',topic:'idioms',diff:'mid',
+   q:'What does the underlined expression mean?\n\nLet\'s not *cross that bridge until we come to it*.',
+   opts:[
+     'Let\'s avoid the bridge altogether.',
+     'Let\'s deal with that problem only when it actually arises.',
+     'Let\'s find a different route.',
+     'Let\'s travel together.'
+   ],
+   a:'Let\'s deal with that problem only when it actually arises.',
+   why:'This idiom means: don\'t worry about a problem before it actually happens. Address each problem when it presents itself, not before.'},
+
+  {id:'e45',topic:'idioms',diff:'hard',
+   q:'What does the underlined idiom mean?\n\nHe was made the *scapegoat* for the team\'s failure.',
+   opts:[
+     'made captain of the team',
+     'blamed for something that was not entirely his fault',
+     'praised in front of the others',
+     'asked to leave the team'
+   ],
+   a:'blamed for something that was not entirely his fault',
+   why:'A "scapegoat" is a person who is blamed for the wrongs of others. The idiom comes from an ancient ritual; in modern usage it always means "the one unjustly blamed".'},
+
+  {id:'e46',topic:'idioms',diff:'hard',
+   q:'What does the underlined expression mean?\n\nHis explanation was a *red herring* designed to distract us.',
+   opts:[
+     'a piece of evidence',
+     'something irrelevant that misleads',
+     'a passionate argument',
+     'a deliberate lie'
+   ],
+   a:'something irrelevant that misleads',
+   why:'A "red herring" is something that draws attention away from the real issue — irrelevant and misleading, but not necessarily a lie. It comes from training hunting dogs by dragging a smelly fish across a trail.'},
+
+  // ═══════════════ ORAL ENGLISH (4) — kept simple to verifiable rhymes ═══════════════
+  {id:'e47',topic:'oral',diff:'easy',
+   q:'Which of these words RHYMES with: *cat*?',
+   opts:['cot','cut','hat','car'],
+   a:'hat',
+   why:'"Cat" and "hat" both end in the same -at sound (/æt/). The other words have different vowel sounds: "cot" /ɒ/, "cut" /ʌ/, "car" /ɑː/.'},
+
+  {id:'e48',topic:'oral',diff:'easy',
+   q:'Which of these words RHYMES with: *sing*?',
+   opts:['sin','sign','ring','sang'],
+   a:'ring',
+   why:'"Sing" and "ring" both end in the -ing sound. "Sin" lacks the -ng; "sign" has a different vowel; "sang" has a different vowel.'},
+
+  {id:'e49',topic:'oral',diff:'mid',
+   q:'Which word has a DIFFERENT vowel sound from the others?',
+   opts:['feet','seat','heat','said'],
+   a:'said',
+   why:'"Feet", "seat", and "heat" all share the long /iː/ vowel sound. "Said" is pronounced /sɛd/ with a short /ɛ/ — clearly different.'},
+
+  {id:'e50',topic:'oral',diff:'mid',
+   q:'Which word has a DIFFERENT vowel sound from the others?',
+   opts:['boat','coat','goat','foot'],
+   a:'foot',
+   why:'"Boat", "coat", and "goat" all share the /oʊ/ (or /əʊ/) diphthong. "Foot" is pronounced /fʊt/ — a short, different vowel sound.'}
+];
+
 // ── 50 SS3 Mathematics Practice Questions ──
 // Self-verified: every answer was hand-computed, every distractor was chosen
 // to reflect a typical student error (off-by-one, sign error, formula mix-up).
@@ -6084,7 +6555,7 @@ var WAEC_MATHS_QS=[
 // and renders as "Coming soon" in the UI.
 var WAEC_QUESTIONS={
   maths:WAEC_MATHS_QS,
-  english:[],
+  english:WAEC_ENGLISH_QS,
   biology:[],
   physics:[],
   chemistry:[],
@@ -6511,9 +6982,10 @@ function openWaecMode(subjectKey){
 }
 
 function _waecTopicsForSubject(key){
-  // Currently only Maths has a topic taxonomy. Other subjects will have their
-  // own when their question banks are built.
+  // Each subject has its own topic taxonomy. Subjects without questions yet
+  // return [] which renders the "Coming soon" state.
   if(key==='maths')return WAEC_MATHS_TOPICS;
+  if(key==='english')return WAEC_ENGLISH_TOPICS;
   return [];
 }
 
@@ -6537,6 +7009,11 @@ function waecStart(mode, topicKey){
   }else{
     pool=shuffle(pool);
   }
+  // Group passage-sharing questions consecutively, preserving overall order
+  // otherwise. Without this, comprehension/cloze questions would scatter and
+  // the student would bounce between passages — annoying and not how the
+  // real exam works.
+  pool=_waecGroupByPassage(pool);
   WS.questions=pool;
   WS.qIdx=0;
   WS.answers=[];
@@ -6587,6 +7064,35 @@ function _waecBalancedSample(pool, n){
   return shuffle(result).slice(0,n);
 }
 
+// Keep questions sharing the same passageId together. The first time we see
+// a passage, that's where the whole group lands; subsequent passage members
+// are inserted right after the first. Standalone questions stay where they
+// were. This means students don't bounce between passages and never have to
+// re-load the same passage twice in a row.
+function _waecGroupByPassage(pool){
+  if(!pool||pool.length<2)return pool;
+  var result=[];
+  var consumed={}; // index → true once we've placed it
+  for(var i=0;i<pool.length;i++){
+    if(consumed[i])continue;
+    var q=pool[i];
+    result.push(q);
+    consumed[i]=true;
+    // If this question has a passage, sweep the rest of the pool and pull
+    // any other questions with the same passageId into this slot.
+    if(q.passageId){
+      for(var j=i+1;j<pool.length;j++){
+        if(consumed[j])continue;
+        if(pool[j].passageId===q.passageId){
+          result.push(pool[j]);
+          consumed[j]=true;
+        }
+      }
+    }
+  }
+  return result;
+}
+
 function _waecTickTimer(){
   var elapsed=Date.now()-WS.cbtStartedAt;
   var remaining=Math.max(0, WS.cbtDurationMs-elapsed);
@@ -6630,8 +7136,21 @@ function _waecRenderQ(){
   var card=document.getElementById('waec-card');
   if(!card)return;
   var stem=_escapeHtml(q.q).replace(/\n/g,'<br>');
-  var html='<div style="font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:'+(subj?subj.color:'#7F1D1D')+';margin-bottom:6px">'+(q.diff||'mid').toUpperCase()+'</div>'
-    +'<div style="font-family:\'Nunito\',sans-serif;font-weight:800;font-size:16px;color:#1E1B4B;line-height:1.55;margin-bottom:14px;white-space:pre-wrap">'+stem+'</div>'
+  var html='<div style="font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:'+(subj?subj.color:'#7F1D1D')+';margin-bottom:6px">'+(q.diff||'mid').toUpperCase()+'</div>';
+  // ── Passage block (Comprehension / Cloze) ──
+  // If this question references a passage (via passageId), render it in a
+  // scrollable bordered box above the question stem. Multiple consecutive
+  // questions sharing the same passage means the student keeps re-reading
+  // the same text — which matches the real exam experience.
+  if(q.passageId&&typeof WAEC_ENGLISH_PASSAGES!=='undefined'&&WAEC_ENGLISH_PASSAGES[q.passageId]){
+    var passage=_escapeHtml(WAEC_ENGLISH_PASSAGES[q.passageId]).replace(/\n/g,'<br><br>');
+    var passageLabel=q.topic==='cloze'?'Read the passage. Each blank is numbered.':'Read the passage carefully, then answer the questions.';
+    html+='<div style="background:#FAFAF7;border:1.5px solid #E5E7EB;border-radius:10px;padding:14px;margin-bottom:14px;max-height:240px;overflow-y:auto">'
+      +'<div style="font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#6B7280;margin-bottom:8px">'+passageLabel+'</div>'
+      +'<div style="font-size:14px;color:#1E1B4B;line-height:1.65;font-family:Georgia,serif">'+passage+'</div>'
+      +'</div>';
+  }
+  html+='<div style="font-family:\'Nunito\',sans-serif;font-weight:800;font-size:16px;color:#1E1B4B;line-height:1.55;margin-bottom:14px;white-space:pre-wrap">'+stem+'</div>'
     +'<div class="opts">';
   q.opts.forEach(function(opt,i){
     var safeOpt=_escapeHtml(opt);
@@ -7488,7 +8007,9 @@ function renderCompQ(){
     var pool=COMP.questions.filter(function(k){return typeof k==='string'&&k!==key;});
     var wrongs=shuffle(pool).slice(0,3);
     var opts=shuffle([key].concat(wrongs));
-    var html='<span style="font-size:52px;display:block;text-align:center;margin-bottom:8px">'+wd.emoji+'</span>';
+    var html=(CUSTOM_ICONS[key]
+      ? '<span style="font-size:52px;display:block;text-align:center;margin-bottom:8px;line-height:1">'+CUSTOM_ICONS[key](56)+'</span>'
+      : '<span style="font-size:52px;display:block;text-align:center;margin-bottom:8px">'+wd.emoji+'</span>');
     html+='<div style="font-size:14px;color:var(--sl);text-align:center;margin-bottom:14px;line-height:1.5">'+wd.def+'</div>';
     html+='<div class="opts">';
     opts.forEach(function(k){
@@ -9287,7 +9808,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
   // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
     var SW_CODE=[
-      "var CACHE='edulab-v12';",
+      "var CACHE='edulab-v14';",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
       "    return c.add(self.location.href.replace(/\\/sw(\\.js|\\?.*)?$/,'/')).catch(function(){});",
@@ -9325,7 +9846,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
     function tryDirectCache(){
       // Fallback: pre-cache the page directly (no SW needed)
       if(!('caches' in window))return;
-      caches.open('edulab-v12').then(function(c){
+      caches.open('edulab-v14').then(function(c){
         c.add(window.location.href).catch(function(){});
       }).catch(function(){});
     }
