@@ -460,9 +460,21 @@ body{display:flex;flex-direction:column}
       📄 Export Progress Report (PDF)
     </button>
     <div style="background:#fff;border-radius:var(--r);padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:#1565C0">👥 Student Progress</div>
         <div id="admin-student-count" style="font-size:12px;color:var(--sm)"></div>
+      </div>
+      <!-- Capacity widget. Hidden until we know the school's cap. The bar
+           and banner update from updateCapacityWidget() called on admin open. -->
+      <div id="cap-widget" style="display:none;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--sm);margin-bottom:5px">
+          <span>Student Capacity</span>
+          <span id="cap-text">0 / 999</span>
+        </div>
+        <div style="height:8px;background:#F0F4F8;border-radius:4px;overflow:hidden">
+          <div id="cap-bar" style="height:100%;width:0%;background:#16A34A;transition:width .3s,background .3s"></div>
+        </div>
+        <div id="cap-banner" style="display:none;margin-top:10px;padding:11px 13px;border-radius:10px;font-size:13px;line-height:1.5"></div>
       </div>
       <div id="admin-progress-list"></div>
       <button onclick="clearAllStudents()" style="width:100%;margin-top:12px;padding:11px;background:var(--errl);color:var(--err);border:1.5px solid var(--err);border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">🗑️ Remove All Students</button>
@@ -3641,6 +3653,7 @@ function openAdmin(){
 function _doOpenAdmin(){
   loadAdminSchoolFields();
   renderAdminProgress();
+  updateCapacityWidget();
   // Show current device mode so the user knows what they're in before switching
   var modeStatus=document.getElementById('admin-mode-status');
   if(modeStatus){
@@ -3695,6 +3708,91 @@ function changeDeviceMode(){
     showRoster();
     toast(hasRoster?'Switched to Shared device — your class roster is restored.':'Switched to Shared device. Add students from the roster screen.',3500);
   }
+}
+
+// ════════════════════════════════════════
+// CAPACITY WIDGET — student-cap monitoring
+// ════════════════════════════════════════
+// Each school doc carries `studentCap` (number of students paid for) and
+// optional `pricePerStudent` (used in upgrade-quote messages). The widget
+// reads the live student count from Firestore (more accurate than ROSTER
+// because shared rosters can drift between devices) and renders:
+//   - a fill bar that turns amber at 80%, red at 95%, deep red when over
+//   - a banner with appropriate copy and a "Tap to upgrade" WhatsApp link
+//
+// Schools without a cap field default to 999 — effectively unlimited until
+// Blestonex sets a real cap during enrolment.
+function updateCapacityWidget(){
+  var widget=document.getElementById('cap-widget');
+  if(!widget)return;
+  var school=getSchool();
+  if(!school||!school.code){widget.style.display='none';return;}
+  var cap=parseInt(school.studentCap)||999; // safe default
+  // For an immediate-render starting value, use the local roster size.
+  // Then refresh from Firestore so the count reflects all devices for this school.
+  var localCount=(lg(LK_ROSTER)||[]).length;
+  if(DMODE==='single'){
+    // Single-device mode usually means one student, but admin still needs to
+    // see the school-wide total. Fall through to Firestore lookup for that.
+    localCount=Math.max(localCount,1);
+  }
+  _renderCapacity(localCount,cap,school);
+  widget.style.display='';
+  // Now refresh from Firestore for an accurate school-wide count
+  FB.onReady(function(){
+    if(!FB.db)return;
+    FB.db.collection('schools').doc(school.code).collection('students').get()
+      .then(function(snap){
+        var actualCount=snap.size;
+        _renderCapacity(actualCount,cap,school);
+      })
+      .catch(function(e){console.warn('Capacity count failed:',e.message);});
+  });
+}
+
+function _renderCapacity(count,cap,school){
+  var pct=cap>0?Math.min(999,Math.round(count/cap*100)):0;
+  var fillPct=Math.min(100,pct); // bar fill caps at 100% visually
+  var capText=document.getElementById('cap-text');
+  var capBar=document.getElementById('cap-bar');
+  var capBanner=document.getElementById('cap-banner');
+  if(capText)capText.textContent=count+' / '+cap+' students ('+pct+'%)';
+  // Bar colour by severity
+  var barColor=pct<80?'#16A34A':pct<95?'#F59E0B':pct<100?'#EF4444':'#DC2626';
+  if(capBar){capBar.style.width=fillPct+'%';capBar.style.background=barColor;}
+  // Banner — only at 80%+, increasing severity
+  if(!capBanner)return;
+  if(pct<80){
+    capBanner.style.display='none';
+    return;
+  }
+  var schoolName=school.name||school.code;
+  var upgradeNum='2347032078669'; // Blestonex sales line
+  var upgradeMsg='Hi Blestonex, '+schoolName+' ('+school.code+') is currently using '
+    +count+' of our '+cap+' student plan. We would like to upgrade. Please send a quote.';
+  var upgradeLink='https://wa.me/'+upgradeNum+'?text='+encodeURIComponent(upgradeMsg);
+  var bannerHtml,bg,border,color;
+  if(pct<95){
+    // 80–94%: gentle warning
+    bg='#FEF3C7';border='#FDE68A';color='#92400E';
+    bannerHtml='<strong>Approaching your student limit.</strong> You\'re at '+pct+'%. Consider upgrading soon to avoid disruption.';
+    bannerHtml+=' <a href="'+upgradeLink+'" target="_blank" style="display:inline-block;margin-top:6px;background:#92400E;color:#fff;padding:6px 12px;border-radius:6px;text-decoration:none;font-weight:800;font-size:12px">Tap to upgrade</a>';
+  }else if(pct<=100){
+    // 95–100%: urgent
+    bg='#FEE2E2';border='#FCA5A5';color='#991B1B';
+    bannerHtml='<strong>Almost full.</strong> '+count+' of '+cap+' students used. Upgrade now to keep adding students.';
+    bannerHtml+=' <a href="'+upgradeLink+'" target="_blank" style="display:inline-block;margin-top:6px;background:#991B1B;color:#fff;padding:6px 12px;border-radius:6px;text-decoration:none;font-weight:800;font-size:12px">Tap to upgrade</a>';
+  }else{
+    // Over capacity
+    bg='#7F1D1D';border='#7F1D1D';color='#fff';
+    bannerHtml='<strong>Over your plan limit.</strong> You have '+count+' students on a '+cap+'-student plan. Please upgrade or contact Blestonex.';
+    bannerHtml+=' <a href="'+upgradeLink+'" target="_blank" style="display:inline-block;margin-top:6px;background:#fff;color:#7F1D1D;padding:6px 12px;border-radius:6px;text-decoration:none;font-weight:800;font-size:12px">Tap to upgrade</a>';
+  }
+  capBanner.style.display='';
+  capBanner.style.background=bg;
+  capBanner.style.border='1.5px solid '+border;
+  capBanner.style.color=color;
+  capBanner.innerHTML=bannerHtml;
 }
 
 function adminBack(){
@@ -10704,7 +10802,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
   // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
     var SW_CODE=[
-      "var CACHE='edulab-v18';",
+      "var CACHE='edulab-v19';",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
       "    return c.add(self.location.href.replace(/\\/sw(\\.js|\\?.*)?$/,'/')).catch(function(){});",
@@ -10742,7 +10840,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
     function tryDirectCache(){
       // Fallback: pre-cache the page directly (no SW needed)
       if(!('caches' in window))return;
-      caches.open('edulab-v18').then(function(c){
+      caches.open('edulab-v19').then(function(c){
         c.add(window.location.href).catch(function(){});
       }).catch(function(){});
     }
