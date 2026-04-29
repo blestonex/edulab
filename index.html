@@ -241,11 +241,58 @@ body{display:flex;flex-direction:column}
     <button class="mode-btn" onclick="pickMode('single')"><span class="mt">👤 My personal device</span><span class="md">One student uses this device</span></button>
     <button class="mode-btn" onclick="pickMode('shared')"><span class="mt">👥 Shared class device</span><span class="md">Multiple students take turns</span></button>
     <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,.15);padding-top:12px">
-      <button class="mode-btn" onclick="openCompMenu()" style="border-color:rgba(255,200,80,.4);background:rgba(255,200,80,.1)">
+      <button class="mode-btn" onclick="openRecovery()" style="border-color:rgba(96,165,250,.4);background:rgba(96,165,250,.1)">
+        <span class="mt">🔑 Recover my account</span>
+        <span class="md">Lost your phone? Restore using your recovery code</span>
+      </button>
+      <button class="mode-btn" onclick="openCompMenu()" style="border-color:rgba(255,200,80,.4);background:rgba(255,200,80,.1);margin-top:8px">
         <span class="mt">🏆 House Competition</span>
         <span class="md">Host or join a live inter-house quiz</span>
       </button>
     </div>
+  </div>
+</div>
+
+<!-- RECOVERY — restore an existing student account using a recovery code -->
+<div id="recovery" class="screen" style="background:linear-gradient(135deg,#1E3A8A,#1E40AF)">
+  <div class="topbar" style="background:transparent">
+    <button class="tback" onclick="SS('splash')">‹</button>
+    <div class="tlogo" style="color:#fff">Recover Account</div>
+  </div>
+  <div style="flex:1;padding:24px;display:flex;flex-direction:column;justify-content:center;max-width:420px;width:100%;margin:0 auto;box-sizing:border-box">
+    <div style="font-size:48px;margin-bottom:8px;text-align:center">🔑</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;text-align:center;margin-bottom:6px">Restore your progress</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.7);text-align:center;line-height:1.55;margin-bottom:24px">Enter your school code and the recovery code you saved when you set up your account. Your scores, stages and history will return.</div>
+    <label style="display:block;font-size:12px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">School Code</label>
+    <input id="rec-school" type="text" placeholder="e.g. AGUDA01" autocomplete="off" autocapitalize="characters" style="width:100%;padding:14px;font-size:18px;font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:2px;text-align:center;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(255,255,255,.95);color:#1E1B4B;margin-bottom:16px;box-sizing:border-box">
+    <label style="display:block;font-size:12px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">Recovery Code</label>
+    <input id="rec-code" type="text" placeholder="e.g. XK4P-Q7M2" autocomplete="off" autocapitalize="characters" style="width:100%;padding:14px;font-size:18px;font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:2px;text-align:center;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(255,255,255,.95);color:#1E1B4B;margin-bottom:14px;box-sizing:border-box">
+    <div id="rec-status" style="font-size:13px;text-align:center;min-height:20px;margin-bottom:14px;color:rgba(255,255,255,.85)"></div>
+    <button id="rec-submit-btn" onclick="submitRecovery()" style="width:100%;padding:14px;background:#fff;color:#1E40AF;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;cursor:pointer">Recover my account →</button>
+  </div>
+</div>
+
+<!-- RECOVERY-SHOW — shown to a new student once at setup so they can save it -->
+<div id="recovery-show" class="screen" style="background:linear-gradient(135deg,#065F46,#10B981)">
+  <div class="topbar" style="background:transparent">
+    <div class="tlogo" style="color:#fff">Save your recovery code</div>
+  </div>
+  <div style="flex:1;padding:24px;display:flex;flex-direction:column;justify-content:center;max-width:440px;width:100%;margin:0 auto;box-sizing:border-box">
+    <div style="font-size:48px;margin-bottom:8px;text-align:center">🔑</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;text-align:center;margin-bottom:6px">This is your recovery code</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.85);text-align:center;line-height:1.55;margin-bottom:20px">If you ever lose your phone, you can restore everything — your scores, your stages, all your progress — using this code.</div>
+    <div style="background:#fff;border-radius:14px;padding:24px;text-align:center;margin-bottom:20px;box-shadow:0 6px 20px rgba(0,0,0,.18)">
+      <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#6B7280;margin-bottom:8px">Your Recovery Code</div>
+      <div id="rec-show-code" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:32px;color:#065F46;letter-spacing:6px;line-height:1">XXXX-XXXX</div>
+      <div style="font-size:11px;color:#9CA3AF;margin-top:10px">Keep this safe. Anyone with this code AND your school code can take over your account.</div>
+    </div>
+    <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:12px;font-size:13px;color:#fff;line-height:1.55;margin-bottom:18px">
+      <strong>How to save it:</strong><br>
+      • Take a screenshot of this screen<br>
+      • Or write it on the back cover of your exercise book<br>
+      • Or ask your parent/teacher to keep a copy
+    </div>
+    <button onclick="ackRecoveryAndContinue()" style="width:100%;padding:14px;background:#fff;color:#065F46;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;cursor:pointer">I have saved my code →</button>
   </div>
 </div>
 
@@ -485,27 +532,27 @@ body{display:flex;flex-direction:column}
         <div class="prog-label"><span id="qr-pt">0 stages complete</span><span id="qr-pp">0%</span></div>
       </div>
     </div>
-    <div class="subj-card" onclick="openWaecHub()" style="background:linear-gradient(135deg,#7F1D1D,#991B1B);border:none">
+    <div id="waec-home-card" class="subj-card" onclick="openWaecHub()" style="background:linear-gradient(135deg,#7F1D1D,#991B1B);border:none">
       <div class="subj-head">
         <div class="subj-icon" style="background:rgba(255,255,255,.15);color:#fff;font-size:24px">🎓</div>
         <div class="subj-meta">
           <div class="subj-name" style="color:#fff">WAEC / JAMB Practice</div>
-          <div class="subj-desc" style="color:rgba(255,255,255,.7)">Practice questions · CBT Mock Exam · Topic drills · For SS3</div>
+          <div class="subj-desc" style="color:rgba(255,255,255,.7)">Practice questions · CBT Mock Exam · Topic drills · SS2 & SS3</div>
         </div>
         <span style="font-size:22px;color:rgba(255,255,255,.5)">›</span>
       </div>
       <div class="subj-prog">
         <div class="prog-wrap" style="background:rgba(255,255,255,.2)"><div class="prog-bar" id="waec-pb" style="width:0%;background:#FCA5A5"></div></div>
-        <div class="prog-label" style="color:rgba(255,255,255,.85)"><span id="waec-pt">10 subjects</span><span id="waec-pp">SS3 Exam Prep</span></div>
+        <div class="prog-label" style="color:rgba(255,255,255,.85)"><span id="waec-pt">10 subjects</span><span id="waec-pp">SS2 / SS3 Exam Prep</span></div>
       </div>
     </div>
-    <!-- Join Competition — single-user students tap this -->
-    <div class="subj-card" onclick="openCompJoin()" style="background:linear-gradient(135deg,#065F46,#047857);border:none">
+    <!-- House Competition — opens menu so user can choose Host or Join -->
+    <div class="subj-card" onclick="openCompMenu()" style="background:linear-gradient(135deg,#065F46,#047857);border:none">
       <div class="subj-head">
-        <div class="subj-icon" style="background:rgba(255,255,255,.15);color:#fff;font-size:24px">🎮</div>
+        <div class="subj-icon" style="background:rgba(255,255,255,.15);color:#fff;font-size:24px">🏆</div>
         <div class="subj-meta">
-          <div class="subj-name" style="color:#fff">Join Competition</div>
-          <div class="subj-desc" style="color:rgba(255,255,255,.6)">Animals · Body · Food · Colours · Science · Social · Verbal · Quantitative</div>
+          <div class="subj-name" style="color:#fff">House Competition</div>
+          <div class="subj-desc" style="color:rgba(255,255,255,.65)">Host a live quiz · Join with a code · View scoreboard</div>
         </div>
         <span style="font-size:22px;color:rgba(255,255,255,.4)">›</span>
       </div>
@@ -2714,6 +2761,54 @@ if(typeof window!=='undefined'){
   });
 }
 
+// ════════════════════════════════════════
+// RECOVERY CODE SYSTEM
+// ════════════════════════════════════════
+// Each student gets an 8-char recovery code (formatted XXXX-XXXX with a
+// hyphen for readability) generated once at setup. If they lose their phone,
+// they can enter their school code + recovery code on a new device and
+// fully restore: profile, all progress, all WAEC scores.
+//
+// Storage:
+//   schools/{code}/students/{uid}    has `recoveryCode` field
+//   schools/{code}/recovery/{code}   reverse-lookup → { studentUid, name, classLabel }
+//   localStorage LK_STU              has `recoveryCode` field
+//
+// Codes use only easily-distinguishable characters (no 0/O/1/I/L) and are
+// case-insensitive on input.
+var RECOVERY_ALPHABET='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+function generateRecoveryCode(){
+  var s='';
+  for(var i=0;i<8;i++)s+=RECOVERY_ALPHABET[Math.floor(Math.random()*RECOVERY_ALPHABET.length)];
+  // Format as XXXX-XXXX for human readability
+  return s.slice(0,4)+'-'+s.slice(4);
+}
+
+// Normalise user-entered codes: uppercase, strip whitespace and dashes
+function _normaliseRecoveryCode(c){
+  return String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+}
+
+// Save the reverse-lookup doc in Firestore so any device can resolve a
+// recovery code → student. Idempotent — safe to call multiple times.
+function saveRecoveryMapping(){
+  var school=getSchool();if(!school||!school.code)return;
+  if(!STU||!STU.recoveryCode||!STU.uid)return;
+  FB.onReady(function(){
+    if(!FB.db)return;
+    var key=_normaliseRecoveryCode(STU.recoveryCode);
+    FB.db.collection('schools').doc(school.code)
+      .collection('recovery').doc(key)
+      .set({
+        studentUid:STU.uid,
+        name:STU.name||'',
+        classLabel:STU.classLabel||'',
+        createdAt:Date.now()
+      },{merge:true})
+      .catch(function(e){console.warn('Recovery mapping save failed:',e.message);});
+  });
+}
+
 function syncStudentToFirestore(){
   var school=getSchool();if(!school||!school.code)return;
   var studentKey=sk();if(!studentKey)return;
@@ -2730,6 +2825,7 @@ function syncStudentToFirestore(){
       emoji:STU.emoji||'👤',
       parentWA:STU.parentWA||'',
       mathLevel:STU.mathLevel||'',
+      recoveryCode:STU.recoveryCode||'',
       progress:studentProg,
       lastSeen:Date.now()
     },{merge:true}).catch(function(e){
@@ -2869,6 +2965,127 @@ function init(){
 function pickMode(m){DMODE=m;ls(LK_MODE,m);if(m==='single')startSetup();else showRoster();}
 
 // ════════════════════════════════════════
+// RECOVERY FLOW (UI handlers)
+// ════════════════════════════════════════
+function openRecovery(){
+  var schoolEl=document.getElementById('rec-school');
+  var codeEl=document.getElementById('rec-code');
+  var statusEl=document.getElementById('rec-status');
+  // Pre-fill school code if we already had one cached
+  var cachedSchool=getSchool();
+  if(schoolEl&&cachedSchool&&cachedSchool.code)schoolEl.value=cachedSchool.code;
+  if(codeEl)codeEl.value='';
+  if(statusEl)statusEl.textContent='';
+  SS('recovery');
+}
+
+function submitRecovery(){
+  var schoolEl=document.getElementById('rec-school');
+  var codeEl=document.getElementById('rec-code');
+  var statusEl=document.getElementById('rec-status');
+  var btn=document.getElementById('rec-submit-btn');
+  var schoolCode=String(schoolEl.value||'').trim().toUpperCase();
+  var recCode=_normaliseRecoveryCode(codeEl.value||'');
+  if(!schoolCode){statusEl.textContent='⚠️ Enter your school code.';statusEl.style.color='#FCD34D';return;}
+  if(recCode.length!==8){statusEl.textContent='⚠️ Recovery code should be 8 letters/numbers.';statusEl.style.color='#FCD34D';return;}
+  statusEl.textContent='⏳ Looking up your account…';statusEl.style.color='rgba(255,255,255,.85)';
+  if(btn){btn.disabled=true;btn.textContent='Recovering…';}
+  // Step 1: verify the school code so we know it's valid
+  activateSchoolCode(schoolCode,function(result,school){
+    if(result!=='ok'&&result!=='offline'){
+      var msg=result==='invalid'?'❌ School code not found.'
+        :result==='expired'?'⚠️ That school\'s subscription has expired.'
+        :result==='inactive'?'⚠️ That school is not active.'
+        :'⚠️ Could not verify school. Check your internet.';
+      statusEl.textContent=msg;statusEl.style.color='#FCA5A5';
+      if(btn){btn.disabled=false;btn.textContent='Recover my account →';}
+      return;
+    }
+    // Step 2: fetch the recovery mapping
+    FB.onReady(function(){
+      if(!FB.db){
+        statusEl.textContent='⚠️ Need internet to recover. Try again when connected.';
+        statusEl.style.color='#FCA5A5';
+        if(btn){btn.disabled=false;btn.textContent='Recover my account →';}
+        return;
+      }
+      FB.db.collection('schools').doc(schoolCode).collection('recovery').doc(recCode).get()
+        .then(function(doc){
+          if(!doc.exists){
+            statusEl.textContent='❌ Recovery code not found for this school.';
+            statusEl.style.color='#FCA5A5';
+            if(btn){btn.disabled=false;btn.textContent='Recover my account →';}
+            return;
+          }
+          var rec=doc.data();
+          var studentUid=rec.studentUid;
+          if(!studentUid){
+            statusEl.textContent='⚠️ Recovery record is incomplete. Contact your school admin.';
+            statusEl.style.color='#FCA5A5';
+            if(btn){btn.disabled=false;btn.textContent='Recover my account →';}
+            return;
+          }
+          // Step 3: fetch the student doc with full progress
+          FB.db.collection('schools').doc(schoolCode).collection('students').doc(studentUid).get()
+            .then(function(stuDoc){
+              if(!stuDoc.exists){
+                statusEl.textContent='⚠️ Student record not found. Contact your school admin.';
+                statusEl.style.color='#FCA5A5';
+                if(btn){btn.disabled=false;btn.textContent='Recover my account →';}
+                return;
+              }
+              // Restore everything to local storage
+              var stu=stuDoc.data();
+              DMODE='single';
+              ls(LK_MODE,'single');
+              STU={
+                name:stu.name||rec.name||'',
+                classLabel:stu.classLabel||rec.classLabel||'',
+                parentWA:stu.parentWA||'',
+                uid:studentUid,
+                emoji:stu.emoji||'👤',
+                mathLevel:stu.mathLevel||'',
+                recoveryCode:stu.recoveryCode||recCode.slice(0,4)+'-'+recCode.slice(4)
+              };
+              ls(LK_STU,STU);
+              // Restore progress map under the right student key
+              var p=lg(LK_PROG)||{};
+              p[studentUid]=stu.progress||{};
+              ls(LK_PROG,p);
+              statusEl.textContent='✅ Welcome back, '+STU.name+'!';
+              statusEl.style.color='#86EFAC';
+              setTimeout(function(){loadHome();},900);
+            })
+            .catch(function(e){
+              console.warn('Student fetch failed:',e.message);
+              statusEl.textContent='⚠️ Could not load your progress. Try again.';
+              statusEl.style.color='#FCA5A5';
+              if(btn){btn.disabled=false;btn.textContent='Recover my account →';}
+            });
+        })
+        .catch(function(e){
+          console.warn('Recovery lookup failed:',e.message);
+          statusEl.textContent='⚠️ Could not verify recovery code. Try again.';
+          statusEl.style.color='#FCA5A5';
+          if(btn){btn.disabled=false;btn.textContent='Recover my account →';}
+        });
+    });
+  });
+}
+
+// Show the recovery code to a freshly-set-up student so they can save it
+function showRecoveryCodeScreen(){
+  var disp=document.getElementById('rec-show-code');
+  if(disp&&STU&&STU.recoveryCode)disp.textContent=STU.recoveryCode;
+  SS('recovery-show');
+}
+
+// User clicked "I have saved my code" — proceed to home
+function ackRecoveryAndContinue(){
+  loadHome();
+}
+
+// ════════════════════════════════════════
 // SETUP
 // ════════════════════════════════════════
 var swStep=0,swName='',swClass='',swParentWA='';
@@ -2960,15 +3177,27 @@ function swNext(){
     if(btn){btn.textContent='Checking\u2026';btn.disabled=true;}
     var st=document.getElementById('sw-code-status');
     if(st){st.textContent='\u23F3 Verifying code\u2026';st.style.color='rgba(255,255,255,.7)';}
-    // Save student profile first
-    STU={name:swName,classLabel:swClass,parentWA:swParentWA,uid:'su_'+swName.replace(/\s+/g,'_').toLowerCase()+'_'+Date.now()};
+    // Save student profile first — including a fresh recovery code so the
+    // student can restore on a new device if they lose this one.
+    var recCode=generateRecoveryCode();
+    STU={
+      name:swName,
+      classLabel:swClass,
+      parentWA:swParentWA,
+      uid:'su_'+swName.replace(/\s+/g,'_').toLowerCase()+'_'+Date.now(),
+      recoveryCode:recCode
+    };
     ls(LK_STU,STU);
     // Verify school code — mandatory
     activateSchoolCode(code,function(result,school){
       if(btn){btn.textContent='Activate \u2192';btn.disabled=false;}
       if(result==='ok'){
         if(st){st.textContent='\u2705 Activated! Welcome to '+(school.name||code);st.style.color='#86EFAC';}
-        setTimeout(function(){loadHome();},1000);
+        // Sync to Firestore (creates student doc + recovery mapping), then
+        // show the recovery code to the user before they reach Home.
+        syncStudentToFirestore();
+        saveRecoveryMapping();
+        setTimeout(function(){showRecoveryCodeScreen();},900);
       }else if(result==='invalid'){
         if(st){st.textContent='\u274C Invalid code. Ask your teacher for the correct code.';st.style.color='#FCA5A5';}
         ls(LK_STU,null); // don't save student until code is valid
@@ -2976,7 +3205,9 @@ function swNext(){
         if(st){st.textContent='\u26A0\uFE0F School subscription expired. Contact Blestonex.';st.style.color='#FCD34D';}
         ls(LK_STU,null);
       }else if(result==='offline'){
-        // Offline — allow entry but mark as unactivated
+        // Offline — allow entry but mark as unactivated. We can\'t save the
+        // recovery mapping yet (no Firestore), but we keep the code in STU
+        // so it syncs whenever the device gets online.
         if(st){st.textContent='\u26A0\uFE0F No internet — code not verified. Connect and re-enter later.';st.style.color='#FCD34D';}
         setTimeout(function(){loadHome();},1500);
       }else{
@@ -3095,12 +3326,14 @@ function saveNewStudent(){
     if(!parentWA){toast('Invalid parent number. Leave blank or fix it.',2500);return;}
   }
   var EMOJIS=['🌟','📚','🎯','🌿','💫','🔮','🦁','🌈','⭐','🎨','🔥','💎'];
+  var newRecCode=generateRecoveryCode();
   ROSTER.push({
     name:name,
     classLabel:asClass,
     parentWA:parentWA,
     uid:'s_'+name.replace(/\s+/g,'_').toLowerCase()+'_'+Date.now(),
-    emoji:EMOJIS[ROSTER.length%EMOJIS.length]
+    emoji:EMOJIS[ROSTER.length%EMOJIS.length],
+    recoveryCode:newRecCode
   });
   ls(LK_ROSTER,ROSTER);
   // Sync this new student to Firestore immediately so other devices (and the
@@ -3117,9 +3350,19 @@ function saveNewStudent(){
           parentWA:justAdded.parentWA||'',
           uid:justAdded.uid,
           emoji:justAdded.emoji||'👤',
+          recoveryCode:justAdded.recoveryCode||'',
           createdAt:Date.now(),
           lastSeen:Date.now()
         },{merge:true}).catch(function(e){console.warn('New student sync:',e.message);});
+      // Save the reverse-lookup recovery doc
+      var recKey=_normaliseRecoveryCode(justAdded.recoveryCode);
+      FB.db.collection('schools').doc(school.code).collection('recovery').doc(recKey)
+        .set({
+          studentUid:justAdded.uid,
+          name:justAdded.name,
+          classLabel:justAdded.classLabel,
+          createdAt:Date.now()
+        },{merge:true}).catch(function(e){console.warn('Recovery mapping:',e.message);});
     });
   }
   if(nameEl)nameEl.value='';
@@ -3308,6 +3551,16 @@ function loadHome(){
   var qrBar=document.getElementById('qr-pb');if(qrBar)qrBar.style.width=qr.pct+'%';
   var qrTxt=document.getElementById('qr-pt');if(qrTxt)qrTxt.textContent=qr.done+' of '+qr.total+' stages done';
   var qrPct=document.getElementById('qr-pp');if(qrPct)qrPct.textContent=qr.pct+'%';
+  // Class-gate the WAEC/JAMB Practice card. The hub is only relevant for
+  // senior secondary students preparing for WAEC SSCE / JAMB UTME — showing
+  // it to a Nursery 1 child confuses the layout and worries parents.
+  // Visible from SS 2 onward (which lets SS2 students start early prep).
+  var waecCard=document.getElementById('waec-home-card');
+  if(waecCard){
+    var cl=STU.classLabel||'';
+    var isSenior=(cl==='SSS 2'||cl==='SSS 3'||cl==='WAEC/JAMB'||cl==='WAEC'||cl==='JAMB');
+    waecCard.style.display=isSenior?'':'none';
+  }
   SS('home');
 }
 
@@ -3468,10 +3721,18 @@ function clearAllStudents(){
 // ════════════════════════════════════════
 function openLessonList(){
   if(DMODE==='shared')document.getElementById('lessons-sw').style.display='';
-  document.getElementById('lessons-bc').textContent='English › '+STU.classLabel+' — All Units';
+  var cl=STU.classLabel;
+  document.getElementById('lessons-bc').textContent=(cl==='SSS 1'||cl==='SSS 2'||cl==='WAEC/JAMB'?'Vocabulary › ':'English › ')+cl+' — All Units';
   var p=prog();
   var outline=getCourseOutline();
-  var cl=STU.classLabel;
+  // Senior class detection
+  var isSenior=(cl==='SSS 1'||cl==='SSS 2'||cl==='WAEC/JAMB');
+  var seniorTitleOverrides={
+    colours: {title:'Maths Vocabulary', emoji:'📐'},
+    body:    {title:'Human Anatomy & Physiology', emoji:'🫀'},
+    food:    {title:'Food Science & Nutrition', emoji:'🍎'},
+    animals: {title:'Biology Vocabulary', emoji:'🦁'}
+  };
   var list=document.getElementById('lessons-list');list.innerHTML='';
   UNITS.forEach(function(unit){
     var stages=unit.stagesMap[cl]||unit.stagesMap['Nursery 2']||[];
@@ -3488,8 +3749,14 @@ function openLessonList(){
       if(!ordered.length)return;
       stages=ordered;
     }
+    // Resolve display title — override for senior classes if applicable
+    var displayTitle=unit.title, displayEmoji=unit.emoji;
+    if(isSenior&&seniorTitleOverrides[unit.key]){
+      displayTitle=seniorTitleOverrides[unit.key].title;
+      displayEmoji=seniorTitleOverrides[unit.key].emoji;
+    }
     var uh=document.createElement('div');uh.className='unit-lbl';
-    uh.textContent=unit.emoji+' '+unit.title;list.appendChild(uh);
+    uh.textContent=displayEmoji+' '+displayTitle;list.appendChild(uh);
     stages.forEach(function(st,idx){
       var sp=p[st.id];var passed=sp&&sp.passed;
       var progressUnlocked=idx===0||(p[stages[idx-1].id]&&p[stages[idx-1].id].passed);
@@ -5806,6 +6073,426 @@ var WAEC_ENGLISH_TOPICS=[
   {key:'oral',      label:'Oral English'}
 ];
 
+// Biology topic taxonomy aligned to WAEC/JAMB Biology syllabus
+var WAEC_BIOLOGY_TOPICS=[
+  {key:'cell',     label:'Cell Biology & Physiology'},
+  {key:'plant',    label:'Plant Biology'},
+  {key:'animal',   label:'Animal Biology & Organ Systems'},
+  {key:'genetics', label:'Genetics & Evolution'},
+  {key:'ecology',  label:'Ecology'},
+  {key:'health',   label:'Disease & Health'},
+  {key:'classify', label:'Classification & Taxonomy'},
+  {key:'reprod',   label:'Reproduction'}
+];
+
+// ── 50 SS3 Biology Practice Questions ──
+// Self-verified against established biology. Distractors reflect common
+// student misconceptions (e.g. confusing arteries/veins, mitosis/meiosis).
+var WAEC_BIOLOGY_QS=[
+  // ═══════════════ CELL BIOLOGY & PHYSIOLOGY (8) ═══════════════
+  {id:'b01',topic:'cell',diff:'easy',
+   q:'Which organelle is known as the "powerhouse" of the cell because it produces most of the cell\'s ATP?',
+   opts:['Nucleus','Mitochondrion','Ribosome','Lysosome'],
+   a:'Mitochondrion',
+   why:'The mitochondrion produces ATP through aerobic respiration. The nucleus stores DNA, ribosomes make proteins, and lysosomes break down waste.'},
+
+  {id:'b02',topic:'cell',diff:'easy',
+   q:'Which structure is found in plant cells but NOT in animal cells?',
+   opts:['Mitochondrion','Cell wall','Nucleus','Cytoplasm'],
+   a:'Cell wall',
+   why:'Plant cells have a rigid cellulose cell wall outside the cell membrane. Animal cells have only a cell membrane. Mitochondria, nuclei, and cytoplasm are present in both.'},
+
+  {id:'b03',topic:'cell',diff:'mid',
+   q:'The movement of water molecules across a semi-permeable membrane from a region of higher to lower water concentration is called:',
+   opts:['Diffusion','Osmosis','Active transport','Plasmolysis'],
+   a:'Osmosis',
+   why:'Osmosis is specifically the movement of WATER through a semi-permeable membrane. Diffusion is the general movement of any substance from high to low concentration. Active transport requires energy.'},
+
+  {id:'b04',topic:'cell',diff:'mid',
+   q:'When a plant cell is placed in a strongly salty solution, which of the following will most likely happen?',
+   opts:['It will burst','It will become turgid','It will undergo plasmolysis','It will divide'],
+   a:'It will undergo plasmolysis',
+   why:'Salty solution has lower water concentration outside the cell, so water moves OUT by osmosis. The cytoplasm shrinks away from the cell wall — this is plasmolysis. (Animal cells in salty solution shrivel; only plant cells "plasmolyse" because of the cell wall.)'},
+
+  {id:'b05',topic:'cell',diff:'mid',
+   q:'The word equation for aerobic respiration in humans is best represented as:',
+   opts:[
+     'Glucose + Oxygen → Carbon dioxide + Water + Energy',
+     'Carbon dioxide + Water → Glucose + Oxygen',
+     'Glucose → Lactic acid + Energy',
+     'Glucose + Carbon dioxide → Energy + Water'
+   ],
+   a:'Glucose + Oxygen → Carbon dioxide + Water + Energy',
+   why:'Aerobic respiration breaks down glucose using oxygen, releasing energy with carbon dioxide and water as by-products. Option 2 is photosynthesis (the reverse). Option 3 is anaerobic respiration in muscles.'},
+
+  {id:'b06',topic:'cell',diff:'mid',
+   q:'Which type of cell division produces gametes (sex cells) with half the chromosome number of the parent cell?',
+   opts:['Mitosis','Meiosis','Binary fission','Budding'],
+   a:'Meiosis',
+   why:'Meiosis halves the chromosome number, producing four genetically different haploid gametes. Mitosis produces two identical diploid body cells. Binary fission and budding are forms of asexual reproduction.'},
+
+  {id:'b07',topic:'cell',diff:'hard',
+   q:'During which phase of mitosis do chromosomes line up along the equator of the cell?',
+   opts:['Prophase','Metaphase','Anaphase','Telophase'],
+   a:'Metaphase',
+   why:'Metaphase = "middle phase" — chromosomes align at the equator (metaphase plate). Prophase: chromosomes condense. Anaphase: sister chromatids separate. Telophase: nuclear membranes reform.'},
+
+  {id:'b08',topic:'cell',diff:'hard',
+   q:'Which of the following is NOT a function of proteins in living organisms?',
+   opts:[
+     'Acting as enzymes',
+     'Forming the structure of muscles',
+     'Storing genetic information',
+     'Forming antibodies'
+   ],
+   a:'Storing genetic information',
+   why:'Genetic information is stored in DNA (a nucleic acid), not in proteins. Proteins act as enzymes, build muscle (e.g. actin, myosin), and form antibodies in the immune system.'},
+
+  // ═══════════════ PLANT BIOLOGY (7) ═══════════════
+  {id:'b09',topic:'plant',diff:'easy',
+   q:'In photosynthesis, which gas is taken in by green plants and which is released?',
+   opts:[
+     'Takes in oxygen, releases carbon dioxide',
+     'Takes in carbon dioxide, releases oxygen',
+     'Takes in nitrogen, releases oxygen',
+     'Takes in carbon dioxide, releases nitrogen'
+   ],
+   a:'Takes in carbon dioxide, releases oxygen',
+   why:'Photosynthesis: 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂. Plants absorb CO₂ from the air and release O₂. (Plants ALSO respire 24 hours a day, but during the day photosynthesis dominates.)'},
+
+  {id:'b10',topic:'plant',diff:'easy',
+   q:'In which part of a leaf does most photosynthesis take place?',
+   opts:['Upper epidermis','Palisade mesophyll','Lower epidermis','Xylem vessels'],
+   a:'Palisade mesophyll',
+   why:'The palisade mesophyll cells are packed with chloroplasts and arranged near the upper surface to catch light. The epidermis is for protection; the xylem transports water.'},
+
+  {id:'b11',topic:'plant',diff:'mid',
+   q:'Which tissue in a plant is responsible for transporting water and dissolved minerals from the roots to the leaves?',
+   opts:['Phloem','Xylem','Cambium','Cortex'],
+   a:'Xylem',
+   why:'Xylem carries water and minerals UPWARDS from roots to leaves (one direction only). Phloem carries dissolved sugars (made in the leaves) to all parts of the plant — both upwards AND downwards.'},
+
+  {id:'b12',topic:'plant',diff:'mid',
+   q:'Transpiration in plants serves all of the following functions EXCEPT:',
+   opts:[
+     'Cooling the plant',
+     'Pulling water up the xylem',
+     'Producing food for the plant',
+     'Carrying mineral salts to leaves'
+   ],
+   a:'Producing food for the plant',
+   why:'Food is produced by photosynthesis, NOT transpiration. Transpiration is the loss of water vapour through stomata; it cools the plant, drives water up the stem, and carries dissolved minerals along with the water.'},
+
+  {id:'b13',topic:'plant',diff:'mid',
+   q:'Which of the following is the main function of chlorophyll in a leaf?',
+   opts:[
+     'To give the leaf its green colour',
+     'To absorb light energy for photosynthesis',
+     'To carry water through the leaf',
+     'To produce oxygen directly'
+   ],
+   a:'To absorb light energy for photosynthesis',
+   why:'Chlorophyll\'s function is to ABSORB light (mainly red and blue) and convert that energy to chemical form. The green colour is a side-effect — green light is reflected, not absorbed. Oxygen is a product of the overall reaction, not made by chlorophyll alone.'},
+
+  {id:'b14',topic:'plant',diff:'mid',
+   q:'Which of the following experiments tests for the presence of starch in a leaf?',
+   opts:[
+     'Adding iodine solution turns it blue-black',
+     'Adding Benedict\'s solution turns it brick-red',
+     'Adding limewater turns it cloudy',
+     'Adding biuret reagent turns it purple'
+   ],
+   a:'Adding iodine solution turns it blue-black',
+   why:'Iodine + starch → blue-black colour. Benedict\'s tests for reducing sugars. Limewater tests for CO₂. Biuret tests for proteins. (In Sach\'s experiment, the leaf is first decolourised in alcohol before adding iodine.)'},
+
+  {id:'b15',topic:'plant',diff:'hard',
+   q:'A potted plant was placed in the dark for 48 hours before being exposed to light. The reason for this is to:',
+   opts:[
+     'Allow the plant to rest',
+     'Remove all starch from the leaves before the experiment',
+     'Increase the rate of photosynthesis',
+     'Kill any pests on the leaves'
+   ],
+   a:'Remove all starch from the leaves before the experiment',
+   why:'Placing a plant in the dark "destarches" the leaves — any starch present is broken down for respiration without new starch being made. This gives a clean baseline so that any starch found AFTER exposure to light must come from new photosynthesis.'},
+
+  // ═══════════════ ANIMAL BIOLOGY & ORGAN SYSTEMS (12) ═══════════════
+  {id:'b16',topic:'animal',diff:'easy',
+   q:'In humans, which blood vessels carry blood AWAY from the heart?',
+   opts:['Veins','Arteries','Capillaries','Venules'],
+   a:'Arteries',
+   why:'Arteries carry blood away from the heart (high pressure, thick walls). Veins carry blood TOWARDS the heart (low pressure, valves). Capillaries are tiny vessels for exchange. (Mnemonic: Arteries = Away.)'},
+
+  {id:'b17',topic:'animal',diff:'easy',
+   q:'Which chamber of the human heart pumps oxygenated blood to the rest of the body?',
+   opts:['Right atrium','Right ventricle','Left atrium','Left ventricle'],
+   a:'Left ventricle',
+   why:'Left ventricle pumps oxygenated blood to the body via the aorta. Its wall is the thickest because it must generate the highest pressure. Right ventricle pumps deoxygenated blood to the lungs only.'},
+
+  {id:'b18',topic:'animal',diff:'easy',
+   q:'Which enzyme in saliva begins the digestion of starch in the mouth?',
+   opts:['Pepsin','Trypsin','Amylase','Lipase'],
+   a:'Amylase',
+   why:'Salivary amylase (ptyalin) begins breaking starch into maltose in the mouth. Pepsin digests proteins in the stomach. Trypsin digests proteins in the small intestine. Lipase digests fats.'},
+
+  {id:'b19',topic:'animal',diff:'mid',
+   q:'In the human digestive system, where does most absorption of digested food into the bloodstream take place?',
+   opts:['Stomach','Mouth','Small intestine','Large intestine'],
+   a:'Small intestine',
+   why:'The small intestine, especially the ileum, is lined with villi and microvilli that vastly increase surface area. Most nutrients are absorbed here. The stomach mainly digests; the large intestine reabsorbs water.'},
+
+  {id:'b20',topic:'animal',diff:'mid',
+   q:'The functional unit of the kidney where blood is filtered is called the:',
+   opts:['Alveolus','Nephron','Neuron','Villus'],
+   a:'Nephron',
+   why:'A nephron is the kidney\'s filtration unit (~1 million per kidney). Alveolus is the lung\'s gas-exchange unit. Neuron is a nerve cell. Villus is in the small intestine.'},
+
+  {id:'b21',topic:'animal',diff:'mid',
+   q:'Which gland in the human body produces insulin?',
+   opts:['Thyroid','Adrenal','Pancreas','Pituitary'],
+   a:'Pancreas',
+   why:'The pancreas (specifically the beta cells of the islets of Langerhans) produces insulin, which lowers blood sugar. Type 1 diabetes results when these cells fail.'},
+
+  {id:'b22',topic:'animal',diff:'mid',
+   q:'Which part of the human eye controls the amount of light entering the eye?',
+   opts:['Cornea','Iris','Retina','Optic nerve'],
+   a:'Iris',
+   why:'The iris (the coloured part) contains muscles that change the size of the pupil — letting in less light in bright conditions, more in dim. The cornea bends light; the retina detects it; the optic nerve carries signals to the brain.'},
+
+  {id:'b23',topic:'animal',diff:'mid',
+   q:'In humans, gas exchange takes place in which of the following structures of the lung?',
+   opts:['Trachea','Bronchi','Bronchioles','Alveoli'],
+   a:'Alveoli',
+   why:'Alveoli are tiny air sacs with thin, moist walls and a rich blood supply — perfect for diffusion of O₂ in and CO₂ out. The trachea, bronchi, and bronchioles are passageways for air, not the site of exchange.'},
+
+  {id:'b24',topic:'animal',diff:'mid',
+   q:'Which component of human blood is mainly responsible for clotting at a wound?',
+   opts:['Red blood cells','White blood cells','Platelets','Plasma'],
+   a:'Platelets',
+   why:'Platelets aggregate at the wound site and trigger the cascade that produces fibrin, forming a clot. Red blood cells carry oxygen; white blood cells fight infection; plasma is the liquid medium.'},
+
+  {id:'b25',topic:'animal',diff:'hard',
+   q:'A person eats a large meal high in protein. Which of the following best describes what happens to the excess amino acids in the liver?',
+   opts:[
+     'They are stored as protein for later use',
+     'They are converted into vitamins',
+     'They are deaminated, with urea formed as a waste product',
+     'They are converted into oxygen'
+   ],
+   a:'They are deaminated, with urea formed as a waste product',
+   why:'The body cannot store excess amino acids. The liver removes the amino group (deamination), converts it to urea, and sends the urea to the kidneys for excretion. The remaining carbon skeleton is used for energy or stored as fat.'},
+
+  {id:'b26',topic:'animal',diff:'hard',
+   q:'Which structure in a neuron receives signals from other neurons?',
+   opts:['Axon','Dendrite','Cell body','Synapse'],
+   a:'Dendrite',
+   why:'Dendrites are branched extensions that receive incoming signals. The axon carries the signal AWAY from the cell body. The synapse is the gap between two neurons where signals jump.'},
+
+  {id:'b27',topic:'animal',diff:'hard',
+   q:'Which hormone is released by the body in response to a stressful or dangerous situation, preparing for "fight or flight"?',
+   opts:['Insulin','Adrenaline','Thyroxine','Growth hormone'],
+   a:'Adrenaline',
+   why:'Adrenaline (epinephrine) from the adrenal glands raises heart rate, dilates pupils, and redirects blood to muscles — the classic fight-or-flight response. Insulin lowers blood sugar; thyroxine controls metabolic rate; growth hormone controls growth.'},
+
+  // ═══════════════ GENETICS & EVOLUTION (6) ═══════════════
+  {id:'b28',topic:'genetics',diff:'easy',
+   q:'In humans, which pair of sex chromosomes results in a female child?',
+   opts:['XY','YY','XX','XO'],
+   a:'XX',
+   why:'Females are XX (two X chromosomes); males are XY. The Y chromosome carries the SRY gene that triggers male development. (XO is Turner syndrome — a single X.)'},
+
+  {id:'b29',topic:'genetics',diff:'mid',
+   q:'In a cross between two heterozygous tall pea plants (Tt × Tt), where T is dominant for tallness and t is recessive for shortness, what fraction of offspring will be SHORT?',
+   opts:['1/4','1/2','3/4','All tall'],
+   a:'1/4',
+   why:'Punnett square: TT, Tt, Tt, tt = 3 tall : 1 short. Only the tt offspring (1/4) are short, because t must be inherited from BOTH parents to show the recessive trait.'},
+
+  {id:'b30',topic:'genetics',diff:'mid',
+   q:'A person with sickle-cell trait has the genotype:',
+   opts:['HbA HbA','HbA HbS','HbS HbS','HbA HbB'],
+   a:'HbA HbS',
+   why:'Sickle-cell trait (carrier, mostly healthy) = heterozygous HbA HbS. Sickle-cell anaemia (the disease) = homozygous HbS HbS. HbA HbA is fully normal. HbB is not a real allele in this gene.'},
+
+  {id:'b31',topic:'genetics',diff:'mid',
+   q:'Which scientist is most famous for proposing the theory of evolution by natural selection?',
+   opts:['Gregor Mendel','Charles Darwin','Louis Pasteur','James Watson'],
+   a:'Charles Darwin',
+   why:'Darwin\'s 1859 book "On the Origin of Species" proposed evolution by natural selection. Mendel founded genetics; Pasteur developed germ theory and pasteurisation; Watson co-discovered the DNA double helix.'},
+
+  {id:'b32',topic:'genetics',diff:'hard',
+   q:'Which of the following best describes a "mutation"?',
+   opts:[
+     'A change in the size of an organism',
+     'A sudden change in the genetic material of a cell',
+     'The development of an organism from an egg',
+     'The grouping of organisms into species'
+   ],
+   a:'A sudden change in the genetic material of a cell',
+   why:'A mutation is a change in DNA — could be a point mutation, deletion, insertion, etc. Mutations are the ultimate source of genetic variation. The other options describe growth, development, and classification respectively.'},
+
+  {id:'b33',topic:'genetics',diff:'hard',
+   q:'Two organisms produce fertile offspring when crossed. According to the biological species concept, this means they:',
+   opts:[
+     'Belong to different species',
+     'Belong to the same species',
+     'Are both hybrids',
+     'Cannot be classified'
+   ],
+   a:'Belong to the same species',
+   why:'The biological species concept defines a species as a group of organisms that can interbreed and produce FERTILE offspring. Lions and tigers can mate to produce ligers, but ligers are largely infertile, so lions and tigers are different species.'},
+
+  // ═══════════════ ECOLOGY (6) ═══════════════
+  {id:'b34',topic:'ecology',diff:'easy',
+   q:'In a food chain, organisms that make their own food using sunlight are called:',
+   opts:['Decomposers','Producers','Consumers','Predators'],
+   a:'Producers',
+   why:'Producers (autotrophs) — usually green plants — use sunlight to make their own food via photosynthesis. Consumers eat other organisms; decomposers break down dead matter; predators are a type of consumer.'},
+
+  {id:'b35',topic:'ecology',diff:'easy',
+   q:'In the food chain: Grass → Grasshopper → Frog → Snake → Hawk\n\nThe frog is a:',
+   opts:['Producer','Primary consumer','Secondary consumer','Tertiary consumer'],
+   a:'Secondary consumer',
+   why:'Grass = producer. Grasshopper eats grass = primary consumer (1st-level consumer). Frog eats grasshopper = secondary consumer. Snake = tertiary. Hawk = quaternary.'},
+
+  {id:'b36',topic:'ecology',diff:'mid',
+   q:'Which of the following is an ABIOTIC factor in an ecosystem?',
+   opts:['Plants','Soil pH','Bacteria','Insects'],
+   a:'Soil pH',
+   why:'Abiotic = non-living factors (soil, light, temperature, pH, water, wind). Biotic = living things (plants, bacteria, insects, animals). Soil pH is a chemical property of soil, not a living organism.'},
+
+  {id:'b37',topic:'ecology',diff:'mid',
+   q:'Which of the following best describes the role of decomposers in an ecosystem?',
+   opts:[
+     'They produce oxygen for other organisms',
+     'They break down dead matter and recycle nutrients',
+     'They consume primary producers',
+     'They are the top predators in any food chain'
+   ],
+   a:'They break down dead matter and recycle nutrients',
+   why:'Decomposers (mainly bacteria and fungi) break down dead organisms and waste, releasing nutrients back into the soil for plants. Without decomposers, ecosystems would run out of nutrients and be buried in waste.'},
+
+  {id:'b38',topic:'ecology',diff:'hard',
+   q:'A farmer notices that the population of grasshoppers in his maize farm has dropped sharply after birds began nesting in nearby trees. The most likely explanation is:',
+   opts:[
+     'Competition for sunlight',
+     'Predation by the birds',
+     'Mutualism between grasshoppers and birds',
+     'Decomposition by the birds'
+   ],
+   a:'Predation by the birds',
+   why:'Birds eat grasshoppers — that\'s predation. The birds (predators) reduce the grasshopper (prey) population. Competition is between organisms wanting the same resource. Mutualism benefits both. Birds don\'t decompose.'},
+
+  {id:'b39',topic:'ecology',diff:'hard',
+   q:'Which of the following human activities would have the GREATEST negative impact on biodiversity?',
+   opts:[
+     'Planting flowers in a home garden',
+     'Clearing a large area of rainforest for farming',
+     'Throwing biodegradable waste in a compost pit',
+     'Walking through a forest path'
+   ],
+   a:'Clearing a large area of rainforest for farming',
+   why:'Tropical rainforests host the highest biodiversity on Earth. Clearing them destroys habitats for thousands of species — many of which exist nowhere else. The other options have minimal or even positive effects.'},
+
+  // ═══════════════ DISEASE & HEALTH (5) ═══════════════
+  {id:'b40',topic:'health',diff:'easy',
+   q:'Malaria is caused by a parasite transmitted to humans by the bite of:',
+   opts:[
+     'A male Anopheles mosquito',
+     'A female Anopheles mosquito',
+     'A tsetse fly',
+     'A housefly'
+   ],
+   a:'A female Anopheles mosquito',
+   why:'Only the FEMALE Anopheles mosquito feeds on blood (males feed on plant nectar) and so only she transmits Plasmodium, the malaria parasite. The tsetse fly transmits sleeping sickness, not malaria.'},
+
+  {id:'b41',topic:'health',diff:'mid',
+   q:'Cholera is caused by which type of microorganism?',
+   opts:['Virus','Bacterium','Fungus','Protozoan'],
+   a:'Bacterium',
+   why:'Cholera is caused by Vibrio cholerae, a bacterium spread through contaminated water and food. It causes severe diarrhoea. Malaria is protozoan; HIV is viral; ringworm is fungal.'},
+
+  {id:'b42',topic:'health',diff:'mid',
+   q:'Which of these BEST describes the role of vaccination?',
+   opts:[
+     'It cures a person who is already sick',
+     'It triggers the body to make antibodies before exposure to the disease',
+     'It kills all microorganisms in the body',
+     'It replaces lost blood cells'
+   ],
+   a:'It triggers the body to make antibodies before exposure to the disease',
+   why:'A vaccine introduces a harmless form of a pathogen so the immune system makes memory antibodies. If the real pathogen arrives later, the body responds quickly. Vaccines are PREVENTIVE, not curative.'},
+
+  {id:'b43',topic:'health',diff:'hard',
+   q:'A person with sickle-cell anaemia is partly protected against which disease, giving the sickle-cell allele a survival advantage in some parts of Africa?',
+   opts:['Cholera','Malaria','Tuberculosis','HIV'],
+   a:'Malaria',
+   why:'Carriers of the sickle-cell allele (HbA HbS) are partly protected against malaria — the parasite cannot reproduce well in sickle-shaped red cells. This is why the allele remains common in malaria-endemic regions despite the disease cost in HbS HbS individuals.'},
+
+  {id:'b44',topic:'health',diff:'hard',
+   q:'White blood cells fight infection mainly by:',
+   opts:[
+     'Carrying oxygen to body tissues',
+     'Engulfing microbes (phagocytosis) and producing antibodies',
+     'Clotting blood at wound sites',
+     'Producing red blood cells'
+   ],
+   a:'Engulfing microbes (phagocytosis) and producing antibodies',
+   why:'White blood cells defend the body in two main ways: phagocytes engulf invaders, and lymphocytes produce antibodies. Oxygen carriage is done by red blood cells; clotting is done by platelets.'},
+
+  // ═══════════════ CLASSIFICATION & TAXONOMY (4) ═══════════════
+  {id:'b45',topic:'classify',diff:'easy',
+   q:'A whale is classified as a mammal, NOT a fish, mainly because:',
+   opts:[
+     'It is much larger than a fish',
+     'It breathes air with lungs and feeds its young with milk',
+     'It lives only in warm seas',
+     'It has a long lifespan'
+   ],
+   a:'It breathes air with lungs and feeds its young with milk',
+   why:'Mammals are defined by lungs (not gills), hair (or vestiges of it), warm blood, and feeding young with milk from mammary glands. Whales have all of these. Size has nothing to do with classification.'},
+
+  {id:'b46',topic:'classify',diff:'mid',
+   q:'Which of the following is a feature of all members of the kingdom Fungi?',
+   opts:[
+     'They photosynthesise',
+     'They have cell walls made of chitin',
+     'They have a backbone',
+     'They move actively to find food'
+   ],
+   a:'They have cell walls made of chitin',
+   why:'Fungal cell walls are made of chitin (the same substance as insect exoskeletons), unlike plant cellulose walls. Fungi do NOT photosynthesise — they absorb nutrients from dead matter or other organisms.'},
+
+  {id:'b47',topic:'classify',diff:'mid',
+   q:'In the binomial system of naming, the scientific name of the human species is "Homo sapiens." In this name, "Homo" refers to the:',
+   opts:['Species','Genus','Family','Kingdom'],
+   a:'Genus',
+   why:'In binomial nomenclature, the FIRST word is the genus (always capitalised) and the second is the species. So "Homo" is the genus and "sapiens" is the species.'},
+
+  {id:'b48',topic:'classify',diff:'hard',
+   q:'A student observes an organism that has feathers, lays eggs, and has a beak. The organism most likely belongs to which class?',
+   opts:['Reptilia','Aves','Mammalia','Amphibia'],
+   a:'Aves',
+   why:'Feathers are the key diagnostic feature of birds (class Aves). Reptiles also lay eggs but have scales, not feathers. Mammals don\'t lay eggs (with rare exceptions like the platypus) and have hair. Amphibians have moist skin.'},
+
+  // ═══════════════ REPRODUCTION (2) ═══════════════
+  {id:'b49',topic:'reprod',diff:'mid',
+   q:'In a flowering plant, fertilisation is the fusion of:',
+   opts:[
+     'Pollen and stigma',
+     'Male gamete and female gamete',
+     'Two pollen grains',
+     'Anther and ovary'
+   ],
+   a:'Male gamete and female gamete',
+   why:'Fertilisation is the fusion of male gamete (from pollen) and female gamete (in the ovule). Pollen landing on the stigma is POLLINATION (a step before fertilisation). Anther and ovary are organs, not gametes.'},
+
+  {id:'b50',topic:'reprod',diff:'hard',
+   q:'In humans, where does fertilisation of the egg by the sperm normally occur?',
+   opts:['Ovary','Uterus','Fallopian tube (oviduct)','Vagina'],
+   a:'Fallopian tube (oviduct)',
+   why:'Fertilisation occurs in the fallopian tube (oviduct), where the egg meets the sperm shortly after ovulation. The fertilised egg then travels to the uterus to implant in the uterine wall.'}
+];
+
 // ── Comprehension & cloze passages ──
 // Stored separately so multiple questions can share a passage. Each question
 // that uses a passage references it by `passageId`. Passages are original
@@ -6556,7 +7243,7 @@ var WAEC_MATHS_QS=[
 var WAEC_QUESTIONS={
   maths:WAEC_MATHS_QS,
   english:WAEC_ENGLISH_QS,
-  biology:[],
+  biology:WAEC_BIOLOGY_QS,
   physics:[],
   chemistry:[],
   literature:[],
@@ -6986,6 +7673,7 @@ function _waecTopicsForSubject(key){
   // return [] which renders the "Coming soon" state.
   if(key==='maths')return WAEC_MATHS_TOPICS;
   if(key==='english')return WAEC_ENGLISH_TOPICS;
+  if(key==='biology')return WAEC_BIOLOGY_TOPICS;
   return [];
 }
 
@@ -9808,7 +10496,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
   // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
     var SW_CODE=[
-      "var CACHE='edulab-v14';",
+      "var CACHE='edulab-v16';",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
       "    return c.add(self.location.href.replace(/\\/sw(\\.js|\\?.*)?$/,'/')).catch(function(){});",
@@ -9846,7 +10534,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
     function tryDirectCache(){
       // Fallback: pre-cache the page directly (no SW needed)
       if(!('caches' in window))return;
-      caches.open('edulab-v14').then(function(c){
+      caches.open('edulab-v16').then(function(c){
         c.add(window.location.href).catch(function(){});
       }).catch(function(){});
     }
