@@ -241,7 +241,11 @@ body{display:flex;flex-direction:column}
     <button class="mode-btn" onclick="pickMode('single')"><span class="mt">👤 My personal device</span><span class="md">One student uses this device</span></button>
     <button class="mode-btn" onclick="pickMode('shared')"><span class="mt">👥 Shared class device</span><span class="md">Multiple students take turns</span></button>
     <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,.15);padding-top:12px">
-      <button class="mode-btn" onclick="openRecovery()" style="border-color:rgba(96,165,250,.4);background:rgba(96,165,250,.1)">
+      <button class="mode-btn" onclick="openStaffLogin()" style="border-color:rgba(168,85,247,.4);background:rgba(168,85,247,.1)">
+        <span class="mt">⚙️ Login as Admin</span>
+        <span class="md">For proprietors and teachers</span>
+      </button>
+      <button class="mode-btn" onclick="openRecovery()" style="border-color:rgba(96,165,250,.4);background:rgba(96,165,250,.1);margin-top:8px">
         <span class="mt">🔑 Recover my account</span>
         <span class="md">Lost your phone? Restore using your recovery code</span>
       </button>
@@ -293,6 +297,77 @@ body{display:flex;flex-direction:column}
       • Or ask your parent/teacher to keep a copy
     </div>
     <button onclick="ackRecoveryAndContinue()" style="width:100%;padding:14px;background:#fff;color:#065F46;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;cursor:pointer">I have saved my code →</button>
+  </div>
+</div>
+
+<!-- ──────────── STAFF LOGIN FLOW (Session 1 of admin restructure) ──────────── -->
+<!-- All four screens use the same purple gradient so they read as one flow.   -->
+
+<!-- STAFF LOGIN — STEP 1: school code -->
+<div id="staff-login-school" class="screen" style="background:linear-gradient(135deg,#581C87,#7C3AED)">
+  <div class="topbar" style="background:transparent">
+    <button class="tback" onclick="SS('splash')">‹</button>
+    <div class="tlogo" style="color:#fff">Login as Admin</div>
+  </div>
+  <div style="flex:1;padding:24px;display:flex;flex-direction:column;justify-content:center;max-width:420px;width:100%;margin:0 auto;box-sizing:border-box">
+    <div style="font-size:48px;margin-bottom:8px;text-align:center">⚙️</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;text-align:center;margin-bottom:6px">School code</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.7);text-align:center;line-height:1.55;margin-bottom:24px">Enter your school's code to see staff list.</div>
+    <input id="staff-school-input" type="text" placeholder="e.g. AGUDA01" autocomplete="off" autocapitalize="characters" style="width:100%;padding:14px;font-size:20px;font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:3px;text-align:center;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(255,255,255,.95);color:#1E1B4B;margin-bottom:14px;box-sizing:border-box">
+    <div id="staff-school-status" style="font-size:13px;text-align:center;min-height:20px;margin-bottom:14px;color:rgba(255,255,255,.85)"></div>
+    <button id="staff-school-btn" onclick="staffSubmitSchoolCode()" style="width:100%;padding:14px;background:#fff;color:#7C3AED;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;cursor:pointer">Continue →</button>
+  </div>
+</div>
+
+<!-- STAFF LOGIN — STEP 2: pick yourself from the list -->
+<div id="staff-login-pick" class="screen" style="background:linear-gradient(180deg,#581C87 0%,#581C87 110px,#FAFAFA 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#581C87,#7C3AED)">
+    <button class="tback" onclick="SS('staff-login-school')">‹</button>
+    <div class="tlogo">Who is signing in?</div>
+  </div>
+  <div style="background:rgba(0,0,0,.2);padding:8px 16px;font-size:12px;color:rgba(255,255,255,.85);flex-shrink:0" id="staff-pick-bc">Tap your name from the list</div>
+  <div class="content" style="padding:14px 16px">
+    <div id="staff-pick-list"></div>
+    <div style="margin-top:18px;padding:14px;background:#fff;border-radius:12px;font-size:13px;color:#6B7280;line-height:1.5;text-align:center">
+      Not on the list? Ask your school proprietor to add you in <strong>Manage Staff</strong>.
+    </div>
+  </div>
+</div>
+
+<!-- STAFF LOGIN — STEP 3: enter PIN -->
+<div id="staff-login-pin" class="screen" style="background:linear-gradient(135deg,#581C87,#7C3AED)">
+  <div class="topbar" style="background:transparent">
+    <button class="tback" onclick="SS('staff-login-pick')">‹</button>
+    <div class="tlogo" style="color:#fff">Enter PIN</div>
+  </div>
+  <div style="flex:1;padding:24px;display:flex;flex-direction:column;justify-content:center;max-width:420px;width:100%;margin:0 auto;box-sizing:border-box">
+    <div id="staff-pin-greeting" style="text-align:center;margin-bottom:18px">
+      <div style="font-size:48px;margin-bottom:6px" id="staff-pin-emoji">👤</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;margin-bottom:4px" id="staff-pin-name">—</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.75)" id="staff-pin-role">—</div>
+    </div>
+    <input id="staff-pin-input" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" autocomplete="off" style="width:100%;padding:14px;font-size:32px;font-family:'Nunito',sans-serif;font-weight:900;letter-spacing:14px;text-align:center;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(255,255,255,.95);color:#1E1B4B;margin-bottom:14px;box-sizing:border-box">
+    <div id="staff-pin-status" style="font-size:13px;text-align:center;min-height:20px;margin-bottom:14px;color:rgba(255,255,255,.85)"></div>
+    <button id="staff-pin-btn" onclick="staffSubmitPin()" style="width:100%;padding:14px;background:#fff;color:#7C3AED;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;cursor:pointer">Sign in →</button>
+  </div>
+</div>
+
+<!-- STAFF LOGIN — MIGRATION: shown the FIRST time a school admin logs in
+     under the new system. Uses the existing admin PIN to authenticate, then
+     creates a proprietor staff doc so the picker works from then on. -->
+<div id="staff-login-migrate" class="screen" style="background:linear-gradient(135deg,#581C87,#7C3AED)">
+  <div class="topbar" style="background:transparent">
+    <button class="tback" onclick="SS('staff-login-school')">‹</button>
+    <div class="tlogo" style="color:#fff">First-time setup</div>
+  </div>
+  <div style="flex:1;padding:24px;display:flex;flex-direction:column;justify-content:center;max-width:440px;width:100%;margin:0 auto;box-sizing:border-box">
+    <div style="font-size:48px;margin-bottom:8px;text-align:center">🏫</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;text-align:center;margin-bottom:6px">Welcome to the new staff system</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.85);text-align:center;line-height:1.6;margin-bottom:18px" id="staff-migrate-intro">This school has not yet set up the new login system. Enter your existing admin PIN once to create your proprietor account.</div>
+    <input id="staff-migrate-name" type="text" placeholder="Display name (e.g. Mr Adekunle)" maxlength="40" style="width:100%;padding:13px;font-size:16px;font-family:'Nunito',sans-serif;font-weight:700;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(255,255,255,.95);color:#1E1B4B;margin-bottom:10px;box-sizing:border-box" autocomplete="off">
+    <input id="staff-migrate-pin" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Existing admin PIN" autocomplete="off" style="width:100%;padding:14px;font-size:24px;font-family:'Nunito',sans-serif;font-weight:900;letter-spacing:10px;text-align:center;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(255,255,255,.95);color:#1E1B4B;margin-bottom:14px;box-sizing:border-box">
+    <div id="staff-migrate-status" style="font-size:13px;text-align:center;min-height:20px;margin-bottom:14px;color:rgba(255,255,255,.85)"></div>
+    <button onclick="staffMigrate()" style="width:100%;padding:14px;background:#fff;color:#7C3AED;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;cursor:pointer">Create proprietor account →</button>
   </div>
 </div>
 
@@ -3123,6 +3198,322 @@ function showRecoveryCodeScreen(){
 // User clicked "I have saved my code" — proceed to home
 function ackRecoveryAndContinue(){
   loadHome();
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// STAFF LOGIN — Session 1 of the admin restructure
+// ════════════════════════════════════════════════════════════════════════
+// Replaces the single "admin PIN" model with a per-staff system.
+//   - Each school has a `staff` subcollection with one doc per staff member
+//   - Each staff doc: { name, pin (hashed), role, assignedClasses, phone, active }
+//   - Sign-in: school code → pick yourself from list → enter PIN
+//
+// Migration: schools that already exist with `adminPinHash` but no `staff`
+// subcollection see a one-time setup screen on first login under the new
+// system. The user enters the existing admin PIN once to authenticate, then
+// a proprietor staff doc is created using that PIN. The school's old
+// adminPinHash stays as a fallback in case the new system breaks.
+//
+// IMPORTANT — Session 1 scope:
+//   - Auth flow + migration only
+//   - All staff still see the SAME admin (no scoping yet)
+//   - Manage Staff UI ships in Session 2
+//   - Teacher-scoped views ship in Session 3
+//
+// The currently-signed-in staff member is held in STAFF (window-level state).
+// Cleared on signout, on app reload (not persisted), and after 30min idle.
+var STAFF=null;     // { id, name, role, assignedClasses, schoolCode } when signed in
+var _staffPickList=[]; // last-rendered list of staff for the picker
+var _staffSchoolCode=''; // school code carried between flow steps
+var _staffSelectedStaff=null; // staff entry highlighted in step 2
+
+// ── Step 1: school code → fetch staff list ──
+function openStaffLogin(){
+  // Pre-fill from cached school if available
+  var cached=getSchool();
+  var input=document.getElementById('staff-school-input');
+  if(input&&cached&&cached.code)input.value=cached.code;
+  var status=document.getElementById('staff-school-status');
+  if(status)status.textContent='';
+  SS('staff-login-school');
+  if(input)setTimeout(function(){input.focus();},100);
+}
+
+function staffSubmitSchoolCode(){
+  var input=document.getElementById('staff-school-input');
+  var status=document.getElementById('staff-school-status');
+  var btn=document.getElementById('staff-school-btn');
+  var code=String(input&&input.value||'').trim().toUpperCase();
+  if(!code){
+    if(status){status.textContent='⚠️ Enter your school code.';status.style.color='#FCD34D';}
+    return;
+  }
+  _staffSchoolCode=code;
+  if(status){status.textContent='⏳ Loading staff list…';status.style.color='rgba(255,255,255,.85)';}
+  if(btn){btn.disabled=true;btn.textContent='Loading…';}
+  // Verify school code first (uses existing activation flow which also caches school data)
+  activateSchoolCode(code,function(result,school){
+    if(btn){btn.disabled=false;btn.textContent='Continue →';}
+    if(result!=='ok'&&result!=='offline'){
+      var msg=result==='invalid'?'❌ School code not found.'
+        :result==='expired'?'⚠️ School subscription expired.'
+        :result==='inactive'?'⚠️ School is not active.'
+        :'⚠️ Could not verify school. Check internet.';
+      if(status){status.textContent=msg;status.style.color='#FCA5A5';}
+      return;
+    }
+    if(result==='offline'){
+      if(status){status.textContent='⚠️ Need internet for staff login.';status.style.color='#FCD34D';}
+      return;
+    }
+    // Now fetch staff list
+    FB.onReady(function(){
+      if(!FB.db){
+        if(status){status.textContent='⚠️ Connection problem. Try again.';status.style.color='#FCA5A5';}
+        return;
+      }
+      FB.db.collection('schools').doc(code).collection('staff').get()
+        .then(function(snap){
+          var staffList=[];
+          snap.forEach(function(doc){
+            var d=doc.data();
+            // Hide deactivated staff from the picker
+            if(d.active===false)return;
+            staffList.push(Object.assign({id:doc.id},d));
+          });
+          // Sort: proprietor first, then teachers alphabetically by name
+          staffList.sort(function(a,b){
+            if(a.role==='proprietor'&&b.role!=='proprietor')return -1;
+            if(b.role==='proprietor'&&a.role!=='proprietor')return 1;
+            return String(a.name||'').localeCompare(String(b.name||''));
+          });
+          if(staffList.length===0){
+            // No staff yet — this school still uses the old adminPinHash. Offer migration.
+            _showStaffMigration(school);
+            return;
+          }
+          _staffPickList=staffList;
+          _renderStaffPicker(school,staffList);
+          SS('staff-login-pick');
+        })
+        .catch(function(e){
+          console.warn('Staff list fetch failed:',e.message);
+          if(status){status.textContent='⚠️ Could not load staff list. Try again.';status.style.color='#FCA5A5';}
+        });
+    });
+  });
+}
+
+// Render the staff picker list. Each item shows name + role + class summary.
+function _renderStaffPicker(school,staffList){
+  var bc=document.getElementById('staff-pick-bc');
+  if(bc)bc.textContent=(school&&school.name?school.name+' · ':'')+staffList.length+' staff';
+  var list=document.getElementById('staff-pick-list');
+  if(!list)return;
+  list.innerHTML=staffList.map(function(s,i){
+    var icon=s.role==='proprietor'?'🏫':'👩‍🏫';
+    var roleLabel=s.role==='proprietor'?'Proprietor':'Teacher';
+    var classes=Array.isArray(s.assignedClasses)&&s.assignedClasses.length
+      ? s.assignedClasses.join(' · ')
+      : (s.role==='proprietor'?'All classes':'No classes assigned');
+    return '<div onclick="staffPickStaff('+i+')" style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer">'
+      +'<div style="width:46px;height:46px;border-radius:12px;background:#F5F3FF;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">'+icon+'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+_escapeHtml(s.name||'(unnamed)')+'</div>'
+      +  '<div style="font-size:12px;color:#6B7280;margin-top:3px">'+_escapeHtml(roleLabel)+' · '+_escapeHtml(classes)+'</div>'
+      +'</div>'
+      +'<span style="font-size:22px;color:#7C3AED">›</span>'
+      +'</div>';
+  }).join('');
+}
+
+// ── Step 2: staff member tapped — go to PIN screen ──
+function staffPickStaff(idx){
+  var s=_staffPickList[idx];
+  if(!s)return;
+  _staffSelectedStaff=s;
+  var emoji=document.getElementById('staff-pin-emoji');
+  if(emoji)emoji.textContent=s.role==='proprietor'?'🏫':'👩‍🏫';
+  var nameEl=document.getElementById('staff-pin-name');
+  if(nameEl)nameEl.textContent=s.name||'(unnamed)';
+  var roleEl=document.getElementById('staff-pin-role');
+  if(roleEl){
+    var classes=Array.isArray(s.assignedClasses)&&s.assignedClasses.length
+      ? s.assignedClasses.join(' · ')
+      : (s.role==='proprietor'?'All classes':'No classes assigned');
+    roleEl.textContent=(s.role==='proprietor'?'Proprietor':'Teacher')+' · '+classes;
+  }
+  var pinInput=document.getElementById('staff-pin-input');
+  if(pinInput){pinInput.value='';setTimeout(function(){pinInput.focus();},100);}
+  var pinStatus=document.getElementById('staff-pin-status');
+  if(pinStatus)pinStatus.textContent='';
+  SS('staff-login-pin');
+}
+
+// ── Step 3: PIN entered — validate against the staff doc's hash ──
+// Same SHA-256 approach as the existing adminPinHash. Rate-limit on too many
+// wrong tries (reuses the existing _adminFailCount + _adminLockUntil).
+function staffSubmitPin(){
+  var pinInput=document.getElementById('staff-pin-input');
+  var status=document.getElementById('staff-pin-status');
+  var btn=document.getElementById('staff-pin-btn');
+  var entered=String(pinInput&&pinInput.value||'').trim();
+  if(!_staffSelectedStaff){
+    if(status){status.textContent='⚠️ Pick a staff member first.';status.style.color='#FCD34D';}
+    return;
+  }
+  if(!/^\d{4}$/.test(entered)){
+    if(status){status.textContent='⚠️ PIN must be 4 digits.';status.style.color='#FCD34D';}
+    return;
+  }
+  if(Date.now()<_adminLockUntil){
+    var secs=Math.ceil((_adminLockUntil-Date.now())/1000);
+    if(status){status.textContent='❌ Too many wrong attempts. Wait '+secs+'s.';status.style.color='#FCA5A5';}
+    return;
+  }
+  if(status){status.textContent='⏳ Checking…';status.style.color='rgba(255,255,255,.85)';}
+  if(btn){btn.disabled=true;btn.textContent='Checking…';}
+  sha256Hex(entered).then(function(enteredHash){
+    var staffPinHash=String(_staffSelectedStaff.pinHash||'').toLowerCase();
+    if(!staffPinHash){
+      if(status){status.textContent='⚠️ This account has no PIN set. Ask your proprietor.';status.style.color='#FCD34D';}
+      if(btn){btn.disabled=false;btn.textContent='Sign in →';}
+      return;
+    }
+    if(enteredHash===staffPinHash){
+      _adminFailCount=0;
+      // Successful sign-in. Build the active staff session.
+      STAFF={
+        id:_staffSelectedStaff.id,
+        name:_staffSelectedStaff.name,
+        role:_staffSelectedStaff.role||'teacher',
+        assignedClasses:Array.isArray(_staffSelectedStaff.assignedClasses)?_staffSelectedStaff.assignedClasses.slice():[],
+        schoolCode:_staffSchoolCode
+      };
+      // Mark the existing _adminVerified flag too so any code paths still
+      // looking at it keep working. _doOpenAdmin handles the rest.
+      _adminVerified=true;
+      _adminVerifyTime=Date.now();
+      if(status){status.textContent='✅ Welcome, '+(_staffSelectedStaff.name.split(' ')[0])+'!';status.style.color='#86EFAC';}
+      // Update lastSeen on the staff doc (best-effort, no error on failure)
+      FB.onReady(function(){
+        if(!FB.db)return;
+        FB.db.collection('schools').doc(_staffSchoolCode).collection('staff').doc(_staffSelectedStaff.id)
+          .set({lastSeen:Date.now()},{merge:true})
+          .catch(function(){/* non-fatal */});
+      });
+      // Land on the existing admin screen. Sessions 2/3 will scope per role.
+      setTimeout(function(){
+        if(btn){btn.disabled=false;btn.textContent='Sign in →';}
+        _doOpenAdmin();
+      },700);
+    }else{
+      _adminFailCount++;
+      if(_adminFailCount>=5){
+        _adminLockUntil=Date.now()+60*1000;
+        _adminFailCount=0;
+        if(status){status.textContent='❌ Wrong PIN — locked for 60 seconds.';status.style.color='#FCA5A5';}
+      }else{
+        if(status){status.textContent='❌ Wrong PIN. ('+_adminFailCount+'/5)';status.style.color='#FCA5A5';}
+      }
+      if(btn){btn.disabled=false;btn.textContent='Sign in →';}
+    }
+  }).catch(function(e){
+    console.warn('PIN hash failed:',e.message);
+    if(status){status.textContent='⚠️ Sign-in failed. Try again.';status.style.color='#FCA5A5';}
+    if(btn){btn.disabled=false;btn.textContent='Sign in →';}
+  });
+}
+
+// ── Migration: school has no staff yet but does have an old adminPinHash ──
+// User enters existing admin PIN once → we create a proprietor staff doc
+// using that same PIN, then route them straight into admin.
+function _showStaffMigration(school){
+  var intro=document.getElementById('staff-migrate-intro');
+  if(intro)intro.textContent='This school ('+(school&&school.name||_staffSchoolCode)+') has not yet set up the new login system. Enter your existing admin PIN once to create your proprietor account.';
+  var nameInput=document.getElementById('staff-migrate-name');
+  if(nameInput&&!nameInput.value)nameInput.value=(school&&school.name?school.name+' Proprietor':'Proprietor');
+  var pinInput=document.getElementById('staff-migrate-pin');
+  if(pinInput)pinInput.value='';
+  var status=document.getElementById('staff-migrate-status');
+  if(status)status.textContent='';
+  SS('staff-login-migrate');
+}
+
+function staffMigrate(){
+  var nameInput=document.getElementById('staff-migrate-name');
+  var pinInput=document.getElementById('staff-migrate-pin');
+  var status=document.getElementById('staff-migrate-status');
+  var name=String(nameInput&&nameInput.value||'').trim();
+  var pin=String(pinInput&&pinInput.value||'').trim();
+  if(!name){
+    if(status){status.textContent='⚠️ Enter a display name.';status.style.color='#FCD34D';}
+    return;
+  }
+  if(!/^\d{4}$/.test(pin)){
+    if(status){status.textContent='⚠️ PIN must be 4 digits.';status.style.color='#FCD34D';}
+    return;
+  }
+  if(status){status.textContent='⏳ Verifying…';status.style.color='rgba(255,255,255,.85)';}
+  // Step 1: verify the entered PIN matches the school's existing adminPinHash.
+  // We must NOT just trust the user — this gate is what prevents anyone
+  // who knows a school code from creating a proprietor account.
+  FB.onReady(function(){
+    if(!FB.db){
+      if(status){status.textContent='⚠️ Need internet. Try again later.';status.style.color='#FCA5A5';}
+      return;
+    }
+    FB.db.collection('schools').doc(_staffSchoolCode).get()
+      .then(function(doc){
+        if(!doc.exists){
+          if(status){status.textContent='❌ School not found.';status.style.color='#FCA5A5';}
+          return;
+        }
+        var data=doc.data();
+        var existingHash=String(data.adminPinHash||'').toLowerCase();
+        if(!existingHash){
+          if(status){status.textContent='⚠️ This school has no admin PIN set. Contact Blestonex.';status.style.color='#FCA5A5';}
+          return;
+        }
+        return sha256Hex(pin).then(function(enteredHash){
+          if(enteredHash!==existingHash){
+            if(status){status.textContent='❌ Wrong PIN. This must match the existing admin PIN.';status.style.color='#FCA5A5';}
+            return;
+          }
+          // Step 2: PIN is correct — create the proprietor staff doc using
+          // the same hash we just verified. Doc ID is auto-generated by Firestore.
+          var staffData={
+            name:name,
+            role:'proprietor',
+            pinHash:enteredHash, // same hash, no need to re-compute
+            assignedClasses:[], // proprietors see all classes
+            phone:'',
+            active:true,
+            createdAt:Date.now(),
+            lastSeen:Date.now()
+          };
+          return FB.db.collection('schools').doc(_staffSchoolCode).collection('staff').add(staffData)
+            .then(function(ref){
+              if(status){status.textContent='✅ Proprietor account created!';status.style.color='#86EFAC';}
+              // Build active session and go straight to admin
+              STAFF={
+                id:ref.id,
+                name:name,
+                role:'proprietor',
+                assignedClasses:[],
+                schoolCode:_staffSchoolCode
+              };
+              _adminVerified=true;
+              _adminVerifyTime=Date.now();
+              setTimeout(function(){_doOpenAdmin();},800);
+            });
+        });
+      })
+      .catch(function(e){
+        console.warn('Migration failed:',e.message);
+        if(status){status.textContent='⚠️ Setup failed: '+e.message;status.style.color='#FCA5A5';}
+      });
+  });
 }
 
 // Admin/teacher view of a student's recovery key. Used when a parent reports
@@ -10892,7 +11283,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
   // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
     var SW_CODE=[
-      "var CACHE='edulab-v20';",
+      "var CACHE='edulab-v21';",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
       "    return c.add(self.location.href.replace(/\\/sw(\\.js|\\?.*)?$/,'/')).catch(function(){});",
@@ -10930,7 +11321,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
     function tryDirectCache(){
       // Fallback: pre-cache the page directly (no SW needed)
       if(!('caches' in window))return;
-      caches.open('edulab-v20').then(function(c){
+      caches.open('edulab-v21').then(function(c){
         c.add(window.location.href).catch(function(){});
       }).catch(function(){});
     }
