@@ -3954,23 +3954,58 @@ function renderAdminProgressWith(roster,allProg){
   });
 }
 function removeStudent(uid){
-  if(!confirm('Remove this student? Their progress will also be deleted.'))return;
-  ROSTER=ROSTER.filter(function(s){return (s.uid||s.name)!==uid;});ls(LK_ROSTER,ROSTER);
+  if(!confirm('Remove this student? Their progress will also be deleted from the cloud and cannot be undone.'))return;
+  var school=getSchool();
+  // Find the student in any source (local roster OR most-recently-rendered list)
+  // so we can also delete their recovery mapping.
+  var rosterEntry=ROSTER.find(function(s){return (s.uid||s.name)===uid;});
+  var recoveryCode=rosterEntry&&rosterEntry.recoveryCode||'';
+
+  // Local removal first — this gives instant UI feedback regardless of network.
+  ROSTER=ROSTER.filter(function(s){return (s.uid||s.name)!==uid;});
+  ls(LK_ROSTER,ROSTER);
   var p=lg(LK_PROG)||{};delete p[uid];ls(LK_PROG,p);
-  // Only delete from Firestore on shared devices (teacher device)
-  // Single-user devices should not be able to delete other students from the cloud
-  if(DMODE==='shared'){
-    var school=getSchool();
-    if(school&&school.code){
-      FB.onReady(function(){
-        if(!FB.db)return;
-        FB.db.collection('schools').doc(school.code)
-          .collection('students').doc(uid).delete()
-          .catch(function(e){console.warn('Cloud delete failed:',e.message);});
-      });
-    }
+  renderAdminProgress();
+
+  // Cloud removal — gated by school being known, NOT by DMODE. The admin PIN
+  // protects this action; whether the device is set up as 'single' or 'shared'
+  // is irrelevant once an authenticated admin has chosen to delete.
+  // Previously the DMODE==='shared' gate caused silent failures on single-mode
+  // teacher devices: the local row vanished but Firestore kept the record, so
+  // it reappeared on next refresh.
+  if(!school||!school.code){
+    toast('Student removed locally. School code not set — cloud copy not removed.',3500);
+    return;
   }
-  renderAdminProgress();toast('Student removed',1800);
+  FB.onReady(function(){
+    if(!FB.db){
+      toast('Student removed locally. Offline — will not delete from cloud automatically.',3500);
+      return;
+    }
+    // Step 1: delete the student doc
+    FB.db.collection('schools').doc(school.code).collection('students').doc(uid).delete()
+      .then(function(){
+        // Step 2: also delete their recovery mapping so the recovery code can't
+        // resurrect a deleted student. Quietly skip if no code was on the record.
+        if(recoveryCode){
+          var key=_normaliseRecoveryCode(recoveryCode);
+          return FB.db.collection('schools').doc(school.code).collection('recovery').doc(key).delete()
+            .catch(function(e){console.warn('Recovery mapping delete (non-fatal):',e.message);});
+        }
+      })
+      .then(function(){
+        // Re-render with fresh cloud data so the deleted student doesn't reappear
+        renderAdminProgress();
+        toast('✅ Student removed (locally and from cloud).',2500);
+      })
+      .catch(function(e){
+        // Real, user-visible error — distinguishes a true failure from success.
+        // Local copy is gone but cloud still has them, so on next admin refresh
+        // they'll re-appear unless the user understands what happened.
+        console.warn('Cloud delete failed:',e.message);
+        toast('⚠️ Removed locally, but cloud delete failed: '+e.message+'. The student may reappear after refresh.',5000);
+      });
+  });
 }
 
 // Edit a student's parent WhatsApp number from the admin panel. Prompts the
@@ -4015,8 +4050,63 @@ function editParentWA(uid){
   }
 }
 function clearAllStudents(){
-  if(!confirm('Remove ALL students and their progress? This cannot be undone.'))return;
-  ROSTER=[];ls(LK_ROSTER,[]);ls(LK_PROG,{});renderAdminProgress();toast('All students cleared',1800);
+  if(!confirm('Remove ALL students and their progress?\n\nThis deletes them from THIS device AND from the cloud. It cannot be undone.'))return;
+  // Local wipe first for instant feedback
+  var school=getSchool();
+  ROSTER=[];ls(LK_ROSTER,[]);ls(LK_PROG,{});renderAdminProgress();
+  if(!school||!school.code){
+    toast('All students cleared locally. School code not set — cloud copies not removed.',3500);
+    return;
+  }
+  // Cloud wipe — fetch all student docs, delete each, then also clear recovery
+  // mappings so deleted students can\'t be restored via recovery codes.
+  toast('⏳ Clearing cloud copies…',2200);
+  FB.onReady(function(){
+    if(!FB.db){
+      toast('All students cleared locally. Offline — cloud copies remain.',3500);
+      return;
+    }
+    var schoolRef=FB.db.collection('schools').doc(school.code);
+    var deletedCount=0,errorCount=0;
+    schoolRef.collection('students').get()
+      .then(function(snap){
+        if(snap.empty){
+          toast('All students cleared (cloud was already empty).',2500);
+          return;
+        }
+        var deletePromises=[];
+        snap.forEach(function(doc){
+          deletePromises.push(
+            doc.ref.delete()
+              .then(function(){deletedCount++;})
+              .catch(function(e){errorCount++;console.warn('Failed to delete '+doc.id+':',e.message);})
+          );
+        });
+        return Promise.all(deletePromises);
+      })
+      .then(function(){
+        // Also wipe recovery mappings so codes from deleted students can\'t resurrect them
+        return schoolRef.collection('recovery').get()
+          .then(function(snap){
+            var p=[];
+            snap.forEach(function(doc){p.push(doc.ref.delete().catch(function(){}));});
+            return Promise.all(p);
+          })
+          .catch(function(){}); // recovery wipe failure is non-fatal
+      })
+      .then(function(){
+        renderAdminProgress();
+        if(errorCount>0){
+          toast('⚠️ Cleared '+deletedCount+' students from cloud, '+errorCount+' failed. Check Firestore.',5000);
+        }else if(deletedCount>0){
+          toast('✅ All '+deletedCount+' students cleared (locally and from cloud).',3000);
+        }
+      })
+      .catch(function(e){
+        console.warn('Bulk delete failed:',e.message);
+        toast('⚠️ Cleared locally, but cloud cleanup failed: '+e.message,5000);
+      });
+  });
 }
 
 // ════════════════════════════════════════
@@ -10802,7 +10892,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
   // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
     var SW_CODE=[
-      "var CACHE='edulab-v19';",
+      "var CACHE='edulab-v20';",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
       "    return c.add(self.location.href.replace(/\\/sw(\\.js|\\?.*)?$/,'/')).catch(function(){});",
@@ -10840,7 +10930,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
     function tryDirectCache(){
       // Fallback: pre-cache the page directly (no SW needed)
       if(!('caches' in window))return;
-      caches.open('edulab-v19').then(function(c){
+      caches.open('edulab-v20').then(function(c){
         c.add(window.location.href).catch(function(){});
       }).catch(function(){});
     }
