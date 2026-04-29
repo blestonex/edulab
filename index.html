@@ -298,6 +298,9 @@ body{display:flex;flex-direction:column}
 
 <!-- SETUP -->
 <div id="setup" class="screen">
+  <div style="display:flex;align-items:center;padding:12px 14px;flex-shrink:0">
+    <button onclick="swBack()" style="background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);color:#fff;width:38px;height:38px;border-radius:10px;font-size:20px;font-weight:900;cursor:pointer;line-height:1">‹</button>
+  </div>
   <div class="setup-body">
     <div id="sw1"><div class="setup-hdr"><h2>What is your name?</h2><p>Your name shows on your progress</p></div><div class="setup-field"><input id="sw-name" class="setup-input" type="text" placeholder="Type your name…" maxlength="30" oninput="swCheck()"></div></div>
     <div id="sw2" style="display:none"><div class="setup-hdr"><h2>What is your class?</h2><p>This sets the right level for you</p></div><div class="class-grid"><button class="class-btn" onclick="swCls(this,'Nursery 1')">Nursery 1</button><button class="class-btn" onclick="swCls(this,'Nursery 2')">Nursery 2</button><button class="class-btn" onclick="swCls(this,'Primary 1')">Primary 1</button><button class="class-btn" onclick="swCls(this,'Primary 2')">Primary 2</button><button class="class-btn" onclick="swCls(this,'Primary 3')">Primary 3</button><button class="class-btn" onclick="swCls(this,'Primary 4')">Primary 4</button><button class="class-btn" onclick="swCls(this,'Primary 5')">Primary 5</button><button class="class-btn" onclick="swCls(this,'Primary 6')">Primary 6</button><button class="class-btn" onclick="swCls(this,'JSS 1')">JSS 1</button><button class="class-btn" onclick="swCls(this,'JSS 2')">JSS 2</button><button class="class-btn" onclick="swCls(this,'JSS 3')">JSS 3</button><button class="class-btn" onclick="swCls(this,'SSS 1')">SSS 1</button><button class="class-btn" onclick="swCls(this,'SSS 2')">SSS 2</button><button class="class-btn" onclick="swCls(this,'WAEC/JAMB')">WAEC/JAMB</button></div></div>
@@ -463,6 +466,15 @@ body{display:flex;flex-direction:column}
       </div>
       <div id="admin-progress-list"></div>
       <button onclick="clearAllStudents()" style="width:100%;margin-top:12px;padding:11px;background:var(--errl);color:var(--err);border:1.5px solid var(--err);border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">🗑️ Remove All Students</button>
+    </div>
+    <!-- Device mode change — for proprietors / teachers who want to switch
+         between Single device and Shared device without losing existing data.
+         Lives at the bottom of admin so it's intentional, not casual. -->
+    <div style="background:#fff;border-radius:var(--r);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-top:14px">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#1565C0;margin-bottom:6px">🔄 Device Mode</div>
+      <div id="admin-mode-status" style="font-size:13px;color:var(--sm);margin-bottom:10px">Currently: …</div>
+      <button onclick="changeDeviceMode()" style="width:100%;padding:11px;background:#fff;color:#1565C0;border:1.5px solid #1565C0;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">Change device mode</button>
+      <div style="font-size:11px;color:var(--sm);margin-top:8px;line-height:1.5">Switching modes does NOT delete data. Single-device profiles and shared-device rosters are kept separately.</div>
     </div>
   </div>
 </div>
@@ -3073,16 +3085,114 @@ function submitRecovery(){
   });
 }
 
-// Show the recovery code to a freshly-set-up student so they can save it
+// Show the recovery code to a freshly-set-up student so they can save it.
+// Defensive logging here because users have reported the screen not appearing
+// — if showRecoveryCodeScreen is somehow not being called, the console log
+// tells us why.
 function showRecoveryCodeScreen(){
+  console.log('[EduLab] showRecoveryCodeScreen called. STU:', STU, 'recoveryCode:', STU&&STU.recoveryCode);
   var disp=document.getElementById('rec-show-code');
-  if(disp&&STU&&STU.recoveryCode)disp.textContent=STU.recoveryCode;
+  var screen=document.getElementById('recovery-show');
+  if(!screen){
+    console.warn('[EduLab] recovery-show screen not found in DOM — falling back to home');
+    loadHome();return;
+  }
+  if(!STU||!STU.recoveryCode){
+    console.warn('[EduLab] No recovery code on STU — generating now as fallback');
+    if(!STU)STU={};
+    STU.recoveryCode=generateRecoveryCode();
+    ls(LK_STU,STU);
+    saveRecoveryMapping();
+  }
+  if(disp)disp.textContent=STU.recoveryCode;
   SS('recovery-show');
 }
 
 // User clicked "I have saved my code" — proceed to home
 function ackRecoveryAndContinue(){
   loadHome();
+}
+
+// Admin/teacher view of a student's recovery key. Used when a parent reports
+// a lost phone — the teacher opens the roster, taps the 🔑 Recovery badge,
+// and sees the code to share with the parent.
+function showStudentRecoveryKey(uid){
+  var student=ROSTER.find(function(s){return (s.uid||s.name)===uid;});
+  if(!student){toast('Student not found.',2000);return;}
+  if(!student.recoveryCode){
+    toast('This student has no recovery code yet. They may have been added before this feature.',3500);
+    return;
+  }
+  var school=getSchool()||{};
+  var schoolCode=school.code||'(school code)';
+  // Build a sharable WhatsApp message
+  var waMsg='Hi, this is the EduLab recovery code for '+student.name+'.\n\n'
+    +'School Code: '+schoolCode+'\n'
+    +'Recovery Code: '+student.recoveryCode+'\n\n'
+    +'If '+student.name.split(' ')[0]+' loses access to the app, open EduLab → Recover my account → enter both codes above. All progress will be restored.\n\n'
+    +'Keep this message safe.';
+  var overlay=document.createElement('div');
+  overlay.id='rec-key-modal-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  overlay.onclick=function(e){if(e.target===overlay)overlay.remove();};
+  overlay.innerHTML=
+    '<div style="background:#fff;border-radius:16px;padding:22px;max-width:400px;width:100%;max-height:90vh;overflow-y:auto">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+        +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:17px;color:#1E1B4B">🔑 Recovery Code</div>'
+        +'<button onclick="document.getElementById(\'rec-key-modal-overlay\').remove()" style="background:none;border:none;font-size:22px;color:#6B7280;cursor:pointer;padding:0 4px;line-height:1">✕</button>'
+      +'</div>'
+      +'<div style="background:#F0F4FF;border:1.5px solid #C7D2FE;border-radius:12px;padding:14px;text-align:center;margin-bottom:12px">'
+        +'<div style="font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#4338CA;margin-bottom:6px">For '+_escapeHtml(student.name)+'</div>'
+        +'<div style="font-size:13px;color:#4B5563;margin-bottom:8px">School Code</div>'
+        +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:22px;color:#1E1B4B;letter-spacing:3px;margin-bottom:10px">'+_escapeHtml(schoolCode)+'</div>'
+        +'<div style="font-size:13px;color:#4B5563;margin-bottom:6px">Recovery Code</div>'
+        +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:24px;color:#3730A3;letter-spacing:4px">'+_escapeHtml(student.recoveryCode)+'</div>'
+      +'</div>'
+      +'<div style="font-size:13px;color:#4B5563;line-height:1.55;margin-bottom:14px">Share these two codes with the parent. If the student loses their phone, they can enter both codes on a new device to restore everything — scores, stages, all progress.</div>'
+      +'<button id="rec-copy-wa-btn" style="width:100%;padding:11px;background:#16A34A;color:#fff;border:none;border-radius:10px;font-family:\'Nunito\',sans-serif;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:8px">📋 Copy WhatsApp message</button>'
+      +(student.parentWA?'<button id="rec-open-wa-btn" style="width:100%;padding:11px;background:#25D366;color:#fff;border:none;border-radius:10px;font-family:\'Nunito\',sans-serif;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:8px">💬 Open WhatsApp to '+_escapeHtml(student.parentWA)+'</button>':'')
+      +'<button onclick="document.getElementById(\'rec-key-modal-overlay\').remove()" style="width:100%;padding:11px;background:#fff;color:#4B5563;border:1.5px solid #D1D5DB;border-radius:10px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:14px;cursor:pointer">Close</button>'
+    +'</div>';
+  document.body.appendChild(overlay);
+  // Wire copy button — uses Clipboard API with a textarea fallback for older browsers
+  var copyBtn=document.getElementById('rec-copy-wa-btn');
+  if(copyBtn){
+    copyBtn.onclick=function(){
+      try{
+        if(navigator.clipboard&&navigator.clipboard.writeText){
+          navigator.clipboard.writeText(waMsg).then(function(){
+            copyBtn.textContent='✅ Copied — paste into WhatsApp';
+            setTimeout(function(){copyBtn.textContent='📋 Copy WhatsApp message';},2500);
+          },function(){_fallbackCopy(waMsg,copyBtn);});
+        }else{_fallbackCopy(waMsg,copyBtn);}
+      }catch(e){_fallbackCopy(waMsg,copyBtn);}
+    };
+  }
+  // Wire "open WhatsApp" if parent number exists
+  var openWaBtn=document.getElementById('rec-open-wa-btn');
+  if(openWaBtn&&student.parentWA){
+    openWaBtn.onclick=function(){
+      var num=String(student.parentWA).replace(/\D/g,'');
+      window.open('https://wa.me/'+num+'?text='+encodeURIComponent(waMsg),'_blank');
+    };
+  }
+}
+
+// Fallback for older browsers without Clipboard API — uses a hidden textarea
+function _fallbackCopy(text,btn){
+  try{
+    var ta=document.createElement('textarea');
+    ta.value=text;ta.style.cssText='position:fixed;top:-1000px;left:-1000px';
+    document.body.appendChild(ta);ta.select();
+    var ok=document.execCommand('copy');
+    document.body.removeChild(ta);
+    if(btn){
+      btn.textContent=ok?'✅ Copied — paste into WhatsApp':'⚠️ Copy failed — long-press the code above';
+      setTimeout(function(){btn.textContent='📋 Copy WhatsApp message';},2800);
+    }
+  }catch(e){
+    if(btn)btn.textContent='⚠️ Long-press the code above to copy';
+  }
 }
 
 // ════════════════════════════════════════
@@ -3104,6 +3214,43 @@ function startSetup(){
 function swCheck(){document.getElementById('sw-next').disabled=!document.getElementById('sw-name').value.trim();}
 function swCls(btn,cls){document.querySelectorAll('#sw2 .class-btn').forEach(function(b){b.classList.remove('sel');});btn.classList.add('sel');swClass=cls;document.getElementById('sw-next').disabled=false;}
 function swDots(a){for(var i=0;i<4;i++){var d=document.getElementById('dot'+i);if(d)d.classList.toggle('active',i===a);}}
+
+// Back button on setup screens — walk back through the wizard steps, or go
+// back to splash from step 0. Lets users escape if they pick the wrong device
+// mode and need to switch (e.g. picked Single but wanted Recover, or picked
+// Single but wanted Shared).
+function swBack(){
+  if(swStep===0){
+    // From step 0, go back to splash to pick a different device mode
+    SS('splash');
+    return;
+  }
+  // Hide all step panels then show the previous one
+  ['sw1','sw2','sw2b','sw3'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  if(swStep===1){
+    swStep=0;
+    document.getElementById('sw1').style.display='';
+    swDots(0);
+    document.getElementById('sw-next').disabled=!document.getElementById('sw-name').value.trim();
+    document.getElementById('sw-next').textContent='Continue \u2192';
+  }else if(swStep===2){
+    swStep=1;
+    document.getElementById('sw2').style.display='';
+    swDots(1);
+    // Class is already chosen if we got past step 1 — keep Continue enabled
+    document.getElementById('sw-next').disabled=!swClass;
+    document.getElementById('sw-next').textContent='Continue \u2192';
+  }else if(swStep===3){
+    // Going back from school-code step — return to parent-WhatsApp step
+    swStep=2;
+    document.getElementById('sw2b').style.display='';
+    swDots(2);
+    document.getElementById('sw-next').disabled=false;
+    document.getElementById('sw-next').textContent='Continue \u2192';
+  }
+}
 
 // Normalise Nigerian phone to E.164 (+234…). Returns '' if unrecognisable.
 function normalizeNaijaPhone(raw){
@@ -3205,11 +3352,12 @@ function swNext(){
         if(st){st.textContent='\u26A0\uFE0F School subscription expired. Contact Blestonex.';st.style.color='#FCD34D';}
         ls(LK_STU,null);
       }else if(result==='offline'){
-        // Offline — allow entry but mark as unactivated. We can\'t save the
+        // Offline — allow entry but mark as unactivated. We can't save the
         // recovery mapping yet (no Firestore), but we keep the code in STU
-        // so it syncs whenever the device gets online.
+        // so it syncs whenever the device gets online. Still show the code
+        // so the student can save it now while it's on screen.
         if(st){st.textContent='\u26A0\uFE0F No internet — code not verified. Connect and re-enter later.';st.style.color='#FCD34D';}
-        setTimeout(function(){loadHome();},1500);
+        setTimeout(function(){showRecoveryCodeScreen();},1500);
       }else{
         if(st){st.textContent='\u274C Could not verify. Check internet and try again.';st.style.color='#FCA5A5';}
         ls(LK_STU,null);
@@ -3493,7 +3641,60 @@ function openAdmin(){
 function _doOpenAdmin(){
   loadAdminSchoolFields();
   renderAdminProgress();
+  // Show current device mode so the user knows what they're in before switching
+  var modeStatus=document.getElementById('admin-mode-status');
+  if(modeStatus){
+    var hasSingleProfile=!!lg(LK_STU);
+    var hasRoster=(lg(LK_ROSTER)||[]).length>0;
+    var label=DMODE==='single'?'👤 Single device (one student\'s personal phone)'
+            :DMODE==='shared'?'👥 Shared device (class roster of '+(lg(LK_ROSTER)||[]).length+' student'+((lg(LK_ROSTER)||[]).length===1?'':'s')+')'
+            :'(not set)';
+    var hint='';
+    if(DMODE==='single'&&hasRoster)hint=' · You also have a saved roster from when this device was shared.';
+    if(DMODE==='shared'&&hasSingleProfile)hint=' · You also have a saved single-user profile.';
+    modeStatus.innerHTML='Currently: <strong>'+label+'</strong>'+(hint?'<br><span style="font-size:11px;color:var(--sm)">'+hint+'</span>':'');
+  }
   SS('admin');
+}
+
+// Switch between Single device and Shared device modes without losing data.
+// Existing single-user STU and shared-device ROSTER both stay in localStorage,
+// so switching back later restores the previous state.
+function changeDeviceMode(){
+  var current=DMODE||'(unknown)';
+  var target=DMODE==='single'?'shared':'single';
+  var hasSingleProfile=!!lg(LK_STU);
+  var hasRoster=(lg(LK_ROSTER)||[]).length>0;
+  var msg='Change device mode?\n\n'
+    +'Now: '+(current==='single'?'Single device (one student)':'Shared device (class roster)')+'\n'
+    +'Switch to: '+(target==='single'?'Single device (one student)':'Shared device (class roster)')+'\n\n'
+    +'Your existing data stays saved. ';
+  if(target==='single'&&hasSingleProfile)msg+='Your previous single-user profile will be restored.';
+  else if(target==='shared'&&hasRoster)msg+='Your previous class roster will be restored.';
+  else if(target==='single')msg+='You\'ll be taken to set up a new single-user profile (or recover one).';
+  else msg+='You\'ll be taken to the empty roster — add students or activate the school code.';
+  msg+='\n\nContinue?';
+  if(!confirm(msg))return;
+  _adminVerified=false; // require PIN re-entry next time admin is opened
+  DMODE=target;
+  ls(LK_MODE,target);
+  if(target==='single'){
+    if(hasSingleProfile){
+      // Restore the saved single-user profile and go straight to home
+      var saved=lg(LK_STU);
+      STU=saved||{name:'',classLabel:'',uid:''};
+      loadHome();
+      toast('Switched to Single device — welcome back, '+(STU.name||'student')+'!',3000);
+    }else{
+      // No saved profile yet — start fresh setup
+      startSetup();
+      toast('Switched to Single device. Set up a new profile or use Recover account.',3500);
+    }
+  }else{
+    // Switching to shared
+    showRoster();
+    toast(hasRoster?'Switched to Shared device — your class roster is restored.':'Switched to Shared device. Add students from the roster screen.',3500);
+  }
 }
 
 function adminBack(){
@@ -3621,10 +3822,17 @@ function renderAdminProgressWith(roster,allProg){
     var pwaBadge=pwa
       ? '<span style="font-size:10px;background:#DCFCE7;color:#166534;border-radius:4px;padding:1px 5px;font-weight:800;margin-left:4px;cursor:pointer" onclick="event.stopPropagation();editParentWA(\''+sk.replace(/'/g,"\\'")+'\')">📱 '+pwa+'</span>'
       : '<span style="font-size:10px;background:#FEE2E2;color:#991B1B;border-radius:4px;padding:1px 5px;font-weight:800;margin-left:4px;cursor:pointer" onclick="event.stopPropagation();editParentWA(\''+sk.replace(/'/g,"\\'")+'\')">+ Add parent WhatsApp</span>';
+    // Recovery key badge — shown to admin/teacher so they can share the code
+    // with the student's parent if a phone is lost. Without showing it here,
+    // a recovered code stored only at setup would be unrecoverable.
+    var rk=s.recoveryCode||'';
+    var rkBadge=rk
+      ? '<span style="font-size:10px;background:#E0E7FF;color:#3730A3;border-radius:4px;padding:1px 5px;font-weight:800;margin-left:4px;cursor:pointer" onclick="event.stopPropagation();showStudentRecoveryKey(\''+sk.replace(/'/g,"\\'")+'\')">🔑 Recovery</span>'
+      : '';
     var row=document.createElement('tr');
     row.style.borderBottom='1px solid var(--bd)';
     row.innerHTML=[
-      '<td style="padding:9px 10px;font-weight:700;color:var(--sl)">'+(s.emoji||'👤')+' '+s.name+mathBadge+'<br>'+pwaBadge+'</td>',
+      '<td style="padding:9px 10px;font-weight:700;color:var(--sl)">'+(s.emoji||'👤')+' '+s.name+mathBadge+'<br>'+pwaBadge+rkBadge+'</td>',
       '<td style="padding:9px 10px;color:var(--sm)">'+s.classLabel+'</td>',
       '<td style="padding:9px 10px;text-align:center"><span style="background:var(--gl);color:var(--gm);border-radius:6px;padding:2px 8px;font-weight:800;font-size:12px">'+passed+'</span></td>',
       '<td style="padding:9px 10px;text-align:center"><span style="font-weight:800;color:'+bestColor+'">'+best+'%</span></td>',
@@ -10496,7 +10704,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
   // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
     var SW_CODE=[
-      "var CACHE='edulab-v16';",
+      "var CACHE='edulab-v18';",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
       "    return c.add(self.location.href.replace(/\\/sw(\\.js|\\?.*)?$/,'/')).catch(function(){});",
@@ -10534,7 +10742,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
     function tryDirectCache(){
       // Fallback: pre-cache the page directly (no SW needed)
       if(!('caches' in window))return;
-      caches.open('edulab-v16').then(function(c){
+      caches.open('edulab-v18').then(function(c){
         c.add(window.location.href).catch(function(){});
       }).catch(function(){});
     }
