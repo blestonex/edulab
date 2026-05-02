@@ -563,6 +563,54 @@ body{display:flex;flex-direction:column}
       <button onclick="changeDeviceMode()" style="width:100%;padding:11px;background:#fff;color:#1565C0;border:1.5px solid #1565C0;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">Change device mode</button>
       <div style="font-size:11px;color:var(--sm);margin-top:8px;line-height:1.5">Switching modes does NOT delete data. Single-device profiles and shared-device rosters are kept separately.</div>
     </div>
+    <!-- Manage Staff — proprietors only. Hidden by default, unhidden in
+         _doOpenAdmin if STAFF.role==='proprietor'. -->
+    <div id="manage-staff-tile" style="display:none;background:#fff;border-radius:var(--r);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-top:14px">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#7C3AED;margin-bottom:6px">👥 Manage Staff</div>
+      <div style="font-size:13px;color:var(--sm);margin-bottom:10px">Add or remove teachers, set their assigned classes, and copy their login details for WhatsApp.</div>
+      <button onclick="openManageStaff()" style="width:100%;padding:11px;background:#7C3AED;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">Manage staff →</button>
+    </div>
+    <!-- Sign out — clears the active staff session and returns to splash. -->
+    <div id="sign-out-tile" style="display:none;margin-top:14px">
+      <button onclick="staffSignOut()" style="width:100%;padding:12px;background:#fff;color:#6B7280;border:1.5px solid #D1D5DB;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">🚪 Sign out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────── MANAGE STAFF (Session 2) ──────────── -->
+
+<!-- Staff list view -->
+<div id="manage-staff" class="screen" style="background:linear-gradient(180deg,#581C87 0%,#581C87 110px,#FAFAFA 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#581C87,#7C3AED)">
+    <button class="tback" onclick="adminBack()">‹</button>
+    <div class="tlogo">Manage Staff</div>
+  </div>
+  <div style="background:rgba(0,0,0,.2);padding:8px 16px;font-size:12px;color:rgba(255,255,255,.85);flex-shrink:0" id="ms-bc">Loading…</div>
+  <div class="content" style="padding:14px 16px">
+    <button onclick="openAddStaff()" style="width:100%;padding:13px;background:#7C3AED;color:#fff;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer;margin-bottom:14px">+ Add a new teacher</button>
+    <div id="ms-list"></div>
+  </div>
+</div>
+
+<!-- Add / Edit Staff form -->
+<div id="add-staff" class="screen" style="background:linear-gradient(180deg,#581C87 0%,#581C87 110px,#FAFAFA 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#581C87,#7C3AED)">
+    <button class="tback" onclick="SS('manage-staff')">‹</button>
+    <div class="tlogo" id="as-staff-title">Add Teacher</div>
+  </div>
+  <div class="content" style="padding:18px 16px">
+    <div style="background:#fff;border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+      <label style="display:block;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--sm);margin-bottom:6px">Full name</label>
+      <input id="as-staff-name" type="text" placeholder="e.g. Mrs Grace Bello" maxlength="40" style="width:100%;padding:11px;font-size:15px;border:1.5px solid #D1D5DB;border-radius:8px;margin-bottom:14px;font-family:'Nunito',sans-serif;font-weight:700;box-sizing:border-box" autocomplete="off">
+      <label style="display:block;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--sm);margin-bottom:6px">4-digit PIN</label>
+      <input id="as-staff-pin" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" style="width:100%;padding:13px;font-size:24px;font-family:'Nunito',sans-serif;font-weight:900;letter-spacing:10px;text-align:center;border:1.5px solid #D1D5DB;border-radius:8px;margin-bottom:14px;box-sizing:border-box" autocomplete="off">
+      <label style="display:block;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--sm);margin-bottom:6px">Phone (optional)</label>
+      <input id="as-staff-phone" type="tel" placeholder="+234 803 ..." style="width:100%;padding:11px;font-size:15px;border:1.5px solid #D1D5DB;border-radius:8px;margin-bottom:14px;font-family:'Nunito',sans-serif;font-weight:700;box-sizing:border-box" autocomplete="off">
+      <label style="display:block;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--sm);margin-bottom:8px">Which class(es) does she teach?</label>
+      <div id="as-staff-classes" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px"></div>
+      <div id="as-staff-status" style="font-size:13px;text-align:center;min-height:20px;margin-bottom:12px;color:var(--sm)"></div>
+      <button id="as-staff-save-btn" onclick="saveStaff()" style="width:100%;padding:13px;background:#7C3AED;color:#fff;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer">Save and copy WhatsApp message</button>
+    </div>
   </div>
 </div>
 
@@ -3200,6 +3248,374 @@ function ackRecoveryAndContinue(){
   loadHome();
 }
 
+// ─── Session 2: Manage Staff ─────────────────────────────────────────
+// Proprietor-only UI for adding teachers, setting their assigned classes,
+// and producing pre-formatted WhatsApp login messages. Teachers themselves
+// see neither the Manage Staff tile nor any of these screens.
+
+// Module state for the staff form. Reset between opens.
+var _staffEdit={
+  id:null,                  // doc id if editing, null if adding
+  selectedClasses:[],       // checked class chips
+  originalPinHash:''        // when editing, the pre-existing hash so we can keep it if PIN field is empty
+};
+
+// Class list for the chip picker — same set used in the assignments form.
+var _STAFF_CLASSES=[
+  'Nursery 1','Nursery 2',
+  'Primary 1','Primary 2','Primary 3','Primary 4','Primary 5','Primary 6',
+  'JSS 1','JSS 2','JSS 3',
+  'SSS 1','SSS 2','WAEC/JAMB'
+];
+
+function openManageStaff(){
+  if(!STAFF||STAFF.role!=='proprietor'){
+    toast('Only the proprietor can manage staff.',2500);
+    return;
+  }
+  var school=getSchool();
+  if(!school||!school.code){
+    toast('No school code set.',2500);
+    return;
+  }
+  var bc=document.getElementById('ms-bc');
+  if(bc)bc.textContent='Loading staff…';
+  var list=document.getElementById('ms-list');
+  if(list)list.innerHTML='<div style="color:#9CA3AF;padding:14px;text-align:center;font-size:13px">Loading…</div>';
+  SS('manage-staff');
+  // Fetch fresh staff list — don't rely on the cached _staffPickList from
+  // login because it filters out deactivated members. Manage Staff needs
+  // to show ALL of them so the proprietor can reactivate.
+  FB.onReady(function(){
+    if(!FB.db){
+      if(list)list.innerHTML='<div style="color:#991B1B;padding:14px;text-align:center;font-size:13px">No internet — try again when connected.</div>';
+      return;
+    }
+    FB.db.collection('schools').doc(school.code).collection('staff').get()
+      .then(function(snap){
+        var staffArr=[];
+        snap.forEach(function(doc){staffArr.push(Object.assign({id:doc.id},doc.data()));});
+        // Sort: proprietor first, then alphabetical
+        staffArr.sort(function(a,b){
+          if(a.role==='proprietor'&&b.role!=='proprietor')return -1;
+          if(b.role==='proprietor'&&a.role!=='proprietor')return 1;
+          return String(a.name||'').localeCompare(String(b.name||''));
+        });
+        _renderManageStaffList(school,staffArr);
+      })
+      .catch(function(e){
+        console.warn('Staff list load failed:',e.message);
+        if(list)list.innerHTML='<div style="color:#991B1B;padding:14px;text-align:center;font-size:13px">Could not load staff: '+_escapeHtml(e.message)+'</div>';
+      });
+  });
+}
+
+function _renderManageStaffList(school,staffArr){
+  var bc=document.getElementById('ms-bc');
+  if(bc){
+    var activeCount=staffArr.filter(function(s){return s.active!==false;}).length;
+    bc.textContent=(school.name||school.code)+' · '+activeCount+' active · '+staffArr.length+' total';
+  }
+  var list=document.getElementById('ms-list');
+  if(!list)return;
+  if(!staffArr.length){
+    list.innerHTML='<div style="color:#9CA3AF;padding:14px;text-align:center;font-size:13px">No staff yet. Tap "Add a new teacher" to start.</div>';
+    return;
+  }
+  list.innerHTML=staffArr.map(function(s){
+    var icon=s.role==='proprietor'?'🏫':'👩‍🏫';
+    var roleLabel=s.role==='proprietor'?'Proprietor':'Teacher';
+    var classes=Array.isArray(s.assignedClasses)&&s.assignedClasses.length
+      ? s.assignedClasses.join(' · ')
+      : (s.role==='proprietor'?'All classes':'No classes assigned');
+    var isActive=s.active!==false;
+    var isMe=STAFF&&s.id===STAFF.id;
+    // Action buttons — rules:
+    //   - Cannot deactivate yourself (lockout risk)
+    //   - Cannot deactivate the only proprietor
+    //   - Edit always available
+    var actionBtns='<button onclick="openAddStaff(\''+s.id.replace(/'/g,"\\'")+'\')" style="background:#EDE9FE;color:#6D28D9;border:none;border-radius:6px;padding:5px 10px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:11px;cursor:pointer;margin-right:6px">Edit</button>';
+    if(!isMe){
+      if(isActive){
+        actionBtns+='<button onclick="toggleStaffActive(\''+s.id.replace(/'/g,"\\'")+'\',false)" style="background:#FEE2E2;color:#991B1B;border:none;border-radius:6px;padding:5px 10px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:11px;cursor:pointer">Deactivate</button>';
+      }else{
+        actionBtns+='<button onclick="toggleStaffActive(\''+s.id.replace(/'/g,"\\'")+'\',true)" style="background:#DCFCE7;color:#166534;border:none;border-radius:6px;padding:5px 10px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:11px;cursor:pointer">Reactivate</button>';
+      }
+    }
+    var dim=isActive?'':'opacity:.55';
+    var meBadge=isMe?'<span style="font-size:10px;background:#DBEAFE;color:#1E3A8A;border-radius:4px;padding:1px 6px;font-weight:800;margin-left:6px">YOU</span>':'';
+    var deactBadge=!isActive?'<span style="font-size:10px;background:#F3F4F6;color:#6B7280;border-radius:4px;padding:1px 6px;font-weight:800;margin-left:6px">DEACTIVATED</span>':'';
+    return '<div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06);'+dim+'">'
+      +'<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">'
+        +'<div style="width:42px;height:42px;border-radius:10px;background:#F5F3FF;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">'+icon+'</div>'
+        +'<div style="flex:1;min-width:0">'
+        +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+_escapeHtml(s.name||'(unnamed)')+meBadge+deactBadge+'</div>'
+        +  '<div style="font-size:12px;color:#6B7280;margin-top:3px">'+_escapeHtml(roleLabel)+' · '+_escapeHtml(classes)+'</div>'
+        +  (s.phone?'<div style="font-size:12px;color:#6B7280;margin-top:2px">📱 '+_escapeHtml(s.phone)+'</div>':'')
+        +'</div>'
+      +'</div>'
+      +'<div style="display:flex;flex-wrap:wrap">'+actionBtns+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// Open the Add/Edit form. Pass a staffId to edit, or no arg to add.
+function openAddStaff(staffId){
+  if(!STAFF||STAFF.role!=='proprietor'){
+    toast('Only the proprietor can manage staff.',2500);
+    return;
+  }
+  var titleEl=document.getElementById('as-staff-title');
+  var nameEl=document.getElementById('as-staff-name');
+  var pinEl=document.getElementById('as-staff-pin');
+  var phoneEl=document.getElementById('as-staff-phone');
+  var statusEl=document.getElementById('as-staff-status');
+  var saveBtn=document.getElementById('as-staff-save-btn');
+  // Reset form
+  _staffEdit={id:null,selectedClasses:[],originalPinHash:''};
+  if(nameEl)nameEl.value='';
+  if(pinEl){pinEl.value='';pinEl.placeholder='••••';}
+  if(phoneEl)phoneEl.value='';
+  if(statusEl)statusEl.textContent='';
+  if(staffId){
+    // EDIT mode — fetch the staff doc and populate the form
+    if(titleEl)titleEl.textContent='Edit Teacher';
+    if(saveBtn)saveBtn.textContent='Save changes';
+    if(pinEl)pinEl.placeholder='leave blank to keep';
+    var school=getSchool();
+    if(!school||!school.code){toast('No school code set.',2500);return;}
+    SS('add-staff');
+    if(statusEl){statusEl.textContent='Loading…';statusEl.style.color='var(--sm)';}
+    FB.onReady(function(){
+      if(!FB.db){
+        if(statusEl){statusEl.textContent='⚠️ No internet.';statusEl.style.color='#991B1B';}
+        return;
+      }
+      FB.db.collection('schools').doc(school.code).collection('staff').doc(staffId).get()
+        .then(function(doc){
+          if(!doc.exists){
+            if(statusEl){statusEl.textContent='⚠️ Staff record not found.';statusEl.style.color='#991B1B';}
+            return;
+          }
+          var d=doc.data();
+          _staffEdit.id=staffId;
+          _staffEdit.originalPinHash=String(d.pinHash||'');
+          _staffEdit.selectedClasses=Array.isArray(d.assignedClasses)?d.assignedClasses.slice():[];
+          if(nameEl)nameEl.value=d.name||'';
+          if(phoneEl)phoneEl.value=d.phone||'';
+          if(statusEl)statusEl.textContent='';
+          _renderStaffClassChips();
+        })
+        .catch(function(e){
+          if(statusEl){statusEl.textContent='⚠️ Load failed: '+_escapeHtml(e.message);statusEl.style.color='#991B1B';}
+        });
+    });
+  }else{
+    // ADD mode
+    if(titleEl)titleEl.textContent='Add Teacher';
+    if(saveBtn)saveBtn.textContent='Save and copy WhatsApp message';
+    _renderStaffClassChips();
+    SS('add-staff');
+    if(nameEl)setTimeout(function(){nameEl.focus();},100);
+  }
+}
+
+// Render the class chips. Each chip is tappable, toggling membership in
+// _staffEdit.selectedClasses.
+function _renderStaffClassChips(){
+  var box=document.getElementById('as-staff-classes');
+  if(!box)return;
+  box.innerHTML=_STAFF_CLASSES.map(function(cl){
+    var sel=_staffEdit.selectedClasses.indexOf(cl)>=0;
+    var bg=sel?'#7C3AED':'#F3E8FF';
+    var fg=sel?'#fff':'#6D28D9';
+    var border=sel?'#7C3AED':'#E9D5FF';
+    return '<button type="button" onclick="toggleStaffClass(\''+cl.replace(/'/g,"\\'")+'\')" style="background:'+bg+';color:'+fg+';border:1.5px solid '+border+';border-radius:8px;padding:6px 10px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:12px;cursor:pointer">'+_escapeHtml(cl)+'</button>';
+  }).join('');
+}
+
+function toggleStaffClass(cl){
+  var idx=_staffEdit.selectedClasses.indexOf(cl);
+  if(idx>=0)_staffEdit.selectedClasses.splice(idx,1);
+  else _staffEdit.selectedClasses.push(cl);
+  _renderStaffClassChips();
+}
+
+function saveStaff(){
+  if(!STAFF||STAFF.role!=='proprietor'){
+    toast('Only the proprietor can manage staff.',2500);
+    return;
+  }
+  var school=getSchool();
+  if(!school||!school.code){toast('No school code set.',2500);return;}
+  var nameEl=document.getElementById('as-staff-name');
+  var pinEl=document.getElementById('as-staff-pin');
+  var phoneEl=document.getElementById('as-staff-phone');
+  var statusEl=document.getElementById('as-staff-status');
+  var saveBtn=document.getElementById('as-staff-save-btn');
+  var name=String(nameEl&&nameEl.value||'').trim();
+  var pin=String(pinEl&&pinEl.value||'').trim();
+  var phone=String(phoneEl&&phoneEl.value||'').trim();
+  var isEdit=!!_staffEdit.id;
+  // Validation
+  if(!name){
+    if(statusEl){statusEl.textContent='⚠️ Enter a name.';statusEl.style.color='#991B1B';}
+    if(nameEl)nameEl.focus();
+    return;
+  }
+  if(!isEdit&&!/^\d{4}$/.test(pin)){
+    if(statusEl){statusEl.textContent='⚠️ PIN must be exactly 4 digits.';statusEl.style.color='#991B1B';}
+    if(pinEl)pinEl.focus();
+    return;
+  }
+  if(isEdit&&pin&&!/^\d{4}$/.test(pin)){
+    if(statusEl){statusEl.textContent='⚠️ PIN must be 4 digits, or leave blank to keep current.';statusEl.style.color='#991B1B';}
+    return;
+  }
+  if(!_staffEdit.selectedClasses.length){
+    // Confirm — same pattern as the assignment form
+    if(!confirm('No classes selected. This teacher will see all students. Continue?'))return;
+  }
+  if(statusEl){statusEl.textContent='⏳ Saving…';statusEl.style.color='var(--sm)';}
+  if(saveBtn)saveBtn.disabled=true;
+  // Compute pinHash. If editing AND the PIN field is empty, keep the existing hash.
+  var hashPromise;
+  if(pin){
+    hashPromise=sha256Hex(pin);
+  }else if(isEdit&&_staffEdit.originalPinHash){
+    hashPromise=Promise.resolve(_staffEdit.originalPinHash);
+  }else{
+    if(statusEl){statusEl.textContent='⚠️ PIN required for new teachers.';statusEl.style.color='#991B1B';}
+    if(saveBtn)saveBtn.disabled=false;
+    return;
+  }
+  hashPromise.then(function(pinHash){
+    var data={
+      name:name,
+      role:'teacher',
+      pinHash:pinHash,
+      assignedClasses:_staffEdit.selectedClasses.slice(),
+      phone:phone,
+      active:true,
+      lastSeen:Date.now()
+    };
+    var col=FB.db.collection('schools').doc(school.code).collection('staff');
+    var op;
+    if(isEdit){
+      op=col.doc(_staffEdit.id).set(data,{merge:true})
+        .then(function(){return _staffEdit.id;});
+    }else{
+      data.createdAt=Date.now();
+      op=col.add(data).then(function(ref){return ref.id;});
+    }
+    return op.then(function(savedId){
+      if(saveBtn)saveBtn.disabled=false;
+      if(statusEl){statusEl.textContent='✅ Saved!';statusEl.style.color='#166534';}
+      // Build the pre-formatted WhatsApp message. Only generate it for ADD
+      // (with the PIN visible). For edits where the PIN didn't change, we
+      // don't have the plaintext PIN to share, so we just confirm.
+      if(!isEdit||pin){
+        var classes=_staffEdit.selectedClasses.length
+          ? _staffEdit.selectedClasses.join(' and ')
+          : 'all classes';
+        var waMsg='Hi '+name+', your EduLab login is ready.\n\n'
+          +'Open the app, tap "⚙️ Login as Admin", enter School Code '+school.code+', then tap your name from the list.\n\n'
+          +'Your PIN is '+pin+'.\n\n'
+          +'You are assigned to: '+classes+'.\n\n'
+          +'Keep this message private.';
+        // Try Clipboard API; fall back to textarea trick
+        var copied=false;
+        try{
+          if(navigator.clipboard&&navigator.clipboard.writeText){
+            navigator.clipboard.writeText(waMsg).then(function(){
+              copied=true;
+              toast('✅ Saved. WhatsApp message copied — paste into WhatsApp to send.',3500);
+            },function(){
+              copied=_fallbackCopyText(waMsg);
+              toast(copied?'✅ Saved. Message copied.':'✅ Saved. Copy failed — long-press to copy from the next screen.',3500);
+            });
+          }else{
+            copied=_fallbackCopyText(waMsg);
+            toast(copied?'✅ Saved. Message copied.':'✅ Saved.',3000);
+          }
+        }catch(e){
+          toast('✅ Saved.',2200);
+        }
+        // If teacher has a phone number, also offer to open WhatsApp directly
+        if(phone){
+          setTimeout(function(){
+            if(confirm('Open WhatsApp to '+phone+' now and send the login message?')){
+              var num=String(phone).replace(/\D/g,'');
+              window.open('https://wa.me/'+num+'?text='+encodeURIComponent(waMsg),'_blank');
+            }
+          },800);
+        }
+      }else{
+        toast('✅ Changes saved.',2200);
+      }
+      // Return to the staff list
+      setTimeout(function(){openManageStaff();},1200);
+    });
+  }).catch(function(e){
+    console.warn('Save staff failed:',e.message);
+    if(statusEl){statusEl.textContent='⚠️ Save failed: '+_escapeHtml(e.message);statusEl.style.color='#991B1B';}
+    if(saveBtn)saveBtn.disabled=false;
+  });
+}
+
+// Synchronous fallback for clipboard copy on browsers without Clipboard API.
+// Returns true on success.
+function _fallbackCopyText(text){
+  try{
+    var ta=document.createElement('textarea');
+    ta.value=text;ta.style.cssText='position:fixed;top:-1000px;left:-1000px';
+    document.body.appendChild(ta);ta.select();
+    var ok=document.execCommand('copy');
+    document.body.removeChild(ta);
+    return !!ok;
+  }catch(e){return false;}
+}
+
+// Deactivate or reactivate a staff member. Doesn't delete the record so
+// reassignment is reversible. Lockout safety: cannot deactivate self.
+function toggleStaffActive(staffId,activate){
+  if(!STAFF||STAFF.role!=='proprietor'){
+    toast('Only the proprietor can manage staff.',2500);
+    return;
+  }
+  if(staffId===STAFF.id){
+    toast('You cannot deactivate yourself.',2800);
+    return;
+  }
+  var verb=activate?'reactivate':'deactivate';
+  if(!confirm('Are you sure you want to '+verb+' this staff member?'))return;
+  var school=getSchool();
+  if(!school||!school.code){toast('No school code set.',2500);return;}
+  FB.onReady(function(){
+    if(!FB.db){toast('No internet — try again when connected.',2800);return;}
+    FB.db.collection('schools').doc(school.code).collection('staff').doc(staffId)
+      .set({active:!!activate},{merge:true})
+      .then(function(){
+        toast(activate?'✅ Reactivated.':'✅ Deactivated.',2200);
+        openManageStaff(); // refresh list
+      })
+      .catch(function(e){
+        console.warn('Toggle active failed:',e.message);
+        toast('⚠️ Failed: '+e.message,3500);
+      });
+  });
+}
+
+function staffSignOut(){
+  // Real sign-out for staff sessions. Clears the session and returns to splash.
+  if(!confirm('Sign out and return to the splash screen?'))return;
+  STAFF=null;
+  _adminVerified=false;
+  _adminVerifyTime=0;
+  toast('Signed out.',1800);
+  SS('splash');
+}
+
 // ════════════════════════════════════════════════════════════════════════
 // STAFF LOGIN — Session 1 of the admin restructure
 // ════════════════════════════════════════════════════════════════════════
@@ -3470,22 +3886,49 @@ function staffMigrate(){
           return;
         }
         var data=doc.data();
+        // Diagnostic logging — helps when "no PIN set" appears on a school
+        // that should have a PIN. Tells us exactly which fields exist.
+        console.log('[EduLab] Migration — school doc fields available:', Object.keys(data));
+        console.log('[EduLab] Migration — adminPinHash present:', !!data.adminPinHash, 'adminPin present:', !!data.adminPin);
         var existingHash=String(data.adminPinHash||'').toLowerCase();
-        if(!existingHash){
-          if(status){status.textContent='⚠️ This school has no admin PIN set. Contact Blestonex.';status.style.color='#FCA5A5';}
+        // Accept several legacy field names defensively. Different snapshots
+        // of the codebase used slightly different conventions.
+        var legacyPlaintextPin=data.adminPin||data.pin||data.adminPIN||'';
+        if(!existingHash&&!legacyPlaintextPin){
+          var fieldList=Object.keys(data).join(', ');
+          if(status){
+            status.textContent='⚠️ This school has no admin PIN set. Fields found: '+fieldList+'. Contact Blestonex.';
+            status.style.color='#FCA5A5';
+          }
+          console.warn('[EduLab] No adminPinHash/adminPin found. School has these fields only:', fieldList);
           return;
         }
         return sha256Hex(pin).then(function(enteredHash){
-          if(enteredHash!==existingHash){
+          // Two valid paths:
+          //   (a) adminPinHash exists and matches enteredHash — preferred
+          //   (b) adminPinHash absent but legacy plaintext adminPin matches — for old schools
+          var pinValid=false;
+          if(existingHash&&enteredHash===existingHash){
+            pinValid=true;
+          }else if(!existingHash&&legacyPlaintextPin&&pin===String(legacyPlaintextPin).trim()){
+            pinValid=true;
+            // Opportunistically write the hash so future migrations and admin
+            // sign-ins use the secure path. Non-blocking — if this fails the
+            // current login still succeeds.
+            FB.db.collection('schools').doc(_staffSchoolCode)
+              .set({adminPinHash:enteredHash},{merge:true})
+              .catch(function(e){console.warn('Legacy PIN hash upgrade failed:',e.message);});
+            console.info('[EduLab] Legacy adminPin migrated to adminPinHash. Ask Blestonex to delete the plaintext field from Firestore.');
+          }
+          if(!pinValid){
             if(status){status.textContent='❌ Wrong PIN. This must match the existing admin PIN.';status.style.color='#FCA5A5';}
             return;
           }
-          // Step 2: PIN is correct — create the proprietor staff doc using
-          // the same hash we just verified. Doc ID is auto-generated by Firestore.
+          // PIN is correct — create the proprietor staff doc using the hash.
           var staffData={
             name:name,
             role:'proprietor',
-            pinHash:enteredHash, // same hash, no need to re-compute
+            pinHash:enteredHash,
             assignedClasses:[], // proprietors see all classes
             phone:'',
             active:true,
@@ -3495,7 +3938,6 @@ function staffMigrate(){
           return FB.db.collection('schools').doc(_staffSchoolCode).collection('staff').add(staffData)
             .then(function(ref){
               if(status){status.textContent='✅ Proprietor account created!';status.style.color='#86EFAC';}
-              // Build active session and go straight to admin
               STAFF={
                 id:ref.id,
                 name:name,
@@ -3521,14 +3963,74 @@ function staffMigrate(){
 // and sees the code to share with the parent.
 function showStudentRecoveryKey(uid){
   var student=ROSTER.find(function(s){return (s.uid||s.name)===uid;});
-  if(!student){toast('Student not found.',2000);return;}
-  if(!student.recoveryCode){
-    toast('This student has no recovery code yet. They may have been added before this feature.',3500);
+  if(student&&student.recoveryCode){
+    _showRecoveryKeyModal(student);
     return;
   }
+  // Student exists but has no code (added before the recovery feature).
+  // Offer to generate one rather than hitting a dead end.
+  if(student&&!student.recoveryCode){
+    generateAndShowRecoveryKey(uid);
+    return;
+  }
+  toast('Student not found.',2000);
+}
+
+// Generate a recovery code for a student that doesn't have one yet, sync it
+// to Firestore (both on the student doc and in the recovery lookup mapping),
+// then open the modal so the teacher can share with the parent.
+function generateAndShowRecoveryKey(uid){
+  var student=ROSTER.find(function(s){return (s.uid||s.name)===uid;});
+  if(!student){toast('Student not found.',2000);return;}
+  if(student.recoveryCode){_showRecoveryKeyModal(student);return;}
+  if(!confirm('Generate a recovery code for '+student.name+'?\n\nThis lets you share the code with the parent so the student can recover their account on a new device.'))return;
+  var newCode=generateRecoveryCode();
+  student.recoveryCode=newCode;
+  // Update local roster
+  var idx=ROSTER.findIndex(function(s){return (s.uid||s.name)===uid;});
+  if(idx>=0)ROSTER[idx]=student;
+  ls(LK_ROSTER,ROSTER);
+  // Sync to Firestore — both the student doc AND the recovery lookup
+  var school=getSchool();
+  if(school&&school.code){
+    FB.onReady(function(){
+      if(!FB.db){
+        toast('Code generated locally. Will sync to cloud when online.',3000);
+        _showRecoveryKeyModal(student);
+        return;
+      }
+      var schoolRef=FB.db.collection('schools').doc(school.code);
+      Promise.all([
+        schoolRef.collection('students').doc(student.uid)
+          .set({recoveryCode:newCode},{merge:true}),
+        schoolRef.collection('recovery').doc(_normaliseRecoveryCode(newCode))
+          .set({
+            studentUid:student.uid,
+            name:student.name,
+            classLabel:student.classLabel||'',
+            createdAt:Date.now()
+          },{merge:true})
+      ])
+        .then(function(){_showRecoveryKeyModal(student);})
+        .catch(function(e){
+          console.warn('Recovery code sync failed:',e.message);
+          toast('Code generated but cloud sync failed — try again when online.',3500);
+          _showRecoveryKeyModal(student);
+        });
+    });
+  }else{
+    _showRecoveryKeyModal(student);
+  }
+  // Re-render so the badge updates from "🔑 Generate code" to "🔑 Recovery"
+  setTimeout(function(){if(typeof renderAdminProgress==='function')renderAdminProgress();},800);
+}
+
+// Render the recovery code modal once we have a student object with a code.
+// Extracted so both the local-roster path and the cloud-fetch path use the
+// same rendering and behavior.
+function _showRecoveryKeyModal(student){
   var school=getSchool()||{};
   var schoolCode=school.code||'(school code)';
-  // Build a sharable WhatsApp message
   var waMsg='Hi, this is the EduLab recovery code for '+student.name+'.\n\n'
     +'School Code: '+schoolCode+'\n'
     +'Recovery Code: '+student.recoveryCode+'\n\n'
@@ -3921,8 +4423,19 @@ function saveNewStudent(){
   asClass='';
   document.querySelectorAll('#add-student .class-btn').forEach(function(b){b.classList.remove('sel');});
   var sb=document.getElementById('as-save');if(sb)sb.disabled=true;
-  toast('✅ '+name+' added!',2000);
+  toast('✅ '+name+' added!',1500);
+  // Switch to roster FIRST, then open the recovery modal on top of it. This
+  // ordering avoids any race where the screen-swap (SS) might interfere with
+  // the just-appended overlay. The modal is position:fixed so it sits above
+  // whichever screen is active at the time it's opened.
+  var addedStudent=ROSTER[ROSTER.length-1];
+  // Reflect the new count on the capacity bar if admin is currently open.
+  if(typeof updateCapacityWidget==='function')updateCapacityWidget();
   showRoster();
+  setTimeout(function(){
+    console.log('[EduLab] Opening recovery modal for new student:', addedStudent.name, 'code:', addedStudent.recoveryCode);
+    _showRecoveryKeyModal(addedStudent);
+  },200);
 }
 
 // ADMIN PANEL
@@ -4057,6 +4570,21 @@ function _doOpenAdmin(){
     if(DMODE==='single'&&hasRoster)hint=' · You also have a saved roster from when this device was shared.';
     if(DMODE==='shared'&&hasSingleProfile)hint=' · You also have a saved single-user profile.';
     modeStatus.innerHTML='Currently: <strong>'+label+'</strong>'+(hint?'<br><span style="font-size:11px;color:var(--sm)">'+hint+'</span>':'');
+  }
+  // Staff tiles visibility:
+  //   - Sign Out: any signed-in staff (proprietor OR teacher) sees it
+  //   - Manage Staff: only proprietors. Teachers should not be able to add or
+  //     remove other staff. Both visible iff STAFF is set (i.e. user came in
+  //     through the new staff-login flow). Old PIN-only flow leaves STAFF
+  //     null, so neither tile shows — preserves backward compat.
+  var manageTile=document.getElementById('manage-staff-tile');
+  var signOutTile=document.getElementById('sign-out-tile');
+  if(STAFF&&STAFF.id){
+    if(signOutTile)signOutTile.style.display='';
+    if(manageTile)manageTile.style.display=STAFF.role==='proprietor'?'':'none';
+  }else{
+    if(signOutTile)signOutTile.style.display='none';
+    if(manageTile)manageTile.style.display='none';
   }
   SS('admin');
 }
@@ -4272,7 +4800,23 @@ function renderAdminProgress(){
       var key=cs.uid||cs.name;
       var exists=merged.some(function(s){return (s.uid||s.name)===key;});
       if(!exists&&cs.name){
-        merged.push({name:cs.name,classLabel:cs.classLabel,uid:cs.uid,emoji:cs.emoji||'👤',mathLevel:cs.mathLevel||'',parentWA:cs.parentWA||''});
+        // Carry recoveryCode through the merge — without it, cloud-only
+        // students would render in admin without the 🔑 Recovery badge,
+        // making it impossible for a teacher to retrieve a parent's code.
+        merged.push({
+          name:cs.name,
+          classLabel:cs.classLabel,
+          uid:cs.uid,
+          emoji:cs.emoji||'👤',
+          mathLevel:cs.mathLevel||'',
+          parentWA:cs.parentWA||'',
+          recoveryCode:cs.recoveryCode||''
+        });
+      }else if(exists&&cs.recoveryCode){
+        // Local copy exists but might not have the recoveryCode (e.g. if it
+        // was added before the recovery feature shipped). Backfill from cloud.
+        var localStudent=merged.find(function(s){return (s.uid||s.name)===key;});
+        if(localStudent&&!localStudent.recoveryCode)localStudent.recoveryCode=cs.recoveryCode;
       }
       if(cs.progress)cloudProg[key]=cs.progress;
     });
@@ -4311,13 +4855,13 @@ function renderAdminProgressWith(roster,allProg){
     var pwaBadge=pwa
       ? '<span style="font-size:10px;background:#DCFCE7;color:#166534;border-radius:4px;padding:1px 5px;font-weight:800;margin-left:4px;cursor:pointer" onclick="event.stopPropagation();editParentWA(\''+sk.replace(/'/g,"\\'")+'\')">📱 '+pwa+'</span>'
       : '<span style="font-size:10px;background:#FEE2E2;color:#991B1B;border-radius:4px;padding:1px 5px;font-weight:800;margin-left:4px;cursor:pointer" onclick="event.stopPropagation();editParentWA(\''+sk.replace(/'/g,"\\'")+'\')">+ Add parent WhatsApp</span>';
-    // Recovery key badge — shown to admin/teacher so they can share the code
-    // with the student's parent if a phone is lost. Without showing it here,
-    // a recovered code stored only at setup would be unrecoverable.
+    // Recovery key badge — ALWAYS shown so the teacher can access it for any
+    // student. For students without a recovery code (added before the feature
+    // existed), tapping the badge generates one on the fly.
     var rk=s.recoveryCode||'';
     var rkBadge=rk
       ? '<span style="font-size:10px;background:#E0E7FF;color:#3730A3;border-radius:4px;padding:1px 5px;font-weight:800;margin-left:4px;cursor:pointer" onclick="event.stopPropagation();showStudentRecoveryKey(\''+sk.replace(/'/g,"\\'")+'\')">🔑 Recovery</span>'
-      : '';
+      : '<span style="font-size:10px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:1px 5px;font-weight:800;margin-left:4px;cursor:pointer" onclick="event.stopPropagation();generateAndShowRecoveryKey(\''+sk.replace(/'/g,"\\'")+'\')">🔑 Generate code</span>';
     var row=document.createElement('tr');
     row.style.borderBottom='1px solid var(--bd)';
     row.innerHTML=[
@@ -4357,6 +4901,10 @@ function removeStudent(uid){
   ls(LK_ROSTER,ROSTER);
   var p=lg(LK_PROG)||{};delete p[uid];ls(LK_PROG,p);
   renderAdminProgress();
+  // Refresh capacity bar immediately from local count — the cloud refetch in
+  // updateCapacityWidget will reconcile to the authoritative number once the
+  // cloud delete completes.
+  if(typeof updateCapacityWidget==='function')updateCapacityWidget();
 
   // Cloud removal — gated by school being known, NOT by DMODE. The admin PIN
   // protects this action; whether the device is set up as 'single' or 'shared'
@@ -4387,6 +4935,7 @@ function removeStudent(uid){
       .then(function(){
         // Re-render with fresh cloud data so the deleted student doesn't reappear
         renderAdminProgress();
+        updateCapacityWidget(); // reflect new count in capacity bar
         toast('✅ Student removed (locally and from cloud).',2500);
       })
       .catch(function(e){
@@ -4445,6 +4994,7 @@ function clearAllStudents(){
   // Local wipe first for instant feedback
   var school=getSchool();
   ROSTER=[];ls(LK_ROSTER,[]);ls(LK_PROG,{});renderAdminProgress();
+  if(typeof updateCapacityWidget==='function')updateCapacityWidget();
   if(!school||!school.code){
     toast('All students cleared locally. School code not set — cloud copies not removed.',3500);
     return;
@@ -4487,6 +5037,7 @@ function clearAllStudents(){
       })
       .then(function(){
         renderAdminProgress();
+        updateCapacityWidget(); // reflect new count in capacity bar
         if(errorCount>0){
           toast('⚠️ Cleared '+deletedCount+' students from cloud, '+errorCount+' failed. Check Firestore.',5000);
         }else if(deletedCount>0){
@@ -11283,7 +11834,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
   // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
     var SW_CODE=[
-      "var CACHE='edulab-v21';",
+      "var CACHE='edulab-v24';",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
       "    return c.add(self.location.href.replace(/\\/sw(\\.js|\\?.*)?$/,'/')).catch(function(){});",
@@ -11321,7 +11872,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
     function tryDirectCache(){
       // Fallback: pre-cache the page directly (no SW needed)
       if(!('caches' in window))return;
-      caches.open('edulab-v21').then(function(c){
+      caches.open('edulab-v24').then(function(c){
         c.add(window.location.href).catch(function(){});
       }).catch(function(){});
     }
