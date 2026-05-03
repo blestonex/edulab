@@ -6279,12 +6279,29 @@ function showExportDialog(schoolName){
     });
     Object.keys(cloudProg).forEach(function(k){if(!allProg[k])allProg[k]=cloudProg[k];});
 
-    if(!merged.length){toast('No students to export.',2000);return;}
+    // Apply teacher scoping. A teacher exporting a progress report should
+    // only get students from her assigned/active class — never the full
+    // school. Proprietors keep the full export. Filter happens here at
+    // the source so both the dropdown options AND the actual export data
+    // are scoped consistently.
+    merged=_filterVisibleStudents(merged);
 
-    // Build selection UI
-    var opts='<option value="all">All Students ('+merged.length+')</option>';
+    if(!merged.length){
+      var msg=_isTeacherSession()
+        ? 'No students in your assigned class'+((_visibleClassesForCurrentStaff()||[]).length>1?'es':'')+' to export.'
+        : 'No students to export.';
+      toast(msg,2500);
+      return;
+    }
+
+    // Build selection UI. The "All Students" label adapts so a teacher
+    // sees "All My Students (N)" rather than the misleading "All Students".
+    var allLabel=_isTeacherSession()
+      ? 'All My Students ('+merged.length+')'
+      : 'All Students ('+merged.length+')';
+    var opts='<option value="all">'+allLabel+'</option>';
     merged.forEach(function(s,i){
-      opts+='<option value="'+i+'">'+(s.emoji||'👤')+' '+s.name+' ('+s.classLabel+')</option>';
+      opts+='<option value="'+i+'">'+(s.emoji||'👤')+' '+_escapeHtml(s.name)+' ('+_escapeHtml(s.classLabel||'')+')</option>';
     });
 
     // Create overlay dialog
@@ -6395,10 +6412,36 @@ var _perfData={roster:[],allProg:{}}; // cached for filter changes
 function openClassPerformance(){
   var content=document.getElementById('class-perf-content');
   if(!content)return;
+  // Scope the class filter dropdown for teachers — only their assigned
+  // classes show as options. Proprietors keep the full list. The dropdown
+  // is rebuilt every time the view opens so it reflects the current
+  // staff session (including the active class for multi-class teachers).
+  var classFilter=document.getElementById('perf-class');
+  if(classFilter){
+    var allowed=_visibleClassesForCurrentStaff();
+    if(allowed&&allowed.length){
+      // Teacher: limit to their classes. Default to the active class if set,
+      // otherwise the first assigned class. No "All Classes" option for
+      // teachers because "all" means proprietor-scope.
+      classFilter.innerHTML=allowed.map(function(cl){
+        return '<option value="'+_escapeHtml(cl)+'">'+_escapeHtml(cl)+'</option>';
+      }).join('');
+      classFilter.value=_staffActiveClass||allowed[0];
+    }else if(allowed===null){
+      // Proprietor / legacy session — restore the full options if needed.
+      // Only rebuild if currently scoped (avoid clobbering on every open).
+      if(!classFilter.querySelector('option[value="all"]')){
+        classFilter.innerHTML='<option value="all">All Classes</option>'
+          +['Nursery 1','Nursery 2','Primary 1','Primary 2','Primary 3','Primary 4','Primary 5','Primary 6','JSS 1','JSS 2','JSS 3','SSS 1','SSS 2','WAEC/JAMB']
+            .map(function(cl){return '<option value="'+cl+'">'+cl+'</option>';}).join('');
+      }
+    }
+  }
   content.innerHTML='<div style="text-align:center;padding:30px;color:#6B7B8D;font-size:14px">Loading\u2026</div>';
   SS('class-performance');
 
-  // Pull merged roster (local + cloud)
+  // Pull merged roster (local + cloud), then apply teacher scoping so only
+  // students from their assigned/active classes are loaded into _perfData.
   var localProg=lg(LK_PROG)||{};
   loadSchoolRosterFromFirestore(function(cloudStudents){
     var merged=ROSTER.slice();
@@ -6412,7 +6455,11 @@ function openClassPerformance(){
     var allProg={};
     Object.keys(localProg).forEach(function(k){allProg[k]=Object.assign({},localProg[k]);});
     Object.keys(cloudProg).forEach(function(k){if(!allProg[k])allProg[k]=cloudProg[k];});
-    _perfData={roster:merged,allProg:allProg};
+    // Apply class scoping. Teachers never see students outside their classes
+    // here, even if they manually set the filter to a class they don't own
+    // (which they can't, given the dropdown above is also scoped, but
+    // belt-and-braces).
+    _perfData={roster:_filterVisibleStudents(merged),allProg:allProg};
     renderPerformance();
   });
 }
@@ -12347,7 +12394,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
   // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
     var SW_CODE=[
-      "var CACHE='edulab-v31';",
+      "var CACHE='edulab-v33';",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
       "    return c.add(self.location.href.replace(/\\/sw(\\.js|\\?.*)?$/,'/')).catch(function(){});",
@@ -12385,7 +12432,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
     function tryDirectCache(){
       // Fallback: pre-cache the page directly (no SW needed)
       if(!('caches' in window))return;
-      caches.open('edulab-v31').then(function(c){
+      caches.open('edulab-v33').then(function(c){
         c.add(window.location.href).catch(function(){});
       }).catch(function(){});
     }
