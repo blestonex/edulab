@@ -72,16 +72,57 @@ body{display:flex;flex-direction:column}
 .shake{animation:shake .3s ease}
 
 /* ── SPLASH ── */
-#splash{background:linear-gradient(145deg,#FF6B35,#FF8E53,#FFBE76);justify-content:center;align-items:center}
-.splash-inner{text-align:center;padding:36px 28px;max-width:340px;width:100%}
-.splash-logo{font-family:'Nunito',sans-serif;font-weight:900;font-size:44px;color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.18)}
-.splash-logo span{opacity:.45}
-.splash-sub{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:44px}
-.splash-lbl{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:14px}
-.mode-btn{width:100%;padding:17px;border:2px solid rgba(255,255,255,.3);border-radius:var(--r);background:rgba(255,255,255,.14);color:#fff;text-align:left;cursor:pointer;margin-bottom:10px}
-.mode-btn:active{background:rgba(255,255,255,.25)}
-.mode-btn .mt{font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;display:block}
-.mode-btn .md{font-size:12px;color:rgba(255,255,255,.55);display:block;margin-top:3px}
+#splash{background:#FFF7ED;justify-content:flex-start;align-items:center;overflow-y:auto;padding-bottom:24px}
+.splash-inner{text-align:left;width:100%;max-width:440px;display:flex;flex-direction:column;animation:none}
+
+/* HERO — compact, restrained. No illustration here; just identity & value prop. */
+.sp-hero{background:linear-gradient(135deg,#F97316 0%,#EA580C 100%);padding:24px 28px 28px;color:#fff;position:relative;overflow:hidden;border-bottom-left-radius:28px;border-bottom-right-radius:28px;box-shadow:0 8px 24px -6px rgba(234,88,12,.45)}
+.sp-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none}
+.sp-hero::after{content:'';position:absolute;bottom:-30px;left:-30px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none}
+.sp-blestonex{font-size:10px;font-weight:800;letter-spacing:2.4px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:8px}
+.sp-logo{font-family:'Nunito',sans-serif;font-weight:900;font-size:48px;color:#fff;letter-spacing:-1.5px;line-height:1;margin-bottom:10px}
+.sp-logo .lab{color:rgba(255,255,255,.55);font-weight:800}
+.sp-tag{font-size:14px;color:rgba(255,255,255,.92);line-height:1.5;font-weight:600;max-width:340px}
+
+/* CARD AREA — white surface that feels like a modern app, breaks the orange */
+.sp-card-area{padding:18px 20px 4px;background:#FFF7ED}
+
+.splash-lbl{font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#9A3412;margin:6px 4px 10px;opacity:.7}
+
+/* PRIMARY BUTTONS — clean white cards with coral accent.
+   This is what proprietors will tap most; treat them like a modern app's CTAs. */
+.mode-btn{width:100%;padding:16px 18px;border:none;border-radius:16px;background:#fff;color:#1F1611;text-align:left;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 4px 12px rgba(234,88,12,.06);transition:transform .15s,box-shadow .15s;font-family:inherit}
+.mode-btn:active{transform:scale(.98);box-shadow:0 1px 2px rgba(0,0,0,.04),0 2px 6px rgba(234,88,12,.05)}
+.mode-btn-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#F97316,#EA580C);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;color:#fff}
+.mode-btn-body{flex:1;min-width:0}
+.mode-btn .mt{font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;display:block;color:#1F1611;line-height:1.2}
+.mode-btn .md{font-size:12px;color:#6B7280;display:block;margin-top:3px;line-height:1.4}
+.mode-btn-chev{font-size:20px;color:#FB923C;flex-shrink:0;font-weight:900}
+
+/* Secondary action buttons — same shape, different icon colours */
+.mode-btn-admin .mode-btn-icon{background:linear-gradient(135deg,#A855F7,#7C3AED)}
+.mode-btn-admin .mode-btn-chev{color:#A855F7}
+.mode-btn-recover .mode-btn-icon{background:linear-gradient(135deg,#3B82F6,#1D4ED8)}
+.mode-btn-recover .mode-btn-chev{color:#3B82F6}
+.mode-btn-comp .mode-btn-icon{background:linear-gradient(135deg,#FBBF24,#D97706)}
+.mode-btn-comp .mode-btn-chev{color:#D97706}
+
+/* FEATURES STRIP — single row, scrollable horizontally on small screens.
+   Compact, factual, easy to scan. Replaces the heavy 2x2 grid. */
+.sp-feats{display:flex;gap:8px;padding:6px 4px 14px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.sp-feats::-webkit-scrollbar{display:none}
+.sp-feat{flex:0 0 auto;min-width:140px;background:#fff;border:1px solid #FED7AA;border-radius:12px;padding:11px 12px;display:flex;align-items:center;gap:10px}
+.sp-feat-em{font-size:20px;line-height:1;flex-shrink:0}
+.sp-feat-tx{font-size:11px;font-weight:700;color:#7C2D12;line-height:1.4}
+.sp-feat-tx strong{display:block;font-weight:900;color:#9A3412;font-size:12px;margin-bottom:1px}
+
+/* Secondary section divider */
+.sp-secondary-lbl{font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#9A3412;opacity:.5;margin:14px 4px 10px;display:flex;align-items:center;gap:10px}
+.sp-secondary-lbl::before,.sp-secondary-lbl::after{content:'';flex:1;height:1px;background:rgba(154,52,18,.18)}
+
+/* Footer line */
+.sp-footer{margin:20px 24px 8px;text-align:center;font-size:11px;color:#9A3412;opacity:.55;line-height:1.5}
+.sp-footer-flag{display:inline-block;width:14px;height:9px;background:linear-gradient(90deg,#16A34A 33%,#fff 33%,#fff 66%,#16A34A 66%);vertical-align:middle;margin-right:5px;border-radius:1px;border:1px solid rgba(0,0,0,.08)}
 
 /* ── SETUP ── */
 #setup{background:linear-gradient(145deg,#6C48CC,#8B5CF6,#A78BFA)}
@@ -234,25 +275,90 @@ body{display:flex;flex-direction:column}
 
 <!-- SPLASH -->
 <div id="splash" class="screen">
-  <div class="splash-inner fade-in">
-    <div class="splash-logo">Edu<span>Lab</span></div>
-    <div class="splash-sub">by Blestonex Global Services</div>
-    <div class="splash-lbl">How is this device used?</div>
-    <button class="mode-btn" onclick="pickMode('single')"><span class="mt">👤 My personal device</span><span class="md">One student uses this device</span></button>
-    <button class="mode-btn" onclick="pickMode('shared')"><span class="mt">👥 Shared class device</span><span class="md">Multiple students take turns</span></button>
-    <div style="margin-top:8px;border-top:1px solid rgba(255,255,255,.15);padding-top:12px">
-      <button class="mode-btn" onclick="openStaffLogin()" style="border-color:rgba(168,85,247,.4);background:rgba(168,85,247,.1)">
-        <span class="mt">⚙️ Login as Admin</span>
-        <span class="md">For proprietors and teachers</span>
+  <div class="splash-inner">
+
+    <!-- HERO ─────────────────────────────────────────────────────────
+         Compact warm-coral header. Identity + value prop only — no
+         illustration here, so the primary buttons sit above the fold
+         on most phones without "scroll for more" hints. -->
+    <div class="sp-hero">
+      <div class="sp-blestonex">Blestonex Global Services</div>
+      <div class="sp-logo">Edu<span class="lab">Lab</span></div>
+      <div class="sp-tag">The complete digital classroom for Nigerian schools — Nursery to JAMB.</div>
+    </div>
+
+    <!-- CARD AREA ─────────────────────────────────────────────────── -->
+    <div class="sp-card-area">
+
+      <!-- PRIMARY ACTIONS — clean white cards with coral icon badges -->
+      <div class="splash-lbl">Get started</div>
+      <button class="mode-btn" onclick="pickMode('single')">
+        <div class="mode-btn-icon">👤</div>
+        <div class="mode-btn-body">
+          <span class="mt">My personal device</span>
+          <span class="md">One student uses this device</span>
+        </div>
+        <span class="mode-btn-chev">›</span>
       </button>
-      <button class="mode-btn" onclick="openRecovery()" style="border-color:rgba(96,165,250,.4);background:rgba(96,165,250,.1);margin-top:8px">
-        <span class="mt">🔑 Recover my account</span>
-        <span class="md">Lost your phone? Restore using your recovery code</span>
+      <button class="mode-btn" onclick="pickMode('shared')">
+        <div class="mode-btn-icon">👥</div>
+        <div class="mode-btn-body">
+          <span class="mt">Shared class device</span>
+          <span class="md">Multiple students take turns</span>
+        </div>
+        <span class="mode-btn-chev">›</span>
       </button>
-      <button class="mode-btn" onclick="openCompMenu()" style="border-color:rgba(255,200,80,.4);background:rgba(255,200,80,.1);margin-top:8px">
-        <span class="mt">🏆 House Competition</span>
-        <span class="md">Host or join a live inter-house quiz</span>
+
+      <!-- FEATURE STRIP — horizontally scrollable on phones, single row.
+           Shows what's inside the product in a way that feels alive without
+           dominating the screen. -->
+      <div class="sp-feats" role="list" aria-label="Features">
+        <div class="sp-feat" role="listitem">
+          <span class="sp-feat-em">📐</span>
+          <div class="sp-feat-tx"><strong>WAEC / JAMB</strong>3 subjects · 150 questions</div>
+        </div>
+        <div class="sp-feat" role="listitem">
+          <span class="sp-feat-em">📱</span>
+          <div class="sp-feat-tx"><strong>Friday Reports</strong>WhatsApp parents weekly</div>
+        </div>
+        <div class="sp-feat" role="listitem">
+          <span class="sp-feat-em">🏫</span>
+          <div class="sp-feat-tx"><strong>Nursery → SS3</strong>Maths, Vocab, Reasoning</div>
+        </div>
+        <div class="sp-feat" role="listitem">
+          <span class="sp-feat-em">🏆</span>
+          <div class="sp-feat-tx"><strong>House Quizzes</strong>Live whole-school events</div>
+        </div>
+      </div>
+
+      <!-- SECONDARY ACTIONS ─────────────────────────────────────── -->
+      <div class="sp-secondary-lbl">More options</div>
+      <button class="mode-btn mode-btn-admin" onclick="openStaffLogin()">
+        <div class="mode-btn-icon">⚙️</div>
+        <div class="mode-btn-body">
+          <span class="mt">Login as Admin</span>
+          <span class="md">For proprietors and teachers</span>
+        </div>
+        <span class="mode-btn-chev">›</span>
       </button>
+      <button class="mode-btn mode-btn-recover" onclick="openRecovery()">
+        <div class="mode-btn-icon">🔑</div>
+        <div class="mode-btn-body">
+          <span class="mt">Recover my account</span>
+          <span class="md">Lost your phone? Restore using your code</span>
+        </div>
+        <span class="mode-btn-chev">›</span>
+      </button>
+      <button class="mode-btn mode-btn-comp" onclick="openCompMenu()">
+        <div class="mode-btn-icon">🏆</div>
+        <div class="mode-btn-body">
+          <span class="mt">House Competition</span>
+          <span class="md">Host or join a live inter-house quiz</span>
+        </div>
+        <span class="mode-btn-chev">›</span>
+      </button>
+
+      <div class="sp-footer"><span class="sp-footer-flag" aria-hidden="true"></span>Made in Nigeria · Built for Nigerian schools</div>
     </div>
   </div>
 </div>
@@ -12171,7 +12277,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
   // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
     var SW_CODE=[
-      "var CACHE='edulab-v26';",
+      "var CACHE='edulab-v29';",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
       "    return c.add(self.location.href.replace(/\\/sw(\\.js|\\?.*)?$/,'/')).catch(function(){});",
@@ -12209,7 +12315,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
     function tryDirectCache(){
       // Fallback: pre-cache the page directly (no SW needed)
       if(!('caches' in window))return;
-      caches.open('edulab-v26').then(function(c){
+      caches.open('edulab-v29').then(function(c){
         c.add(window.location.href).catch(function(){});
       }).catch(function(){});
     }
