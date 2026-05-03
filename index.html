@@ -483,11 +483,15 @@ body{display:flex;flex-direction:column}
   <div class="topbar" style="background:linear-gradient(135deg,#1565C0,#1976D2)">
     <button class="tback" onclick="adminBack()">‹</button>
     <div class="tlogo">Admin <span>Panel</span></div>
+    <button id="admin-switch-class-btn" onclick="switchActiveClass()" style="display:none;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);border-radius:8px;color:#fff;padding:5px 10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;margin-right:6px">🔄 Switch class</button>
     <button onclick="SS('roster')" class="tswitch">Roster</button>
   </div>
+  <!-- Active-context banner — shown for teachers so they always know which
+       class they're scoped to. Hidden for proprietors and legacy sessions. -->
+  <div id="admin-staff-context" style="display:none;background:#EDE9FE;color:#5B21B6;padding:8px 16px;font-size:12px;font-weight:700;text-align:center;flex-shrink:0"></div>
   <div class="content">
-    <!-- School info -->
-    <div style="background:#fff;border-radius:var(--r);padding:18px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+    <!-- School info — wrapped so we can hide it from teachers (proprietors edit branding). -->
+    <div id="admin-school-fields-tile" style="background:#fff;border-radius:var(--r);padding:18px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
       <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:#1565C0;margin-bottom:12px">🏫 School Settings</div>
       <div style="font-size:12px;color:var(--sm);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.8px">School Name</div>
       <input id="admin-school-name" type="text" placeholder="e.g. Blestonex Academy" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-size:15px;font-family:'Nunito',sans-serif;font-weight:700;margin-bottom:10px">
@@ -556,8 +560,9 @@ body{display:flex;flex-direction:column}
     </div>
     <!-- Device mode change — for proprietors / teachers who want to switch
          between Single device and Shared device without losing existing data.
-         Lives at the bottom of admin so it's intentional, not casual. -->
-    <div style="background:#fff;border-radius:var(--r);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-top:14px">
+         Lives at the bottom of admin so it's intentional, not casual.
+         Hidden from teachers — device-mode switching is the proprietor's call. -->
+    <div id="device-mode-tile" style="background:#fff;border-radius:var(--r);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-top:14px">
       <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#1565C0;margin-bottom:6px">🔄 Device Mode</div>
       <div id="admin-mode-status" style="font-size:13px;color:var(--sm);margin-bottom:10px">Currently: …</div>
       <button onclick="changeDeviceMode()" style="width:100%;padding:11px;background:#fff;color:#1565C0;border:1.5px solid #1565C0;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">Change device mode</button>
@@ -611,6 +616,21 @@ body{display:flex;flex-direction:column}
       <div id="as-staff-status" style="font-size:13px;text-align:center;min-height:20px;margin-bottom:12px;color:var(--sm)"></div>
       <button id="as-staff-save-btn" onclick="saveStaff()" style="width:100%;padding:13px;background:#7C3AED;color:#fff;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;cursor:pointer">Save and copy WhatsApp message</button>
     </div>
+  </div>
+</div>
+
+<!-- CLASS PICKER — shown to multi-class teachers at sign-in. Single-class
+     teachers and proprietors skip this screen entirely. -->
+<div id="class-picker" class="screen" style="background:linear-gradient(135deg,#581C87,#7C3AED)">
+  <div class="topbar" style="background:transparent">
+    <button class="tback" onclick="staffSignOut()">‹</button>
+    <div class="tlogo" style="color:#fff">Choose your class</div>
+  </div>
+  <div style="flex:1;padding:24px;display:flex;flex-direction:column;justify-content:center;max-width:420px;width:100%;margin:0 auto;box-sizing:border-box">
+    <div style="font-size:48px;margin-bottom:8px;text-align:center">🏫</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;text-align:center;margin-bottom:6px" id="cp-greeting">Welcome!</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.75);text-align:center;line-height:1.55;margin-bottom:24px">Which class are you working with today? You can switch later via the "Switch class" button in admin.</div>
+    <div id="cp-list"></div>
   </div>
 </div>
 
@@ -3257,7 +3277,8 @@ function ackRecoveryAndContinue(){
 var _staffEdit={
   id:null,                  // doc id if editing, null if adding
   selectedClasses:[],       // checked class chips
-  originalPinHash:''        // when editing, the pre-existing hash so we can keep it if PIN field is empty
+  originalPinHash:'',       // when editing, the pre-existing hash so we can keep it if PIN field is empty
+  originalRole:''           // when editing, the existing role — preserved so editing never demotes a proprietor
 };
 
 // Class list for the chip picker — same set used in the assignments form.
@@ -3400,6 +3421,7 @@ function openAddStaff(staffId){
           var d=doc.data();
           _staffEdit.id=staffId;
           _staffEdit.originalPinHash=String(d.pinHash||'');
+          _staffEdit.originalRole=String(d.role||'teacher');
           _staffEdit.selectedClasses=Array.isArray(d.assignedClasses)?d.assignedClasses.slice():[];
           if(nameEl)nameEl.value=d.name||'';
           if(phoneEl)phoneEl.value=d.phone||'';
@@ -3490,9 +3512,15 @@ function saveStaff(){
     return;
   }
   hashPromise.then(function(pinHash){
+    // Determine role:
+    //   - For new staff, always 'teacher' (the Manage Staff form is "Add Teacher")
+    //   - For edits, PRESERVE the existing role. Editing must never demote a
+    //     proprietor to teacher — that would lock the school out of Manage Staff
+    //     since teachers can't access it.
+    var roleToSave=isEdit?(_staffEdit.originalRole||'teacher'):'teacher';
     var data={
       name:name,
-      role:'teacher',
+      role:roleToSave,
       pinHash:pinHash,
       assignedClasses:_staffEdit.selectedClasses.slice(),
       phone:phone,
@@ -3642,6 +3670,106 @@ var STAFF=null;     // { id, name, role, assignedClasses, schoolCode } when sign
 var _staffPickList=[]; // last-rendered list of staff for the picker
 var _staffSchoolCode=''; // school code carried between flow steps
 var _staffSelectedStaff=null; // staff entry highlighted in step 2
+// Active class for a multi-class teacher session. Null when not yet picked.
+// Single-class teachers have this auto-populated. Proprietors leave it null
+// (they don't restrict to a single class).
+var _staffActiveClass=null;
+
+// ════════════════════════════════════════════════════════════════════════
+// SCOPING HELPERS — the audit point for every "who can see what" check
+// ════════════════════════════════════════════════════════════════════════
+// Single source of truth for class visibility. Every consumer that filters
+// by class goes through one of these helpers, so adding a new filter rule
+// or auditing access is a one-place change.
+//
+// Important: these are CLIENT-side filters. A determined teacher who
+// reverse-engineers the Firestore API could still read other classes'
+// students. True server-side isolation requires per-staff Firebase Auth
+// accounts + custom claims, which is a Blaze-plan upgrade. For Session 3
+// scope we accept client-side enforcement — it stops the casual case
+// (a teacher tapping around the app) but not a sophisticated attacker.
+
+// Returns the list of class labels the current staff member can see.
+// Returns null to mean "no filter" (proprietor or pre-staff legacy session).
+function _visibleClassesForCurrentStaff(){
+  // No staff session = legacy PIN-only flow = no restriction
+  if(!STAFF||!STAFF.id)return null;
+  // Proprietor sees everything
+  if(STAFF.role==='proprietor')return null;
+  // Teacher: respect their assignedClasses. Empty array means "no classes
+  // assigned" — show nothing rather than everything (fail closed).
+  if(!Array.isArray(STAFF.assignedClasses))return [];
+  // If multi-class teacher has picked a single active class for this session,
+  // narrow further. Otherwise return their full assigned list.
+  if(_staffActiveClass)return [_staffActiveClass];
+  return STAFF.assignedClasses.slice();
+}
+
+// Should this student be visible to the current staff member?
+function _isStudentVisible(student){
+  if(!student)return false;
+  var allowed=_visibleClassesForCurrentStaff();
+  if(allowed===null)return true;          // proprietor / no scope
+  if(!allowed.length)return false;        // teacher with no classes assigned
+  return allowed.indexOf(student.classLabel)>=0;
+}
+
+// Convenience: filter a list of students to only the visible ones.
+function _filterVisibleStudents(arr){
+  var allowed=_visibleClassesForCurrentStaff();
+  if(allowed===null)return arr;
+  if(!allowed.length)return [];
+  return arr.filter(function(s){return allowed.indexOf(s.classLabel)>=0;});
+}
+
+// Is the current session a teacher (vs proprietor / no-staff legacy)?
+function _isTeacherSession(){
+  return !!(STAFF&&STAFF.role==='teacher');
+}
+
+// Show the class picker for a multi-class teacher. They tap one class for
+// this session; picking it sets _staffActiveClass and routes to admin.
+// They can switch classes mid-session via the "Switch class" pill.
+function _showClassPicker(){
+  if(!STAFF||STAFF.role!=='teacher'){_doOpenAdmin();return;}
+  var classes=Array.isArray(STAFF.assignedClasses)?STAFF.assignedClasses:[];
+  if(classes.length<=1){
+    // Shouldn't normally happen — handler should auto-pick a single-class
+    // teacher. But fail safe: if 0, show admin (they'll see empty rosters).
+    // If 1, set it and continue.
+    if(classes.length===1)_staffActiveClass=classes[0];
+    _doOpenAdmin();
+    return;
+  }
+  var greeting=document.getElementById('cp-greeting');
+  if(greeting){
+    var first=String(STAFF.name||'').split(' ')[0]||STAFF.name;
+    greeting.textContent='Welcome, '+first+'!';
+  }
+  var list=document.getElementById('cp-list');
+  if(list){
+    list.innerHTML=classes.map(function(cl){
+      return '<button onclick="pickActiveClass(\''+cl.replace(/'/g,"\\'")+'\')" style="display:block;width:100%;background:#fff;color:#1E1B4B;border:none;border-radius:12px;padding:16px;margin-bottom:10px;font-family:\'Nunito\',sans-serif;font-weight:900;font-size:16px;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between">'
+        +'<span>📚 '+_escapeHtml(cl)+'</span>'
+        +'<span style="color:#7C3AED;font-size:20px">›</span>'
+        +'</button>';
+    }).join('');
+  }
+  SS('class-picker');
+}
+
+// User tapped a class on the picker. Set it as the active class and route
+// to admin. Can be called again later via the Switch Class pill.
+function pickActiveClass(cl){
+  _staffActiveClass=cl;
+  _doOpenAdmin();
+}
+
+// Switch class mid-session: re-open the picker (for multi-class teachers).
+// Called from the "Switch class" pill in admin/roster.
+function switchActiveClass(){
+  _showClassPicker();
+}
 
 // ── Step 1: school code → fetch staff list ──
 function openStaffLogin(){
@@ -3706,6 +3834,22 @@ function staffSubmitSchoolCode(){
           if(staffList.length===0){
             // No staff yet — this school still uses the old adminPinHash. Offer migration.
             _showStaffMigration(school);
+            return;
+          }
+          // Rescue path: there's at least one staff record but no active
+          // proprietor. This can happen if a proprietor was accidentally
+          // demoted (an earlier version of saveStaff overwrote role to
+          // 'teacher' on edit). Without rescue, the school would be locked
+          // out of Manage Staff with no way back from inside the app.
+          // The migration screen authenticates against the school's
+          // adminPinHash (which never gets demoted) and creates a NEW
+          // proprietor doc, so the original demoted teacher record stays
+          // in the picker as a teacher and a fresh proprietor account is
+          // added.
+          var hasProprietor=staffList.some(function(s){return s.role==='proprietor';});
+          if(!hasProprietor){
+            console.warn('[EduLab] No active proprietor found — offering rescue path');
+            _showStaffMigration(school,/*rescue=*/true);
             return;
           }
           _staffPickList=staffList;
@@ -3818,11 +3962,30 @@ function staffSubmitPin(){
           .set({lastSeen:Date.now()},{merge:true})
           .catch(function(){/* non-fatal */});
       });
-      // Land on the existing admin screen. Sessions 2/3 will scope per role.
-      setTimeout(function(){
-        if(btn){btn.disabled=false;btn.textContent='Sign in →';}
-        _doOpenAdmin();
-      },700);
+      // Decide where to land:
+      //   - Proprietor / single-class teacher → straight to admin
+      //   - Multi-class teacher → ask which class to work with this session
+      // _staffActiveClass starts null; the class picker sets it.
+      _staffActiveClass=null;
+      var assignedClasses=Array.isArray(_staffSelectedStaff.assignedClasses)?_staffSelectedStaff.assignedClasses:[];
+      var isMultiClassTeacher=(_staffSelectedStaff.role==='teacher'&&assignedClasses.length>=2);
+      if(isMultiClassTeacher){
+        // Auto-pick the only class is impossible here (multi by definition),
+        // so route to picker. Single-class teachers (length===1) auto-pick.
+        setTimeout(function(){
+          if(btn){btn.disabled=false;btn.textContent='Sign in →';}
+          _showClassPicker();
+        },700);
+      }else{
+        // Single-class teacher: auto-set the active class to their only one
+        if(_staffSelectedStaff.role==='teacher'&&assignedClasses.length===1){
+          _staffActiveClass=assignedClasses[0];
+        }
+        setTimeout(function(){
+          if(btn){btn.disabled=false;btn.textContent='Sign in →';}
+          _doOpenAdmin();
+        },700);
+      }
     }else{
       _adminFailCount++;
       if(_adminFailCount>=5){
@@ -3844,9 +4007,21 @@ function staffSubmitPin(){
 // ── Migration: school has no staff yet but does have an old adminPinHash ──
 // User enters existing admin PIN once → we create a proprietor staff doc
 // using that same PIN, then route them straight into admin.
-function _showStaffMigration(school){
+//
+// rescue=true means the migration is being used to recover from a school
+// where all staff are teachers (no proprietor remains, e.g. due to the
+// accidental-demotion bug). The flow is the same — verify against the
+// school's adminPinHash and add a new proprietor staff doc — but the copy
+// changes so the user understands they're creating an additional proprietor.
+function _showStaffMigration(school,rescue){
   var intro=document.getElementById('staff-migrate-intro');
-  if(intro)intro.textContent='This school ('+(school&&school.name||_staffSchoolCode)+') has not yet set up the new login system. Enter your existing admin PIN once to create your proprietor account.';
+  if(intro){
+    if(rescue){
+      intro.textContent='This school has no active proprietor account. Enter the school\'s admin PIN to create one. Existing staff records stay as they are.';
+    }else{
+      intro.textContent='This school ('+(school&&school.name||_staffSchoolCode)+') has not yet set up the new login system. Enter your existing admin PIN once to create your proprietor account.';
+    }
+  }
   var nameInput=document.getElementById('staff-migrate-name');
   if(nameInput&&!nameInput.value)nameInput.value=(school&&school.name?school.name+' Proprietor':'Proprietor');
   var pinInput=document.getElementById('staff-migrate-pin');
@@ -3961,68 +4136,110 @@ function staffMigrate(){
 // Admin/teacher view of a student's recovery key. Used when a parent reports
 // a lost phone — the teacher opens the roster, taps the 🔑 Recovery badge,
 // and sees the code to share with the parent.
+// Resolve a student by uid from any source we know about. Tries (in order):
+//   1. The cached merged admin list (covers cloud-only students seen in admin)
+//   2. The local ROSTER
+//   3. A direct Firestore lookup by uid (covers the rare case where neither
+//      cache has the record — e.g. another device just added them)
+// Calls cb with the student object or null.
+function _findStudentByUid(uid, cb){
+  // 1. Check the cached merged admin list first
+  if(window._ADMIN_MERGED){
+    var fromMerged=window._ADMIN_MERGED.find(function(s){return (s.uid||s.name)===uid;});
+    if(fromMerged){cb(fromMerged);return;}
+  }
+  // 2. Check local roster
+  var fromRoster=ROSTER.find(function(s){return (s.uid||s.name)===uid;});
+  if(fromRoster){cb(fromRoster);return;}
+  // 3. Last resort — fetch from Firestore directly
+  var school=getSchool();
+  if(!school||!school.code){cb(null);return;}
+  FB.onReady(function(){
+    if(!FB.db){cb(null);return;}
+    FB.db.collection('schools').doc(school.code).collection('students').doc(uid).get()
+      .then(function(doc){
+        if(!doc.exists){cb(null);return;}
+        var d=doc.data();
+        cb({
+          name:d.name||'',
+          classLabel:d.classLabel||'',
+          uid:uid,
+          emoji:d.emoji||'👤',
+          parentWA:d.parentWA||'',
+          recoveryCode:d.recoveryCode||''
+        });
+      })
+      .catch(function(){cb(null);});
+  });
+}
+
 function showStudentRecoveryKey(uid){
-  var student=ROSTER.find(function(s){return (s.uid||s.name)===uid;});
-  if(student&&student.recoveryCode){
-    _showRecoveryKeyModal(student);
-    return;
-  }
-  // Student exists but has no code (added before the recovery feature).
-  // Offer to generate one rather than hitting a dead end.
-  if(student&&!student.recoveryCode){
+  _findStudentByUid(uid,function(student){
+    if(!student){toast('Student not found.',2200);return;}
+    if(student.recoveryCode){
+      _showRecoveryKeyModal(student);
+      return;
+    }
+    // No code yet — offer to generate one
     generateAndShowRecoveryKey(uid);
-    return;
-  }
-  toast('Student not found.',2000);
+  });
 }
 
 // Generate a recovery code for a student that doesn't have one yet, sync it
 // to Firestore (both on the student doc and in the recovery lookup mapping),
 // then open the modal so the teacher can share with the parent.
 function generateAndShowRecoveryKey(uid){
-  var student=ROSTER.find(function(s){return (s.uid||s.name)===uid;});
-  if(!student){toast('Student not found.',2000);return;}
-  if(student.recoveryCode){_showRecoveryKeyModal(student);return;}
-  if(!confirm('Generate a recovery code for '+student.name+'?\n\nThis lets you share the code with the parent so the student can recover their account on a new device.'))return;
-  var newCode=generateRecoveryCode();
-  student.recoveryCode=newCode;
-  // Update local roster
-  var idx=ROSTER.findIndex(function(s){return (s.uid||s.name)===uid;});
-  if(idx>=0)ROSTER[idx]=student;
-  ls(LK_ROSTER,ROSTER);
-  // Sync to Firestore — both the student doc AND the recovery lookup
-  var school=getSchool();
-  if(school&&school.code){
-    FB.onReady(function(){
-      if(!FB.db){
-        toast('Code generated locally. Will sync to cloud when online.',3000);
-        _showRecoveryKeyModal(student);
-        return;
-      }
-      var schoolRef=FB.db.collection('schools').doc(school.code);
-      Promise.all([
-        schoolRef.collection('students').doc(student.uid)
-          .set({recoveryCode:newCode},{merge:true}),
-        schoolRef.collection('recovery').doc(_normaliseRecoveryCode(newCode))
-          .set({
-            studentUid:student.uid,
-            name:student.name,
-            classLabel:student.classLabel||'',
-            createdAt:Date.now()
-          },{merge:true})
-      ])
-        .then(function(){_showRecoveryKeyModal(student);})
-        .catch(function(e){
-          console.warn('Recovery code sync failed:',e.message);
-          toast('Code generated but cloud sync failed — try again when online.',3500);
+  _findStudentByUid(uid,function(student){
+    if(!student){toast('Student not found.',2200);return;}
+    if(student.recoveryCode){_showRecoveryKeyModal(student);return;}
+    if(!confirm('Generate a recovery code for '+student.name+'?\n\nThis lets you share the code with the parent so the student can recover their account on a new device.'))return;
+    var newCode=generateRecoveryCode();
+    student.recoveryCode=newCode;
+    // Update local roster if the student is there
+    var idx=ROSTER.findIndex(function(s){return (s.uid||s.name)===uid;});
+    if(idx>=0){
+      ROSTER[idx].recoveryCode=newCode;
+      ls(LK_ROSTER,ROSTER);
+    }
+    // Update the cached merged list too so subsequent lookups see the new code
+    if(window._ADMIN_MERGED){
+      var mIdx=window._ADMIN_MERGED.findIndex(function(s){return (s.uid||s.name)===uid;});
+      if(mIdx>=0)window._ADMIN_MERGED[mIdx].recoveryCode=newCode;
+    }
+    // Sync to Firestore — both the student doc AND the recovery lookup
+    var school=getSchool();
+    if(school&&school.code){
+      FB.onReady(function(){
+        if(!FB.db){
+          toast('Code generated locally. Will sync to cloud when online.',3000);
           _showRecoveryKeyModal(student);
-        });
-    });
-  }else{
-    _showRecoveryKeyModal(student);
-  }
-  // Re-render so the badge updates from "🔑 Generate code" to "🔑 Recovery"
-  setTimeout(function(){if(typeof renderAdminProgress==='function')renderAdminProgress();},800);
+          return;
+        }
+        var schoolRef=FB.db.collection('schools').doc(school.code);
+        Promise.all([
+          schoolRef.collection('students').doc(student.uid)
+            .set({recoveryCode:newCode},{merge:true}),
+          schoolRef.collection('recovery').doc(_normaliseRecoveryCode(newCode))
+            .set({
+              studentUid:student.uid,
+              name:student.name,
+              classLabel:student.classLabel||'',
+              createdAt:Date.now()
+            },{merge:true})
+        ])
+          .then(function(){_showRecoveryKeyModal(student);})
+          .catch(function(e){
+            console.warn('Recovery code sync failed:',e.message);
+            toast('Code generated but cloud sync failed — try again when online.',3500);
+            _showRecoveryKeyModal(student);
+          });
+      });
+    }else{
+      _showRecoveryKeyModal(student);
+    }
+    // Re-render so the badge updates from "🔑 Generate code" to "🔑 Recovery"
+    setTimeout(function(){if(typeof renderAdminProgress==='function')renderAdminProgress();},800);
+  });
 }
 
 // Render the recovery code modal once we have a student object with a code.
@@ -4335,16 +4552,30 @@ function activateSharedDevice(){
 function renderRoster(list){
   var g=document.getElementById('roster-grid');if(!g)return;
   var rc=document.getElementById('roster-count');
-  if(rc)rc.textContent=ROSTER.length+' student'+(ROSTER.length!==1?'s':'');
+  // Apply class scoping. Teachers see only their assigned classes (or the
+  // single active class if multi-class). Proprietors / legacy sessions see all.
+  var visible=_filterVisibleStudents(list||[]);
+  if(rc){
+    var totalCount=(list||ROSTER||[]).length;
+    var visibleCount=visible.length;
+    if(_isTeacherSession()&&visibleCount!==totalCount){
+      rc.textContent=visibleCount+' of '+totalCount+' student'+(totalCount!==1?'s':'');
+    }else{
+      rc.textContent=visibleCount+' student'+(visibleCount!==1?'s':'');
+    }
+  }
   g.innerHTML='';
-  if(!list.length){
-    g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:rgba(255,255,255,.5)"><div style="font-size:40px;margin-bottom:10px">&#128070;</div><div style="font-weight:800;font-size:16px;color:rgba(255,255,255,.8)">No students yet</div><div style="font-size:13px;margin-top:6px">Tap Add New Student below to begin</div></div>';
+  if(!visible.length){
+    var emptyMsg=_isTeacherSession()
+      ? '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:rgba(255,255,255,.5)"><div style="font-size:40px;margin-bottom:10px">&#128218;</div><div style="font-weight:800;font-size:16px;color:rgba(255,255,255,.8)">No students in your class yet</div><div style="font-size:13px;margin-top:6px">Tap Add New Student below to begin</div></div>'
+      : '<div style="grid-column:1/-1;text-align:center;padding:32px 16px;color:rgba(255,255,255,.5)"><div style="font-size:40px;margin-bottom:10px">&#128070;</div><div style="font-weight:800;font-size:16px;color:rgba(255,255,255,.8)">No students yet</div><div style="font-size:13px;margin-top:6px">Tap Add New Student below to begin</div></div>';
+    g.innerHTML=emptyMsg;
     return;
   }
   var EMOJIS=['🌟','📚','🎯','🌿','💫','🔮','🦁','🌈','⭐','🎨','🔥','💎'];
-  list.forEach(function(s,i){
+  visible.forEach(function(s,i){
     var d=document.createElement('div');d.className='rc';
-    d.innerHTML='<div class="rc-av">'+(s.emoji||EMOJIS[i%EMOJIS.length])+'</div><div class="rc-name">'+s.name+'</div><div class="rc-cls">'+s.classLabel+'</div>';
+    d.innerHTML='<div class="rc-av">'+(s.emoji||EMOJIS[i%EMOJIS.length])+'</div><div class="rc-name">'+_escapeHtml(s.name)+'</div><div class="rc-cls">'+_escapeHtml(s.classLabel||'')+'</div>';
     d.onclick=function(){STU=s;loadHome();};
     g.appendChild(d);
   });
@@ -4557,7 +4788,6 @@ function openAdmin(){
 function _doOpenAdmin(){
   loadAdminSchoolFields();
   renderAdminProgress();
-  updateCapacityWidget();
   // Show current device mode so the user knows what they're in before switching
   var modeStatus=document.getElementById('admin-mode-status');
   if(modeStatus){
@@ -4571,20 +4801,70 @@ function _doOpenAdmin(){
     if(DMODE==='shared'&&hasSingleProfile)hint=' · You also have a saved single-user profile.';
     modeStatus.innerHTML='Currently: <strong>'+label+'</strong>'+(hint?'<br><span style="font-size:11px;color:var(--sm)">'+hint+'</span>':'');
   }
-  // Staff tiles visibility:
-  //   - Sign Out: any signed-in staff (proprietor OR teacher) sees it
-  //   - Manage Staff: only proprietors. Teachers should not be able to add or
-  //     remove other staff. Both visible iff STAFF is set (i.e. user came in
-  //     through the new staff-login flow). Old PIN-only flow leaves STAFF
-  //     null, so neither tile shows — preserves backward compat.
+  // ── Role-based scoping ───────────────────────────────────────────────
+  // Three states:
+  //   1. STAFF.role === 'proprietor' → see everything (capacity, school
+  //      branding, manage staff, change device mode)
+  //   2. STAFF.role === 'teacher'    → narrowed view: no school branding,
+  //      no capacity widget, no change-device-mode, no manage staff,
+  //      only their assigned classes' students. Switch-class pill shown
+  //      for multi-class teachers.
+  //   3. No STAFF (legacy PIN-only flow) → behave like proprietor for
+  //      backward compat — older schools that never went through the new
+  //      login flow keep working as before.
+  var isProprietor=!STAFF||STAFF.role==='proprietor';
+  var isTeacher=_isTeacherSession();
+  // Tiles that are proprietor-only
   var manageTile=document.getElementById('manage-staff-tile');
   var signOutTile=document.getElementById('sign-out-tile');
+  var capWidget=document.getElementById('cap-widget');
+  var deviceModeTile=document.getElementById('device-mode-tile');
+  var schoolFieldsTile=document.getElementById('admin-school-fields-tile');
   if(STAFF&&STAFF.id){
     if(signOutTile)signOutTile.style.display='';
-    if(manageTile)manageTile.style.display=STAFF.role==='proprietor'?'':'none';
+    if(manageTile)manageTile.style.display=isProprietor?'':'none';
   }else{
     if(signOutTile)signOutTile.style.display='none';
     if(manageTile)manageTile.style.display='none';
+  }
+  // Hide proprietor-only sections from teachers
+  if(deviceModeTile)deviceModeTile.style.display=isTeacher?'none':'';
+  if(schoolFieldsTile)schoolFieldsTile.style.display=isTeacher?'none':'';
+  // Capacity widget is updated/shown only for proprietors. updateCapacityWidget
+  // handles its own visibility, but we override here to ensure teachers never
+  // see it even if there's a stale render.
+  if(isTeacher){
+    if(capWidget)capWidget.style.display='none';
+  }else{
+    updateCapacityWidget();
+  }
+  // Active-context banner — shows teachers which class scope they're in
+  var ctxBanner=document.getElementById('admin-staff-context');
+  if(ctxBanner){
+    if(isTeacher){
+      var classes=Array.isArray(STAFF.assignedClasses)?STAFF.assignedClasses:[];
+      var ctxText='';
+      if(_staffActiveClass){
+        ctxText='👩‍🏫 '+_escapeHtml(STAFF.name)+' · viewing '+_escapeHtml(_staffActiveClass);
+        if(classes.length>=2){
+          ctxText+=' (of '+classes.length+' classes)';
+        }
+      }else if(classes.length){
+        ctxText='👩‍🏫 '+_escapeHtml(STAFF.name)+' · '+classes.length+' classes assigned';
+      }else{
+        ctxText='⚠️ '+_escapeHtml(STAFF.name)+' · no classes assigned — ask your proprietor';
+      }
+      ctxBanner.innerHTML=ctxText;
+      ctxBanner.style.display='';
+    }else{
+      ctxBanner.style.display='none';
+    }
+  }
+  // Switch-class pill in the admin topbar — only shown for multi-class teachers
+  var switchBtn=document.getElementById('admin-switch-class-btn');
+  if(switchBtn){
+    var canSwitch=isTeacher&&Array.isArray(STAFF.assignedClasses)&&STAFF.assignedClasses.length>=2;
+    switchBtn.style.display=canSwitch?'':'none';
   }
   SS('admin');
 }
@@ -4789,6 +5069,12 @@ function renderAdminProgress(){
   var list=document.getElementById('admin-progress-list');if(!list)return;
   var cnt=document.getElementById('admin-student-count');
   // Show local roster immediately, then merge Firestore students
+  // _ADMIN_MERGED is the source of truth for any code that needs to look up
+  // a student by uid from the admin screen — including the recovery-key
+  // functions. Without this cache, lookups via ROSTER alone miss any
+  // cloud-only students (those added on another device) and the user gets
+  // a "Student not found" error when trying to view their recovery code.
+  window._ADMIN_MERGED=ROSTER.slice();
   renderAdminProgressWith(ROSTER,lg(LK_PROG)||{});
   // Pull cloud students in background
   loadSchoolRosterFromFirestore(function(cloudStudents){
@@ -4825,6 +5111,8 @@ function renderAdminProgress(){
     Object.keys(cloudProg).forEach(function(k){
       if(!localProg[k])localProg[k]=cloudProg[k];
     });
+    // Update cache so recovery-key lookups can find cloud-only students
+    window._ADMIN_MERGED=merged;
     if(cnt)cnt.textContent=merged.length+' student'+(merged.length!==1?'s':'')+' (incl. other devices)';
     renderAdminProgressWith(merged,localProg);
   });
@@ -4833,12 +5121,24 @@ function renderAdminProgress(){
 function renderAdminProgressWith(roster,allProg){
   var list=document.getElementById('admin-progress-list');if(!list)return;
   var cnt=document.getElementById('admin-student-count');
-  if(cnt&&!cnt.textContent.includes('other'))cnt.textContent=roster.length+' student'+(roster.length!==1?'s':'');
-  if(!roster.length){
-    list.innerHTML='<div style="text-align:center;padding:20px;color:var(--sm);font-size:14px">No students yet. Students appear here after they log in on any device.</div>';
+  // Apply class scoping. Teachers see only their assigned/active class students.
+  var visibleRoster=_filterVisibleStudents(roster);
+  if(cnt&&!cnt.textContent.includes('other')){
+    var totalCount=roster.length;
+    if(_isTeacherSession()&&visibleRoster.length!==totalCount){
+      cnt.textContent=visibleRoster.length+' of '+totalCount+' students';
+    }else{
+      cnt.textContent=visibleRoster.length+' student'+(visibleRoster.length!==1?'s':'');
+    }
+  }
+  if(!visibleRoster.length){
+    var msg=_isTeacherSession()
+      ? 'No students in your assigned class'+((_visibleClassesForCurrentStaff()||[]).length>1?'es':'')+' yet.'
+      : 'No students yet. Students appear here after they log in on any device.';
+    list.innerHTML='<div style="text-align:center;padding:20px;color:var(--sm);font-size:14px">'+msg+'</div>';
     return;
   }
-  var rows=roster.map(function(s){
+  var rows=visibleRoster.map(function(s){
     var sk=s.uid||s.name;
     var sp=allProg[sk]||{};
     var passed=Object.values(sp).filter(function(v){return v&&v.passed;}).length;
@@ -10562,13 +10862,18 @@ function _frEmptyState(html){
 function _frPopulateClassFilter(roster){
   var sel=document.getElementById('fr-class-filter');
   if(!sel)return;
+  // Build the class set from the SCOPED roster so a teacher's filter
+  // dropdown only shows classes they actually have access to. Avoids the
+  // confusing case of a filter option that returns no results because
+  // the underlying student is hidden anyway.
+  var scopedRoster=_filterVisibleStudents(roster||[]);
   var classes={};
-  roster.forEach(function(s){if(s.classLabel)classes[s.classLabel]=true;});
+  scopedRoster.forEach(function(s){if(s.classLabel)classes[s.classLabel]=true;});
   var current=sel.value;
   sel.innerHTML='<option value="">All classes</option>'+Object.keys(classes).sort().map(function(c){
-    return '<option value="'+c+'">'+c+'</option>';
+    return '<option value="'+_escapeHtml(c)+'">'+_escapeHtml(c)+'</option>';
   }).join('');
-  if(current)sel.value=current;
+  if(current&&classes[current])sel.value=current;
 }
 
 // Build a weekly snapshot for one student. Returns null if student has no activity.
@@ -10831,8 +11136,14 @@ function renderFridayReportList(){
   var data=_FR_DATA;
   var listEl=document.getElementById('fr-list');
   if(!listEl)return;
-  if(!data.roster.length){
-    listEl.innerHTML=_frEmptyState('No students in the roster yet. Add students first.');
+  // Apply class scoping FIRST. Teachers should never see, count, or be able
+  // to send Friday reports to students outside their assigned/active classes.
+  var scopedRoster=_filterVisibleStudents(data.roster||[]);
+  if(!scopedRoster.length){
+    var msg=_isTeacherSession()
+      ? 'No students in your assigned class'+((_visibleClassesForCurrentStaff()||[]).length>1?'es':'')+' yet.'
+      : 'No students in the roster yet. Add students first.';
+    listEl.innerHTML=_frEmptyState(msg);
     _frUpdateStats(0,0,0);
     return;
   }
@@ -10843,7 +11154,7 @@ function renderFridayReportList(){
   // Build one row per student
   var rows=[];
   var counts={eligible:0,nowa:0,inactive:0};
-  data.roster.forEach(function(student){
+  scopedRoster.forEach(function(student){
     if(classFilter&&student.classLabel!==classFilter)return;
     var report=_frBuildReport(student,data.allProg);
     var hasWA=!!student.parentWA;
@@ -11233,6 +11544,13 @@ function renderAssignmentList(arr){
 
 function newAssignment(){
   CUR_ASSIGN={id:'a_'+Date.now(),name:'',due:'',classes:[],stageId:'',stageLabel:'',note:'',_editIdx:undefined};
+  // Default: pre-tick the teacher's assigned classes so the common case
+  // ("teacher sets work for their own classes") needs zero extra clicks.
+  // Proprietors start with no classes ticked (they may want all/none/any).
+  if(_isTeacherSession()){
+    var allowed=_visibleClassesForCurrentStaff()||[];
+    CUR_ASSIGN.classes=allowed.slice();
+  }
   renderAssignmentEditor();SS('assignment-edit');
 }
 function editAssignment(idx){
@@ -11251,7 +11569,26 @@ function renderAssignmentEditor(){
   var d=document.getElementById('ae-due');if(d)d.value=CUR_ASSIGN.due||'';
   var nt=document.getElementById('ae-note');if(nt)nt.value=CUR_ASSIGN.note||'';
   var boxes=document.querySelectorAll('#ae-classes input[type=checkbox]');
-  boxes.forEach(function(cb){cb.checked=(CUR_ASSIGN.classes||[]).indexOf(cb.value)>-1;});
+  // For teachers: disable + visually dim chips for classes outside their
+  // assignment. They can't tick or untick those — assignments are scoped
+  // to their own classes only. Proprietors see all chips fully active.
+  var allowed=_visibleClassesForCurrentStaff();
+  boxes.forEach(function(cb){
+    cb.checked=(CUR_ASSIGN.classes||[]).indexOf(cb.value)>-1;
+    var label=cb.parentElement;
+    if(allowed===null){
+      // Proprietor / legacy session — all chips enabled
+      cb.disabled=false;
+      if(label)label.style.opacity='1';
+    }else{
+      var canPick=allowed.indexOf(cb.value)>=0;
+      cb.disabled=!canPick;
+      if(label)label.style.opacity=canPick?'1':'.4';
+      // If a teacher is editing an OLD assignment that includes a class
+      // they no longer have access to, leave that box ticked so they don't
+      // accidentally unassign it — but they can't change it either.
+    }
+  });
   // Populate stage dropdown
   populateStageDropdown();
   var sg=document.getElementById('ae-stage');if(sg)sg.value=CUR_ASSIGN.stageId||'';
@@ -11834,7 +12171,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
   // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
     var SW_CODE=[
-      "var CACHE='edulab-v24';",
+      "var CACHE='edulab-v26';",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
       "    return c.add(self.location.href.replace(/\\/sw(\\.js|\\?.*)?$/,'/')).catch(function(){});",
@@ -11872,7 +12209,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
     function tryDirectCache(){
       // Fallback: pre-cache the page directly (no SW needed)
       if(!('caches' in window))return;
-      caches.open('edulab-v24').then(function(c){
+      caches.open('edulab-v26').then(function(c){
         c.add(window.location.href).catch(function(){});
       }).catch(function(){});
     }
