@@ -687,6 +687,14 @@ body.banner-open .screen.active{padding-bottom:80px}
       <div style="font-size:13px;color:var(--sm);margin-bottom:10px">Add or remove teachers, set their assigned classes, and copy their login details for WhatsApp.</div>
       <button onclick="openManageStaff()" style="width:100%;padding:11px;background:#7C3AED;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">Manage staff →</button>
     </div>
+
+    <!-- ── TEACHER: per-class subject control ── -->
+    <div id="teacher-subject-tile" style="display:none;background:#fff;border-radius:var(--r);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-top:14px">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#0D9488;margin-bottom:4px">📚 Class Subject Access</div>
+      <div style="font-size:12px;color:var(--sm);margin-bottom:12px;line-height:1.5">Set which subjects each of your classes can access. You can only enable subjects your school has subscribed to.</div>
+      <div id="teacher-class-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
     <!-- Sign out — clears the active staff session and returns to splash. -->
     <div id="sign-out-tile" style="display:none;margin-top:14px">
       <button onclick="staffSignOut()" style="width:100%;padding:12px;background:#fff;color:#6B7280;border:1.5px solid #D1D5DB;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">🚪 Sign out</button>
@@ -4956,6 +4964,12 @@ function _doOpenAdmin(){
   // Hide proprietor-only sections from teachers
   if(deviceModeTile)deviceModeTile.style.display=isTeacher?'none':'';
   if(schoolFieldsTile)schoolFieldsTile.style.display=isTeacher?'none':'';
+  // Teacher gets per-class subject tile; proprietor does not
+  var teacherSubjectTile=document.getElementById('teacher-subject-tile');
+  if(teacherSubjectTile){
+    teacherSubjectTile.style.display=isTeacher?'':'none';
+    if(isTeacher)renderTeacherClassSubjectList();
+  }
   // Capacity widget is updated/shown only for proprietors. updateCapacityWidget
   // handles its own visibility, but we override here to ensure teachers never
   // see it even if there's a stale render.
@@ -5189,6 +5203,8 @@ function loadHome(){
   // Note: WAEC card may be overridden above — applySubjectAccess only hides,
   // class gate above may already hide it, so we call after.
   applySubjectAccess();
+  // Apply class-level subject filter (set by teacher, overrides school-level for this class)
+  applyClassSubjectAccess();
   SS('home');
 }
 
@@ -7170,42 +7186,98 @@ function genWAECMixed(){
 function genQuadratic(){
   var qs=[];
   var variants=[
-    // x² + bx + c = 0 (positive roots)
+    // Type 1: x² + bx + c = 0 (both roots negative)
     function(){
       var r1=1+Math.floor(Math.random()*6),r2=1+Math.floor(Math.random()*6);
       var b=r1+r2,c=r1*r2;
-      var q='x² + '+b+'x + '+c+' = 0\nSolve for x (both roots)';
+      var q='x² + '+b+'x + '+c+' = 0\nSolve for x';
       var ans='x = −'+r1+' or −'+r2;
       var w=['x = '+r1+' or '+r2,'x = '+r1+' or −'+r2,'x = −'+r1+' only'];
-      return {q,ans,w};
+      var why='Step 1: We need two numbers that MULTIPLY to give +'+c+' and ADD to give +'+b+'.\n'
+             +'Step 2: Those numbers are +'+r1+' and +'+r2+' ('+r1+' × '+r2+' = '+c+', '+r1+' + '+r2+' = '+b+').\n'
+             +'Step 3: Factor as (x + '+r1+')(x + '+r2+') = 0.\n'
+             +'Step 4: Set each bracket to zero: x + '+r1+' = 0 → x = −'+r1+', and x + '+r2+' = 0 → x = −'+r2+'.\n'
+             +'Both roots are negative because we have + signs in the brackets.';
+      return {q,ans,w,why};
     },
-    // x² - bx + c = 0 (both positive roots)
+    // Type 2: x² - bx + c = 0 (both roots positive)
     function(){
       var r1=1+Math.floor(Math.random()*6),r2=1+Math.floor(Math.random()*6);
       var b=r1+r2,c=r1*r2;
       var q='x² − '+b+'x + '+c+' = 0\nSolve for x';
       var ans='x = '+r1+' or '+r2;
       var w=['x = −'+r1+' or −'+r2,'x = '+b+' or '+c,'x = '+r1+' only'];
-      return {q,ans,w};
+      var why='Step 1: We need two numbers that MULTIPLY to give +'+c+' and ADD to give −'+b+' (note the minus sign).\n'
+             +'Step 2: Both numbers must be negative: −'+r1+' and −'+r2+' (−'+r1+' × −'+r2+' = +'+c+', −'+r1+' + −'+r2+' = −'+b+').\n'
+             +'Step 3: Factor as (x − '+r1+')(x − '+r2+') = 0.\n'
+             +'Step 4: x − '+r1+' = 0 → x = '+r1+', and x − '+r2+' = 0 → x = '+r2+'.\n'
+             +'Both roots are POSITIVE because we subtracted in the brackets.';
+      return {q,ans,w,why};
     },
-    // x² - (a-b)x - ab = 0 (one positive one negative root)
+    // Type 3: x² + (r2-r1)x - r1*r2 = 0 → roots: x = r1 and x = -r2  (one positive, one negative)
+    // NOTE: equation = (x - r1)(x + r2) so roots are +r1 and -r2
     function(){
-      var r1=1+Math.floor(Math.random()*5),r2=1+Math.floor(Math.random()*5);
-      var b=r1-r2,c=-r1*r2;
-      var q='x² '+(b>=0?'+ '+b:'− '+Math.abs(b))+'x '+(c>=0?'+ '+c:'− '+Math.abs(c))+' = 0\nSolve for x';
-      var ans='x = '+r1+' or −'+r2;
-      var w=['x = −'+r1+' or '+r2,'x = '+r1+' or '+r2,'x = '+r1+' only'];
-      return {q,ans,w};
+      var r1=2+Math.floor(Math.random()*5),r2=1+Math.floor(Math.random()*4);
+      if(r1===r2)r2=r2+1; // avoid x²−4=0 here (handled below)
+      var coefX=r2-r1; // this is the middle coefficient (can be negative)
+      var coefC=-r1*r2; // always negative
+      var xPart=coefX===0?'':(coefX>0?' + '+coefX+'x':' − '+Math.abs(coefX)+'x');
+      var q='x²'+xPart+' − '+Math.abs(coefC)+' = 0\nSolve for x';
+      var ans='x = '+r1+' or −'+r2; // roots of (x-r1)(x+r2)=0 are x=r1 and x=-r2
+      var w=['x = −'+r1+' or '+r2,'x = '+r1+' or '+r2,'x = '+r2+' only'];
+      var why='Step 1: We need two numbers that MULTIPLY to give −'+Math.abs(coefC)+' and ADD to give '+(coefX>=0?'+'+coefX:coefX)+'.\n'
+             +'Step 2: Those numbers are +'+r1+' and −'+r2+' ('+r1+' × −'+r2+' = −'+Math.abs(coefC)+', '+r1+' + (−'+r2+') = '+(r1-r2)+').\n'
+             +'Step 3: Factor as (x − '+r1+')(x + '+r2+') = 0.\n'
+             +'Step 4: x − '+r1+' = 0 → x = +'+r1+', and x + '+r2+' = 0 → x = −'+r2+'.\n'
+             +'One root is positive, one is negative — because the last term is negative.';
+      return {q,ans,w,why};
     },
-    // ax² + bx + c using quadratic formula label
+    // Type 4: ax² + bx + c = 0 where a≠1 — taught via the ac-method
     function(){
-      var r1=1+Math.floor(Math.random()*4),r2=1+Math.floor(Math.random()*4);
-      var a=2,b=-(a*r1+r2),c=-r1*r2; // rough
-      // Simpler: 2x² + 5x + 2 = 0 → (2x+1)(x+2) → x=-1/2 or -2
-      var pairs=[[2,5,2,'x = −½ or −2'],[2,7,3,'x = −½ or −3'],[3,7,2,'x = −⅓ or −2'],[2,3,-2,'x = ½ or −2']];
-      var p=pairs[Math.floor(Math.random()*pairs.length)];
-      var q=p[0]+'x² + '+p[1]+'x + '+p[2]+' = 0\nSolve for x';
-      return {q,ans:p[3],w:['x = '+p[1]+' or '+p[2],'x = '+p[0]+' or '+p[1],'No real roots']};
+      // Each entry: [a, b, c, root1_display, root2_display, ac_product, split_into_p, split_into_q]
+      var pairs=[
+        {q:'2x² + 5x + 2 = 0',ans:'x = −½ or −2',w:['x = 2 or 5','x = 5 or 2','No real roots'],
+         why:'This has a leading coefficient of 2, so we use the AC method:\n'
+            +'Step 1: Multiply A × C = 2 × 2 = 4. We need two numbers that MULTIPLY to 4 and ADD to 5 (the middle coefficient).\n'
+            +'Step 2: Those numbers are 1 and 4 (1 × 4 = 4 ✓, 1 + 4 = 5 ✓).\n'
+            +'Step 3: Rewrite the middle term using 1 and 4: 2x² + 1x + 4x + 2 = 0.\n'
+            +'Step 4: Group in pairs: x(2x + 1) + 2(2x + 1) = 0.\n'
+            +'Step 5: Factor out (2x + 1): (x + 2)(2x + 1) = 0.\n'
+            +'Step 6: Set each bracket to zero: x + 2 = 0 → x = −2, and 2x + 1 = 0 → x = −½.'},
+        {q:'2x² + 7x + 3 = 0',ans:'x = −½ or −3',w:['x = 7 or 3','x = 3 or 7','No real roots'],
+         why:'AC method — leading coefficient ≠ 1:\n'
+            +'Step 1: A × C = 2 × 3 = 6. Find two numbers: multiply to 6, add to 7.\n'
+            +'Step 2: Those numbers are 1 and 6 (1 × 6 = 6, 1 + 6 = 7 ✓).\n'
+            +'Step 3: Rewrite: 2x² + 1x + 6x + 3 = 0.\n'
+            +'Step 4: Group: x(2x + 1) + 3(2x + 1) = 0.\n'
+            +'Step 5: (x + 3)(2x + 1) = 0.\n'
+            +'Step 6: x = −3 or x = −½.'},
+        {q:'3x² + 7x + 2 = 0',ans:'x = −⅓ or −2',w:['x = 7 or 2','x = 2 or 7','No real roots'],
+         why:'AC method:\n'
+            +'Step 1: A × C = 3 × 2 = 6. Find two numbers: multiply to 6, add to 7.\n'
+            +'Step 2: Those numbers are 1 and 6 (1 × 6 = 6, 1 + 6 = 7 ✓).\n'
+            +'Step 3: Rewrite: 3x² + 1x + 6x + 2 = 0.\n'
+            +'Step 4: Group: x(3x + 1) + 2(3x + 1) = 0.\n'
+            +'Step 5: (x + 2)(3x + 1) = 0.\n'
+            +'Step 6: x = −2 or x = −⅓.'},
+        {q:'2x² + 3x − 2 = 0',ans:'x = ½ or −2',w:['x = 3 or −2','x = 2 or −3','No real roots'],
+         why:'AC method — note the last term is NEGATIVE:\n'
+            +'Step 1: A × C = 2 × (−2) = −4. Find two numbers: multiply to −4, add to +3.\n'
+            +'Step 2: Those numbers are +4 and −1 (4 × −1 = −4, 4 + (−1) = 3 ✓).\n'
+            +'Step 3: Rewrite: 2x² + 4x − 1x − 2 = 0.\n'
+            +'Step 4: Group: 2x(x + 2) − 1(x + 2) = 0.\n'
+            +'Step 5: (2x − 1)(x + 2) = 0.\n'
+            +'Step 6: 2x − 1 = 0 → x = ½, and x + 2 = 0 → x = −2.'},
+        {q:'3x² − 5x + 2 = 0',ans:'x = 1 or ⅔',w:['x = 5 or 2','x = −1 or −⅔','No real roots'],
+         why:'AC method — both signs negative in equation:\n'
+            +'Step 1: A × C = 3 × 2 = 6. Find two numbers: multiply to +6, add to −5.\n'
+            +'Step 2: Those numbers are −2 and −3 (−2 × −3 = 6, −2 + (−3) = −5 ✓).\n'
+            +'Step 3: Rewrite: 3x² − 2x − 3x + 2 = 0.\n'
+            +'Step 4: Group: x(3x − 2) − 1(3x − 2) = 0.\n'
+            +'Step 5: (x − 1)(3x − 2) = 0.\n'
+            +'Step 6: x = 1 or x = ⅔.'}
+      ];
+      return pairs[Math.floor(Math.random()*pairs.length)];
     }
   ];
   for(var i=0;i<10;i++){
@@ -7216,12 +7288,18 @@ function genQuadratic(){
   }
   return qs;
 }
-// Auto-generate a worked explanation hint for quadratic questions
+// Fallback worked explanation for any quadratic not explicitly covered above
 function _quadraticWhy(q,ans){
-  if(q.indexOf('x²')!==-1&&q.indexOf('=')!==-1){
-    return 'To solve a quadratic, look for two numbers that multiply to give the last term (c) and add to give the middle coefficient (b). Then write as (x − r₁)(x − r₂) = 0. Each bracket gives one root: if (x − r₁) = 0 then x = r₁. The correct answer is '+ans+'.';
+  if(/^\d+x²/.test(q.trim())){
+    return 'This is an ax² type (leading coefficient ≠ 1). Use the AC method:\n'
+          +'Step 1: Multiply A × C.\n'
+          +'Step 2: Find two numbers that multiply to AC and add to the middle coefficient (B).\n'
+          +'Step 3: Rewrite the middle term using those two numbers.\n'
+          +'Step 4: Factor by grouping in pairs.\n'
+          +'Step 5: Set each bracket to zero to find x.\n'
+          +'The correct answer is '+ans+'.';
   }
-  return 'Set each factor to zero to find the roots. The correct answer is '+ans+'.';
+  return 'To solve a quadratic:\nStep 1: Find two numbers that MULTIPLY to give the last term and ADD to give the middle coefficient.\nStep 2: Write as (x − r₁)(x − r₂) = 0.\nStep 3: Set each bracket to zero to find x.\nCorrect answer: '+ans+'.';
 }
 // SSS 2 — deeper WAEC topics
 MATH_STAGES['SSS 2']=[
@@ -9077,18 +9155,338 @@ var WAEC_MATHS_QS=[
 
 // Subjects-to-questions registry. Maths is populated; everything else is empty
 // and renders as "Coming soon" in the UI.
+
+var WAEC_PHYSICS_QS=[
+  {id:'ph01',topic:'mechanics',diff:'easy',q:'A car travels 120 km in 2 hours. What is its average speed?',opts:['60 km/h','240 km/h','30 km/h','120 km/h'],a:'60 km/h',why:'Speed = Distance ÷ Time = 120 ÷ 2 = 60 km/h.'},
+  {id:'ph02',topic:'mechanics',diff:'easy',q:'Which of the following is a scalar quantity?',opts:['Force','Velocity','Speed','Displacement'],a:'Speed',why:'Scalar quantities have magnitude only — no direction. Speed is scalar. Velocity, force and displacement are vectors.'},
+  {id:'ph03',topic:'mechanics',diff:'mid',q:'Object of mass 5 kg, force 20 N. Acceleration?',opts:['4 m/s²','100 m/s²','0.25 m/s²','25 m/s²'],a:'4 m/s²',why:"Newton's 2nd Law: a = F÷m = 20÷5 = 4 m/s²."},
+  {id:'ph04',topic:'mechanics',diff:'mid',q:'A body in equilibrium has resultant force of:',opts:['Maximum','Zero','Equal to its weight','Greater than friction'],a:'Zero',why:'Equilibrium: no net force — body at rest or constant velocity.'},
+  {id:'ph05',topic:'mechanics',diff:'mid',q:'Work done by 10 N force moving object 5 m in direction of force?',opts:['50 J','2 J','15 J','0.5 J'],a:'50 J',why:'Work = Force × Distance = 10 × 5 = 50 J.'},
+  {id:'ph06',topic:'mechanics',diff:'mid',q:'Kinetic energy of 2 kg at 4 m/s?',opts:['16 J','8 J','4 J','32 J'],a:'16 J',why:'KE = ½mv² = ½ × 2 × 16 = 16 J. Always square velocity first.'},
+  {id:'ph07',topic:'mechanics',diff:'hard',q:'Ball thrown upward at 20 m/s. Maximum height? (g=10)',opts:['20 m','40 m','10 m','2 m'],a:'20 m',why:'At max height v=0. v²=u²−2gh → 0=400−20h → h=20 m.'},
+  {id:'ph08',topic:'mechanics',diff:'easy',q:'Moment of a force =',opts:['Force × Distance from pivot','Force ÷ Area','Mass × Acceleration','Force + Distance'],a:'Force × Distance from pivot',why:'Moment = Force × perpendicular distance from pivot.'},
+  {id:'ph09',topic:'heat',diff:'easy',q:'SI unit of temperature:',opts:['Celsius','Fahrenheit','Kelvin','Joule'],a:'Kelvin',why:'SI base unit = Kelvin (K). 0°C = 273 K.'},
+  {id:'ph10',topic:'heat',diff:'easy',q:'When heated, substance particles:',opts:['Slow down','Vibrate faster and move apart','Become heavier','Stop moving'],a:'Vibrate faster and move apart',why:'Heat gives kinetic energy — particles vibrate more vigorously and move further apart, causing expansion.'},
+  {id:'ph11',topic:'heat',diff:'mid',q:'Convert 27°C to Kelvin:',opts:['300 K','246 K','27 K','373 K'],a:'300 K',why:'K = °C + 273 = 27 + 273 = 300 K.'},
+  {id:'ph12',topic:'heat',diff:'mid',q:'Heat transfer not requiring a medium:',opts:['Conduction','Convection','Radiation','Evaporation'],a:'Radiation',why:'Radiation transfers heat as electromagnetic waves — no particles needed. How the Sun heats Earth across the vacuum of space.'},
+  {id:'ph13',topic:'heat',diff:'mid',q:'Specific heat capacity = heat to raise temperature of:',opts:['1 g by 1°C','1 kg by 1°C','1 kg by 100°C','Any mass by 1°C'],a:'1 kg by 1°C',why:'Specific heat capacity (c): energy to raise 1 kg by 1°C. Formula: Q = mcΔT.'},
+  {id:'ph14',topic:'heat',diff:'hard',q:'Heat to raise 2 kg water 20°C to 70°C? (c=4200 J/kg°C)',opts:['420 000 J','84 000 J','210 000 J','504 000 J'],a:'420 000 J',why:'Q = mcΔT = 2 × 4200 × 50 = 420 000 J.'},
+  {id:'ph15',topic:'waves',diff:'easy',q:'Complete waves per second at a point:',opts:['Wavelength','Amplitude','Frequency','Period'],a:'Frequency',why:'Frequency (f) = oscillations per second, measured in Hertz (Hz).'},
+  {id:'ph16',topic:'waves',diff:'easy',q:'Sound is an example of:',opts:['Transverse wave','Longitudinal wave','Electromagnetic wave','Stationary wave'],a:'Longitudinal wave',why:'Longitudinal: particles vibrate parallel to energy travel — compressions and rarefactions. Sound needs a medium.'},
+  {id:'ph17',topic:'waves',diff:'mid',q:'Wave: 50 Hz frequency, 2 m wavelength. Speed?',opts:['100 m/s','25 m/s','52 m/s','0.04 m/s'],a:'100 m/s',why:'v = fλ = 50 × 2 = 100 m/s. Universal wave equation.'},
+  {id:'ph18',topic:'waves',diff:'mid',q:'Bending of waves around obstacles is called:',opts:['Reflection','Refraction','Diffraction','Interference'],a:'Diffraction',why:'Diffraction: spreading of waves through gaps or around barriers. Most noticeable when gap ≈ wavelength.'},
+  {id:'ph19',topic:'waves',diff:'hard',q:'Echo heard 2 s after sound. Speed of sound 340 m/s. Distance to wall?',opts:['340 m','680 m','170 m','1360 m'],a:'340 m',why:'Total distance = 340 × 2 = 680 m. Distance to wall = 680 ÷ 2 = 340 m (round trip).'},
+  {id:'ph20',topic:'light',diff:'easy',q:'Speed of light in vacuum:',opts:['3 × 10⁸ m/s','3 × 10⁶ m/s','340 m/s','3 × 10¹⁰ m/s'],a:'3 × 10⁸ m/s',why:'Speed of light c = 3 × 10⁸ m/s. Fundamental constant.'},
+  {id:'ph21',topic:'light',diff:'easy',q:'Image in a plane mirror is:',opts:['Real and inverted','Virtual and upright','Real and upright','Virtual and inverted'],a:'Virtual and upright',why:'Plane mirror: virtual, upright, laterally inverted, same size as object.'},
+  {id:'ph22',topic:'light',diff:'mid',q:'Light entering denser medium:',opts:['Speeds up and bends away','Slows down and bends toward normal','Speeds up toward normal','Passes straight through'],a:'Slows down and bends toward normal',why:'Refraction: light slows in denser medium and bends toward the normal (e.g. air → glass).'},
+  {id:'ph23',topic:'light',diff:'mid',q:'Convex lens corrects which defect?',opts:['Hypermetropia (long-sightedness)','Myopia (short-sightedness)','Astigmatism','Colour blindness'],a:'Hypermetropia (long-sightedness)',why:'Converging (convex) lens corrects hypermetropia. Myopia corrected with concave (diverging) lens.'},
+  {id:'ph24',topic:'light',diff:'hard',q:'Total internal reflection occurs when:',opts:['Dense to less dense at angle > critical angle','Less dense to denser','At exactly critical angle','In vacuum'],a:'Dense to less dense at angle > critical angle',why:'TIR: dense → less dense AND angle > critical angle. Used in optical fibres.'},
+  {id:'ph25',topic:'electricity',diff:'easy',q:"Ohm's Law states:",opts:['V = IR','V = I + R','V = I/R','V = I²R'],a:'V = IR',why:"Ohm's Law: Voltage = Current × Resistance."},
+  {id:'ph26',topic:'electricity',diff:'easy',q:'SI unit of resistance:',opts:['Ampere','Volt','Ohm','Watt'],a:'Ohm',why:'Resistance: Ohms (Ω). Current: Amperes (A). Voltage: Volts (V). Power: Watts (W).'},
+  {id:'ph27',topic:'electricity',diff:'mid',q:'2Ω, 3Ω, 6Ω in parallel. Combined resistance?',opts:['1 Ω','11 Ω','0.5 Ω','3 Ω'],a:'1 Ω',why:'1/R = 1/2 + 1/3 + 1/6 = 6/6 = 1. So R = 1 Ω.'},
+  {id:'ph28',topic:'electricity',diff:'mid',q:'Electrical power =',opts:['P = V × I','P = V + I','P = V/I','P = V − I'],a:'P = V × I',why:'Power (W) = Voltage (V) × Current (A). Also P = I²R = V²/R.'},
+  {id:'ph29',topic:'electricity',diff:'hard',q:'60 W bulb, 5 hours. Energy in kWh?',opts:['0.3 kWh','300 kWh','0.012 kWh','3 kWh'],a:'0.3 kWh',why:'Energy = 0.06 kW × 5 h = 0.3 kWh.'},
+  {id:'ph30',topic:'electricity',diff:'mid',q:'Device measuring electric current:',opts:['Voltmeter','Ammeter','Galvanometer','Ohmmeter'],a:'Ammeter',why:'Ammeter measures current (A) — connected in series with the circuit.'},
+  {id:'ph31',topic:'magnetism',diff:'easy',q:'Region around a magnet where force acts:',opts:['Electric field','Magnetic field','Gravitational field','Force field'],a:'Magnetic field',why:'Magnetic field: region where force acts on magnetic materials or moving charges.'},
+  {id:'ph32',topic:'magnetism',diff:'mid',q:'Electromagnetic induction produces:',opts:['Current through magnet','EMF by changing magnetic flux','Magnetism using electricity','Electrons jumping atoms'],a:'EMF by changing magnetic flux',why:"Faraday's Law: EMF induced when magnetic flux changes. Principle of generators and transformers."},
+  {id:'ph33',topic:'modern',diff:'easy',q:'Particles in atomic nucleus:',opts:['Protons and electrons','Protons and neutrons','Neutrons and electrons','Photons and protons'],a:'Protons and neutrons',why:'Nucleus: protons (positive) + neutrons (neutral). Electrons orbit in shells outside.'},
+  {id:'ph34',topic:'modern',diff:'mid',q:'Radioactive decay is a:',opts:['Physical change','Chemical change','Nuclear change','Reversible change'],a:'Nuclear change',why:'Radioactive decay transforms the nucleus — a nuclear change that cannot be reversed normally.'},
+  {id:'ph35',topic:'modern',diff:'mid',q:'Most penetrating radiation:',opts:['Alpha (α)','Beta (β)','Gamma (γ)','X-rays'],a:'Gamma (γ)',why:'Gamma rays penetrate cm of lead. Alpha: stopped by paper. Beta: stopped by thin aluminium.'},
+  {id:'ph36',topic:'modern',diff:'mid',q:'Half-life is time for:',opts:['All atoms to decay','Half the atoms to decay','Half total energy released','Radiation to double'],a:'Half the atoms to decay',why:'Half-life: time for exactly half of radioactive nuclei to decay. Constant, independent of sample size.'},
+  {id:'ph37',topic:'modern',diff:'hard',q:'Half-life = 10 days. Fraction after 30 days?',opts:['1/2','1/4','1/8','1/16'],a:'1/8',why:'30 days = 3 half-lives. After 1: 1/2. After 2: 1/4. After 3: 1/8.'},
+  {id:'ph38',topic:'pressure',diff:'easy',q:'Pressure =',opts:['Force × Area','Force ÷ Area','Mass × Volume','Force ÷ Volume'],a:'Force ÷ Area',why:'Pressure = Force ÷ Area. Unit: Pascal (Pa) = N/m².'},
+  {id:'ph39',topic:'pressure',diff:'mid',q:'Pressure at depth h in liquid of density ρ:',opts:['P = ρgh','P = ρg/h','P = mgh','P = ρ/gh'],a:'P = ρgh',why:'Fluid pressure increases with depth: P = ρgh.'},
+  {id:'ph40',topic:'pressure',diff:'mid',q:"Archimedes' Principle: immersed body experiences:",opts:['Upthrust = its weight','Upthrust = weight of fluid displaced','Downthrust = its volume','No net force'],a:'Upthrust = weight of fluid displaced',why:"Upthrust = weight of fluid displaced. Object floats if weight equals upthrust."},
+  {id:'ph41',topic:'energy',diff:'easy',q:'Energy stored in stretched spring:',opts:['Kinetic energy','Potential energy','Chemical energy','Electrical energy'],a:'Potential energy',why:'Stretched spring stores elastic potential energy. Released → converts to kinetic energy.'},
+  {id:'ph42',topic:'energy',diff:'mid',q:'Mechanical advantage of a machine:',opts:['Output force ÷ Input force','Input force ÷ Output force','Work × Efficiency','Power × Time'],a:'Output force ÷ Input force',why:'MA = Load ÷ Effort. MA > 1 means machine multiplies force.'},
+  {id:'ph43',topic:'energy',diff:'mid',q:'Machine: 500 J useful from 800 J input. Efficiency?',opts:['62.5%','160%','37.5%','100%'],a:'62.5%',why:'Efficiency = (500 ÷ 800) × 100% = 62.5%.'},
+  {id:'ph44',topic:'mechanics',diff:'mid',q:'Area under velocity-time graph represents:',opts:['Acceleration','Speed','Distance travelled','Force'],a:'Distance travelled',why:'Area under v-t graph = distance. Slope = acceleration. Horizontal line = constant velocity.'},
+  {id:'ph45',topic:'mechanics',diff:'easy',q:'Body at constant velocity has acceleration of:',opts:['9.8 m/s²','−9.8 m/s²','Zero','Increasing'],a:'Zero',why:'Constant velocity means no change — acceleration = zero.'},
+  {id:'ph46',topic:'mechanics',diff:'mid',q:"Hooke's Law: spring extension is:",opts:['Inversely proportional to load','Directly proportional to load','Equal to load ÷ k','Independent of material'],a:'Directly proportional to load',why:"Hooke's Law: F = ke (within elastic limit)."},
+  {id:'ph47',topic:'measurement',diff:'easy',q:'Instrument for accurate wire diameter:',opts:['Ruler','Vernier callipers or micrometer screw gauge','Measuring tape','Thermometer'],a:'Vernier callipers or micrometer screw gauge',why:'Micrometer: 0.01 mm precision. Vernier: 0.1 mm. Ruler is too imprecise.'},
+  {id:'ph48',topic:'waves',diff:'hard',q:'Period of simple pendulum depends on:',opts:['Mass of bob','Amplitude','Length of string','Density of bob'],a:'Length of string',why:'T = 2π√(L/g). Depends only on length and gravity — not mass or amplitude.'},
+  {id:'ph49',topic:'electricity',diff:'mid',q:'In series circuit, current is:',opts:['Different at each component','Same through all components','Zero through resistors','Highest at battery'],a:'Same through all components',why:'Series: one path only — same current everywhere. Voltage is shared.'},
+  {id:'ph50',topic:'electricity',diff:'hard',q:'Transformer: 200 primary turns, 1000 secondary, primary 240 V. Secondary voltage?',opts:['1200 V','48 V','240 V','2000 V'],a:'1200 V',why:'Vs = Vp × (Ns/Np) = 240 × 5 = 1200 V. More secondary turns = step-up.'}
+];
+
+var WAEC_CHEMISTRY_QS=[
+  {id:'ch01',topic:'atomic',diff:'easy',q:'Atomic number equals number of:',opts:['Neutrons','Protons','Outer electrons','Nucleons'],a:'Protons',why:'Atomic number (Z) = protons. Defines the element. Neutral atom: protons = electrons.'},
+  {id:'ch02',topic:'atomic',diff:'easy',q:'Isotopes have same atomic number but different:',opts:['Protons','Electrons','Mass number','Neutrons and protons'],a:'Mass number',why:'Isotopes: same protons (same element), different neutrons → different mass numbers. E.g. C-12, C-13, C-14.'},
+  {id:'ch03',topic:'atomic',diff:'mid',q:'Atom: 11 protons, 12 neutrons. Mass number?',opts:['11','12','23','1'],a:'23',why:'Mass number = protons + neutrons = 11 + 12 = 23. This is sodium-23.'},
+  {id:'ch04',topic:'atomic',diff:'mid',q:'Electronic configuration of sodium (Z=11)?',opts:['2,9','2,8,1','2,1,8','8,2,1'],a:'2,8,1',why:'1st shell max 2, 2nd max 8. Na: 2+8+1. The lone outer electron makes Na very reactive.'},
+  {id:'ch05',topic:'bonding',diff:'mid',q:'Bond formed by electron transfer:',opts:['Covalent','Ionic','Metallic','Hydrogen'],a:'Ionic',why:'Ionic bond: electron transfer creates cations (+) and anions (−). Example: Na gives 1e⁻ to Cl → NaCl.'},
+  {id:'ch06',topic:'bonding',diff:'easy',q:'How many covalent bonds does carbon form?',opts:['2','3','4','6'],a:'4',why:'Carbon: 4 outer electrons → forms 4 covalent bonds. Tetravalency = basis of organic chemistry.'},
+  {id:'ch07',topic:'bonding',diff:'mid',q:'Ionic compounds characteristically:',opts:['Low melting points','Conduct in solid state','Dissolve in non-polar solvents','High MP, conduct when molten/dissolved'],a:'High MP, conduct when molten/dissolved',why:'Strong electrostatic forces → high MP. Conduct when molten/dissolved (free ions), NOT as solid.'},
+  {id:'ch08',topic:'bonding',diff:'mid',q:'VSEPR theory predicts:',opts:['Colour','Shape of molecules','Metal reactivity','Boiling points'],a:'Shape of molecules',why:'VSEPR: electron pairs repel to maximise distance → determines molecular geometry.'},
+  {id:'ch09',topic:'states',diff:'easy',q:'Gas particles are:',opts:['Close, vibrating in fixed positions','Far apart, moving randomly at high speed','Close, flowing freely','Touching but slow'],a:'Far apart, moving randomly at high speed',why:'Gas: far apart, rapid random motion, weak forces, highly compressible.'},
+  {id:'ch10',topic:'states',diff:'mid',q:'Solid → gas without liquid stage is called:',opts:['Evaporation','Condensation','Sublimation','Deposition'],a:'Sublimation',why:'Sublimation: solid → gas directly. Examples: dry ice, iodine crystals, naphthalene.'},
+  {id:'ch11',topic:'states',diff:'mid',q:'Brownian motion is evidence for:',opts:['Stationary atoms','Continuous random motion of particles','Regular crystal arrangement','Solid particles moving freely'],a:'Continuous random motion of particles',why:'Random zigzag of pollen/smoke particles caused by invisible molecules colliding with them.'},
+  {id:'ch12',topic:'reactions',diff:'easy',q:'2H₂ + O₂ → 2H₂O. Total moles of reactants?',opts:['2','3','4','1'],a:'3',why:'2 mol H₂ + 1 mol O₂ = 3 mol total reactants.'},
+  {id:'ch13',topic:'reactions',diff:'mid',q:'A catalyst:',opts:['Increases activation energy','Is used up','Speeds up without being used up','Decreases yield'],a:'Speeds up without being used up',why:'Catalyst: lower-energy pathway. Unchanged at end — can be reused.'},
+  {id:'ch14',topic:'reactions',diff:'mid',q:'Which is exothermic?',opts:['Photosynthesis','Thermal decomposition','Combustion of fuel','Dissolving ammonium nitrate'],a:'Combustion of fuel',why:'Exothermic releases heat. Combustion, neutralisation are exothermic. Photosynthesis is endothermic.'},
+  {id:'ch15',topic:'moles',diff:'hard',q:'Volume H₂ at STP when 4g Ca + excess HCl? (Ca=40, molar vol=22.4L)',opts:['2.24 L','22.4 L','11.2 L','4.48 L'],a:'2.24 L',why:'Ca+2HCl→CaCl₂+H₂. Moles Ca = 4/40=0.1. Moles H₂=0.1. Volume=0.1×22.4=2.24 L.'},
+  {id:'ch16',topic:'acids',diff:'easy',q:'pH 7 solution is:',opts:['Acidic','Basic','Neutral','Strongly acidic'],a:'Neutral',why:'pH 7 = neutral. <7 = acidic. >7 = basic.'},
+  {id:'ch17',topic:'acids',diff:'easy',q:'Which is a strong acid?',opts:['Citric acid','Ethanoic acid','Hydrochloric acid','Carbonic acid'],a:'Hydrochloric acid',why:'Strong acids fully dissociate: HCl → H⁺ + Cl⁻. Weak: ethanoic, citric, carbonic.'},
+  {id:'ch18',topic:'acids',diff:'mid',q:'Reaction between acid and base:',opts:['Oxidation','Neutralisation','Precipitation','Combustion'],a:'Neutralisation',why:'Neutralisation: acid + base → salt + water. H⁺ + OH⁻ → H₂O.'},
+  {id:'ch19',topic:'acids',diff:'mid',q:'Indicator red in acid, blue in alkali:',opts:['Phenolphthalein','Litmus','Methyl orange','Universal indicator'],a:'Litmus',why:'Litmus: red in acid, blue in alkali. Phenolphthalein: colourless/pink. Methyl orange: red/yellow.'},
+  {id:'ch20',topic:'acids',diff:'hard',q:'Salt from H₂SO₄ + NaOH?',opts:['Sodium chloride','Sodium sulphate','Sodium carbonate','Sodium nitrate'],a:'Sodium sulphate',why:'H₂SO₄ + 2NaOH → Na₂SO₄ + 2H₂O. Salt = metal (Na) + acid anion (sulphate).'},
+  {id:'ch21',topic:'electrolysis',diff:'mid',q:'During electrolysis, oxidation occurs at:',opts:['Cathode','Anode','Electrolyte','Both electrodes'],a:'Anode',why:'AN OX — RED CAT: Anode = Oxidation; Cathode = Reduction.'},
+  {id:'ch22',topic:'electrolysis',diff:'mid',q:'In electrolysis of dilute H₂SO₄, gas at cathode?',opts:['Oxygen','SO₂','Hydrogen','CO₂'],a:'Hydrogen',why:'Cathode: 2H⁺ + 2e⁻ → H₂↑. Anode: OH⁻ oxidised → O₂.'},
+  {id:'ch23',topic:'organic',diff:'easy',q:'General formula for alkanes?',opts:['CₙH₂ₙ','CₙH₂ₙ₊₂','CₙH₂ₙ₋₂','CₙHₙ'],a:'CₙH₂ₙ₊₂',why:'Alkanes (saturated, single bonds): CH₄, C₂H₆... CₙH₂ₙ₊₂. Alkenes = CₙH₂ₙ.'},
+  {id:'ch24',topic:'organic',diff:'easy',q:'Ethanol (C₂H₅OH) belongs to:',opts:['Alkanes','Alkenes','Alcohols','Carboxylic acids'],a:'Alcohols',why:'Alcohols contain −OH (hydroxyl) group. Carboxylic acids have −COOH.'},
+  {id:'ch25',topic:'organic',diff:'mid',q:'Fermentation of glucose produces:',opts:['Methanol and CO₂','Ethanol and CO₂','Ethanoic acid and H₂','Ethane and water'],a:'Ethanol and CO₂',why:'C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ (yeast, anaerobic conditions).'},
+  {id:'ch26',topic:'organic',diff:'mid',q:'Saponification: fat reacts with:',opts:['Dilute acid','Concentrated alkali','Concentrated acid','An ester'],a:'Concentrated alkali',why:'Saponification: fat + NaOH → soap + glycerol. Alkaline hydrolysis of fats = soap making.'},
+  {id:'ch27',topic:'organic',diff:'hard',q:'Ethene + bromine water main product?',opts:['Ethane','Ethanol','1,2-dibromoethane','Ethanoic acid'],a:'1,2-dibromoethane',why:'CH₂=CH₂ + Br₂ → CH₂BrCH₂Br (addition). Decolourises bromine water — test for unsaturation.'},
+  {id:'ch28',topic:'gases',diff:'mid',q:"Avogadro's Law: equal volumes at same T and P contain:",opts:['Equal masses','Equal numbers of molecules','Equal densities','Equal atoms'],a:'Equal numbers of molecules',why:'Equal volumes same T and P → same number of molecules (6.02 × 10²³ per mole).'},
+  {id:'ch29',topic:'gases',diff:'mid',q:"Boyle's Law: at constant T, gas pressure is:",opts:['Directly ∝ to volume','Inversely ∝ to volume','Equal to temperature','Independent of volume'],a:'Inversely ∝ to volume',why:"Boyle's Law: P ∝ 1/V (constant T). P₁V₁ = P₂V₂. Half volume doubles pressure."},
+  {id:'ch30',topic:'metals',diff:'easy',q:'Metal reacting most vigorously with cold water:',opts:['Copper','Iron','Potassium','Zinc'],a:'Potassium',why:'Reactivity: K > Na > Ca > Mg > Al > Zn > Fe > Cu. Potassium reacts explosively, igniting H₂.'},
+  {id:'ch31',topic:'environment',diff:'easy',q:'Gas mainly responsible for greenhouse effect:',opts:['Oxygen','Nitrogen','Carbon dioxide','Argon'],a:'Carbon dioxide',why:'CO₂ absorbs infrared radiation, trapping heat. Fossil fuels and deforestation increase CO₂.'},
+  {id:'ch32',topic:'environment',diff:'mid',q:'Acid rain caused by oxides of:',opts:['Carbon and nitrogen','Sulphur and nitrogen','Calcium and magnesium','Hydrogen and oxygen'],a:'Sulphur and nitrogen',why:'SO₂ + NOₓ → H₂SO₄ and HNO₃ in rainwater → acid rain (pH < 5.6).'},
+  {id:'ch33',topic:'moles',diff:'mid',q:'Moles in 44g CO₂? (C=12, O=16)',opts:['1 mol','2 mol','0.5 mol','4 mol'],a:'1 mol',why:'Molar mass CO₂ = 12 + 32 = 44 g/mol. Moles = 44 ÷ 44 = 1 mol.'},
+  {id:'ch34',topic:'moles',diff:'hard',q:'Concentration: 4g NaOH in 500 cm³? (NaOH=40 g/mol)',opts:['0.2 mol/L','0.4 mol/L','0.1 mol/L','2 mol/L'],a:'0.2 mol/L',why:'Moles = 4/40 = 0.1 mol. Volume = 0.5 L. Concentration = 0.1/0.5 = 0.2 mol/L.'},
+  {id:'ch35',topic:'separation',diff:'easy',q:'Separate salt from water using:',opts:['Filtration','Distillation','Chromatography','Sublimation'],a:'Distillation',why:'Distillation: evaporate water, condense → pure water. Salt stays behind.'},
+  {id:'ch36',topic:'separation',diff:'mid',q:'Paper chromatography separates based on:',opts:['Density','Boiling point','Solubility and travel through medium','Electrical charge'],a:'Solubility and travel through medium',why:'Components travel different distances based on solubility in mobile phase vs affinity for stationary phase.'},
+  {id:'ch37',topic:'equilibrium',diff:'mid',q:"Le Chatelier's Principle: disturbed equilibrium:",opts:['Reaction stops','System shifts to oppose change','Forward always speeds up','Equilibrium constant changes'],a:'System shifts to oppose change',why:"System shifts in direction minimising disturbance. Basis of optimising industrial reactions."},
+  {id:'ch38',topic:'equilibrium',diff:'hard',q:'Haber Process N₂ + 3H₂ ⇌ 2NH₃. Increasing pressure:',opts:['Decreases NH₃','No effect','Increases NH₃','Decreases rate'],a:'Increases NH₃',why:'Left: 4 mol gas. Right: 2 mol. Higher pressure favours fewer moles → more NH₃.'},
+  {id:'ch39',topic:'electrochemistry',diff:'mid',q:'In Daniell cell, anode is:',opts:['Copper','Zinc','Carbon','Silver'],a:'Zinc',why:'Zinc (more reactive) is anode — oxidises: Zn → Zn²⁺ + 2e⁻. Copper is cathode.'},
+  {id:'ch40',topic:'water',diff:'mid',q:'Temporary hardness caused by:',opts:['Calcium chloride','Calcium sulphate','Calcium hydrogencarbonate','Sodium chloride'],a:'Calcium hydrogencarbonate',why:'Temporary hardness: Ca(HCO₃)₂ — removed by boiling. Permanent (CaSO₄): NOT removed by boiling.'},
+  {id:'ch41',topic:'periodic',diff:'easy',q:'Elements in same group have:',opts:['Same mass number','Same outer electrons','Same neutrons','Same atomic radius'],a:'Same outer electrons',why:'Group = number of valence electrons. Same outer electrons → similar chemical properties.'},
+  {id:'ch42',topic:'periodic',diff:'mid',q:'Smallest atomic radius among Na, Mg, Al, Cl?',opts:['Na','Mg','Al','Cl'],a:'Cl',why:'Across a period, nuclear charge increases — electrons pulled closer. Cl (Group 7) has smallest radius.'},
+  {id:'ch43',topic:'redox',diff:'mid',q:'A reducing agent:',opts:['Gains electrons','Loses electrons','Gains oxygen','Neither'],a:'Loses electrons',why:'OILRIG: Oxidation Is Loss, Reduction Is Gain. Reducing agent LOSES electrons (gets oxidised itself).'},
+  {id:'ch44',topic:'redox',diff:'hard',q:'Oxidation state of Mn in KMnO₄?',opts:['+7','+5','+3','+4'],a:'+7',why:'K=+1, O=−2×4=−8. +1+Mn−8=0 → Mn=+7. KMnO₄ is a strong oxidising agent.'},
+  {id:'ch45',topic:'organic',diff:'mid',q:'Which is an addition polymer?',opts:['Nylon','Terylene','Polyethylene','Protein'],a:'Polyethylene',why:'Addition polymers: double bonds open and join: nCH₂=CH₂ → (−CH₂−CH₂−)ₙ. Nylon/Terylene are condensation polymers.'},
+  {id:'ch46',topic:'lab',diff:'easy',q:'When heating liquid in test tube, mouth should point:',opts:['Toward yourself','Toward other students','Away from people','Downward'],a:'Away from people',why:'Heated liquid can eject suddenly. Always point test tube away from yourself and others.'},
+  {id:'ch47',topic:'environment',diff:'mid',q:'Nitrogen fixation converts:',opts:['Plants absorb N from air','N₂ to ammonia or nitrates','Proteins to N₂','Rain washes N to soil'],a:'N₂ to ammonia or nitrates',why:'Nitrogen fixation: N₂ → NH₃ or NO₃⁻ by lightning, Rhizobium (legume root nodules), Haber Process.'},
+  {id:'ch48',topic:'energy',diff:'mid',q:'Enthalpy change measured at:',opts:['Variable pressure','Constant pressure','Constant volume','Constant temperature only'],a:'Constant pressure',why:'Enthalpy (ΔH): heat at constant pressure. ΔH negative = exothermic; positive = endothermic.'},
+  {id:'ch49',topic:'periodic',diff:'mid',q:'Most characteristic property of transition metals:',opts:['Colourless compounds','Variable oxidation states','Very reactive','No complex ions'],a:'Variable oxidation states',why:'Transition metals form ions with different oxidation states (Fe²⁺/Fe³⁺, Cu⁺/Cu²⁺) — diverse chemistry, coloured compounds.'},
+  {id:'ch50',topic:'reactions',diff:'hard',q:'Gas when Cu + concentrated HNO₃?',opts:['H₂','NO','NO₂','SO₂'],a:'NO₂',why:'Cu + 4HNO₃(conc) → Cu(NO₃)₂ + 2H₂O + 2NO₂↑. Brown NO₂ from concentrated acid; colourless NO from dilute.'}
+];
+
+var WAEC_LITERATURE_QS=[
+  {id:'lt01',topic:'drama',diff:'easy',q:'A monologue is a speech by:',opts:['Two characters together','One character alone or to others','Narrator only','The audience'],a:'One character alone or to others',why:'Monologue: long speech by one character. Soliloquy: private thoughts aloud. Dialogue: two or more characters.'},
+  {id:'lt02',topic:'drama',diff:'easy',q:'The protagonist of a play is:',opts:['The villain','Main character driving the plot','A minor character','The narrator'],a:'Main character driving the plot',why:'Protagonist: central character whose goals drive the narrative. Antagonist opposes them.'},
+  {id:'lt03',topic:'drama',diff:'mid',q:'Dramatic irony occurs when:',opts:['Audience knows what character does not','Character says opposite of truth','Ending is unexpected','Two characters disagree'],a:'Audience knows what character does not',why:'Dramatic irony: audience has information character lacks — creates tension. Example: Oedipus Rex.'},
+  {id:'lt04',topic:'drama',diff:'mid',q:"Tragic flaw (hamartia) is:",opts:["Villain's strength","Hero's weakness leading to downfall","Comic relief","Opening scene"],a:"Hero's weakness leading to downfall",why:"Hamartia: fatal flaw — Hamlet's indecision, Macbeth's ambition, Othello's jealousy. Leads to catastrophe."},
+  {id:'lt05',topic:'drama',diff:'mid',q:"Which is NOT a Wole Soyinka work?",opts:["The Lion and the Jewel","Death and the King's Horseman","The Road","Petals of Blood"],a:"Petals of Blood",why:"Petals of Blood is by Ngugi wa Thiong'o (Kenya). Soyinka's works include The Lion and the Jewel, Death and the King's Horseman, The Road."},
+  {id:'lt06',topic:'drama',diff:'hard',q:"'Abiku' in Yoruba belief is:",opts:["Ancestral spirit","Spirit child born to die and return repeatedly","God of thunder","A masquerade"],a:"Spirit child born to die and return repeatedly",why:"Abiku: spirit child believed to die young and return. Explored by Soyinka, J.P. Clark, Ben Okri (The Famished Road)."},
+  {id:'lt07',topic:'prose',diff:'easy',q:'Things Fall Apart was written by:',opts:['Wole Soyinka','Chinua Achebe',"Ngugi wa Thiong'o",'Chimamanda Adichie'],a:'Chinua Achebe',why:"Things Fall Apart (1958): landmark African literature depicting Igbo society's collision with colonialism."},
+  {id:'lt08',topic:'prose',diff:'easy',q:"Central theme of Achebe's Things Fall Apart:",opts:['Triumph of colonialism','Clash between Igbo society and colonial change','A love story','Failure of Christianity'],a:'Clash between Igbo society and colonial change',why:"Depicts disintegration of Igbo culture under colonialism. Title from Yeats' 'The Second Coming'."},
+  {id:'lt09',topic:'prose',diff:'mid',q:"In 'The African Child', the narrator's father is:",opts:['Farmer','Blacksmith/goldsmith','Teacher','Warrior'],a:'Blacksmith/goldsmith',why:"Skilled goldsmith in Guinea; craft tied to a protective spirit. Autobiographical bildungsroman by Camara Laye."},
+  {id:'lt10',topic:'prose',diff:'mid',q:'A bildungsroman deals with:',opts:['War and conflict','Moral/psychological growth of protagonist','Mystery','Social satire'],a:'Moral/psychological growth of protagonist',why:'Bildungsroman (German: novel of formation): growth from childhood to maturity. Examples: Great Expectations, Purple Hibiscus.'},
+  {id:'lt11',topic:'prose',diff:'mid',q:'Narrative carrying a deeper symbolic parallel meaning:',opts:['Foreshadowing','Allegory','Aptronym','Soliloquy'],a:'Allegory',why:'Allegory: narrative on two levels — literal and symbolic. Animal Farm = allegory of Soviet communism.'},
+  {id:'lt12',topic:'prose',diff:'easy',q:'Flashback means:',opts:['Jumping forward in time','Returning to earlier event','Repeating opening','A dream'],a:'Returning to earlier event',why:'Flashback (analepsis): interrupts present narrative to show earlier events — provides background.'},
+  {id:'lt13',topic:'poetry',diff:'easy',q:'A sonnet has how many lines?',opts:['8','12','14','16'],a:'14',why:"Sonnet: 14 lines. Shakespearean: 3 quatrains + couplet. Petrarchan: octave (8) + sestet (6)."},
+  {id:'lt14',topic:'poetry',diff:'easy',q:'Personification gives:',opts:['Comparison with like/as','Human qualities to non-human things','Exaggeration','Repeated consonants'],a:'Human qualities to non-human things',why:"Personification: 'The wind whispered.' Simile uses like/as. Hyperbole exaggerates."},
+  {id:'lt15',topic:'poetry',diff:'mid',q:'Repetition of vowel sounds in middle of words:',opts:['Alliteration','Assonance','Onomatopoeia','Rhyme'],a:'Assonance',why:"Assonance: 'the rain in Spain stays mainly in the plain.' Alliteration repeats initial consonants."},
+  {id:'lt16',topic:'poetry',diff:'mid',q:'The speaker of a poem (not necessarily the poet):',opts:['Narrator','Protagonist','Persona','Character'],a:'Persona',why:"Persona (speaker/voice): the 'I' of the poem, distinct from the poet. Never assume speaker IS the poet."},
+  {id:'lt17',topic:'poetry',diff:'mid',q:'Iambic pentameter has:',opts:['5 stressed syllables','10 syllables alternating unstressed/stressed','8 syllables stressed first','12 syllables'],a:'10 syllables alternating unstressed/stressed',why:"5 iambs per line (da-DUM), 10 syllables. Shakespeare's meter: 'Shall I comPARE thee TO a SUM-mer's DAY?'"},
+  {id:'lt18',topic:'poetry',diff:'hard',q:"Okigbo's 'Heavensgate' is primarily about:",opts:['Political satire','Spiritual journey of quest and initiation','History of colonialism','Romantic love'],a:'Spiritual journey of quest and initiation',why:"Modernist poem tracing spiritual journey — prodigal's return and initiation into Igbo ancestral tradition through goddess Idoto."},
+  {id:'lt19',topic:'devices',diff:'easy',q:'Repetition of initial consonant sounds:',opts:['Assonance','Rhyme','Alliteration','Oxymoron'],a:'Alliteration',why:"Alliteration: 'Peter Piper picked a peck.' Creates rhythm and emphasis."},
+  {id:'lt20',topic:'devices',diff:'easy',q:'An oxymoron:',opts:['Exaggeration','Combines contradictory terms','Compares using like/as','Addresses absent person'],a:'Combines contradictory terms',why:"Oxymoron: 'living death', 'bittersweet', 'deafening silence.' Highlights paradox."},
+  {id:'lt21',topic:'devices',diff:'mid',q:'A symbol represents:',opts:['Exaggerated description','Something beyond its literal meaning','Comparison using like','Rhyming pattern'],a:'Something beyond its literal meaning',why:'Symbol: literal and figurative. Dove = peace; yams in Achebe = wealth and masculinity in Igbo culture.'},
+  {id:'lt22',topic:'devices',diff:'mid',q:'Hinting at future events:',opts:['Flashback','Foreshadowing','In medias res','Stream of consciousness'],a:'Foreshadowing',why:"Foreshadowing: hints at events to come. Okonkwo's accidental gun killing foreshadows his violent end."},
+  {id:'lt23',topic:'devices',diff:'mid',q:"'All hands on deck' (hands = sailors) is:",opts:['Metonymy','Synecdoche','Hyperbole','Antithesis'],a:'Synecdoche',why:"Synecdoche: part for whole. 'Wheels' = car. Metonymy: 'the Crown' = monarchy."},
+  {id:'lt24',topic:'devices',diff:'hard',q:"Narrative accessing only one character's thoughts:",opts:['Omniscient narrator','Third-person limited','First-person plural','Unreliable narrator'],a:'Third-person limited',why:"Third-person limited: he/she narration but only one character's thoughts accessed. Omniscient knows all."},
+  {id:'lt25',topic:'prose',diff:'mid',q:'Purple Hibiscus by Adichie deals with:',opts:['Colonial exploitation','Domestic violence, religion and coming of age','Slave trade','Political independence'],a:'Domestic violence, religion and coming of age',why:"Purple Hibiscus (2003): Kambili in a wealthy but abusive, religiously fanatical home. Themes: silence, awakening, domestic violence."},
+  {id:'lt26',topic:'drama',diff:'mid',q:"Central conflict in J.P. Clark's 'Song of a Goat':",opts:['Political rivalry','Barrenness and its consequences','Murder mystery','Colonial oppression'],a:'Barrenness and its consequences',why:"What happens when Zifa's wife cannot have more children — cultural pressure, guilt and tragedy in traditional setting."},
+  {id:'lt27',topic:'genre',diff:'easy',q:'An epic is:',opts:['Short personal story','Long narrative celebrating heroic deeds on grand scale','Romance only','Always in free verse'],a:'Long narrative celebrating heroic deeds on grand scale',why:"Epics: heroic protagonist on grand journey of national significance. Homer's Iliad/Odyssey, the Sundiata epic."},
+  {id:'lt28',topic:'genre',diff:'mid',q:'Satire uses:',opts:['Pure tragedy','Humour, irony and exaggeration to criticise vices','Allegory only','Nature description'],a:'Humour, irony and exaggeration to criticise vices',why:"Satire attacks individuals/society through wit. Examples: Animal Farm, A Modest Proposal, Soyinka's Trials of Brother Jero."},
+  {id:'lt29',topic:'genre',diff:'easy',q:'A short story is:',opts:['Long narrative in chapters','Brief prose focused on single incident','A poem telling story','A one-act play'],a:'Brief prose focused on single incident',why:'Short stories: concise, few characters, single plot line, compressed timeframe. Every word counts.'},
+  {id:'lt30',topic:'devices',diff:'hard',q:"Stream of consciousness presents:",opts:['Events in strict order','Continuous flow of thoughts without conventional structure','Third-person external account','Dialogue between characters'],a:"Continuous flow of thoughts without conventional structure",why:"Mind's natural flow — associations, memories, sensory impressions. Virginia Woolf, James Joyce; African example: Ama Ata Aidoo."},
+  {id:'lt31',topic:'comprehension',diff:'easy',q:'Mood of a text refers to:',opts:["Author's attitude to subject","Emotional atmosphere for the reader","Grammatical tone","Speed of events"],a:'Emotional atmosphere for the reader',why:'Mood: feeling created in reader (melancholic, tense, joyful). Tone: author attitude. Both created through word choice and imagery.'},
+  {id:'lt32',topic:'devices',diff:'mid',q:'Example of hyperbole:',opts:['"She is as tall as a tree"','"I have told you a million times"','"The stars danced"','"His heart is a stone"'],a:'"I have told you a million times"',why:"Hyperbole: deliberate exaggeration. 'Million times' not literal. Simile uses like/as. 'Stars danced' = personification. 'Heart is a stone' = metaphor."},
+  {id:'lt33',topic:'poetry',diff:'mid',q:'A stanza of four lines is called:',opts:['Couplet','Tercet','Quatrain','Sestet'],a:'Quatrain',why:'Couplet=2, Tercet=3, Quatrain=4, Sestet=6, Octave=8 lines.'},
+  {id:'lt34',topic:'drama',diff:'mid',q:'Deus ex machina ending is:',opts:['Villain killed','Unexpected force suddenly resolves plot','Hero fails at last moment','Narrator explains moral'],a:'Unexpected force suddenly resolves plot',why:"Deus ex machina (Latin: 'god from the machine'): improbable device resolving unsolvable problem. Considered weak writing."},
+  {id:'lt35',topic:'devices',diff:'easy',q:'Onomatopoeia: words that:',opts:['Contradict each other','Sound like what they describe','Repeat vowel sounds','Compare using like/as'],a:'Sound like what they describe',why:"Onomatopoeia: buzz, hiss, crack, sizzle. Word's sound imitates its meaning."},
+  {id:'lt36',topic:'genre',diff:'mid',q:'Verisimilitude means:',opts:['Verse in prose','Appearance of truth or reality in fiction','A type of metaphor','Writing with no rules'],a:'Appearance of truth or reality in fiction',why:"Verisimilitude ('seeming true'): realistic characters, plausible events, authentic detail — allows suspension of disbelief."},
+  {id:'lt37',topic:'poetry',diff:'hard',q:"Okara's 'Piano and Drums' explores tension between:",opts:['Wealth and poverty','Western modernity and African tradition','War and peace','Childhood and old age'],a:'Western modernity and African tradition',why:'Piano (Western) vs Drums (African tradition). Speaker caught between two worlds — central tension of post-colonial African literature.'},
+  {id:'lt38',topic:'prose',diff:'mid',q:"'In medias res' means:",opts:['Starting at beginning','Starting in middle of action','Starting at end','Starting with flashback'],a:'Starting in middle of action',why:"Latin 'into the middle of things': narrative begins at crucial dramatic point. Homer's Iliad begins this way."},
+  {id:'lt39',topic:'devices',diff:'mid',q:'An allusion is:',opts:['Direct description of setting','Indirect reference to person, event or other text','Exaggerated statement','Repeated phrase'],a:'Indirect reference to person, event or other text',why:"Allusion enriches meaning. 'He was a real Judas' alludes to biblical betrayer. Achebe's title alludes to Yeats."},
+  {id:'lt40',topic:'genre',diff:'easy',q:'Feature of oral literature:',opts:['Always in verse','Relies on performance, participation and memory','Never changes','Only written form'],a:'Relies on performance, participation and memory',why:'Oral literature: transmitted by word of mouth, shaped in performance, preserved through memory. Oldest form of literature.'},
+  {id:'lt41',topic:'drama',diff:'easy',q:'Comic relief in drama is:',opts:['Tragic ending','Light scenes inserted to relieve tension in serious play','A comedy play','Stage directions'],a:'Light scenes inserted to relieve tension in serious play',why:'Comic relief: emotional breathing space. Porter scene in Macbeth, gravediggers in Hamlet. Heightens tragedy by contrast.'},
+  {id:'lt42',topic:'prose',diff:'hard',q:'Post-colonial literature explores:',opts:['Works before colonialism','Experiences and aftermath of colonial rule','Only European authors','Only independence struggles'],a:'Experiences and aftermath of colonial rule',why:'Post-colonial: from formerly colonised nations, examining identity, hybridity, power, legacy of colonialism. Achebe, Ngugi, Soyinka, Adichie.'},
+  {id:'lt43',topic:'devices',diff:'mid',q:'Juxtaposition means:',opts:['Similes and metaphors together','Placing contrasting elements side by side','Repeating words','Same character in different settings'],a:'Placing contrasting elements side by side',why:"Juxtaposition: opposites together (rich/poor, past/present) without stating the contrast. 'Piano and Drums' is built on it."},
+  {id:'lt44',topic:'poetry',diff:'easy',q:'Free verse has:',opts:['Strict rhyme and meter','No fixed rhyme or meter','Exactly 14 lines','Haiku structure'],a:'No fixed rhyme or meter',why:'Free verse: no predetermined rhyme or meter. Uses natural rhythms of language. Walt Whitman pioneered it.'},
+  {id:'lt45',topic:'genre',diff:'mid',q:'A fable uses:',opts:['Always human characters','Animals to teach a moral lesson','Verse only','No moral'],a:'Animals to teach a moral lesson',why:"Fables: animal characters illustrate human virtues/vices, always ending with a moral. Aesop's Fables, Tortoise stories."},
+  {id:'lt46',topic:'drama',diff:'mid',q:'Denouement of a play is:',opts:['Opening scene','The climax','Resolution after the climax','Conflict introduction'],a:'Resolution after the climax',why:"Denouement (French: 'unknotting'): final section where plot strands resolve after the climax."},
+  {id:'lt47',topic:'devices',diff:'easy',q:'A metaphor:',opts:['Uses like/as','States one thing IS another','Addresses absent person','Gives human qualities to objects'],a:'States one thing IS another',why:"'Life is a journey' (metaphor) vs 'Life is like a journey' (simile). Metaphor: direct equation, stronger comparison."},
+  {id:'lt48',topic:'prose',diff:'mid',q:'Characterisation refers to:',opts:['Physical setting','Methods to create and develop characters','Plot sequence','Narrative point of view'],a:'Methods to create and develop characters',why:"Characterisation: direct (author tells) or indirect (shown through Speech, Thoughts, Actions, Appearance, Reactions — STAAR)."},
+  {id:'lt49',topic:'poetry',diff:'mid',q:'An elegy:',opts:['Celebrates victory','Mourns death or loss','Satirises leaders','Describes nature'],a:'Mourns death or loss',why:"Elegy: poem of mourning. Milton's Lycidas, Tennyson's In Memoriam, Okigbo's Lament of the Drums."},
+  {id:'lt50',topic:'genre',diff:'hard',q:"'Negritude' literary movement celebrated:",opts:['Opposing independence','African culture and identity against colonial devaluation','European traditions in Africa','Criticism of African practices'],a:'African culture and identity against colonial devaluation',why:"Negritude (1930s-40s): Aimé Césaire, Léopold Senghor, Léon Damas — affirmed African cultural identity, rejected colonial assimilation."}
+];
+
+var WAEC_ECONOMICS_QS=[
+  {id:'ec01',topic:'basic',diff:'easy',q:'Economics is best defined as:',opts:['Study of how to make money','Allocating scarce resources to satisfy unlimited wants','Management of government finances','Study of banking'],a:'Allocating scarce resources to satisfy unlimited wants',why:'Economics: allocation of scarce resources to unlimited wants. Scarcity forces choices — the fundamental economic problem.'},
+  {id:'ec02',topic:'basic',diff:'easy',q:'Four factors of production:',opts:['Land, Labour, Capital, Money','Land, Labour, Capital, Enterprise','Labour, Capital, Goods, Services','Land, Labour, Technology, Enterprise'],a:'Land, Labour, Capital, Enterprise',why:'Factors: Land (natural), Labour (human effort), Capital (man-made productive resources), Enterprise (risk/organising). Rewards: rent, wages, interest, profit.'},
+  {id:'ec03',topic:'demand',diff:'easy',q:"Law of Demand: as price rises, all else equal:",opts:['Qd rises','Qd falls','Qd unchanged','Supply increases'],a:'Qd falls',why:'Law of Demand: price and quantity demanded inversely related (ceteris paribus).'},
+  {id:'ec04',topic:'supply',diff:'easy',q:'Law of Supply: as price rises:',opts:['Qs decreases','Qs constant','Qs increases','Demand increases'],a:'Qs increases',why:'Higher prices incentivise more production. Price and Qs directly related. Supply curve slopes upward.'},
+  {id:'ec05',topic:'demand',diff:'mid',q:'Which shifts demand curve right?',opts:['Fall in income (normal good)','Rise in price of good','Rise in income (normal good)','Rise in complement price'],a:'Rise in income (normal good)',why:"Demand shifts RIGHT when income rises (normal goods). Change in own price = MOVEMENT along the curve, not a shift."},
+  {id:'ec06',topic:'elasticity',diff:'mid',q:'Price +10%, Qd −20%. PED?',opts:['0.5','2','−2','0.2'],a:'−2',why:'PED = %ΔQd ÷ %ΔP = −20 ÷ 10 = −2. Negative = inverse relationship. |PED|>1 = elastic.'},
+  {id:'ec07',topic:'elasticity',diff:'mid',q:'Most likely inelastic demand:',opts:['Luxury cars','Designer clothing','Insulin for diabetics','Holidays'],a:'Insulin for diabetics',why:'Inelastic (PED<1): necessities, no substitutes. Diabetics need insulin regardless of price.'},
+  {id:'ec08',topic:'market',diff:'mid',q:'Market equilibrium is when:',opts:['Supply > demand','Demand > supply','Qd = Qs','Price is highest'],a:'Qd = Qs',why:'Equilibrium: market clears where Qd = Qs. No shortage or surplus.'},
+  {id:'ec09',topic:'market',diff:'mid',q:'Price ceiling below equilibrium causes:',opts:['Surplus','Shortage','No change','Supply increase'],a:'Shortage',why:'Price ceiling: Qd > Qs → shortage. E.g. rent controls.'},
+  {id:'ec10',topic:'national',diff:'mid',q:'GDP measures:',opts:['Income of citizens abroad','Total value of goods/services produced within country per year','Government spending only','Exports minus imports'],a:'Total value of goods/services produced within country per year',why:'GDP = total monetary value of all finished goods/services within borders. GDP = C+I+G+(X−M).'},
+  {id:'ec11',topic:'national',diff:'mid',q:'Inflation defined as:',opts:['Rise in one good price','Sustained general rise in price level','Fall in export value','Decrease in money supply'],a:'Sustained general rise in price level',why:'Inflation: persistent general price increase — measured by CPI. Erodes purchasing power.'},
+  {id:'ec12',topic:'national',diff:'hard',q:'Nominal GDP = ₦50 trillion, deflator = 125. Real GDP?',opts:['₦62.5 trillion','₦40 trillion','₦50 trillion','₦37.5 trillion'],a:'₦40 trillion',why:'Real GDP = (50 ÷ 125) × 100 = 40 trillion.'},
+  {id:'ec13',topic:'money',diff:'easy',q:'Primary function of money:',opts:['Store of value','Standard of deferred payment','Medium of exchange','Unit of account'],a:'Medium of exchange',why:"Primary function: medium of exchange — eliminates barter's double coincidence of wants problem."},
+  {id:'ec14',topic:'money',diff:'mid',q:'Commercial banks create money through:',opts:['Printing currency','Credit creation (fractional reserve banking)','Borrowing from central bank','Selling bonds'],a:'Credit creation (fractional reserve banking)',why:'Banks keep fraction of deposits, lend rest. Each loan creates new deposit — multiplies money. Multiplier = 1÷reserve ratio.'},
+  {id:'ec15',topic:'money',diff:'mid',q:'Central bank controls inflation by:',opts:['Reducing income tax','Raising Monetary Policy Rate (MPR)','Printing more money','Reducing reserve requirement'],a:'Raising Monetary Policy Rate (MPR)',why:'Raising MPR: borrowing more expensive → less spending → reduces inflation. Contractionary monetary policy.'},
+  {id:'ec16',topic:'trade',diff:'easy',q:'Balance of trade =',opts:['Imports and exports of goods','Government revenue and expenditure','Income and consumption','Investment and savings'],a:'Imports and exports of goods',why:'Balance of Trade = exports − imports (goods only). Surplus: X>M. Deficit: M>X.'},
+  {id:'ec17',topic:'trade',diff:'mid',q:'Comparative advantage: produce goods with:',opts:['Lower absolute cost','Most labour','Lowest opportunity cost relative to others','Others cannot produce'],a:'Lowest opportunity cost relative to others',why:'Comparative advantage (Ricardo): specialise where opportunity cost is lowest. Basis for international trade benefits.'},
+  {id:'ec18',topic:'trade',diff:'mid',q:'A tariff is:',opts:['Subsidy to local producers','Tax on imports raising their price','Quantity quota','Ban on foreign goods'],a:'Tax on imports raising their price',why:'Tariff: tax on imports — raises price, protects domestic producers, generates government revenue.'},
+  {id:'ec19',topic:'production',diff:'mid',q:'Law of Diminishing Returns:',opts:['Adding capital always increases output','Adding variable factor to fixed eventually reduces marginal output','Total output always falls','Profits always diminish'],a:'Adding variable factor to fixed eventually reduces marginal output',why:'Law of Diminishing Returns (short run): more labour on fixed land → marginal product eventually falls.'},
+  {id:'ec20',topic:'market',diff:'hard',q:'In perfect competition, firms are price:',opts:['Makers','Takers','Setters','Discriminators'],a:'Takers',why:'Perfect competition: many buyers/sellers, identical products, free entry/exit. No firm influences price.'},
+  {id:'ec21',topic:'market',diff:'mid',q:'Monopoly characterised by:',opts:['Many sellers','One seller, no close substitutes','Two sellers','Free entry/exit'],a:'One seller, no close substitutes',why:'Monopoly: single seller, unique product, high entry barriers, price maker.'},
+  {id:'ec22',topic:'government',diff:'mid',q:'Fiscal policy uses:',opts:['Interest rates','Government spending and taxation','Exchange rates','Central bank lending'],a:'Government spending and taxation',why:'Fiscal policy: taxation and expenditure to achieve macroeconomic goals.'},
+  {id:'ec23',topic:'development',diff:'mid',q:'Economic development is:',opts:['Rise in GDP only','GDP increase with improved living standards and poverty reduction','Growth in company numbers','Rise in government revenue'],a:'GDP increase with improved living standards and poverty reduction',why:'Development is broader than growth — includes health, education, income distribution, quality of life.'},
+  {id:'ec24',topic:'national',diff:'mid',q:'Workers between jobs face:',opts:['Structural unemployment','Cyclical unemployment','Frictional unemployment','Seasonal unemployment'],a:'Frictional unemployment',why:'Frictional: between jobs, natural in a healthy economy. Structural: skills mismatch. Cyclical: recession-caused.'},
+  {id:'ec25',topic:'production',diff:'easy',q:'Opportunity cost is:',opts:['Monetary cost of a good','Value of best alternative foregone','Total production cost','Cost of raw materials'],a:'Value of best alternative foregone',why:"Opportunity cost: value of what you give up when making a choice. No free lunch."},
+  {id:'ec26',topic:'basic',diff:'easy',q:'Which is NOT a factor of production?',opts:['Land','Labour','Money','Enterprise'],a:'Money',why:'Money is a medium of exchange, not a factor. Factors: Land, Labour, Capital, Enterprise.'},
+  {id:'ec27',topic:'demand',diff:'mid',q:'Goods are substitutes if:',opts:['Always consumed together','Rise in price of one increases demand for the other','Fall in price reduces demand for other','No relationship'],a:'Rise in price of one increases demand for the other',why:'Substitutes replace each other: Coke/Pepsi. Coke price rises → Pepsi demand rises.'},
+  {id:'ec28',topic:'elasticity',diff:'mid',q:'Income elasticity for inferior good is:',opts:['Positive >1','Zero','Positive <1','Negative'],a:'Negative',why:'Inferior goods: demand falls when income rises. YED negative for inferior goods.'},
+  {id:'ec29',topic:'trade',diff:'easy',q:"Nigeria's main export commodity:",opts:['Cocoa','Gold','Crude oil','Cotton'],a:'Crude oil',why:"Crude oil: ~90% of Nigeria's export earnings. Heavy dependence = vulnerability to oil price fluctuations."},
+  {id:'ec30',topic:'government',diff:'mid',q:'A progressive tax system means:',opts:['Same % for all','Higher earners pay higher %','Lower earners pay more','Rates fall with income'],a:'Higher earners pay higher %',why:'Progressive: tax rate increases with income. Rich pay larger share. Regressive: higher burden on lower earners.'},
+  {id:'ec31',topic:'national',diff:'easy',q:'Expenditure approach to GDP includes:',opts:['Transfer payments','Intermediate goods','Consumer spending (C)','Stock market transactions'],a:'Consumer spending (C)',why:'GDP = C+I+G+(X−M). Transfer payments excluded — no new production.'},
+  {id:'ec32',topic:'money',diff:'easy',q:"Value of money is inversely related to:",opts:['Supply of goods','Price level','Interest rate','Employment'],a:'Price level',why:'When price level rises, money buys fewer goods — value falls. Value = 1/Price level.'},
+  {id:'ec33',topic:'production',diff:'mid',q:'Economies of scale:',opts:['Increased costs as firm grows','Reduced long-run average costs as output increases','Benefits of smaller firms','Government subsidies'],a:'Reduced long-run average costs as output increases',why:'Economies of scale: larger output → lower average costs (bulk buying, specialisation).'},
+  {id:'ec34',topic:'market',diff:'hard',q:'Price rigidity in oligopoly explained by:',opts:['Law of demand','Kinked demand curve model','Monopoly pricing','Perfect competition model'],a:'Kinked demand curve model',why:"Kinked demand: price rises not followed by rivals (elastic); price cuts matched (inelastic). Firms stick to current price."},
+  {id:'ec35',topic:'development',diff:'mid',q:'HDI measures:',opts:['GDP per capita only','Life expectancy, education and income per capita','Military strength','Population and GDP'],a:'Life expectancy, education and income per capita',why:'HDI (UNDP): health (life expectancy) + education (years schooling) + standard of living (GNI per capita).'},
+  {id:'ec36',topic:'government',diff:'mid',q:'Public goods are:',opts:['Expensive to produce','Non-excludable and non-rival','Only from private sector','Always at zero price'],a:'Non-excludable and non-rival',why:'Public goods: non-excludable (cannot stop non-payers) + non-rival (use by one does not reduce for others). Examples: defence, street lighting.'},
+  {id:'ec37',topic:'trade',diff:'mid',q:'Devaluation makes:',opts:['Exports cheaper, imports dearer','Exports dearer, imports cheaper','Both more expensive','No change'],a:'Exports cheaper, imports dearer',why:'Devaluation: deliberate exchange rate reduction. Exports cheaper for foreigners; imports more expensive domestically.'},
+  {id:'ec38',topic:'basic',diff:'easy',q:'"Ceteris paribus" means:',opts:['Everything changes','All other things remaining equal','Only prices change','Supply equals demand'],a:'All other things remaining equal',why:'"Ceteris paribus" (Latin): change one variable, hold all others constant.'},
+  {id:'ec39',topic:'production',diff:'mid',q:'Which is a variable cost?',opts:['Factory rent','Loan repayment','Raw materials used','Insurance'],a:'Raw materials used',why:'Variable costs change with output: raw materials, direct labour. Fixed costs unchanged: rent, insurance.'},
+  {id:'ec40',topic:'national',diff:'mid',q:'The multiplier effect:',opts:['Population on GDP','Initial spending generates larger national income increase','Interest compounding','Price impact on spending'],a:'Initial spending generates larger national income increase',why:'Keynesian multiplier: initial spending → income → more spending. Multiplier = 1/(1−MPC).'},
+  {id:'ec41',topic:'basic',diff:'easy',q:'Branch of economics for individual markets:',opts:['Macroeconomics','Microeconomics','Development economics','International economics'],a:'Microeconomics',why:'Micro: individual consumers, firms, markets. Macro: economy-wide (GDP, inflation, unemployment).'},
+  {id:'ec42',topic:'elasticity',diff:'hard',q:'Positive cross elasticity (XED) between A and B means:',opts:['Complements','Normal goods','Substitutes','Inferior goods'],a:'Substitutes',why:'Positive XED → substitutes: price of B rises → demand for A rises. Negative XED → complements.'},
+  {id:'ec43',topic:'government',diff:'mid',q:'Example of automatic stabiliser:',opts:['Building roads in boom','Raising rates in recession','Unemployment benefits in recession','Government cutting taxes deliberately'],a:'Unemployment benefits in recession',why:'Automatic stabilisers: activate without deliberate policy action. Unemployment benefits rise in recessions automatically.'},
+  {id:'ec44',topic:'market',diff:'mid',q:'Market failure occurs when:',opts:['Market reaches equilibrium','Free market allocates resources inefficiently','All goods from government','Prices set by government'],a:'Free market allocates resources inefficiently',why:'Market failure: price mechanism fails optimally. Causes: public goods, externalities, information asymmetry, monopoly.'},
+  {id:'ec45',topic:'development',diff:'easy',q:'Economic growth measured by:',opts:['Population changes','Increase in real GDP over time','Rise in government spending','Increase in imports'],a:'Increase in real GDP over time',why:'Growth = increase in real GDP (inflation-adjusted). Nominal GDP growth may just reflect rising prices.'},
+  {id:'ec46',topic:'production',diff:'mid',q:'Break-even point where:',opts:['Revenue is zero','Profit is maximum','TR = TC','MC = zero'],a:'TR = TC',why:'Break-even: TR = TC, profit = 0. Break-even output = Fixed Costs ÷ Contribution per unit.'},
+  {id:'ec47',topic:'basic',diff:'easy',q:'Example of a merit good:',opts:['Cigarettes','Street lighting','Education','Military defence'],a:'Education',why:'Merit goods: beneficial but under-consumed if left to market (education, healthcare). Government provides/subsidises.'},
+  {id:'ec48',topic:'national',diff:'hard',q:'MPC = 0.75. Keynesian multiplier?',opts:['4','0.75','1.75','3'],a:'4',why:'Multiplier = 1/(1−MPC) = 1/0.25 = 4. ₦1 billion injection → ₦4 billion national income increase.'},
+  {id:'ec49',topic:'trade',diff:'mid',q:'Foreign exchange reserves held primarily to:',opts:['Pay domestic workers','Finance international trade and stabilise exchange rate','Fund domestic infrastructure','Increase money supply'],a:'Finance international trade and stabilise exchange rate',why:'Forex reserves: pay imports, service external debts, stabilise exchange rate, build investor confidence.'},
+  {id:'ec50',topic:'market',diff:'easy',q:'Consumer surplus is:',opts:['Price minus production cost','Willingness to pay minus actual price paid','TR minus TC','Exports minus imports'],a:'Willingness to pay minus actual price paid',why:"Consumer surplus: buyer's gain from trade. Pay ₦3,000 for what you'd pay ₦5,000 = ₦2,000 surplus."}
+];
+
+var WAEC_GOVERNMENT_QS=[
+  {id:'gv01',topic:'concepts',diff:'easy',q:'The state is defined as:',opts:['A city or local area','Political unit with territory, population, government and sovereignty','Ruling political party','Army and police'],a:'Political unit with territory, population, government and sovereignty',why:'Four elements of a state: Territory, Population, Government, Sovereignty. All four required.'},
+  {id:'gv02',topic:'concepts',diff:'easy',q:'Sovereignty means:',opts:['Right to vote','Supreme, absolute power of a state','Wealth of a nation','Power of the police'],a:'Supreme, absolute power of a state',why:"Sovereignty: highest form of authority — internal governance + external independence. Jean Bodin first defined it."},
+  {id:'gv03',topic:'concepts',diff:'easy',q:'In democracy, power is held by:',opts:['A single ruler','Military group','The people, directly or through elected representatives','Religious leaders'],a:'The people, directly or through elected representatives',why:"Democracy (Greek: demos=people + kratia=power). Direct: citizens vote on all issues. Representative: elected representatives."},
+  {id:'gv04',topic:'concepts',diff:'mid',q:'Federal system means:',opts:['Power concentrated in centre','Power shared between central and regional governments by constitution','One-party rule','Military power'],a:'Power shared between central and regional governments by constitution',why:'Federalism: power divided constitutionally between central and component units. Nigeria, USA, Germany are federal states.'},
+  {id:'gv05',topic:'nigeria',diff:'easy',q:'Nigeria operates:',opts:['Parliamentary democracy','Presidential federal democracy','Constitutional monarchy','Military government'],a:'Presidential federal democracy',why:"Nigeria: federal republic, presidential system. President = head of state AND government. Power shared federal/36 states."},
+  {id:'gv06',topic:'arms',diff:'easy',q:'Three arms of government:',opts:['Executive, Judiciary, Military','Legislature, Executive, Judiciary','Police, Army, Courts','Senate, House, President'],a:'Legislature, Executive, Judiciary',why:'Legislature (makes laws), Executive (implements), Judiciary (interprets). Separated to prevent tyranny.'},
+  {id:'gv07',topic:'arms',diff:'mid',q:'Separation of powers articulated most influentially by:',opts:['John Locke','Karl Marx','Baron de Montesquieu','Jean Bodin'],a:'Baron de Montesquieu',why:"Montesquieu's 'The Spirit of the Laws' (1748): legislative, executive, judicial separation. Influenced US Constitution."},
+  {id:'gv08',topic:'arms',diff:'mid',q:"Nigeria's Supreme Court serves as:",opts:['Court of first instance','Final court of appeal and constitutional guardian','Highest legislative body','Arm of executive'],a:'Final court of appeal and constitutional guardian',why:"Supreme Court: apex court, final arbiter of all legal disputes and constitutional questions."},
+  {id:'gv09',topic:'nigeria',diff:'mid',q:'Nigerian National Assembly consists of:',opts:['Senate only','House of Representatives only','Senate and House of Representatives','President and Senate'],a:'Senate and House of Representatives',why:'NASS = Senate (109) + House of Representatives (360). Bills must pass both chambers.'},
+  {id:'gv10',topic:'nigeria',diff:'easy',q:'How many senators per Nigerian state?',opts:['2','3','4','1'],a:'3',why:"3 per state × 36 = 108 + 1 (FCT) = 109 senators total."},
+  {id:'gv11',topic:'concepts',diff:'mid',q:'Checks and balances means:',opts:['Executive controls all','Each branch can limit the others','Military supervises elected officials','Courts override elections'],a:'Each branch can limit the others',why:'Legislature passes laws but executive can veto; courts can declare laws unconstitutional. Prevents tyranny.'},
+  {id:'gv12',topic:'concepts',diff:'easy',q:'A constitution is:',opts:['List of parliament laws','Fundamental law establishing government structure and rights','Party manifesto','National budget'],a:'Fundamental law establishing government structure and rights',why:'Constitution: supreme law — establishes structure, distributes power, guarantees rights. All other laws must conform.'},
+  {id:'gv13',topic:'concepts',diff:'mid',q:'A rigid constitution:',opts:['Amended by simple majority','Requires special procedure to amend','Has no amendment provision','Enforced by military'],a:'Requires special procedure to amend',why:"Rigid: supermajority or referendum required. Nigeria's requires 2/3 NASS + 2/3 state assemblies."},
+  {id:'gv14',topic:'political',diff:'easy',q:'A political party:',opts:['Controls military','Seeks power through elections to form government','Manages economy','Writes constitution'],a:'Seeks power through elections to form government',why:"Political parties organise citizens around policies, contest elections and aim to control government. Nigeria: APC and PDP."},
+  {id:'gv15',topic:'political',diff:'mid',q:'Proportional representation means:',opts:['Winner-takes-all','Seats in proportion to votes received','Only members vote','President appoints'],a:'Seats in proportion to votes received',why:'PR: 30% votes ≈ 30% seats. Ensures minority representation. Contrasts with FPTP.'},
+  {id:'gv16',topic:'nigeria',diff:'mid',q:"Nigeria's electoral body:",opts:['EFCC','INEC','NCC','CBN'],a:'INEC',why:'INEC: Independent National Electoral Commission — conducts federal and state elections. Established by 1999 Constitution.'},
+  {id:'gv17',topic:'concepts',diff:'mid',q:'Rule of law means:',opts:['Military makes laws','All persons subject to and accountable to law','President is above the law','Laws only for ordinary citizens'],a:'All persons subject to and accountable to law',why:'Rule of law (A.V. Dicey): supremacy of law, equality before the law. Foundation of democratic governance.'},
+  {id:'gv18',topic:'concepts',diff:'easy',q:'Franchise refers to:',opts:['Business licence','The right to vote','Power to appoint ministers','Military authority'],a:'The right to vote',why:'Franchise (suffrage): right to vote. Universal adult suffrage: all above minimum age (18 in Nigeria) can vote.'},
+  {id:'gv19',topic:'international',diff:'mid',q:'United Nations established in:',opts:['1939','1945','1960','1963'],a:'1945',why:'UN: 24 October 1945, after WWII. Nigeria joined 1960. HQ: New York City.'},
+  {id:'gv20',topic:'international',diff:'mid',q:'African Union replaced:',opts:['ECOWAS','OAU','Commonwealth','Non-Aligned Movement'],a:'OAU',why:'AU succeeded OAU on 9 July 2002. OAU (1963) focused on decolonisation; AU has broader goals. HQ: Addis Ababa.'},
+  {id:'gv21',topic:'nigeria',diff:'mid',q:"Nigeria's independence date:",opts:['1st October 1960','1st October 1963','15th August 1960','27th May 1967'],a:'1st October 1960',why:'Nigeria independence: 1st October 1960. Republic: 1st October 1963. Return to democracy: 1999 (Obasanjo).'},
+  {id:'gv22',topic:'concepts',diff:'mid',q:'NOT a feature of democratic state:',opts:['Free and fair elections','Fundamental human rights','Rule of law','Suppression of political opposition'],a:'Suppression of political opposition',why:'Democracy: free elections, pluralism, rule of law, fundamental rights, free press. Suppressing opposition = authoritarianism.'},
+  {id:'gv23',topic:'concepts',diff:'mid',q:'Apartheid (ended 1994, South Africa) was:',opts:['Democratic governance','Racial segregation and oppression','Federal government','Military rule'],a:'Racial segregation and oppression',why:'Apartheid: institutionalised racial segregation (1948-1994) by white minority. Mandela led ANC resistance; first multiracial elections 1994.'},
+  {id:'gv24',topic:'concepts',diff:'easy',q:'A referendum is:',opts:['Election for president','Direct vote on a specific issue','Court ruling','Parliamentary debate'],a:'Direct vote on a specific issue',why:'Referendum: citizens vote directly yes/no on a specific question. Example: Brexit (2016).'},
+  {id:'gv25',topic:'political',diff:'mid',q:'Pressure group differs from party in that:',opts:['Contests elections','Influences policy without seeking to govern','Appoints ministers','Writes constitution'],a:'Influences policy without seeking to govern',why:'Pressure groups (NLC, ASUU) advocate for specific interests without contesting elections.'},
+  {id:'gv26',topic:'concepts',diff:'mid',q:'Legitimacy means:',opts:['Legal right to use force','General acceptance of authority as right by the governed','Military control','Constitutional amendments'],a:'General acceptance of authority as right by the governed',why:'Legitimacy: citizens accept authority as justified — through tradition, charisma or rational-legal grounds (elections).'},
+  {id:'gv27',topic:'nigeria',diff:'hard',q:"Exclusive Legislative List (Nigeria's 1999 Constitution) legislated by:",opts:['State governments','National Assembly (Federal)','Both federal and state','Local government'],a:'National Assembly (Federal)',why:'Exclusive List: federal only — defence, currency, immigration. Concurrent: both. Residual: states.'},
+  {id:'gv28',topic:'concepts',diff:'easy',q:'Totalitarianism seeks:',opts:['Free elections','Total control over all aspects of life','Only military control','Maximum individual freedom'],a:'Total control over all aspects of life',why:"Totalitarianism: government controls all — politics, economy, culture, private life. Stalin's USSR, Nazi Germany."},
+  {id:'gv29',topic:'international',diff:'mid',q:'ECOWAS established in:',opts:['1960','1975','1963','1999'],a:'1975',why:'ECOWAS: 28 May 1975, Treaty of Lagos. 15 West African members. Objectives: economic integration, regional peace.'},
+  {id:'gv30',topic:'concepts',diff:'mid',q:'Civil society refers to:',opts:['Military and police','Voluntary associations outside government and business','Politicians and parties','The judiciary'],a:'Voluntary associations outside government and business',why:"Civil society: NGOs, trade unions, faith organisations — the 'third sector' between state and market."},
+  {id:'gv31',topic:'concepts',diff:'easy',q:'Which is a fundamental human right?',opts:['Right to own a car','Right to life','Right to free public transport','Right to hold office'],a:'Right to life',why:'Fundamental rights (Chapter IV, 1999 Constitution): right to life, dignity, liberty, fair hearing. Inalienable.'},
+  {id:'gv32',topic:'political',diff:'mid',q:'Propaganda in politics is:',opts:['Balanced reporting','Biased information to promote political agenda','Official statistics','Free speech by press'],a:'Biased information to promote political agenda',why:'Propaganda: deliberate biased communication — emotional appeals, selective facts, falsehoods. Modern fake news is a form.'},
+  {id:'gv33',topic:'nigeria',diff:'mid',q:'EFCC established to:',opts:['Conduct elections','Combat financial crimes and corruption','Manage national budget','Regulate parties'],a:'Combat financial crimes and corruption',why:'EFCC (2003): investigates/prosecutes economic crimes — fraud, money laundering, embezzlement, corruption.'},
+  {id:'gv34',topic:'concepts',diff:'mid',q:'Impeachment refers to:',opts:["Removal by military","Formal process of charging and potentially removing president","Voluntary resignation","Court ruling"],a:'Formal process of charging and potentially removing president',why:"Impeachment: legislature formally charges executive. Nigeria: 2/3 NASS can impeach. Doesn't automatically remove — leads to trial."},
+  {id:'gv35',topic:'concepts',diff:'easy',q:'Colonialism refers to:',opts:['International trade between equals','Powerful nation controlling and exploiting weaker territory','Voluntary cultural exchange','Development aid'],a:'Powerful nation controlling and exploiting weaker territory',why:'Colonialism: powerful state controls, exploiting resources and people. Nigeria colonised by Britain 1900-1960.'},
+  {id:'gv36',topic:'concepts',diff:'mid',q:'Presidential system:',opts:['Executive drawn from legislature','President directly elected, head of state and government','Power shared with monarch','PM controls executive'],a:'President directly elected, head of state and government',why:'Presidential: president separately elected, independent of legislature. Head of state AND government.'},
+  {id:'gv37',topic:'concepts',diff:'mid',q:'Parliamentary system characterised by:',opts:['Strict separation of powers','Executive drawn from and accountable to legislature','Independently elected president','Single-chamber parliament'],a:'Executive drawn from and accountable to legislature',why:"Parliamentary (UK, India): PM and Cabinet drawn from legislature, accountable to it. Falls if loses vote of no confidence."},
+  {id:'gv38',topic:'international',diff:'mid',q:'Commonwealth of Nations is association of:',opts:['West African nations','Former British colonies and territories','Countries with largest GDPs','Nations sharing currency'],a:'Former British colonies and territories',why:'Commonwealth: 56 members, most formerly British Empire. Founded 1931. Nigeria is a member.'},
+  {id:'gv39',topic:'political',diff:'hard',q:'Representative democracy implies:',opts:['Citizens vote on every decision','Elected officials make decisions on behalf of citizens','Military represents public','Religious leaders govern'],a:'Elected officials make decisions on behalf of citizens',why:'Representative (indirect) democracy: elected representatives govern on behalf of citizens, accountable at elections.'},
+  {id:'gv40',topic:'nigeria',diff:'mid',q:'Tier responsible for primary schools and primary healthcare in Nigeria:',opts:['Federal government','State government','Local government','ECOWAS'],a:'Local government',why:"Three tiers: Federal (Exclusive List), State (secondary education), Local (primary schools, healthcare, markets). 774 LGAs."},
+  {id:'gv41',topic:'concepts',diff:'easy',q:'Executive arm is responsible for:',opts:['Making laws','Interpreting laws','Implementing and enforcing laws','Conducting elections'],a:'Implementing and enforcing laws',why:'Executive: implements laws — President/ministers (presidential) or PM/Cabinet (parliamentary).'},
+  {id:'gv42',topic:'political',diff:'mid',q:'Right to vote is also known as:',opts:['Habeas corpus','Suffrage','Sovereignty','Franchise'],a:'Suffrage',why:"Suffrage and franchise both mean the right to vote. 'Habeas corpus' = right not to be detained without trial."},
+  {id:'gv43',topic:'concepts',diff:'mid',q:'Characteristic of authoritarian government:',opts:['Free press','Independent judiciary','Concentration of power with limited pluralism','Regular free elections'],a:'Concentration of power with limited pluralism',why:'Authoritarian: concentrates power, restricts liberties, limits opposition, controls media.'},
+  {id:'gv44',topic:'nigeria',diff:'hard',q:"Nigeria's 1999 Constitution promulgated under:",opts:['Sani Abacha','Abdulsalami Abubakar','Ibrahim Babangida','Yakubu Gowon'],a:'Abdulsalami Abubakar',why:"Gen. Abdulsalami Abubakar: promulgated 1999 Constitution, oversaw transition to civilian rule. Obasanjo elected 1999 → Fourth Republic."},
+  {id:'gv45',topic:'international',diff:'easy',q:'UN headquarters:',opts:['Washington D.C.','Geneva','New York City','London'],a:'New York City',why:'UN HQ: Midtown Manhattan, New York. Also major offices in Geneva, Vienna, Nairobi.'},
+  {id:'gv46',topic:'concepts',diff:'mid',q:'Nationalism describes:',opts:['Opposition to all government','Strong identification with nation and desire for self-determination','Support for international cooperation only','Loyalty to a party'],a:'Strong identification with nation and desire for self-determination',why:'Nationalism drove African independence. Nigerian nationalists: Azikiwe, Awolowo, Ahmadu Bello.'},
+  {id:'gv47',topic:'concepts',diff:'easy',q:'Public opinion refers to:',opts:['Views of government ministers','Collective attitudes of citizens on political issues','Opinions in official documents','Military intelligence'],a:'Collective attitudes of citizens on political issues',why:'Public opinion: aggregated views of general population on political matters. Measured by polls.'},
+  {id:'gv48',topic:'nigeria',diff:'mid',q:'Bicameral legislature means National Assembly has:',opts:['One chamber','Two chambers — Senate and House','Three chambers','President in legislature'],a:'Two chambers — Senate and House',why:'Bicameral = two chambers. Senate (upper) + House of Representatives (lower). Bills pass both.'},
+  {id:'gv49',topic:'concepts',diff:'hard',q:'Judicial review is power to:',opts:['Create new laws','Declare laws or executive actions unconstitutional','Review government budgets','Appoint judges'],a:'Declare laws or executive actions unconstitutional',why:"Judicial review: courts check laws comply with constitution. Supreme Court can strike down any law violating Nigeria's 1999 Constitution."},
+  {id:'gv50',topic:'concepts',diff:'mid',q:'Political socialisation is:',opts:['Government controlling citizens','Process by which people learn political values and behaviours','Social media in politics','Joining a party'],a:'Process by which people learn political values and behaviours',why:'Political socialisation: lifelong process acquiring political attitudes via family, school, peers, media, religion.'}
+];
+
+var WAEC_AGRIC_QS=[
+  {id:'ag01',topic:'crops',diff:'easy',q:'Photosynthesis takes place mainly in the:',opts:['Roots','Stem','Leaves','Flowers'],a:'Leaves',why:'Leaves contain chloroplasts with chlorophyll. Photosynthesis: CO₂ + H₂O + light → glucose + O₂.'},
+  {id:'ag02',topic:'soil',diff:'easy',q:'Best soil type for most crops:',opts:['Clay','Sandy','Loamy','Silt'],a:'Loamy',why:'Loamy soil: ideal mix of sand, silt and clay — good drainage, water retention, aeration, nutrients, easy to till.'},
+  {id:'ag03',topic:'crops',diff:'easy',q:'Which is a leguminous crop?',opts:['Maize','Cassava','Groundnut','Yam'],a:'Groundnut',why:'Legumes: groundnut, soybeans, cowpea. Roots contain Rhizobium bacteria that fix atmospheric nitrogen.'},
+  {id:'ag04',topic:'animals',diff:'easy',q:'Most important nutrient for growth of young animals:',opts:['Carbohydrates','Fats','Proteins','Vitamins'],a:'Proteins',why:'Proteins: building blocks of muscle, organs and body tissues. Young animals need high protein for growth.'},
+  {id:'ag05',topic:'soil',diff:'mid',q:'Soil pH 7 indicates:',opts:['Acidic','Neutral','Alkaline','Highly fertile'],a:'Neutral',why:'pH 7 = neutral. Most crops: pH 5.5–7.5. Acidic soils limed with calcium carbonate to raise pH.'},
+  {id:'ag06',topic:'crops',diff:'mid',q:'Preparing land for planting called:',opts:['Harvesting','Planting','Tillage','Irrigation'],a:'Tillage',why:'Tillage: mechanical soil manipulation. Primary (ploughing) is deeper; secondary (harrowing) refines seedbed.'},
+  {id:'ag07',topic:'crops',diff:'mid',q:'Which is a root crop?',opts:['Maize','Rice','Cassava','Soybean'],a:'Cassava',why:'Root/tuber crops: cassava, yam, sweet potato, cocoyam. Cassava: drought-resistant, high-yielding staple.'},
+  {id:'ag08',topic:'soil',diff:'mid',q:'Soil erosion best prevented by:',opts:['Burning vegetation','Monoculture','Cover crops and contour ploughing','Removing trees'],a:'Cover crops and contour ploughing',why:'Cover crops protect bare soil; contour ploughing slows runoff and traps soil.'},
+  {id:'ag09',topic:'animals',diff:'easy',q:'Ruminants regurgitating and re-chewing food:',opts:['Digestion','Rumination (chewing the cud)','Fermentation','Peristalsis'],a:'Rumination (chewing the cud)',why:'Ruminants: swallow grass, regurgitate cud later. Rumen microorganisms ferment cellulose.'},
+  {id:'ag10',topic:'crops',diff:'mid',q:'Mixed farming combines:',opts:['One crop repeatedly','Crop production with livestock on same farm','Farming different plots','Only cash crops'],a:'Crop production with livestock on same farm',why:'Mixed farming: animals provide manure; crops provide feed. More sustainable than monoculture.'},
+  {id:'ag11',topic:'crops',diff:'easy',q:'Transplanting means:',opts:['Moving seeds from storage','Moving seedlings from nursery to main field','Removing weeds','Applying fertiliser to seeds'],a:'Moving seedlings from nursery to main field',why:'Transplanting: seedlings raised in nursery then moved to main field. Used for tomatoes, cabbage, onions.'},
+  {id:'ag12',topic:'soil',diff:'mid',q:'Fertiliser supplying nitrogen:',opts:['Single superphosphate','Muriate of potash','Urea','Triple superphosphate'],a:'Urea',why:'Urea: 46% nitrogen — highest concentration solid nitrogen fertiliser. Superphosphate provides P; muriate provides K.'},
+  {id:'ag13',topic:'animals',diff:'mid',q:'Selective breeding in livestock:',opts:['Random mating','Choosing animals with desired traits to breed for improvement','Importing exotic breeds only','Reducing herd size'],a:'Choosing animals with desired traits to breed for improvement',why:"Selective breeding: choose superior parents (high milk yield, fast growth, disease resistance). Improves herd over generations."},
+  {id:'ag14',topic:'crops',diff:'hard',q:'Correct order of cereal grain milling:',opts:['Cleaning→Conditioning→Breaking→Separation→Reduction','Breaking→Cleaning→Reduction→Conditioning→Separation','Conditioning→Cleaning→Breaking→Reduction→Separation','Cleaning→Breaking→Reduction→Conditioning→Separation'],a:'Cleaning→Conditioning→Breaking→Separation→Reduction',why:'Milling stages: (1) Cleaning, (2) Conditioning (moisture), (3) Breaking, (4) Separation (sifting), (5) Reduction (grinding).'},
+  {id:'ag15',topic:'soil',diff:'mid',q:'Crop rotation maintains soil fertility by:',opts:['Growing same crop repeatedly','Alternating crops especially legumes to restore nutrients','Adding only artificial fertilisers','Burning residues'],a:'Alternating crops especially legumes to restore nutrients',why:'Crop rotation: maize → beans → cassava. Legumes fix nitrogen. Breaks pest/disease cycles.'},
+  {id:'ag16',topic:'animals',diff:'easy',q:'Main function of gizzard in poultry:',opts:['Produce digestive enzymes','Grind food','Store eggs','Produce bile'],a:'Grind food',why:'Gizzard: muscular organ grinding food using ingested grit. Replaces teeth in birds.'},
+  {id:'ag17',topic:'crops',diff:'easy',q:'Cash crop grown for export in Nigeria:',opts:['Cassava','Cocoa','Maize','Cowpea'],a:'Cocoa',why:"Nigeria's main agricultural export: cocoa (SW). Others: groundnut (N), rubber, palm oil. Leading non-oil export."},
+  {id:'ag18',topic:'pest',diff:'mid',q:'IPM (Integrated Pest Management) combines:',opts:['Chemical only','Biological, cultural, mechanical and chemical methods','Burning crops','One pesticide repeatedly'],a:'Biological, cultural, mechanical and chemical methods',why:'IPM: biological (predators) + cultural (rotation) + mechanical (traps) + chemical (targeted). Minimises environmental damage.'},
+  {id:'ag19',topic:'soil',diff:'mid',q:'Humus in soil is:',opts:['Clay mineral','Decomposed organic matter improving fertility','Chemical fertiliser','Rock particle'],a:'Decomposed organic matter improving fertility',why:"Humus: dark decomposed organic matter — improves soil structure, water retention, drainage and nutrients."},
+  {id:'ag20',topic:'animals',diff:'mid',q:'Mastitis in cattle affects:',opts:['Respiratory system','Digestive system','Udder (mammary gland)','Reproductive system'],a:'Udder (mammary gland)',why:'Mastitis: inflammation of udder by bacterial infection. Major cause of milk loss in dairy. Treated with antibiotics.'},
+  {id:'ag21',topic:'crops',diff:'easy',q:'Irrigation is:',opts:['Removing excess water','Adding water artificially when rainfall insufficient','Applying fertiliser through pipes','Planting in dry season only'],a:'Adding water artificially when rainfall insufficient',why:'Irrigation: artificial water application. Enables year-round farming. Critical in northern Nigeria.'},
+  {id:'ag22',topic:'soil',diff:'hard',q:'Water removing soluble nutrients from topsoil downward:',opts:['Erosion','Leaching','Compaction','Laterisation'],a:'Leaching',why:'Leaching: rainfall carries soluble nutrients (N, K, Ca) downward out of root reach. Serious in high-rainfall tropical areas.'},
+  {id:'ag23',topic:'animals',diff:'mid',q:'Vitamin essential for blood clotting:',opts:['Vitamin A','Vitamin C','Vitamin D','Vitamin K'],a:'Vitamin K',why:'Vitamin K: essential for clotting factors (prothrombin). Deficiency causes bleeding disorders.'},
+  {id:'ag24',topic:'crops',diff:'mid',q:'Nitrogen in plant growth promotes:',opts:['Root development','Flowering/fruiting','Vegetative (leaf/stem) growth','Water absorption'],a:'Vegetative (leaf/stem) growth',why:'Nitrogen: essential for chlorophyll and protein synthesis — promotes leafy growth. Deficiency: yellowing (chlorosis).'},
+  {id:'ag25',topic:'animals',diff:'easy',q:'Poultry farming involves rearing:',opts:['Cattle and goats','Chickens, turkeys, ducks and guinea fowl','Only broilers','Fish and shrimp'],a:'Chickens, turkeys, ducks and guinea fowl',why:'Poultry: domesticated birds for meat, eggs, feathers. Types: broilers (meat), layers (eggs).'},
+  {id:'ag26',topic:'soil',diff:'easy',q:'Suitable pH for maize:',opts:['4.0–5.0','5.5–7.0','8.0–9.0','3.0–4.0'],a:'5.5–7.0',why:'Maize grows best at pH 5.5–7.0. Very acidic soils reduce phosphorus availability.'},
+  {id:'ag27',topic:'crops',diff:'mid',q:'Method of vegetative propagation:',opts:['Broadcasting seeds','Stem cuttings','Pollination','Seed germination'],a:'Stem cuttings',why:'Vegetative propagation from non-seed parts: stem cuttings (cassava, sugarcane), grafting, budding, layering.'},
+  {id:'ag28',topic:'animals',diff:'mid',q:'Gestation period of cattle:',opts:['3 months','6 months','9 months','12 months'],a:'9 months',why:'Cattle gestation: ~9 months (280 days). Pig: ~3 months 3 weeks 3 days. Rabbit: ~28-31 days.'},
+  {id:'ag29',topic:'pest',diff:'easy',q:'Pest causing most damage to stored grains:',opts:['Tsetse fly','Weevil (grain weevil)','Aphid','Grasshopper'],a:'Weevil (grain weevil)',why:'Grain weevils (Sitophilus) bore into stored cereals. Control: hermetic storage, fumigation, proper drying.'},
+  {id:'ag30',topic:'crops',diff:'easy',q:'Mulching involves:',opts:['Applying water','Covering soil with organic material','Cutting trees near farm','Applying pesticides'],a:'Covering soil with organic material',why:'Mulch covers soil: conserves moisture, suppresses weeds, moderates temperature, improves organic matter.'},
+  {id:'ag31',topic:'soil',diff:'mid',q:'Laterisation results from:',opts:['Soil enriched with humus','Heavy rainfall leaching silica leaving iron/aluminium oxides','Soil freezing and thawing','Volcanic ash deposited'],a:'Heavy rainfall leaching silica leaving iron/aluminium oxides',why:'Laterisation: intense tropical rainfall leaches silica/bases → iron and aluminium oxides (laterite). Low nutrient, common in West Africa.'},
+  {id:'ag32',topic:'animals',diff:'mid',q:'Newcastle disease caused by:',opts:['Bacterium','Fungus','Virus','Parasite'],a:'Virus',why:'Newcastle disease: Avian Paramyxovirus. Respiratory distress, nervous signs, high mortality. Controlled by vaccination.'},
+  {id:'ag33',topic:'crops',diff:'mid',q:'Adding lime to acidic soil:',opts:['Supplies phosphorus','Increases pH (reduces acidity)','Kills bacteria','Improves drainage'],a:'Increases pH (reduces acidity)',why:'Agricultural lime (CaCO₃) raises pH: improves nutrient availability, reduces toxic Al³⁺ and Mn²⁺.'},
+  {id:'ag34',topic:'animals',diff:'easy',q:'Which is a monogastric animal?',opts:['Goat','Sheep','Pig','Cow'],a:'Pig',why:'Monogastric: single-chambered stomach — pigs, humans, horses, rabbits, poultry. Ruminants have four-chambered stomachs.'},
+  {id:'ag35',topic:'crops',diff:'mid',q:'Pollination is transfer of pollen from:',opts:['Root to stem','Anther to stigma','Stigma to ovary','Leaf to flower'],a:'Anther to stigma',why:'Pollination: pollen from anther (male stamen) to stigma (top of female pistil).'},
+  {id:'ag36',topic:'soil',diff:'easy',q:'Farming practice preventing erosion on slopes:',opts:['Row planting up and down slope','Contour ploughing','Burning residues','Removing all vegetation'],a:'Contour ploughing',why:'Contour ploughing: furrows follow contour lines — slows water flow and traps soil.'},
+  {id:'ag37',topic:'animals',diff:'mid',q:'Trypanosomiasis transmitted by:',opts:['Mosquito','Tsetse fly','Tick','Louse'],a:'Tsetse fly',why:'Trypanosomiasis: caused by Trypanosoma parasites, transmitted by tsetse flies (Glossina). Major livestock disease in sub-Saharan Africa.'},
+  {id:'ag38',topic:'crops',diff:'easy',q:'Science of growing fruits and vegetables:',opts:['Agronomy','Horticulture','Silviculture','Apiculture'],a:'Horticulture',why:'Horticulture: fruits, vegetables, flowers, ornamentals. Agronomy: field crops. Apiculture: beekeeping.'},
+  {id:'ag39',topic:'animals',diff:'mid',q:'Vaccination in livestock:',opts:['Treats existing diseases','Improves weight gain','Prevents disease by stimulating immunity','Improves fertility'],a:'Prevents disease by stimulating immunity',why:'Vaccination: introduces weakened/killed pathogen → immune system makes antibodies without disease. Prevention not treatment.'},
+  {id:'ag40',topic:'soil',diff:'hard',q:'Most important role of earthworms:',opts:['Causing erosion','Improving aeration, drainage and organic matter','Transmitting plant diseases','Competing for water'],a:'Improving aeration, drainage and organic matter',why:"Earthworms: burrows improve drainage/aeration; nutrient-rich casts. Darwin studied their importance."},
+  {id:'ag41',topic:'crops',diff:'mid',q:'Grafting involves:',opts:['Growing from spores','Joining parts of two plants to grow as one','Propagating from leaf cuttings','Dividing root system'],a:'Joining parts of two plants to grow as one',why:'Grafting: scion (desired variety) on rootstock (hardy roots). Combines disease resistance with superior fruiting.'},
+  {id:'ag42',topic:'animals',diff:'easy',q:'Main product from sheep apart from meat:',opts:['Milk','Silk','Wool','Honey'],a:'Wool',why:'Sheep: meat (lamb/mutton), wool (sheared annually), milk, leather. Honey = bees; silk = silkworms.'},
+  {id:'ag43',topic:'crops',diff:'mid',q:'Zero tillage (no-till farming):',opts:['Deep ploughing before planting','Planting without disturbing soil','Burning before planting','Removing all residues'],a:'Planting without disturbing soil',why:'No-till: seeds into undisturbed soil. Conserves moisture, reduces erosion, preserves soil structure.'},
+  {id:'ag44',topic:'animals',diff:'mid',q:'Brooding temperature for day-old chicks:',opts:['10–15°C','20–25°C','32–35°C','40–45°C'],a:'32–35°C',why:'Day-old chicks cannot regulate temperature. Week 1: 32-35°C. Reduce ~3°C/week. Too cold → huddle/crush; too hot → death.'},
+  {id:'ag45',topic:'soil',diff:'mid',q:'Atmospheric nitrogen converted to ammonia by bacteria:',opts:['Nitrification','Denitrification','Nitrogen fixation','Ammonification'],a:'Nitrogen fixation',why:'Nitrogen fixation: N₂ → NH₃ by free-living bacteria (Azotobacter), Rhizobium (legume root nodules), lightning.'},
+  {id:'ag46',topic:'crops',diff:'easy',q:'Staple food crop in southern Nigeria:',opts:['Millet','Sorghum','Yam and cassava','Wheat'],a:'Yam and cassava',why:"Southern Nigeria: yam and cassava. Northern: millet, sorghum, groundnut. Nigeria = world's largest yam producer."},
+  {id:'ag47',topic:'animals',diff:'mid',q:'Weaning in animal husbandry:',opts:['Introducing solid food and separating from mother','Treating for parasites','Selecting for breeding','Feeding before slaughter'],a:'Introducing solid food and separating from mother',why:'Weaning: transition from milk to solid feed. Piglets ~4 weeks, calves ~8 weeks, lambs ~12 weeks.'},
+  {id:'ag48',topic:'crops',diff:'hard',q:'F1 hybrid seeds are:',opts:['Inbred lines that breed true','First-generation offspring with superior vigour','Genetically modified seeds','Vegetatively propagated'],a:'First-generation offspring with superior vigour',why:'F1 hybrids: exhibit hybrid vigour (heterosis) — superior yield, growth, disease resistance. Seeds do NOT breed true.'},
+  {id:'ag49',topic:'pest',diff:'mid',q:'Fungicides control:',opts:['Insect pests','Weeds','Fungal diseases','Nematodes'],a:'Fungal diseases',why:'Agrochemicals: Insecticides (insects), Herbicides (weeds), Fungicides (fungi: blight, rust, smut).'},
+  {id:'ag50',topic:'soil',diff:'mid',q:'Most important soil horizon for crops:',opts:['A horizon (topsoil)','B horizon (subsoil)','C horizon (parent material)','D horizon (bedrock)'],a:'A horizon (topsoil)',why:'A horizon (topsoil): dark, rich in organic matter and nutrients. Most plant roots are here. Topsoil loss = reduced productivity.'}
+];
+
 var WAEC_QUESTIONS={
   maths:WAEC_MATHS_QS,
   english:WAEC_ENGLISH_QS,
   biology:WAEC_BIOLOGY_QS,
-  physics:[],
-  chemistry:[],
-  literature:[],
-  agric:[],
+  physics:WAEC_PHYSICS_QS,
+  chemistry:WAEC_CHEMISTRY_QS,
+  literature:WAEC_LITERATURE_QS,
+  agric:WAEC_AGRIC_QS,
   accounting:[],
-  economics:[],
-  government:[]
+  economics:WAEC_ECONOMICS_QS,
+  government:WAEC_GOVERNMENT_QS
 };
+
 
 // Module state — separate from MS so reasoning/maths state isn't corrupted
 var WS={
@@ -9262,9 +9660,19 @@ function renderMathQ(){
   card.innerHTML=html;
 }
 
+// Normalise "x = A or B" answers so order doesn't matter in comparison
+// e.g. "x = 2 or −2" and "x = −2 or 2" should match
+function _normMathAns(s){
+  if(!s)return s;
+  var m=String(s).match(/^x\s*=\s*(.+?)\s+or\s+(.+)$/i);
+  if(!m)return s.trim();
+  var parts=[m[1].trim(),m[2].trim()].sort();
+  return 'x = '+parts[0]+' or '+parts[1];
+}
+
 function mathPick(btn,chosen){
   var q=MS.questions[MS.qIdx];
-  var isRight=chosen===q.a;
+  var isRight=_normMathAns(chosen)===_normMathAns(q.a);
   if(isRight)sOk();else sFail();
   var ids=_msIds();
   // Highlight all options
@@ -10241,6 +10649,203 @@ function getWaecSubjectList(){
 function renderSubjectAccessUI(){}
 function saveSubjectAccess(){}
 function resetSubjectAccess(){}
+
+
+// ════════════════════════════════════════════════════════════
+// TEACHER CLASS SUBJECT CONTROL
+// Teacher sets which subjects each of their classes can see.
+// Limited to the school's paid pool (set by Blestonex in Firestore).
+// Stored in Firestore: schools/{code}/classes/{className}/config
+// Cached in localStorage: el_class_cfg_{className}
+// ════════════════════════════════════════════════════════════
+
+var CLASS_CFG_PREFIX='el_class_cfg_';
+
+// Get school's paid subject pool (what Blestonex unlocked for this school)
+function _getSchoolPaidSubjects(){
+  var access=loadSubjectAccess();
+  if(access===null)return MAIN_SUBJECTS.map(function(s){return s.key;});
+  return MAIN_SUBJECTS.filter(function(s){return access[s.key]!==false;}).map(function(s){return s.key;});
+}
+function _getSchoolPaidWaecSubjects(){
+  var access=loadWaecAccess();
+  if(access===null)return WAEC_ACCESS_LIST.map(function(s){return s.key;});
+  return WAEC_ACCESS_LIST.filter(function(s){return access[s.key]!==false;}).map(function(s){return s.key;});
+}
+
+// Load a class config from localStorage cache
+function loadClassConfig(className){
+  try{return JSON.parse(localStorage.getItem(CLASS_CFG_PREFIX+className)||'null');}catch(e){return null;}
+}
+
+// Save class config to Firestore + localStorage cache
+function saveClassConfig(className, cfg, onDone){
+  localStorage.setItem(CLASS_CFG_PREFIX+className, JSON.stringify(cfg));
+  var school=getSchool();
+  if(!school||!school.code||!FB||!FB.db){if(onDone)onDone(true);return;}
+  FB.db.collection('schools').doc(school.code)
+    .collection('classes').doc(className)
+    .set(cfg,{merge:true})
+    .then(function(){if(onDone)onDone(true);})
+    .catch(function(e){console.warn('Class config save failed:',e.message);if(onDone)onDone(false);});
+}
+
+// Fetch class config from Firestore and cache it
+function fetchClassConfig(className, onDone){
+  var school=getSchool();
+  if(!school||!school.code||!FB||!FB.db){onDone(loadClassConfig(className));return;}
+  FB.db.collection('schools').doc(school.code)
+    .collection('classes').doc(className).get()
+    .then(function(doc){
+      var cfg=doc.exists?doc.data():null;
+      if(cfg)localStorage.setItem(CLASS_CFG_PREFIX+className,JSON.stringify(cfg));
+      onDone(cfg);
+    })
+    .catch(function(){onDone(loadClassConfig(className));});
+}
+
+// Render the teacher's class list with subject buttons
+function renderTeacherClassSubjectList(){
+  var list=document.getElementById('teacher-class-list');
+  if(!list||!STAFF)return;
+  var classes=Array.isArray(STAFF.assignedClasses)?STAFF.assignedClasses:[];
+  if(!classes.length){
+    list.innerHTML='<div style="font-size:13px;color:var(--sm);text-align:center;padding:12px">No classes assigned yet. Ask the proprietor to assign classes to you.</div>';
+    return;
+  }
+  list.innerHTML='<div style="font-size:12px;color:var(--sm);margin-bottom:4px">Loading class settings…</div>';
+  var rendered=[];
+  classes.forEach(function(cls,i){
+    fetchClassConfig(cls,function(cfg){
+      rendered[i]={cls:cls,cfg:cfg};
+      if(rendered.filter(Boolean).length===classes.length) _drawTeacherClasses(list,rendered);
+    });
+  });
+}
+
+function _drawTeacherClasses(list,items){
+  var paid=_getSchoolPaidSubjects();
+  var paidWaec=_getSchoolPaidWaecSubjects();
+  // Labels for display
+  var labels={english:'English & GS',maths:'Mathematics',verbal:'Verbal Reasoning',
+    quantitative:'Quant. Reasoning',waec:'WAEC/JAMB',competition:'Competition',leaderboard:'Leaderboard'};
+  list.innerHTML='';
+  items.forEach(function(item){
+    if(!item)return;
+    var cls=item.cls, cfg=item.cfg;
+    var allowedMain=cfg&&Array.isArray(cfg.allowedSubjects)?cfg.allowedSubjects:null;
+    var allowedWaec=cfg&&Array.isArray(cfg.allowedWaecSubjects)?cfg.allowedWaecSubjects:null;
+    var card=document.createElement('div');
+    card.style.cssText='background:#F0FDF4;border-radius:10px;padding:12px 14px;border:1.5px solid #BBF7D0';
+    var summary=allowedMain?allowedMain.map(function(k){return labels[k]||k;}).join(', '):'All subjects';
+    card.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+      +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:14px;color:#065F46">'+_escapeHtml(cls)+'</div>'
+      +'<button onclick="openClassSubjectPicker(\''+_escapeHtml(cls)+'\')" style="background:#0D9488;color:#fff;border:none;border-radius:7px;padding:6px 12px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:12px;cursor:pointer">Set subjects</button>'
+      +'</div>'
+      +'<div style="font-size:12px;color:#047857">Subjects: '+_escapeHtml(summary)+'</div>';
+    list.appendChild(card);
+  });
+}
+
+// Open picker modal for a specific class
+function openClassSubjectPicker(className){
+  var paid=_getSchoolPaidSubjects();
+  var paidWaec=_getSchoolPaidWaecSubjects();
+  var cfg=loadClassConfig(className)||{};
+  var allowedMain=Array.isArray(cfg.allowedSubjects)?cfg.allowedSubjects:paid.slice();
+  var allowedWaec=Array.isArray(cfg.allowedWaecSubjects)?cfg.allowedWaecSubjects:paidWaec.slice();
+
+  var labels={english:'📖 English & GS',maths:'🔢 Mathematics',verbal:'🔤 Verbal Reasoning',
+    quantitative:'🔢 Quant. Reasoning',waec:'🎓 WAEC/JAMB',competition:'🏆 Competition',leaderboard:'🏅 Leaderboard'};
+  var waecLabels={maths:'📐 Mathematics',english:'📖 English',biology:'🧬 Biology',
+    physics:'⚛️ Physics',chemistry:'⚗️ Chemistry',literature:'📚 Literature',
+    agric:'🌾 Agric Science',accounting:'💼 Accounting',economics:'📊 Economics',government:'🏛️ Government'};
+
+  // Build modal HTML
+  var html='<div id="cls-picker-overlay" onclick="if(event.target===this)closeClassPicker()" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:flex;align-items:flex-end">'
+    +'<div style="background:#fff;border-radius:16px 16px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:20px 16px 32px">'
+    +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:16px;color:#065F46;margin-bottom:4px">📚 '+_escapeHtml(className)+' — Subjects</div>'
+    +'<div style="font-size:12px;color:#6B7280;margin-bottom:14px">Only subjects your school has subscribed to are shown.</div>'
+    +'<div style="font-weight:800;font-size:12px;color:#0D9488;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Main subjects</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px" id="cls-main-checks">';
+  paid.forEach(function(k){
+    var chk=allowedMain.indexOf(k)!==-1?'checked':'';
+    html+='<div style="display:flex;align-items:center;gap:8px;background:#F0FDF4;border-radius:8px;padding:8px 10px">'
+      +'<input type="checkbox" id="clsm-'+k+'" '+chk+' style="width:15px;height:15px;accent-color:#0D9488;cursor:pointer">'
+      +'<label for="clsm-'+k+'" style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;flex:1">'+labels[k]+'</label></div>';
+  });
+  html+='</div>';
+  if(paidWaec.length){
+    html+='<div style="font-weight:800;font-size:12px;color:#7F1D1D;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">WAEC / JAMB subjects</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px" id="cls-waec-checks">';
+    paidWaec.forEach(function(k){
+      var chk=allowedWaec.indexOf(k)!==-1?'checked':'';
+      html+='<div style="display:flex;align-items:center;gap:8px;background:#FEF2F2;border-radius:8px;padding:8px 10px">'
+        +'<input type="checkbox" id="clsw-'+k+'" '+chk+' style="width:15px;height:15px;accent-color:#7F1D1D;cursor:pointer">'
+        +'<label for="clsw-'+k+'" style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;flex:1">'+waecLabels[k]+'</label></div>';
+    });
+    html+='</div>';
+  }
+  html+='<button onclick="confirmClassSubjectPicker(\''+_escapeHtml(className)+'\')" style="width:100%;padding:14px;background:#0D9488;color:#fff;border:none;border-radius:12px;font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;cursor:pointer">Save for '+_escapeHtml(className)+'</button>'
+    +'<button onclick="closeClassPicker()" style="width:100%;padding:12px;background:transparent;color:#6B7280;border:none;font-family:\'Nunito\',sans-serif;font-weight:700;font-size:13px;cursor:pointer;margin-top:6px">Cancel</button>'
+    +'</div></div>';
+
+  var overlay=document.createElement('div');
+  overlay.id='cls-picker-root';
+  overlay.innerHTML=html;
+  document.body.appendChild(overlay);
+}
+
+function confirmClassSubjectPicker(className){
+  var paid=_getSchoolPaidSubjects();
+  var paidWaec=_getSchoolPaidWaecSubjects();
+  var main=[],waec=[];
+  paid.forEach(function(k){var cb=document.getElementById('clsm-'+k);if(cb&&cb.checked)main.push(k);});
+  paidWaec.forEach(function(k){var cb=document.getElementById('clsw-'+k);if(cb&&cb.checked)waec.push(k);});
+  var cfg={allowedSubjects:main,allowedWaecSubjects:waec};
+  closeClassPicker();
+  saveClassConfig(className,cfg,function(ok){
+    toast(ok?'✅ Subjects saved for '+className:'⚠️ Saved locally — sync when online',2200);
+    renderTeacherClassSubjectList();
+  });
+}
+
+function closeClassPicker(){
+  var el=document.getElementById('cls-picker-root');
+  if(el)el.parentNode.removeChild(el);
+}
+
+// Apply class-level subject filter for the current student.
+// Called from loadHome() — checks if student's class has its own config.
+function applyClassSubjectAccess(){
+  var cls=STU&&(STU.classLabel||STU.class);
+  if(!cls)return;
+  var cfg=loadClassConfig(cls);
+  if(!cfg)return; // no class config — school-level already applied
+  // Override with class-level settings
+  var access=cfg.allowedSubjects;
+  var waecAccess=cfg.allowedWaecSubjects;
+  if(Array.isArray(access)){
+    MAIN_SUBJECTS.forEach(function(s){
+      var el=document.getElementById(s.card);
+      if(!el)return;
+      if(access.indexOf(s.key)===-1)el.style.display='none';
+    });
+  }
+  if(Array.isArray(waecAccess)){
+    // Cache so getWaecSubjectList() picks it up for this session
+    var waecMap={};
+    WAEC_ACCESS_LIST.forEach(function(s){waecMap[s.key]=waecAccess.indexOf(s.key)!==-1;});
+    localStorage.setItem(WAEC_ACCESS_KEY,JSON.stringify(waecMap));
+  }
+  // Also fetch fresh from Firestore in background
+  fetchClassConfig(cls,function(freshCfg){
+    if(freshCfg&&JSON.stringify(freshCfg)!==JSON.stringify(cfg)){
+      // Config changed — re-apply next time home loads
+      localStorage.setItem(CLASS_CFG_PREFIX+cls,JSON.stringify(freshCfg));
+    }
+  });
+}
 
 function saveSchoolSettings(){
   var nameEl=document.getElementById('admin-school-name');
