@@ -10180,20 +10180,37 @@ function loadWaecAccess(){
 // If the fields are absent, ALL subjects are allowed (default / no restriction).
 function syncSubjectAccessFromSchool(schoolData){
   if(!schoolData)return;
-  if(schoolData.allowedSubjects&&Array.isArray(schoolData.allowedSubjects)){
+
+  // Normalise a Firestore value to a lowercase array regardless of how it was stored:
+  // "English"  →  ["english"]
+  // "English, Maths"  →  ["english","maths"]
+  // ["english","maths"]  →  ["english","maths"]
+  // absent / null  →  null  (means no restriction)
+  function _toList(val){
+    if(!val)return null;
+    if(Array.isArray(val))return val.map(function(v){return String(v).trim().toLowerCase();});
+    if(typeof val==='string'&&val.trim()){
+      return val.split(',').map(function(v){return v.trim().toLowerCase();});
+    }
+    return null;
+  }
+
+  var allowed=_toList(schoolData.allowedSubjects);
+  if(allowed){
     var access={};
     MAIN_SUBJECTS.forEach(function(s){
-      access[s.key]=schoolData.allowedSubjects.indexOf(s.key)!==-1;
+      access[s.key]=allowed.indexOf(s.key.toLowerCase())!==-1;
     });
     localStorage.setItem(SUBJECT_ACCESS_KEY,JSON.stringify(access));
   }else{
-    // No restriction set — clear any old cache so all subjects show
     localStorage.removeItem(SUBJECT_ACCESS_KEY);
   }
-  if(schoolData.allowedWaecSubjects&&Array.isArray(schoolData.allowedWaecSubjects)){
+
+  var waecAllowed=_toList(schoolData.allowedWaecSubjects);
+  if(waecAllowed){
     var waecAccess={};
     WAEC_ACCESS_LIST.forEach(function(s){
-      waecAccess[s.key]=schoolData.allowedWaecSubjects.indexOf(s.key)!==-1;
+      waecAccess[s.key]=waecAllowed.indexOf(s.key.toLowerCase())!==-1;
     });
     localStorage.setItem(WAEC_ACCESS_KEY,JSON.stringify(waecAccess));
   }else{
