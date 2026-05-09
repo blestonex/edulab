@@ -78,7 +78,7 @@ body{display:flex;flex-direction:column}
 .splash-inner{text-align:left;width:100%;max-width:440px;display:flex;flex-direction:column;animation:none}
 
 /* HERO — compact, restrained. No illustration here; just identity & value prop. */
-.sp-hero{background:linear-gradient(135deg,#C2410C 0%,#7C2D12 100%);padding:24px 28px 28px;color:#fff;position:relative;overflow:hidden;border-bottom-left-radius:28px;border-bottom-right-radius:28px;box-shadow:0 8px 24px -6px rgba(234,88,12,.45)}
+.sp-hero{background:linear-gradient(135deg,#F97316 0%,#EA580C 100%);padding:24px 28px 28px;color:#fff;position:relative;overflow:hidden;border-bottom-left-radius:28px;border-bottom-right-radius:28px;box-shadow:0 8px 24px -6px rgba(234,88,12,.45)}
 .sp-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none}
 .sp-hero::after{content:'';position:absolute;bottom:-30px;left:-30px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none}
 .sp-blestonex{font-size:10px;font-weight:800;letter-spacing:2.4px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:8px}
@@ -87,7 +87,7 @@ body{display:flex;flex-direction:column}
 .sp-tag{font-size:14px;color:rgba(255,255,255,.92);line-height:1.5;font-weight:600;max-width:340px}
 
 /* CARD AREA — white surface that feels like a modern app, breaks the orange */
-.sp-card-area{padding:18px 20px 4px;background:#FAFAFA}
+.sp-card-area{padding:18px 20px 4px;background:#FFF7ED}
 
 .splash-lbl{font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#9A3412;margin:6px 4px 10px;opacity:.7}
 
@@ -242,6 +242,8 @@ body{display:flex;flex-direction:column}
 /* ── PWA INSTALL BANNER ── */
 #install-banner{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;padding:14px 16px;display:none;align-items:center;gap:12px;z-index:9999;box-shadow:0 -4px 20px rgba(0,0,0,.2)}
 #install-banner.show{display:flex}
+/* When banner is visible, push all screen content up so Next buttons aren't hidden */
+body.banner-open .screen.active{padding-bottom:80px}
 #install-banner .ib-icon{font-size:28px;flex-shrink:0}
 #install-banner .ib-text{flex:1}
 #install-banner .ib-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:15px}
@@ -610,6 +612,8 @@ body{display:flex;flex-direction:column}
       <div id="admin-brand-preview" style="display:none;margin-top:10px;border-radius:10px;padding:12px 16px;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;align-items:center;gap:8px"></div>
     </div>
 
+    <!-- ── SUBJECT ACCESS is controlled by Blestonex centrally (not editable here) ── -->
+
     <!-- Teacher details — used in Friday WhatsApp Reports -->
     <div style="background:#fff;border-radius:var(--r);padding:18px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
       <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;color:#15803D;margin-bottom:4px">👩🏽‍🏫 Your details <span style="font-size:11px;color:var(--sm);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-left:4px">for Friday Reports</span></div>
@@ -763,7 +767,7 @@ body{display:flex;flex-direction:column}
     <div id="expiry-notice" style="display:none;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;font-size:13px;font-weight:700;text-align:center">
       <span id="expiry-notice-text"></span>
     </div>
-    <div class="subj-card" onclick="openLessonList()">
+    <div class="subj-card" id="subj-card-english" onclick="openLessonList()">
       <div class="subj-head">
         <div class="subj-icon" style="background:#E0F0FF;color:#1565C0">📖</div>
         <div class="subj-meta"><div class="subj-name">English & General Studies</div><div class="subj-desc">Animals · Body · Food · Colours · Science · Social</div></div>
@@ -774,7 +778,7 @@ body{display:flex;flex-direction:column}
         <div class="prog-label"><span id="eng-pt">0 stages complete</span><span id="eng-pp">0%</span></div>
       </div>
     </div>
-    <div class="subj-card" onclick="openMathList()">
+    <div class="subj-card" id="subj-card-maths" onclick="openMathList()">
       <div class="subj-head">
         <div class="subj-icon" style="background:#FFF3E0;color:#E65100">🔢</div>
         <div class="subj-meta"><div class="subj-name">Mathematics</div><div class="subj-desc">Numbers · Addition · Multiplication · Algebra</div></div>
@@ -785,7 +789,7 @@ body{display:flex;flex-direction:column}
         <div class="prog-label"><span id="math-pt">0 stages complete</span><span id="math-pp">0%</span></div>
       </div>
     </div>
-    <div class="subj-card" onclick="openReasoningList('verbal')">
+    <div class="subj-card" id="subj-card-verbal" onclick="openReasoningList('verbal')">
       <div class="subj-head">
         <div class="subj-icon" style="background:#EDE9FE;color:#6D28D9">🔤</div>
         <div class="subj-meta"><div class="subj-name">Verbal Reasoning</div><div class="subj-desc">Synonyms · Antonyms · Analogies · Coding · Odd-One-Out</div></div>
@@ -796,7 +800,7 @@ body{display:flex;flex-direction:column}
         <div class="prog-label"><span id="vr-pt">0 stages complete</span><span id="vr-pp">0%</span></div>
       </div>
     </div>
-    <div class="subj-card" onclick="openReasoningList('quantitative')">
+    <div class="subj-card" id="subj-card-quantitative" onclick="openReasoningList('quantitative')">
       <div class="subj-head">
         <div class="subj-icon" style="background:#DCFCE7;color:#15803D">🔢</div>
         <div class="subj-meta"><div class="subj-name">Quantitative Reasoning</div><div class="subj-desc">Number Series · Fractions · Data Tables · Speed Tests</div></div>
@@ -822,7 +826,7 @@ body{display:flex;flex-direction:column}
       </div>
     </div>
     <!-- House Competition — opens menu so user can choose Host or Join -->
-    <div class="subj-card" onclick="openCompMenu()" style="background:linear-gradient(135deg,#065F46,#047857);border:none">
+    <div class="subj-card" id="subj-card-competition" onclick="openCompMenu()" style="background:linear-gradient(135deg,#065F46,#047857);border:none">
       <div class="subj-head">
         <div class="subj-icon" style="background:rgba(255,255,255,.15);color:#fff;font-size:24px">🏆</div>
         <div class="subj-meta">
@@ -833,7 +837,7 @@ body{display:flex;flex-direction:column}
       </div>
     </div>
     <!-- Leaderboard -->
-    <div class="subj-card" onclick="openLeaderboard()" style="background:linear-gradient(135deg,#0F172A,#1E1B4B);border:none">
+    <div class="subj-card" id="subj-card-leaderboard" onclick="openLeaderboard()" style="background:linear-gradient(135deg,#0F172A,#1E1B4B);border:none">
       <div class="subj-head">
         <div class="subj-icon" style="background:rgba(255,255,255,.15);color:#FDE68A;font-size:24px">🏅</div>
         <div class="subj-meta">
@@ -998,6 +1002,10 @@ body{display:flex;flex-direction:column}
   <div class="content" style="padding:16px">
     <div id="math-card" class="q-card" style="margin-bottom:10px;text-align:center"></div>
     <div id="math-msg" class="q-msg"></div>
+    <div id="math-why" style="display:none;margin-top:8px;border-radius:12px;overflow:hidden;border:2px solid #EA580C">
+      <div style="background:#EA580C;color:#fff;padding:7px 14px;font-family:'Nunito',sans-serif;font-weight:900;font-size:12px;letter-spacing:.6px;text-transform:uppercase">👩&#x200D;🏫 How to solve it</div>
+      <div id="math-why-body" style="background:#FFF7ED;padding:12px 14px;font-size:13px;color:#7C2D12;line-height:1.8"></div>
+    </div>
   </div>
   <div class="actionbar">
     <button class="btn" id="math-next" onclick="mathNext()" disabled style="background:#EA580C;color:#fff">Next →</button>
@@ -1051,6 +1059,10 @@ body{display:flex;flex-direction:column}
   <div class="content" style="padding:16px">
     <div id="rz-card" class="q-card" style="margin-bottom:10px;text-align:center"></div>
     <div id="rz-msg" class="q-msg"></div>
+    <div id="rz-why" style="display:none;margin-top:8px;border-radius:12px;overflow:hidden;border:2px solid #7C3AED">
+      <div style="background:#7C3AED;color:#fff;padding:7px 14px;font-family:'Nunito',sans-serif;font-weight:900;font-size:12px;letter-spacing:.6px;text-transform:uppercase">👩&#x200D;🏫 How to solve it</div>
+      <div id="rz-why-body" style="background:#F5F3FF;padding:12px 14px;font-size:13px;color:#4C1D95;line-height:1.8"></div>
+    </div>
   </div>
   <div class="actionbar">
     <button class="btn" id="rz-next" onclick="mathNext()" disabled style="background:#7C3AED;color:#fff">Next →</button>
@@ -1130,7 +1142,10 @@ body{display:flex;flex-direction:column}
   <div class="content" style="padding:16px">
     <div id="waec-card" class="q-card" style="margin-bottom:10px"></div>
     <div id="waec-msg" class="q-msg"></div>
-    <div id="waec-why" style="display:none;background:#FEF3C7;border-radius:10px;padding:12px 14px;margin-top:6px;font-size:13px;color:#78350F;line-height:1.6;white-space:pre-wrap"></div>
+    <div id="waec-why" style="display:none;margin-top:8px;border-radius:12px;overflow:hidden;border:2px solid #F59E0B">
+      <div style="background:#F59E0B;color:#fff;padding:7px 14px;font-family:'Nunito',sans-serif;font-weight:900;font-size:12px;letter-spacing:.6px;text-transform:uppercase">👩&#x200D;🏫 Teacher's Explanation</div>
+      <div id="waec-why-body" style="background:#FEF3C7;padding:12px 14px;font-size:13px;color:#78350F;line-height:1.8"></div>
+    </div>
   </div>
   <div class="actionbar">
     <button class="btn" id="waec-next" onclick="waecNext()" disabled style="background:#7F1D1D;color:#fff">Next →</button>
@@ -1669,10 +1684,10 @@ body{display:flex;flex-direction:column}
   <div class="ib-icon">📚</div>
   <div class="ib-text">
     <div class="ib-title">Install EduLab</div>
-    <div class="ib-sub">Works offline · No internet needed in class</div>
+    <div class="ib-sub">Tap Install or ✕ to close, then continue</div>
   </div>
   <button class="ib-install" onclick="pwaInstall()">Install</button>
-  <button class="ib-close" onclick="pwaDismiss()">✕</button>
+  <button class="ib-close" onclick="pwaDismiss()" title="Close and continue" style="font-size:24px;padding:0 8px;font-weight:900">✕</button>
 </div>
 
 <!-- iOS INSTALL TIP (Safari) -->
@@ -3199,6 +3214,8 @@ function init(){
               // Stamp a fresh verifiedAt so the MAX_OFFLINE_DAYS window resets
               ls(LK_SCHOOL,Object.assign({code:school.code,verifiedAt:Date.now()},safe));
               applyBranding();
+              // Sync subject access from Firestore (set by Blestonex owner, not local admin)
+              syncSubjectAccessFromSchool(data);
               // Touch the device's lastSeen so Blestonex sees it as active
               var deviceId=getDeviceId();
               FB.db.collection('schools').doc(school.code).collection('devices').doc(deviceId)
@@ -4896,6 +4913,7 @@ function openAdmin(){
 function _doOpenAdmin(){
   loadAdminSchoolFields();
   renderAdminProgress();
+  renderSubjectAccessUI(); // populate subject access checkboxes
   // Show current device mode so the user knows what they're in before switching
   var modeStatus=document.getElementById('admin-mode-status');
   if(modeStatus){
@@ -5167,6 +5185,10 @@ function loadHome(){
     var isSenior=(cl==='SSS 2'||cl==='SSS 3'||cl==='WAEC/JAMB'||cl==='WAEC'||cl==='JAMB');
     waecCard.style.display=isSenior?'':'none';
   }
+  // Apply admin subject access filter (hides cards not in the school's plan)
+  // Note: WAEC card may be overridden above — applySubjectAccess only hides,
+  // class gate above may already hide it, so we call after.
+  applySubjectAccess();
   SS('home');
 }
 
@@ -6279,29 +6301,12 @@ function showExportDialog(schoolName){
     });
     Object.keys(cloudProg).forEach(function(k){if(!allProg[k])allProg[k]=cloudProg[k];});
 
-    // Apply teacher scoping. A teacher exporting a progress report should
-    // only get students from her assigned/active class — never the full
-    // school. Proprietors keep the full export. Filter happens here at
-    // the source so both the dropdown options AND the actual export data
-    // are scoped consistently.
-    merged=_filterVisibleStudents(merged);
+    if(!merged.length){toast('No students to export.',2000);return;}
 
-    if(!merged.length){
-      var msg=_isTeacherSession()
-        ? 'No students in your assigned class'+((_visibleClassesForCurrentStaff()||[]).length>1?'es':'')+' to export.'
-        : 'No students to export.';
-      toast(msg,2500);
-      return;
-    }
-
-    // Build selection UI. The "All Students" label adapts so a teacher
-    // sees "All My Students (N)" rather than the misleading "All Students".
-    var allLabel=_isTeacherSession()
-      ? 'All My Students ('+merged.length+')'
-      : 'All Students ('+merged.length+')';
-    var opts='<option value="all">'+allLabel+'</option>';
+    // Build selection UI
+    var opts='<option value="all">All Students ('+merged.length+')</option>';
     merged.forEach(function(s,i){
-      opts+='<option value="'+i+'">'+(s.emoji||'👤')+' '+_escapeHtml(s.name)+' ('+_escapeHtml(s.classLabel||'')+')</option>';
+      opts+='<option value="'+i+'">'+(s.emoji||'👤')+' '+s.name+' ('+s.classLabel+')</option>';
     });
 
     // Create overlay dialog
@@ -6412,36 +6417,10 @@ var _perfData={roster:[],allProg:{}}; // cached for filter changes
 function openClassPerformance(){
   var content=document.getElementById('class-perf-content');
   if(!content)return;
-  // Scope the class filter dropdown for teachers — only their assigned
-  // classes show as options. Proprietors keep the full list. The dropdown
-  // is rebuilt every time the view opens so it reflects the current
-  // staff session (including the active class for multi-class teachers).
-  var classFilter=document.getElementById('perf-class');
-  if(classFilter){
-    var allowed=_visibleClassesForCurrentStaff();
-    if(allowed&&allowed.length){
-      // Teacher: limit to their classes. Default to the active class if set,
-      // otherwise the first assigned class. No "All Classes" option for
-      // teachers because "all" means proprietor-scope.
-      classFilter.innerHTML=allowed.map(function(cl){
-        return '<option value="'+_escapeHtml(cl)+'">'+_escapeHtml(cl)+'</option>';
-      }).join('');
-      classFilter.value=_staffActiveClass||allowed[0];
-    }else if(allowed===null){
-      // Proprietor / legacy session — restore the full options if needed.
-      // Only rebuild if currently scoped (avoid clobbering on every open).
-      if(!classFilter.querySelector('option[value="all"]')){
-        classFilter.innerHTML='<option value="all">All Classes</option>'
-          +['Nursery 1','Nursery 2','Primary 1','Primary 2','Primary 3','Primary 4','Primary 5','Primary 6','JSS 1','JSS 2','JSS 3','SSS 1','SSS 2','WAEC/JAMB']
-            .map(function(cl){return '<option value="'+cl+'">'+cl+'</option>';}).join('');
-      }
-    }
-  }
   content.innerHTML='<div style="text-align:center;padding:30px;color:#6B7B8D;font-size:14px">Loading\u2026</div>';
   SS('class-performance');
 
-  // Pull merged roster (local + cloud), then apply teacher scoping so only
-  // students from their assigned/active classes are loaded into _perfData.
+  // Pull merged roster (local + cloud)
   var localProg=lg(LK_PROG)||{};
   loadSchoolRosterFromFirestore(function(cloudStudents){
     var merged=ROSTER.slice();
@@ -6455,11 +6434,7 @@ function openClassPerformance(){
     var allProg={};
     Object.keys(localProg).forEach(function(k){allProg[k]=Object.assign({},localProg[k]);});
     Object.keys(cloudProg).forEach(function(k){if(!allProg[k])allProg[k]=cloudProg[k];});
-    // Apply class scoping. Teachers never see students outside their classes
-    // here, even if they manually set the filter to a class they don't own
-    // (which they can't, given the dropdown above is also scoped, but
-    // belt-and-braces).
-    _perfData={roster:_filterVisibleStudents(merged),allProg:allProg};
+    _perfData={roster:merged,allProg:allProg};
     renderPerformance();
   });
 }
@@ -6650,8 +6625,8 @@ function renderPerformance(){
 
 // Each math question: {q, a, opts, type, emoji}
 // opts: array of 4 answer choices (strings), a is the correct one
-function makeMathQ(q,a,opts,type,emoji){
-  return {q:q,a:String(a),opts:opts.map(String),type:type,emoji:emoji||'🔢'};
+function makeMathQ(q,a,opts,type,emoji,why){
+  return {q:q,a:String(a),opts:opts.map(String),type:type,emoji:emoji||'🔢',why:why||null};
 }
 
 // Generate wrong answers near a number
@@ -6718,31 +6693,47 @@ var MATH_STAGES={
 };
 // JSS differentiated maths
 MATH_STAGES['JSS 1']=[
-  {id:'m-j1-s1',label:'Stage 1 — Number & Indices',  emoji:'🔢',gen:function(){return genIndices();}},
-  {id:'m-j1-s2',label:'Stage 2 — LCM & HCF',        emoji:'🔢',gen:function(){return genLCMHCF();}},
-  {id:'m-j1-s3',label:'Stage 3 — Simple Algebra',    emoji:'x', gen:function(){return genAlgebra(1);}},
-  {id:'m-j1-s4',label:'Stage 4 — Basic Geometry',    emoji:'📐',gen:function(){return genGeometry();}}
+  {id:'m-j1-s1',label:'Stage 1 — Number & Indices',  emoji:'🔢',gen:function(){return genIndices();},
+   concept:{title:'Indices (Powers)',body:'An index (power) tells you how many times to multiply a number by itself.\n\nKey rules:\n• aᵐ × aⁿ = aᵐ⁺ⁿ  (add powers, same base)\n• aᵐ ÷ aⁿ = aᵐ⁻ⁿ  (subtract powers)\n• a⁰ = 1  (anything to power 0 is 1)\n• a¹ = a  (power 1 changes nothing)',formula:'3² × 3³ = 3⁵ = 243'}},
+  {id:'m-j1-s2',label:'Stage 2 — LCM & HCF',        emoji:'🔢',gen:function(){return genLCMHCF();},
+   concept:{title:'LCM and HCF',body:'HCF (Highest Common Factor): the BIGGEST number that divides into BOTH numbers.\n\nLCM (Lowest Common Multiple): the SMALLEST number that BOTH numbers divide into.\n\nMethod — list factors/multiples or use prime factorisation.',formula:'HCF(12,18)=6   LCM(4,6)=12'}},
+  {id:'m-j1-s3',label:'Stage 3 — Simple Algebra',    emoji:'x', gen:function(){return genAlgebra(1);},
+   concept:{title:'Solving Simple Equations',body:'To solve for x, do the same thing to BOTH sides to isolate x.\n\nSteps:\n1. Move numbers away from x (use inverse operations)\n2. Divide both sides by x\'s coefficient\n3. Check: substitute your answer back in\n\nInverse operations: + and − cancel each other, × and ÷ cancel each other.',formula:'3x + 5 = 14  →  3x = 9  →  x = 3'}},
+  {id:'m-j1-s4',label:'Stage 4 — Basic Geometry',    emoji:'📐',gen:function(){return genGeometry();},
+   concept:{title:'Angles — Key Facts',body:'• Angles on a straight line add up to 180°\n• Angles around a point add up to 360°\n• Vertically opposite angles are equal\n• Triangle angles sum to 180°\n• Quadrilateral angles sum to 360°\n• Complementary = adds to 90°\n• Supplementary = adds to 180°',formula:'Equilateral △: all angles = 60°'}}
 ];
 MATH_STAGES['JSS 2']=[
-  {id:'m-j2-s1',label:'Stage 1 — Linear Equations',  emoji:'x', gen:function(){return genAlgebra(2);}},
-  {id:'m-j2-s2',label:'Stage 2 — Simultaneous Eqns', emoji:'x', gen:function(){return genSimultaneous();}},
+  {id:'m-j2-s1',label:'Stage 1 — Linear Equations',  emoji:'x', gen:function(){return genAlgebra(2);},
+   concept:{title:'Linear Equations with Two Steps',body:'When x appears on one side:\n1. Expand any brackets first\n2. Collect all x terms on one side\n3. Collect numbers on the other\n4. Divide to find x\n\nIf x is in a fraction, multiply both sides by the denominator first.',formula:'2(x + 3) = 14  →  2x + 6 = 14  →  2x = 8  →  x = 4'}},
+  {id:'m-j2-s2',label:'Stage 2 — Simultaneous Eqns', emoji:'x', gen:function(){return genSimultaneous();},
+   concept:{title:'Simultaneous Equations',body:'Two equations, two unknowns. Use the ELIMINATION method:\n\n1. Make the coefficient of one variable the same in both equations\n2. Add or subtract the equations to eliminate that variable\n3. Solve for the remaining variable\n4. Substitute back to find the other one\n\nAlways check your answer in BOTH original equations.',formula:'x + y = 5  and  x − y = 1  →  add → 2x = 6 → x = 3, y = 2'}},
   {id:'m-j2-s3',label:'Stage 3 — Coordinates',       emoji:'📍',gen:function(){return genCoordinates();}},
-  {id:'m-j2-s4',label:'Stage 4 — Statistics',        emoji:'📊',gen:function(){return genStats();}}
+  {id:'m-j2-s4',label:'Stage 4 — Statistics',        emoji:'📊',gen:function(){return genStats();},
+   concept:{title:'Mean, Median, Mode, Range',body:'• Mean: add all values ÷ how many values (the "average")\n• Median: arrange in order, take the MIDDLE value\n• Mode: the value that appears MOST often\n• Range: highest value − lowest value\n\nTip: in even number of values, median = average of the two middle ones.',formula:'Data: 2, 5, 5, 7, 9  →  Mean=5.6  Median=5  Mode=5  Range=7'}}
 ];
 MATH_STAGES['JSS 3']=[
-  {id:'m-j3-s1',label:'Stage 1 — Factorisation',     emoji:'x²',gen:function(){return genFactorise();}},
-  {id:'m-j3-s2',label:'Stage 2 — Pythagoras',        emoji:'📐',gen:function(){return genPythagoras();}},
-  {id:'m-j3-s3',label:'Stage 3 — Bearings',          emoji:'🧭',gen:function(){return genBearings();}},
+  {id:'m-j3-s1',label:'Stage 1 — Factorisation',     emoji:'x²',gen:function(){return genFactorise();},
+   concept:{title:'Factorising Quadratics',body:'To factorise x² + bx + c, find two numbers p and q such that:\n• p × q = c  (they multiply to give the last number)\n• p + q = b  (they add to give the middle coefficient)\n\nThen write: (x + p)(x + q)\n\nTip: if c is positive, p and q have the SAME sign as b.\nIf c is negative, p and q have DIFFERENT signs.',formula:'x² + 5x + 6 → p×q=6, p+q=5 → p=2, q=3 → (x+2)(x+3)'}},
+  {id:'m-j3-s2',label:'Stage 2 — Pythagoras',        emoji:'📐',gen:function(){return genPythagoras();},
+   concept:{title:'Pythagoras\' Theorem',body:'Only works for RIGHT-ANGLED triangles.\n\nThe hypotenuse (c) is the longest side, always opposite the right angle.\n\nc² = a² + b²\n\nTo find c: c = √(a² + b²)\nTo find a missing leg: a = √(c² − b²)\n\nCommon triples to memorise: 3-4-5, 5-12-13, 8-15-17',formula:'3² + 4² = 9 + 16 = 25 = 5²'}},
+  {id:'m-j3-s3',label:'Stage 3 — Bearings',          emoji:'🧭',gen:function(){return genBearings();},
+   concept:{title:'Compass Bearings',body:'Bearings are measured CLOCKWISE from North.\nAlways written as 3 digits.\n\nN = 000°\nE = 090°\nS = 180°\nW = 270°\n\nBack bearing = original bearing + 180°\n(if over 360°, subtract 360°)',formula:'NE = 045°    SE = 135°    SW = 225°    NW = 315°'}},
   {id:'m-j3-s4',label:'Stage 4 — Mixed JSS',         emoji:'🏆',gen:function(){return genMixed('jss');}}
 ];
 // SSS 1 — WAEC/NECO preparation
 MATH_STAGES['SSS 1']=[
-  {id:'m-s1-s1',label:'Stage 1 — Quadratics',          emoji:'x²',gen:function(){return genQuadratic();}},
-  {id:'m-s1-s2',label:'Stage 2 — Surds & Indices',     emoji:'√', gen:function(){return genSurds();}},
-  {id:'m-s1-s3',label:'Stage 3 — Trigonometry',        emoji:'📐',gen:function(){return genTrig();}},
-  {id:'m-s1-s4',label:'Stage 4 — Circle Theorems',     emoji:'⭕',gen:function(){return genCircleTheorems();}},
-  {id:'m-s1-s5',label:'Stage 5 — Logarithms',          emoji:'㏒', gen:function(){return genLogarithms();}},
-  {id:'m-s1-s6',label:'Stage 6 — Vectors',             emoji:'➡️',gen:function(){return genVectors();}},
+  {id:'m-s1-s1',label:'Stage 1 — Quadratics',          emoji:'x²',gen:function(){return genQuadratic();},
+   concept:{title:'Solving Quadratic Equations',body:'A quadratic equation has the form ax² + bx + c = 0.\n\nTo solve by factorisation:\n1. Find two numbers that MULTIPLY to give c and ADD to give b\n2. Write as (x + p)(x + q) = 0\n3. Set each bracket to zero: x = −p or x = −q',formula:'x² − 5x + 6 = 0 → (x−2)(x−3) = 0 → x = 2 or 3'}},
+  {id:'m-s1-s2',label:'Stage 2 — Surds & Indices',     emoji:'√', gen:function(){return genSurds();},
+   concept:{title:'Simplifying Surds',body:'A surd is a square root that cannot be simplified to a whole number.\n\nKey rules:\n• √(a×b) = √a × √b  →  break into perfect square × rest\n• Add like surds: 3√2 + 5√2 = 8√2 (like terms)\n• Rationalise: multiply top and bottom by the surd',formula:'√50 = √(25×2) = 5√2'}},
+  {id:'m-s1-s3',label:'Stage 3 — Trigonometry',        emoji:'📐',gen:function(){return genTrig();},
+   concept:{title:'SOH-CAH-TOA',body:'In a right-angled triangle:\n\n• sin θ = Opposite ÷ Hypotenuse\n• cos θ = Adjacent ÷ Hypotenuse\n• tan θ = Opposite ÷ Adjacent\n\nMemory trick: SOH-CAH-TOA\n\nKey values to know by heart:\n• sin 30°=0.5,  cos 60°=0.5,  tan 45°=1\n• sin 90°=1,    cos 0°=1',formula:'sin θ = O/H,  cos θ = A/H,  tan θ = O/A'}},
+  {id:'m-s1-s4',label:'Stage 4 — Circle Theorems',     emoji:'⭕',gen:function(){return genCircleTheorems();},
+   concept:{title:'Circle Theorems',body:'Six key theorems to memorise:\n\n1. Angle in semicircle = 90°\n2. Angle at centre = 2 × angle at circumference\n3. Angles in same segment are equal\n4. Opposite angles in cyclic quadrilateral add to 180°\n5. Tangent ⊥ radius at point of contact\n6. Two tangents from external point are equal',formula:'∠BOC = 2 × ∠BAC (same arc)'}},
+  {id:'m-s1-s5',label:'Stage 5 — Logarithms',          emoji:'㏒', gen:function(){return genLogarithms();},
+   concept:{title:'Understanding Logarithms',body:'A logarithm is the reverse of a power:\n\nIf 10² = 100, then log₁₀ 100 = 2\n\nRules to know:\n• log(a × b) = log a + log b\n• log(a ÷ b) = log a − log b\n• log(aⁿ) = n × log a\n• log of the base = 1\n• log of 1 = 0 (always)',formula:'log₁₀ 1000 = 3  because  10³ = 1000'}},
+  {id:'m-s1-s6',label:'Stage 6 — Vectors',             emoji:'➡️',gen:function(){return genVectors();},
+   concept:{title:'Vector Addition & Subtraction',body:'A vector has both direction and magnitude.\nWritten as (x, y) — the x and y components.\n\nTo add or subtract vectors:\n→ Simply add or subtract each component separately:\n  a + b = (a_x + b_x, a_y + b_y)\n  a − b = (a_x − b_x, a_y − b_y)',formula:'(3, 5) + (−1, 2) = (2, 7)'}},
   {id:'m-s1-s7',label:'Stage 7 — Statistics & Prob.',  emoji:'📊',gen:function(){return genStats();}},
   {id:'m-s1-s8',label:'Stage 8 — WAEC Mixed',          emoji:'🏆',gen:function(){return genWAECMixed();}}
 ];
@@ -6937,19 +6928,19 @@ function genGeometry(){
 
 function genTrig(){
   var qs=[
-    {q:'sin 30° = ?',a:'0.5',w:['1','0.866','0.707']},
-    {q:'cos 60° = ?',a:'0.5',w:['0.866','1','0.707']},
-    {q:'sin 90° = ?',a:'1',w:['0','0.5','0.707']},
-    {q:'cos 0° = ?',a:'1',w:['0','0.5','0.866']},
-    {q:'tan 45° = ?',a:'1',w:['0.5','0.866','undefined']},
-    {q:'sin 45° ≈ ?',a:'0.707',w:['0.5','0.866','1']},
-    {q:'cos 30° ≈ ?',a:'0.866',w:['0.5','0.707','1']},
-    {q:'tan 0° = ?',a:'0',w:['1','0.5','undefined']},
-    {q:'sin 60° ≈ ?',a:'0.866',w:['0.5','0.707','1']},
-    {q:'cos 90° = ?',a:'0',w:['1','0.5','0.707']}
+    {q:'sin 30° = ?',a:'0.5',w:['1','0.866','0.707'],why:'Use SOH: sin = Opposite ÷ Hypotenuse. In a 30-60-90 triangle, the sides are in ratio 1:√3:2. sin 30° = 1÷2 = 0.5'},
+    {q:'cos 60° = ?',a:'0.5',w:['0.866','1','0.707'],why:'Use CAH: cos = Adjacent ÷ Hypotenuse. In a 30-60-90 triangle, cos 60° = 1÷2 = 0.5. Note: cos 60° = sin 30° — this is not a coincidence. cos θ = sin(90°−θ) always.'},
+    {q:'sin 90° = ?',a:'1',w:['0','0.5','0.707'],why:'At 90°, the opposite side equals the hypotenuse in a right angle. sin 90° = Opposite÷Hypotenuse = 1÷1 = 1. This is the maximum value sin can ever reach.'},
+    {q:'cos 0° = ?',a:'1',w:['0','0.5','0.866'],why:'At 0°, the adjacent side equals the hypotenuse. cos 0° = Adjacent÷Hypotenuse = 1÷1 = 1. Tip: cos starts at 1 and decreases as the angle increases.'},
+    {q:'tan 45° = ?',a:'1',w:['0.5','0.866','undefined'],why:'tan = sin÷cos (or Opposite÷Adjacent). At 45°, sin 45° = cos 45° = √2/2. So tan 45° = (√2/2)÷(√2/2) = 1. The triangle is isosceles.'},
+    {q:'sin 45° ≈ ?',a:'0.707',w:['0.5','0.866','1'],why:'sin 45° = 1÷√2 = √2÷2 ≈ 0.707. Remember: a 45-45-90 triangle has sides 1, 1, √2. Opposite and hypotenuse give 1÷√2 ≈ 0.707.'},
+    {q:'cos 30° ≈ ?',a:'0.866',w:['0.5','0.707','1'],why:'In a 30-60-90 triangle, sides are 1, √3, 2. cos 30° = Adjacent÷Hypotenuse = √3÷2 ≈ 1.732÷2 ≈ 0.866.'},
+    {q:'tan 0° = ?',a:'0',w:['1','0.5','undefined'],why:'tan 0° = sin 0°÷cos 0° = 0÷1 = 0. At 0°, there is no opposite side — the angle hasn\'t opened at all, so the ratio is zero.'},
+    {q:'sin 60° ≈ ?',a:'0.866',w:['0.5','0.707','1'],why:'In a 30-60-90 triangle, sin 60° = Opposite÷Hypotenuse = √3÷2 ≈ 0.866. Notice: sin 60° = cos 30° — they swap because 60° + 30° = 90°.'},
+    {q:'cos 90° = ?',a:'0',w:['1','0.5','0.707'],why:'At 90°, the adjacent side has shrunk to zero. cos 90° = Adjacent÷Hypotenuse = 0÷1 = 0. Remember: sin increases from 0→1 while cos decreases from 1→0 as angle goes from 0°→90°.'}
   ];
   return shuffle(qs).slice(0,10).map(function(f){
-    return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Trig','📐');
+    return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Trig','📐',f.why);
   });
 }
 function genStats(){
@@ -7060,7 +7051,8 @@ function genFactorise(){
     var q='Factorise: x² + '+B+'x + '+C;
     var ans='(x+'+a+')(x+'+b+')';
     var w=['(x+'+B+')(x+'+C+')','(x−'+a+')(x−'+b+')','(x+'+C+')(x+'+B+')'];
-    qs.push(makeMathQ(q,ans,shuffle([ans].concat(w)),'Factorise','x²'));
+    var why='Find two numbers that: MULTIPLY to give '+C+' and ADD to give '+B+'. Those numbers are '+a+' and '+b+' ('+a+'×'+b+'='+C+', '+a+'+'+b+'='+B+'). So x² + '+B+'x + '+C+' = (x+'+a+')(x+'+b+').';
+    qs.push(makeMathQ(q,ans,shuffle([ans].concat(w)),'Factorise','x²',why));
   }
   return qs;
 }
@@ -7071,81 +7063,81 @@ function genPythagoras(){
   for(var i=0;i<10;i++){
     var t=triples[i%triples.length];
     if(t[2]){
-      // Find hypotenuse
       var ans=t[2];
       var q='Right-angled triangle:\na = '+t[0]+', b = '+t[1]+'\nFind c (hypotenuse)';
       var opts=shuffle([String(ans)].concat(mathWrong(ans,3,4)));
-      qs.push(makeMathQ(q,ans,opts,'Pythagoras','📐'));
+      var why='Pythagoras: c² = a² + b² = '+t[0]+'² + '+t[1]+'² = '+(t[0]*t[0])+' + '+(t[1]*t[1])+' = '+(t[0]*t[0]+t[1]*t[1])+'. So c = √'+(t[0]*t[0]+t[1]*t[1])+' = '+ans+'.';
+      qs.push(makeMathQ(q,ans,opts,'Pythagoras','📐',why));
     }else{
-      // Find missing shorter side
       var a=t[0],b=t[1];
       var c2=a*a+b*b;var c=Math.round(Math.sqrt(c2)*10)/10;
       var q2='Right triangle: a='+a+', b='+b+'\nc² = a² + b²\nc = ?';
       var opts2=shuffle([String(c)].concat([String(a+b),String(a*b),String(Math.round(c*2))]));
-      qs.push(makeMathQ(q2,c,opts2,'Pythagoras','📐'));
+      var why2='c² = '+a+'² + '+b+'² = '+(a*a)+' + '+(b*b)+' = '+c2+'. So c = √'+c2+' ≈ '+c+'.';
+      qs.push(makeMathQ(q2,c,opts2,'Pythagoras','📐',why2));
     }
   }
   return qs;
 }
 function genBearings(){
   var qs=[
-    {q:'A ship sails on bearing 090°.\nIn which direction is it heading?',a:'East',w:['North','West','South']},
-    {q:'North is 000°. What bearing is South?',a:'180°',w:['090°','270°','360°']},
-    {q:'What bearing is West?',a:'270°',w:['090°','180°','360°']},
-    {q:'What bearing is East?',a:'090°',w:['180°','270°','000°']},
-    {q:'Bearing 045° is which direction?',a:'North-East',w:['North-West','South-East','South-West']},
-    {q:'Bearing 135° is which direction?',a:'South-East',w:['North-East','South-West','North-West']},
-    {q:'Back bearing of 060° is?',a:'240°',w:['120°','300°','180°']},
-    {q:'Back bearing of 150° is?',a:'330°',w:['030°','210°','300°']},
-    {q:'A plane flies 300 km on bearing 000°. How far North?',a:'300 km',w:['0 km','150 km','600 km']},
-    {q:'Back bearing of 270° (West) is?',a:'090°',w:['180°','000°','270°']}
+    {q:'A ship sails on bearing 090°.\nIn which direction is it heading?',a:'East',w:['North','West','South'],why:'Bearings are measured CLOCKWISE from North. 000°=North, 090°=East (quarter turn), 180°=South, 270°=West. So bearing 090° = due East.'},
+    {q:'North is 000°. What bearing is South?',a:'180°',w:['090°','270°','360°'],why:'South is directly opposite North. Starting at 000° and rotating clockwise by half a full turn: 000° + 180° = 180°.'},
+    {q:'What bearing is West?',a:'270°',w:['090°','180°','360°'],why:'Clockwise from North: N=000°, E=090°, S=180°, W=270°. Three-quarter turn clockwise from North.'},
+    {q:'What bearing is East?',a:'090°',w:['180°','270°','000°'],why:'East is a quarter-turn clockwise from North. Always write bearings as 3 digits: 090°, not 90°.'},
+    {q:'Bearing 045° is which direction?',a:'North-East',w:['North-West','South-East','South-West'],why:'045° is halfway between North (000°) and East (090°). Halfway between N and E = North-East.'},
+    {q:'Bearing 135° is which direction?',a:'South-East',w:['North-East','South-West','North-West'],why:'135° is halfway between East (090°) and South (180°). 090° + 45° = 135° = South-East.'},
+    {q:'Back bearing of 060° is?',a:'240°',w:['120°','300°','180°'],why:'Back bearing = original + 180°. 060° + 180° = 240°. The back bearing points in the exact opposite direction — used to return to your start.'},
+    {q:'Back bearing of 150° is?',a:'330°',w:['030°','210°','300°'],why:'Back bearing = 150° + 180° = 330°. Since 330° < 360°, no further adjustment needed.'},
+    {q:'A plane flies 300 km on bearing 000°.\nHow far North?',a:'300 km',w:['0 km','150 km','600 km'],why:'Bearing 000° = due North. The entire journey is northward. North distance = 300 × cos(0°) = 300 × 1 = 300 km.'},
+    {q:'Back bearing of 270° (West) is?',a:'090°',w:['180°','000°','270°'],why:'Back bearing = 270° + 180° = 450°. Since 450° > 360°, subtract 360°: 450° − 360° = 090° = East. West and East are always opposite.'}
   ];
-  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Bearings','🧭');});
+  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Bearings','🧭',f.why);});
 }
 function genSurds(){
   var qs=[
-    {q:'Simplify √50',a:'5√2',w:['25√2','√25','10√5']},
-    {q:'Simplify √72',a:'6√2',w:['8√3','36√2','3√8']},
-    {q:'Simplify √18',a:'3√2',w:['6√3','9√2','2√9']},
-    {q:'√8 × √2 = ?',a:'4',w:['8','√10','2√4']},
-    {q:'(√3)² = ?',a:'3',w:['9','√9','6']},
-    {q:'√100 = ?',a:'10',w:['50','20','5']},
-    {q:'2^(1/2) is the same as?',a:'√2',w:['2','√4','1/2']},
-    {q:'Simplify: 3√2 + 5√2',a:'8√2',w:['15√2','8√4','√30']},
-    {q:'√12 + √3 = ?',a:'3√3',w:['2√3','4√3','√15']},
-    {q:'Rationalise: 1/√2 = ?',a:'√2/2',w:['√2','2/√2','1/2']}
+    {q:'Simplify √50',a:'5√2',w:['25√2','√25','10√5'],why:'Break 50 into a perfect square × something: 50 = 25 × 2. So √50 = √25 × √2 = 5√2. Key rule: √(a×b) = √a × √b.'},
+    {q:'Simplify √72',a:'6√2',w:['8√3','36√2','3√8'],why:'72 = 36 × 2. So √72 = √36 × √2 = 6√2. Always look for the LARGEST perfect square factor (36 is better than 4 here).'},
+    {q:'Simplify √18',a:'3√2',w:['6√3','9√2','2√9'],why:'18 = 9 × 2. So √18 = √9 × √2 = 3√2. Perfect squares to know: 4, 9, 16, 25, 36, 49, 64, 81, 100.'},
+    {q:'√8 × √2 = ?',a:'4',w:['8','√10','2√4'],why:'√8 × √2 = √(8×2) = √16 = 4. Rule: √a × √b = √(ab). Then simplify the result.'},
+    {q:'(√3)² = ?',a:'3',w:['9','√9','6'],why:'Squaring a square root cancels them out: (√3)² = √3 × √3 = 3. This is the definition of a square root — it\'s the number that when squared gives you back the original.'},
+    {q:'√100 = ?',a:'10',w:['50','20','5'],why:'√100 = 10 because 10² = 100. A common perfect square to memorise.'},
+    {q:'2^(1/2) is the same as?',a:'√2',w:['2','√4','1/2'],why:'A fractional power means a root: a^(1/n) = ⁿ√a. So 2^(1/2) = ²√2 = √2. Similarly 8^(1/3) = ∛8 = 2.'},
+    {q:'Simplify: 3√2 + 5√2',a:'8√2',w:['15√2','8√4','√30'],why:'Like surds are added like terms: 3√2 + 5√2 = (3+5)√2 = 8√2. The √2 stays — you only add the coefficients in front, exactly like 3x + 5x = 8x.'},
+    {q:'√12 + √3 = ?',a:'3√3',w:['2√3','4√3','√15'],why:'Simplify √12 first: √12 = √(4×3) = 2√3. Now add: 2√3 + √3 = 3√3. Always simplify each surd first, then combine like terms.'},
+    {q:'Rationalise: 1/√2 = ?',a:'√2/2',w:['√2','2/√2','1/2'],why:'Rationalising means removing the surd from the denominator. Multiply top and bottom by √2: (1×√2)÷(√2×√2) = √2÷2. The denominator becomes 2 (a rational number). ✓'}
   ];
-  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Surds','√');});
+  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Surds','√',f.why);});
 }
 function genCircleTheorems(){
   var qs=[
-    {q:'Angle in a semicircle = ?',a:'90°',w:['45°','180°','60°']},
-    {q:'Angles in the same segment are?',a:'Equal',w:['Supplementary','Complementary','Different']},
-    {q:'Opposite angles of a cyclic quadrilateral add up to?',a:'180°',w:['90°','360°','270°']},
-    {q:'The angle at the centre is _____ the angle at the circumference.',a:'Twice',w:['Half','Equal to','Three times']},
-    {q:'A tangent to a circle is _____ to the radius at that point.',a:'Perpendicular',w:['Parallel','Equal','Bisecting']},
-    {q:'Two tangents from an external point are?',a:'Equal in length',w:['Parallel','Perpendicular','Unequal']},
-    {q:'Angle in alternate segment = angle between?',a:'Tangent and chord',w:['Two tangents','Two chords','Radius and chord']},
-    {q:'An inscribed angle is _____ of its intercepted arc.',a:'Half',w:['Equal to','Twice','A quarter of']},
-    {q:'A chord that passes through the centre is called?',a:'Diameter',w:['Radius','Secant','Arc']},
-    {q:'The perpendicular from the centre to a chord _____ the chord.',a:'Bisects',w:['Doubles','Is parallel to','Triples']}
+    {q:'Angle in a semicircle = ?',a:'90°',w:['45°','180°','60°'],why:'This is Thales\' Theorem: any angle inscribed in a semicircle (where the triangle\'s longest side is the diameter) is always 90°. The angle at the circumference = half the angle at the centre, and the centre angle for a diameter is 180°, so 180°÷2 = 90°.'},
+    {q:'Angles in the same segment are?',a:'Equal',w:['Supplementary','Complementary','Different'],why:'Any two angles inscribed in the same arc (same side of a chord) are equal. They both subtend the same arc, so both equal half the central angle for that arc.'},
+    {q:'Opposite angles of a cyclic quadrilateral add up to?',a:'180°',w:['90°','360°','270°'],why:'In a cyclic quadrilateral (all 4 vertices on the circle), opposite angles are supplementary. Each pair subtends arcs that together make the full circle (360°). Angle at circumference = half central angle, so each pair sums to 360°÷2 = 180°.'},
+    {q:'The angle at the centre is _____ the angle at the circumference.',a:'Twice',w:['Half','Equal to','Three times'],why:'Central Angle Theorem: the angle at the centre = 2 × the angle at the circumference, when both subtend the same arc. So if the circumference angle is 35°, the centre angle is 70°.'},
+    {q:'A tangent to a circle is _____ to the radius at that point.',a:'Perpendicular',w:['Parallel','Equal','Bisecting'],why:'A tangent just "touches" the circle at one point. The radius to that point is always at exactly 90° (perpendicular) to the tangent. This gives you a right angle to use in calculations.'},
+    {q:'Two tangents from an external point are?',a:'Equal in length',w:['Parallel','Perpendicular','Unequal'],why:'From any external point, the two tangent lines to a circle are always equal in length. You can prove this using congruent triangles (RHS congruence with the two radii).'},
+    {q:'Angle in alternate segment = angle between?',a:'Tangent and chord',w:['Two tangents','Two chords','Radius and chord'],why:'Alternate Segment Theorem (Tangent-Chord angle): the angle between a tangent and a chord equals the inscribed angle in the alternate segment. Very commonly tested in WAEC.'},
+    {q:'An inscribed angle is _____ of its intercepted arc.',a:'Half',w:['Equal to','Twice','A quarter of'],why:'The inscribed angle theorem says: angle at circumference = ½ × central angle = ½ × arc. So if the arc is 120°, the inscribed angle is 60°.'},
+    {q:'A chord that passes through the centre is called?',a:'Diameter',w:['Radius','Secant','Arc'],why:'The diameter is the longest possible chord — it passes through the exact centre of the circle. Its length = 2 × radius.'},
+    {q:'The perpendicular from the centre to a chord _____ the chord.',a:'Bisects',w:['Doubles','Is parallel to','Triples'],why:'If you drop a perpendicular from the centre of a circle to any chord, it cuts that chord exactly in half. This creates two congruent right-angled triangles you can use to find missing lengths.'}
   ];
-  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Circles','⭕');});
+  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Circles','⭕',f.why);});
 }
 function genLogarithms(){
   var qs=[
-    {q:'log₁₀ 100 = ?',a:'2',w:['10','1','20']},
-    {q:'log₁₀ 1000 = ?',a:'3',w:['100','10','30']},
-    {q:'log₁₀ 10 = ?',a:'1',w:['0','10','100']},
-    {q:'log₁₀ 1 = ?',a:'0',w:['1','−1','10']},
-    {q:'log₂ 8 = ?',a:'3',w:['2','4','8']},
-    {q:'log₂ 16 = ?',a:'4',w:['2','8','3']},
-    {q:'log₃ 27 = ?',a:'3',w:['9','27','6']},
-    {q:'If log x = 2, then x = ?',a:'100',w:['20','10','1000']},
-    {q:'log(a × b) = ?',a:'log a + log b',w:['log a − log b','log a × log b','log(a+b)']},
-    {q:'log(a/b) = ?',a:'log a − log b',w:['log a + log b','log a ÷ log b','log(a−b)']}
+    {q:'log₁₀ 100 = ?',a:'2',w:['10','1','20'],why:'log₁₀ 100 asks: "10 to what power gives 100?" Answer: 10² = 100, so log₁₀ 100 = 2. Think of log as the inverse of "raising to a power".'},
+    {q:'log₁₀ 1000 = ?',a:'3',w:['100','10','30'],why:'10³ = 1000, so log₁₀ 1000 = 3. Pattern: log₁₀ of a power of 10 is simply the number of zeros: 100→2, 1000→3, 10000→4.'},
+    {q:'log₁₀ 10 = ?',a:'1',w:['0','10','100'],why:'10¹ = 10, so log₁₀ 10 = 1. The log of the base itself is always 1. log₂ 2 = 1, log₃ 3 = 1, etc.'},
+    {q:'log₁₀ 1 = ?',a:'0',w:['1','−1','10'],why:'10⁰ = 1 (anything to the power 0 is 1). So log₁₀ 1 = 0. The log of 1 is always 0, in any base.'},
+    {q:'log₂ 8 = ?',a:'3',w:['2','4','8'],why:'log₂ 8 asks: "2 to what power gives 8?" 2¹=2, 2²=4, 2³=8. So the answer is 3.'},
+    {q:'log₂ 16 = ?',a:'4',w:['2','8','3'],why:'2⁴ = 16 (2→4→8→16). So log₂ 16 = 4.'},
+    {q:'log₃ 27 = ?',a:'3',w:['9','27','6'],why:'3¹=3, 3²=9, 3³=27. So log₃ 27 = 3.'},
+    {q:'If log x = 2, then x = ?',a:'100',w:['20','10','1000'],why:'"log x = 2" means log₁₀ x = 2. To undo a log, raise the base to that power: x = 10² = 100. This is called finding the antilog.'},
+    {q:'log(a × b) = ?',a:'log a + log b',w:['log a − log b','log a × log b','log(a+b)'],why:'Product Rule of Logarithms: log(a×b) = log a + log b. Example: log(100×10) = log 1000 = 3. And log 100 + log 10 = 2 + 1 = 3 ✓. Multiplication becomes addition inside a log.'},
+    {q:'log(a/b) = ?',a:'log a − log b',w:['log a + log b','log a ÷ log b','log(a−b)'],why:'Quotient Rule of Logarithms: log(a/b) = log a − log b. Division becomes subtraction inside a log. Example: log(1000/10) = log 100 = 2. And log 1000 − log 10 = 3 − 1 = 2 ✓.'}
   ];
-  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Logarithms','㏒');});
+  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Logarithms','㏒',f.why);});
 }
 function genVectors(){
   var qs=[];
@@ -7157,7 +7149,10 @@ function genVectors(){
     var q='a = ('+ax+', '+ay+'), b = ('+bx+', '+by+')\na '+(isAdd?'+':'-')+' b = ?';
     var ans='('+cx+', '+cy+')';
     var w=['('+(cx+1)+', '+cy+')','('+cx+', '+(cy+1)+')','('+(cx-1)+', '+(cy-1)+')'];
-    qs.push(makeMathQ(q,ans,shuffle([ans].concat(w)),'Vectors','➡️'));
+    var why=isAdd
+      ? 'To add vectors, add their x-components and y-components separately:\n('+ax+' + '+bx+', '+ay+' + '+by+') = ('+cx+', '+cy+')'
+      : 'To subtract vectors, subtract x-components then y-components:\n('+ax+' − ('+bx+'), '+ay+' − ('+by+')) = ('+cx+', '+cy+')';
+    qs.push(makeMathQ(q,ans,shuffle([ans].concat(w)),'Vectors','➡️',why));
   }
   return qs;
 }
@@ -7216,9 +7211,17 @@ function genQuadratic(){
   for(var i=0;i<10;i++){
     var v=variants[i%variants.length]();
     var opts=shuffle([v.ans].concat(v.w));
-    qs.push(makeMathQ(v.q,v.ans,opts,'Quadratic','x²'));
+    var why=v.why||_quadraticWhy(v.q,v.ans);
+    qs.push(makeMathQ(v.q,v.ans,opts,'Quadratic','x²',why));
   }
   return qs;
+}
+// Auto-generate a worked explanation hint for quadratic questions
+function _quadraticWhy(q,ans){
+  if(q.indexOf('x²')!==-1&&q.indexOf('=')!==-1){
+    return 'To solve a quadratic, look for two numbers that multiply to give the last term (c) and add to give the middle coefficient (b). Then write as (x − r₁)(x − r₂) = 0. Each bracket gives one root: if (x − r₁) = 0 then x = r₁. The correct answer is '+ans+'.';
+  }
+  return 'Set each factor to zero to find the roots. The correct answer is '+ans+'.';
 }
 // SSS 2 — deeper WAEC topics
 MATH_STAGES['SSS 2']=[
@@ -9184,8 +9187,37 @@ function startMathStage(idx){
   MS.questions=shuffle(MS.stage.gen());
   MS.qIdx=0;MS.answers=[];
   var t=document.getElementById('math-play-title');if(t)t.textContent=MS.stage.label;
-  renderMathQ();
-  SS('math-play');
+  // Show concept intro for senior classes (JSS+) before first question
+  var isSenior=/JSS|SSS|WAEC/.test(cl);
+  if(isSenior&&MS.stage.concept){
+    _showConceptFlash(MS.stage.concept, function(){renderMathQ();});
+    SS('math-play');
+  }else{
+    renderMathQ();
+    SS('math-play');
+  }
+}
+
+// Show a concept flash card before the first question
+function _showConceptFlash(concept, onDone){
+  var card=document.getElementById('math-card');
+  var mm=document.getElementById('math-msg');
+  var why=document.getElementById('math-why');
+  var nx=document.getElementById('math-next');
+  if(mm){mm.textContent='';mm.className='q-msg';}
+  if(why){why.style.display='none';}
+  if(nx){nx.disabled=true;}
+  // Update progress bar to 0
+  var pb=document.getElementById('math-prog');if(pb)pb.style.width='0%';
+  var qn=document.getElementById('math-qnum');if(qn)qn.textContent='Concept First';
+  if(!card)return;
+  card.innerHTML='<div style="background:linear-gradient(135deg,#1E40AF,#1565C0);border-radius:12px;padding:18px;color:#fff;text-align:left;margin-bottom:4px">'
+    +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:13px;letter-spacing:.6px;text-transform:uppercase;opacity:.75;margin-bottom:6px">📚 Before you start</div>'
+    +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:17px;margin-bottom:10px">'+concept.title+'</div>'
+    +'<div style="font-size:13px;line-height:1.7;opacity:.92">'+concept.body+'</div>'
+    +(concept.formula?'<div style="background:rgba(255,255,255,.15);border-radius:8px;padding:10px 14px;margin-top:12px;font-family:monospace;font-size:15px;font-weight:700;letter-spacing:.5px">'+concept.formula+'</div>':'')
+    +'</div>'
+    +'<button onclick="('+onDone.toString()+')()" style="width:100%;padding:14px;background:#EA580C;color:#fff;border:none;border-radius:12px;font-family:\'Nunito\',sans-serif;font-weight:900;font-size:16px;cursor:pointer;margin-top:10px">Got it! Start Practice →</button>';
 }
 
 // Helper — pick the correct DOM element ID based on current mode.
@@ -9233,8 +9265,6 @@ function renderMathQ(){
 function mathPick(btn,chosen){
   var q=MS.questions[MS.qIdx];
   var isRight=chosen===q.a;
-  // Play feedback sound — same as the vocab module via optPick. Previously
-  // silent, which made the maths module feel less responsive than the rest.
   if(isRight)sOk();else sFail();
   var ids=_msIds();
   // Highlight all options
@@ -9246,14 +9276,32 @@ function mathPick(btn,chosen){
   });
   var mm=document.getElementById(ids.msg);
   if(mm){
-    mm.textContent=isRight?'✅ Correct!':'❌ Answer: '+q.a;
+    mm.textContent=isRight?'✅ Correct!':'❌ The correct answer is '+q.a;
     mm.className='q-msg '+(isRight?'ok':'no');
+  }
+  // Show worked example if available (senior maths / reasoning)
+  var whyId=MS.mode==='reasoning'?'rz-why':'math-why';
+  var whyBodyId=MS.mode==='reasoning'?'rz-why-body':'math-why-body';
+  var whyEl=document.getElementById(whyId);
+  var whyBody=document.getElementById(whyBodyId);
+  if(whyEl&&whyBody&&q.why){
+    whyBody.innerHTML=_formatWhy(q.why, isRight);
+    whyEl.style.display='';
+  } else if(whyEl){
+    whyEl.style.display='none';
   }
   MS.answers.push({correct:isRight});
   var nx=document.getElementById(ids.next);if(nx)nx.disabled=false;
 }
 
 function mathNext(){
+  // Hide worked example before moving on
+  ['math-why','rz-why'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  ['math-why-body','rz-why-body'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.innerHTML='';
+  });
   MS.qIdx++;
   if(MS.qIdx>=MS.questions.length){
     if(MS.mode==='reasoning')finishReasoning();
@@ -9440,7 +9488,7 @@ function openWaecHub(){
   var list=document.getElementById('waec-subjects-list');
   if(!list)return;
   var p=prog();
-  list.innerHTML=WAEC_SUBJECTS.map(function(s){
+  list.innerHTML=getWaecSubjectList().map(function(s){
     var qs=WAEC_QUESTIONS[s.key]||[];
     var available=qs.length>0;
     var bestKey='waec_best_'+s.key;
@@ -9634,6 +9682,44 @@ function _waecTickTimer(){
   }
 }
 
+// ── TEACHER-STYLE WORKED EXPLANATION FORMATTER ──
+// Splits a compressed explanation string into numbered visual steps.
+// Splitting cues: ". So ", ". Substitute", ". Then ", ". Therefore ",
+// ". Divide", ". Multiply", ". Add", ". Subtract", ". Check", ". Since",
+// "→", periods followed by capital letters in a sentence-boundary position.
+function _formatWhy(why, isRight){
+  // Headline changes based on whether they got it right
+  var intro = isRight
+    ? '<p style="font-weight:700;margin-bottom:8px">Here\'s why that\'s correct:</p>'
+    : '<p style="font-weight:700;margin-bottom:8px">Here\'s how to solve it step by step:</p>';
+
+  // Split on sentence-boundary cues that naturally delineate steps
+  var raw = why
+    .replace(/\. (So |Then |Therefore |Substitute |Check:|Since |Divide |Multiply |Add |Subtract |Factor|Simplify|Note:|Thus )/g, '||$1')
+    .replace(/ → /g, '||→ ')
+    .replace(/\n\n/g, '||');
+  var parts = raw.split('||').map(function(s){ return s.trim(); }).filter(Boolean);
+
+  if(parts.length <= 1){
+    // No natural split found — just display as a single readable paragraph
+    return intro + '<p style="margin:0">' + _escHtml(why) + '</p>';
+  }
+
+  var html = intro;
+  parts.forEach(function(step, i){
+    // Highlight any "= X" final answers in bold
+    var text = _escHtml(step).replace(/= ([^\s,\.]+)/g, '= <strong>$1</strong>');
+    html += '<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">'
+          + '<div style="flex-shrink:0;background:#F59E0B;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:\'Nunito\',sans-serif;font-weight:900;font-size:11px">'+(i+1)+'</div>'
+          + '<div style="flex:1;padding-top:2px">'+text+'</div>'
+          + '</div>';
+  });
+  return html;
+}
+function _escHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 function _waecRenderQ(){
   var q=WS.questions[WS.qIdx];
   if(!q)return;
@@ -9648,7 +9734,8 @@ function _waecRenderQ(){
   var tp=document.getElementById('waec-qtopic');if(tp)tp.textContent=topicLabel;
   // Reset feedback
   var msg=document.getElementById('waec-msg');if(msg){msg.textContent='';msg.className='q-msg';}
-  var why=document.getElementById('waec-why');if(why){why.style.display='none';why.textContent='';}
+  var why=document.getElementById('waec-why');if(why){why.style.display='none';}
+  var whyBody=document.getElementById('waec-why-body');if(whyBody){whyBody.innerHTML='';}
   var nx=document.getElementById('waec-next');
   if(nx){
     nx.disabled=true;
@@ -9714,8 +9801,9 @@ function waecPick(btn, optIdx){
       msgEl.className='q-msg '+(isRight?'ok':'no');
     }
     var whyEl=document.getElementById('waec-why');
-    if(whyEl&&q.why){
-      whyEl.textContent='Worked solution:\n\n'+q.why;
+    var whyBody=document.getElementById('waec-why-body');
+    if(whyEl&&whyBody&&q.why){
+      whyBody.innerHTML=_formatWhy(q.why, isRight);
       whyEl.style.display='';
     }
   }
@@ -10027,6 +10115,8 @@ function activateSchoolCode(code,cb){
             },{merge:true})
             .catch(function(e){console.warn('Device register failed:',e.message);});
           applyBranding();
+          // Sync subject access rights from Firestore immediately on activation
+          syncSubjectAccessFromSchool(data);
           cb('ok',school);
         })
         .catch(function(e){
@@ -10050,6 +10140,90 @@ function activateSchoolCode(code,cb){
     attemptLookup(false);
   });
 }
+
+
+// ════════════════════════════════════════════════════════
+// SUBJECT ACCESS — set by Blestonex owner in Firestore,
+// downloaded on activation, cached locally. Schools cannot
+// change this — it reflects what they paid for.
+// ════════════════════════════════════════════════════════
+var SUBJECT_ACCESS_KEY='el_subject_access';   // cached main subjects
+var WAEC_ACCESS_KEY='el_waec_access';         // cached WAEC subjects
+
+var MAIN_SUBJECTS=[
+  {key:'english',    label:'English & GS',       card:'subj-card-english'},
+  {key:'maths',      label:'Mathematics',         card:'subj-card-maths'},
+  {key:'verbal',     label:'Verbal Reasoning',    card:'subj-card-verbal'},
+  {key:'quantitative',label:'Quant. Reasoning',   card:'subj-card-quantitative'},
+  {key:'waec',       label:'WAEC/JAMB',           card:'waec-home-card'},
+  {key:'competition',label:'Competition',          card:'subj-card-competition'},
+  {key:'leaderboard',label:'Leaderboard',          card:'subj-card-leaderboard'}
+];
+var WAEC_ACCESS_LIST=[
+  {key:'maths'},{key:'english'},{key:'biology'},{key:'physics'},
+  {key:'chemistry'},{key:'literature'},{key:'agric'},
+  {key:'accounting'},{key:'economics'},{key:'government'}
+];
+
+// Read locally-cached access config (downloaded from Firestore on activation)
+function loadSubjectAccess(){
+  try{return JSON.parse(localStorage.getItem(SUBJECT_ACCESS_KEY)||'null');}catch(e){return null;}
+}
+function loadWaecAccess(){
+  try{return JSON.parse(localStorage.getItem(WAEC_ACCESS_KEY)||'null');}catch(e){return null;}
+}
+
+// Called during school code activation — pull allowedSubjects from Firestore
+// and cache them. The school doc in Firestore should have:
+//   allowedSubjects: ['english','maths','verbal','quantitative','waec','competition','leaderboard']
+//   allowedWaecSubjects: ['maths','english','biology','physics','chemistry']
+// If the fields are absent, ALL subjects are allowed (default / no restriction).
+function syncSubjectAccessFromSchool(schoolData){
+  if(!schoolData)return;
+  if(schoolData.allowedSubjects&&Array.isArray(schoolData.allowedSubjects)){
+    var access={};
+    MAIN_SUBJECTS.forEach(function(s){
+      access[s.key]=schoolData.allowedSubjects.indexOf(s.key)!==-1;
+    });
+    localStorage.setItem(SUBJECT_ACCESS_KEY,JSON.stringify(access));
+  }else{
+    // No restriction set — clear any old cache so all subjects show
+    localStorage.removeItem(SUBJECT_ACCESS_KEY);
+  }
+  if(schoolData.allowedWaecSubjects&&Array.isArray(schoolData.allowedWaecSubjects)){
+    var waecAccess={};
+    WAEC_ACCESS_LIST.forEach(function(s){
+      waecAccess[s.key]=schoolData.allowedWaecSubjects.indexOf(s.key)!==-1;
+    });
+    localStorage.setItem(WAEC_ACCESS_KEY,JSON.stringify(waecAccess));
+  }else{
+    localStorage.removeItem(WAEC_ACCESS_KEY);
+  }
+}
+
+// Apply subject visibility to home screen cards
+function applySubjectAccess(){
+  var access=loadSubjectAccess();
+  MAIN_SUBJECTS.forEach(function(s){
+    var el=document.getElementById(s.card);
+    if(!el)return;
+    var allowed=(access===null||access[s.key]!==false);
+    // Don't accidentally SHOW a card that was already hidden by the class gate
+    if(!allowed)el.style.display='none';
+  });
+}
+
+// Returns the filtered WAEC subject list based on what was activated
+function getWaecSubjectList(){
+  var access=loadWaecAccess();
+  if(access===null)return WAEC_SUBJECTS;
+  return WAEC_SUBJECTS.filter(function(s){return access[s.key]!==false;});
+}
+
+// Stubs kept so nothing breaks if called elsewhere — no-ops now
+function renderSubjectAccessUI(){}
+function saveSubjectAccess(){}
+function resetSubjectAccess(){}
 
 function saveSchoolSettings(){
   var nameEl=document.getElementById('admin-school-name');
@@ -12394,7 +12568,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
   // ── 2. Register service worker — tries three strategies silently ──
   if('serviceWorker' in navigator){
     var SW_CODE=[
-      "var CACHE='edulab-v33';",
+      "var CACHE='edulab-v31';",
       "self.addEventListener('install',function(e){",
       "  e.waitUntil(caches.open(CACHE).then(function(c){",
       "    return c.add(self.location.href.replace(/\\/sw(\\.js|\\?.*)?$/,'/')).catch(function(){});",
@@ -12432,7 +12606,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
     function tryDirectCache(){
       // Fallback: pre-cache the page directly (no SW needed)
       if(!('caches' in window))return;
-      caches.open('edulab-v33').then(function(c){
+      caches.open('edulab-v31').then(function(c){
         c.add(window.location.href).catch(function(){});
       }).catch(function(){});
     }
@@ -12446,21 +12620,27 @@ var FB={initialized:false,db:null,user:null,_queue:[],
 
   // ── 3. Install prompt (Android/Chrome) ──
   var _deferredPrompt=null;
+  function _showInstallBanner(){
+    var b=document.getElementById('install-banner');if(b)b.classList.add('show');
+    document.body.classList.add('banner-open');
+  }
+  function _hideInstallBanner(){
+    var b=document.getElementById('install-banner');if(b)b.classList.remove('show');
+    document.body.classList.remove('banner-open');
+  }
   window.addEventListener('beforeinstallprompt',function(e){
     e.preventDefault();_deferredPrompt=e;
     // Show banner after a short delay so it doesn't appear mid-lesson
-    setTimeout(function(){
-      var b=document.getElementById('install-banner');if(b)b.classList.add('show');
-    },3000);
+    setTimeout(_showInstallBanner,3000);
   });
   window.addEventListener('appinstalled',function(){
-    var b=document.getElementById('install-banner');if(b)b.classList.remove('show');
+    _hideInstallBanner();
     _deferredPrompt=null;
     toast('✅ EduLab installed!',2500);
   });
   window.pwaInstall=function(){
     if(!_deferredPrompt)return;
-    var b=document.getElementById('install-banner');if(b)b.classList.remove('show');
+    _hideInstallBanner();
     _deferredPrompt.prompt();
     _deferredPrompt.userChoice.then(function(r){
       if(r.outcome==='accepted')console.log('[EduLab PWA] installed');
@@ -12468,7 +12648,7 @@ var FB={initialized:false,db:null,user:null,_queue:[],
     });
   };
   window.pwaDismiss=function(){
-    var b=document.getElementById('install-banner');if(b)b.classList.remove('show');
+    _hideInstallBanner();
     _deferredPrompt=null;
   };
 
