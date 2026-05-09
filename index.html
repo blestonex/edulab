@@ -714,6 +714,11 @@ body.banner-open .screen.active{padding-bottom:80px}
     </div>
 
     <!-- ── TEACHER: per-class subject control ── -->
+    <!-- ── TEACHER CLASS DASHBOARD ── -->
+    <div id="teacher-class-dashboard" style="display:none;margin-top:14px">
+      <div id="teacher-dashboard-cards" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
     <div id="teacher-subject-tile" style="display:none;background:#fff;border-radius:var(--r);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-top:14px">
       <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#0D9488;margin-bottom:4px">📚 Class Subject Access</div>
       <div style="font-size:12px;color:var(--sm);margin-bottom:12px;line-height:1.5">Set which subjects each of your classes can access. You can only enable subjects your school has subscribed to.</div>
@@ -1142,6 +1147,11 @@ body.banner-open .screen.active{padding-bottom:80px}
     <div id="waec-subject-info" style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:6px">
       <div style="font-size:13px;color:#6B7280;line-height:1.55" id="waec-subject-stats"></div>
     </div>
+    <!-- Learn Module — staged topic lessons (Biology, Chemistry, Physics) -->
+    <div id="waec-learn-btn" style="display:none;background:linear-gradient(135deg,#1E40AF,#1565C0);border-radius:14px;padding:16px;cursor:pointer;color:#fff" onclick="openScienceLearnModule()">
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;margin-bottom:4px">📖 Learn by Topic</div>
+      <div style="font-size:13px;opacity:.85;line-height:1.5">Start with a concept explanation, then practise questions on that topic. Great for building understanding from scratch.</div>
+    </div>
     <div onclick="waecStart('practice')" style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08);cursor:pointer;border-left:5px solid #16A34A">
       <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:16px;color:#1E1B4B;margin-bottom:4px">📚 Practice Mode</div>
       <div style="font-size:13px;color:#6B7280;line-height:1.5">Answer at your own pace. See the worked solution after each question. No time pressure. Best for learning.</div>
@@ -1156,6 +1166,26 @@ body.banner-open .screen.active{padding-bottom:80px}
       <div id="waec-topics-list"></div>
     </div>
   </div>
+</div>
+
+<!-- SCIENCE LEARN MODULE — staged topic learning screen -->
+<div id="science-learn" class="screen" style="background:linear-gradient(180deg,#1E40AF 0%,#1E40AF 110px,#EFF6FF 110px)">
+  <div class="topbar" style="background:linear-gradient(135deg,#1E40AF,#1565C0)">
+    <button class="tback" onclick="SS('waec-mode')">‹</button>
+    <div class="tlogo" id="sci-learn-title">Biology</div>
+  </div>
+  <div class="content" style="padding:16px;gap:0">
+    <div id="sci-learn-list" style="display:flex;flex-direction:column;gap:10px;padding-top:4px"></div>
+  </div>
+</div>
+
+<!-- SCIENCE LESSON PLAYER — concept flash + practice for one topic -->
+<div id="science-lesson" class="screen" style="background:#FAFAFA">
+  <div class="topbar" id="sci-lesson-topbar" style="background:linear-gradient(135deg,#1E40AF,#1565C0)">
+    <button class="tback" onclick="SS('science-learn')">‹</button>
+    <div class="tlogo" id="sci-lesson-title">Cell Biology</div>
+  </div>
+  <div class="content" style="padding:16px" id="sci-lesson-content"></div>
 </div>
 
 <!-- WAEC PLAY — handles practice, cbt, and topic-drill modes -->
@@ -5050,6 +5080,8 @@ function _doOpenAdmin(){
     teacherSubjectTile.style.display=isTeacher?'':'none';
     if(isTeacher)renderTeacherClassSubjectList();
   }
+  // Teacher class dashboard — shows per-class summary with struggling students
+  if(isTeacher) renderTeacherClassDashboard();
   // Capacity widget is updated/shown only for proprietors. updateCapacityWidget
   // handles its own visibility, but we override here to ensure teachers never
   // see it even if there's a stale render.
@@ -5364,6 +5396,7 @@ function renderAdminProgress(){
     window._ADMIN_MERGED=merged;
     if(cnt)cnt.textContent=merged.length+' student'+(merged.length!==1?'s':'')+' (incl. other devices)';
     renderAdminProgressWith(merged,localProg);
+    if(_isTeacherSession())renderTeacherClassDashboard();
   });
 }
 
@@ -9839,6 +9872,129 @@ var JSS_BASIC_TECH_QS=[
 ];
 
 
+
+// ════════════════════════════════════════════════════════════════
+// SCIENCE LEARN MODULES — Biology, Chemistry, Physics
+// Each module is a set of stages. Each stage has:
+//   label, emoji, topic (matches question bank topic key),
+//   concept (title + body + formula for the concept flash card)
+// Questions for each stage come from the WAEC question bank
+// filtered by topic — reusing the entire existing infrastructure.
+// ════════════════════════════════════════════════════════════════
+
+var BIO_LEARN_STAGES=[
+  {id:'bio-s01',label:'Cell Biology',emoji:'🔬',topic:'cell',
+   concept:{title:'The Cell — Unit of Life',
+    body:'All living things are made of cells. Two main types:\n\n• Prokaryotic cells (bacteria) — no nucleus, no membrane-bound organelles\n• Eukaryotic cells (plants, animals, fungi) — have a true nucleus\n\nKey organelles:\n• Nucleus — control centre, contains DNA\n• Mitochondria — produces energy (ATP) through respiration\n• Ribosome — makes proteins\n• Cell membrane — controls what enters and leaves\n• Plant cells also have: cell wall, chloroplasts, large vacuole',
+    formula:'Animal cell: membrane + cytoplasm + nucleus + mitochondria\nPlant cell: + cell wall + chloroplasts + large central vacuole'}},
+  {id:'bio-s02',label:'Nutrition & Digestion',emoji:'🍎',topic:'nutrition',
+   concept:{title:'Nutrition and the Digestive System',
+    body:'Nutrition: obtaining food for energy, growth and repair.\n\nDigestion pathway:\nMouth → Oesophagus → Stomach → Small intestine → Large intestine → Rectum → Anus\n\nKey processes:\n• Mouth: chewing (mechanical) + amylase (starch → maltose)\n• Stomach: pepsin (protein → peptides), HCl kills bacteria\n• Small intestine: most digestion and ALL absorption (villi)\n• Large intestine: absorbs water, forms faeces\n\nFood classes: Carbohydrates (energy), Proteins (growth/repair), Fats (energy store), Vitamins/Minerals (regulation), Water',
+    formula:'Villi → huge surface area → efficient nutrient absorption'}},
+  {id:'bio-s03',label:'Respiration',emoji:'💨',topic:'respiration',
+   concept:{title:'Respiration — Release of Energy',
+    body:'Respiration: breakdown of glucose to release energy (ATP). Not the same as breathing!\n\nAerobic respiration (with O₂):\nC₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + 38 ATP\nOccurs in mitochondria. Produces lots of energy.\n\nAnaerobic respiration (without O₂):\nIn animals: glucose → lactic acid + 2 ATP\nIn yeast: glucose → ethanol + CO₂ + 2 ATP\n\nBreathing moves air in/out of lungs. Gas exchange occurs at alveoli:\nO₂ diffuses into blood; CO₂ diffuses out.',
+    formula:'Aerobic: C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + Energy (ATP)'}},
+  {id:'bio-s04',label:'Transport Systems',emoji:'❤️',topic:'transport',
+   concept:{title:'Blood and Circulation',
+    body:'The circulatory system moves blood, nutrients, oxygen and waste around the body.\n\nHeart: 4 chambers\n• Right side: receives deoxygenated blood → pumps to lungs (pulmonary circulation)\n• Left side: receives oxygenated blood → pumps to body (systemic circulation)\n\nBlood vessels:\n• Arteries: carry blood FROM heart (thick walls, high pressure)\n• Veins: carry blood TO heart (thin walls, valves, low pressure)\n• Capillaries: site of exchange (one cell thick)\n\nBlood components:\n• Red blood cells (RBCs): carry O₂ using haemoglobin\n• White blood cells (WBCs): immune defence\n• Platelets: blood clotting\n• Plasma: liquid (90% water) — carries nutrients, hormones, CO₂',
+    formula:'Pulmonary: heart → lungs → heart\nSystemic: heart → body → heart'}},
+  {id:'bio-s05',label:'Reproduction',emoji:'🧬',topic:'reprod',
+   concept:{title:'Sexual and Asexual Reproduction',
+    body:'Asexual reproduction: ONE parent, no fertilisation, offspring genetically identical (clones)\nMethods: binary fission (bacteria), budding (yeast, hydra), fragmentation, vegetative propagation (plants), spores\n\nSexual reproduction: TWO parents, gametes join at fertilisation, genetic variation\nIn plants: pollination → fertilisation → seed → fruit\nIn humans: sperm + egg → zygote → embryo → foetus → baby\n\nMitosis: cell division for GROWTH and REPAIR → 2 identical daughter cells (2n)\nMeiosis: division for GAMETE formation → 4 cells with half chromosomes (n)',
+    formula:'Mitosis: 2n → 2n + 2n (growth)\nMeiosis: 2n → n + n + n + n (gametes)'}},
+  {id:'bio-s06',label:'Genetics & Heredity',emoji:'🧪',topic:'genetics',
+   concept:{title:'Genetics — Inheritance of Traits',
+    body:'DNA (deoxyribonucleic acid): double helix of nucleotide bases (A-T, G-C)\nGene: a segment of DNA coding for a specific trait\nChromosome: coiled DNA + protein (humans have 46 = 23 pairs)\nAllele: alternative forms of a gene (dominant or recessive)\n\nDominant allele (capital letter): expressed even in one copy\nRecessive allele (small letter): only expressed when TWO copies present\n\nGenotype: the genes (e.g. Aa, AA, aa)\nPhenotype: the visible trait (e.g. tall or short)\n\nMendel\'s Laws:\n1. Law of Segregation: gametes carry one allele per gene\n2. Law of Independent Assortment: genes on different chromosomes segregate independently',
+    formula:'Aa × Aa → 1AA : 2Aa : 1aa (3:1 phenotype ratio)'}},
+  {id:'bio-s07',label:'Ecology',emoji:'🌍',topic:'ecology',
+   concept:{title:'Ecology — Organisms and their Environment',
+    body:'Ecology: study of how organisms interact with each other and their environment.\n\nKey terms:\n• Habitat: where an organism lives\n• Niche: role/function of organism in habitat\n• Population: all individuals of one species in an area\n• Community: all populations in a habitat\n• Ecosystem: community + non-living environment\n• Biosphere: all ecosystems on Earth\n\nFeeding relationships:\n• Producer (green plants) → Primary consumer → Secondary consumer → Tertiary consumer\n• Only 10% of energy passes to next trophic level\n• Decomposers (bacteria, fungi) return nutrients to soil\n\nNutrient cycles: carbon cycle, nitrogen cycle, water cycle',
+    formula:'Food web: interconnected food chains\nPyramid of numbers/biomass/energy shows ecosystem structure'}},
+  {id:'bio-s08',label:'Disease & Health',emoji:'🏥',topic:'health',
+   concept:{title:'Disease and Immunity',
+    body:'Pathogens: microorganisms that cause disease\n• Bacteria: cholera, tuberculosis, typhoid, gonorrhoea\n• Viruses: HIV/AIDS, malaria... wait — malaria is a protozoan!\n• Protozoa: malaria (Plasmodium via Anopheles mosquito)\n• Fungi: ringworm, candida\n• Parasites: tapeworm, roundworm\n\nTransmission: airborne, waterborne, vectors (mosquito, fly), contact, sexual\n\nDefence mechanisms:\n• Skin: first barrier (physical + chemical)\n• Phagocytes: engulf pathogens\n• Lymphocytes: produce antibodies (B-cells) or attack cells (T-cells)\n\nVaccination: introduces weakened pathogen → immune system makes antibodies + memory cells → future protection',
+    formula:'Vaccine → antibodies + memory cells → immunity'}},
+  {id:'bio-s09',label:'Plant Biology',emoji:'🌿',topic:'plant',
+   concept:{title:'Plants — Structure and Photosynthesis',
+    body:'Photosynthesis: 6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂\nOccurs in chloroplasts (palisade mesophyll cells of leaves)\n\nLeaf adaptations: thin (short diffusion path), large surface area, many chloroplasts, stomata (gas exchange), network of veins (water and mineral transport)\n\nWater transport: root hair cells absorb water → xylem vessels → leaves (transpiration pull)\nFood transport: phloem carries glucose (as sucrose) from leaves to all parts\n\nFlowering plant reproduction:\nPollinators transfer pollen from anther to stigma\nPollen tube grows to ovule → fertilisation → seed → fruit (dispersal)\n\nInsect-pollinated flowers: bright colours, scent, nectar, sticky pollen\nWind-pollinated flowers: dull colour, large feathery stigma, light pollen',
+    formula:'Photosynthesis: CO₂ + H₂O + light → glucose + O₂\nTranspiration: water loss through stomata'}},
+  {id:'bio-s10',label:'Classification',emoji:'📋',topic:'classify',
+   concept:{title:'Classification of Living Things',
+    body:'Taxonomy: science of classifying organisms. Based on shared characteristics and evolutionary relationships.\n\nHierarchy (largest to smallest):\nKingdom → Phylum → Class → Order → Family → Genus → Species\nMnemonic: King Philip Came Over For Good Soup\n\n5 Kingdoms:\n1. Monera (bacteria — prokaryotes, no nucleus)\n2. Protista (amoeba, algae — mostly unicellular eukaryotes)\n3. Fungi (mushrooms, yeast — absorb dead organic matter)\n4. Plantae (multicellular, photosynthesis, cell walls)\n5. Animalia (multicellular, ingest food, no cell wall)\n\nVertebrates: fish, amphibians, reptiles, birds, mammals (warm-blooded = birds and mammals)\nInvertebrates: insects, worms, molluscs, crustaceans, spiders',
+    formula:'Binomial nomenclature: Genus species (e.g. Homo sapiens)'}}
+];
+
+var CHEM_LEARN_STAGES=[
+  {id:'chem-s01',label:'Atomic Structure',emoji:'⚛️',topic:'atomic',
+   concept:{title:'Structure of the Atom',
+    body:'Atom: smallest particle of an element retaining its chemical properties.\n\nStructure:\n• Nucleus (centre): protons (+) + neutrons (no charge)\n• Electrons (−): orbit in shells (energy levels) outside nucleus\n\nKey numbers:\n• Atomic number (Z) = number of protons = number of electrons (neutral atom)\n• Mass number (A) = protons + neutrons\n• Isotopes: same Z, different A (different neutrons)\n\nElectronic configuration:\n• Shell 1: max 2 electrons\n• Shell 2: max 8 electrons\n• Shell 3: max 8 electrons (for elements 1-20)\n\nExample — Sodium (Z=11): 2, 8, 1\nValence electrons (outermost shell) determine chemical behaviour',
+    formula:'Z = protons = electrons (neutral atom)\nA = protons + neutrons\nIsotopes: same Z, different A'}},
+  {id:'chem-s02',label:'Chemical Bonding',emoji:'🔗',topic:'bonding',
+   concept:{title:'How Atoms Bond Together',
+    body:'Atoms bond to achieve a full outer shell (usually 8 electrons — the octet rule).\n\nIonic bonding:\n• Metal GIVES electrons to non-metal → creates ions\n• Metal → positive cation; Non-metal → negative anion\n• Held by electrostatic attraction\n• High melting point, conducts when molten/dissolved\n• Example: Na⁺Cl⁻ (NaCl)\n\nCovalent bonding:\n• Both atoms SHARE electrons\n• Usually between non-metals\n• Can be single (H₂), double (O₂), or triple (N₂) bonds\n• Molecular compounds: usually low melting points\n• Example: H₂O, CO₂, CH₄\n\nMetallic bonding:\n• Metal ions in a "sea" of delocalised electrons\n• Good conductors, malleable, ductile',
+    formula:'DEAD CLIC: Debits↑Expenses,Assets,Drawings; Credits↑Liabilities,Income,Capital\nIonic: metal + non-metal → salt\nCovalent: non-metal + non-metal → molecule'}},
+  {id:'chem-s03',label:'Acids, Bases & Salts',emoji:'⚗️',topic:'acids',
+   concept:{title:'Acids, Bases and Neutralisation',
+    body:'Acids: donate H⁺ ions in solution. pH < 7. Turn litmus red.\n• Strong acids: fully dissociate — HCl, H₂SO₄, HNO₃\n• Weak acids: partially dissociate — ethanoic (vinegar), citric (lemons)\n\nBases: accept H⁺ ions. pH > 7. Turn litmus blue.\n• Soluble bases = alkalis: NaOH (caustic soda), NH₃\n• Indicators: litmus (red/blue), phenolphthalein (colourless/pink), methyl orange (red/yellow)\n\nNeutralisation: acid + base → salt + water\nHCl + NaOH → NaCl + H₂O\n\nSalt naming: metal from base + anion from acid\nHCl → chloride, H₂SO₄ → sulphate, HNO₃ → nitrate, H₃PO₄ → phosphate',
+    formula:'pH scale: 0-6 acidic, 7 neutral, 8-14 alkaline\nNeutralisation: acid + base → salt + water'}},
+  {id:'chem-s04',label:'Chemical Reactions',emoji:'🔥',topic:'reactions',
+   concept:{title:'Types of Chemical Reactions',
+    body:'Chemical reaction: reactants → products (bonds broken and formed)\n\nTypes of reactions:\n1. Synthesis: A + B → AB (elements combine)\n2. Decomposition: AB → A + B (compound breaks down)\n3. Displacement: A + BC → AC + B (more reactive replaces less reactive)\n4. Neutralisation: acid + base → salt + water\n5. Redox: simultaneous oxidation (loss of e⁻) and reduction (gain of e⁻)\n6. Combustion: fuel + O₂ → CO₂ + H₂O + energy\n\nConditions that affect reaction rate:\n• Temperature (higher = faster)\n• Concentration (higher = faster)\n• Surface area (greater = faster)\n• Catalyst (lowers activation energy)\n• Pressure (for gases — higher = faster)\n\nExothermic: releases heat (combustion, neutralisation)\nEndothermic: absorbs heat (photosynthesis, thermal decomposition)',
+    formula:'OILRIG: Oxidation Is Loss, Reduction Is Gain (of electrons)'}},
+  {id:'chem-s05',label:'Organic Chemistry',emoji:'🧫',topic:'organic',
+   concept:{title:'Carbon and Organic Compounds',
+    body:'Organic chemistry: study of carbon compounds. Carbon is unique — it forms 4 bonds and can chain together.\n\nHomologous series (same general formula, similar properties):\n• Alkanes (CₙH₂ₙ₊₂): saturated, single bonds — methane, ethane, propane\n• Alkenes (CₙH₂ₙ): unsaturated, one C=C double bond — ethene, propene\n• Alcohols (−OH group): ethanol (C₂H₅OH)\n• Carboxylic acids (−COOH): ethanoic acid (vinegar)\n\nTest for unsaturation: decolourises bromine water\nFermentation: C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ (yeast)\nSaponification: fat + NaOH → soap + glycerol\n\nPolymers:\n• Addition: ethene → polythene (double bond opens and monomers join)\n• Condensation: nylon, polyester (water lost with each link)',
+    formula:'Alkane CₙH₂ₙ₊₂ | Alkene CₙH₂ₙ | Alcohol −OH | Acid −COOH'}},
+  {id:'chem-s06',label:'Mole Calculations',emoji:'🔢',topic:'moles',
+   concept:{title:'The Mole and Calculations',
+    body:'The mole is the chemist\'s "dozen" — a counting unit for particles.\n1 mole = 6.02 × 10²³ particles (Avogadro\'s number)\n1 mole of any gas at STP = 22.4 litres\n\nKey formulas:\n• Moles = Mass ÷ Molar mass\n• Molar mass = sum of relative atomic masses\n• Concentration (mol/L) = Moles ÷ Volume (L)\n• Moles of gas at STP = Volume ÷ 22.4\n\nWorked example:\nHow many moles in 44g CO₂? (C=12, O=16)\nMolar mass CO₂ = 12 + 2(16) = 44 g/mol\nMoles = 44 ÷ 44 = 1 mol ✓\n\nStoichiometry: mole ratios from balanced equation\n2H₂ + O₂ → 2H₂O means: 2 mol H₂ + 1 mol O₂ → 2 mol H₂O',
+    formula:'Moles = Mass ÷ M_r\nConcentration = Moles ÷ Volume(L)\n1 mol gas at STP = 22.4 L'}},
+  {id:'chem-s07',label:'Redox & Electrolysis',emoji:'⚡',topic:'electrolysis',
+   concept:{title:'Redox Reactions and Electrolysis',
+    body:'Redox: reactions involving transfer of electrons.\nOILRIG: Oxidation Is Loss (of electrons), Reduction Is Gain.\nReducing agent: LOSES electrons (gets oxidised)\nOxidising agent: GAINS electrons (gets reduced)\n\nElectrolysis: using electricity to drive a non-spontaneous chemical reaction.\n• Electrolyte: solution or molten compound that conducts electricity\n• Cathode (negative): REDUCTION — cations (positive ions) gain electrons\n• Anode (positive): OXIDATION — anions (negative ions) lose electrons\n\nExample — Dilute H₂SO₄:\n• Cathode: 2H⁺ + 2e⁻ → H₂↑\n• Anode: 4OH⁻ → 2H₂O + O₂↑ + 4e⁻\n\nApplications: electroplating, extraction of aluminium, purification of copper',
+    formula:'AN OX — RED CAT\nAnode = Oxidation | Cathode = Reduction'}},
+  {id:'chem-s08',label:'Periodic Table',emoji:'📊',topic:'periodic',
+   concept:{title:'The Periodic Table',
+    body:'The Periodic Table arranges elements by increasing atomic number (proton number).\n\nPeriods (rows): elements in same period have same number of electron shells\nGroups (columns): elements have same number of VALENCE (outer) electrons → similar properties\n\nKey groups:\n• Group 1 (Alkali metals): 1 outer electron, very reactive, react vigorously with water (K > Na > Li)\n• Group 7 (Halogens): 7 outer electrons, reactive non-metals (F > Cl > Br > I)\n• Group 0/18 (Noble gases): 8 outer electrons (full shell), unreactive (He, Ne, Ar)\n• Transition metals (middle block): variable oxidation states, form coloured compounds, catalytic\n\nAcross a period (→): atomic radius ↓, electronegativity ↑, metallic character ↓\nDown a group (↓): reactivity ↑ for metals, reactivity ↓ for halogens',
+    formula:'Group = number of valence electrons\nPeriod = number of electron shells'}}
+];
+
+var PHYSICS_LEARN_STAGES=[
+  {id:'phys-s01',label:'Mechanics & Motion',emoji:'🏎️',topic:'mechanics',
+   concept:{title:'Mechanics — Forces and Motion',
+    body:"Newton's Three Laws of Motion:\n\n1st Law (Inertia): An object remains at rest or moves at constant velocity unless acted on by a net force.\n\n2nd Law: F = ma (Force = mass × acceleration). The bigger the force, the greater the acceleration; the bigger the mass, the less the acceleration.\n\n3rd Law: For every action there is an equal and opposite reaction.\n\nKinematics equations (constant acceleration):\n• v = u + at\n• s = ut + ½at²\n• v² = u² + 2as\n• s = ½(u+v)t\n\nWork, Energy and Power:\n• Work = Force × Distance (J)\n• KE = ½mv² | PE = mgh\n• Power = Work ÷ Time (W)",
+    formula:"F = ma | W = Fd | KE = ½mv² | P = W/t"}},
+  {id:'phys-s02',label:'Heat & Temperature',emoji:'🌡️',topic:'heat',
+   concept:{title:'Heat Transfer and Temperature',
+    body:'Heat: energy transferred due to temperature difference.\nTemperature: measure of average kinetic energy of particles.\n\nSI unit of temperature: Kelvin (K)\nConversion: K = °C + 273\n\nHeat transfer methods:\n• Conduction: particle to particle vibration (best in solids — metals)\n• Convection: hot fluid (liquid/gas) rises, cool sinks (convection currents)\n• Radiation: electromagnetic waves (infrared) — no medium needed\n\nSpecific Heat Capacity (c):\nQ = mcΔT\nAmount of heat to raise 1 kg of substance by 1°C\nWater: 4200 J/kg°C (very high — climate moderator)\n\nLatent heat: heat needed to change state WITHOUT temperature change\nMelting/freezing: latent heat of fusion\nBoiling/condensing: latent heat of vaporisation',
+    formula:'Q = mcΔT | K = °C + 273\nConduction, Convection, Radiation'}},
+  {id:'phys-s03',label:'Waves & Sound',emoji:'🔊',topic:'waves',
+   concept:{title:'Wave Properties and Sound',
+    body:'Wave: disturbance that transfers energy without transferring matter.\n\nTypes:\n• Transverse waves: vibration perpendicular to direction of travel (light, water waves, radio)\n• Longitudinal waves: vibration parallel to direction (sound — compressions and rarefactions)\n\nKey properties:\n• Amplitude: maximum displacement from equilibrium\n• Wavelength (λ): distance of one complete cycle\n• Frequency (f): cycles per second (Hz)\n• Period (T): time for one cycle = 1/f\n• Wave speed (v) = fλ (wave equation)\n\nSound: longitudinal mechanical wave — needs a medium.\nSpeed in air ≈ 340 m/s. Speed: solid > liquid > gas\nPitch = frequency. Volume = amplitude.\nEchoes: reflected sound. Sonar: echo location.',
+    formula:'v = fλ | f = 1/T\nSound: longitudinal, needs medium, 340 m/s in air'}},
+  {id:'phys-s04',label:'Light & Optics',emoji:'💡',topic:'light',
+   concept:{title:'Light — Reflection, Refraction and Optics',
+    body:'Light is an electromagnetic transverse wave. Speed in vacuum = 3 × 10⁸ m/s.\n\nReflection (bouncing off surfaces):\n• Law: angle of incidence = angle of reflection\n• Plane mirror: virtual, upright, laterally inverted, same size\n\nRefraction (bending when entering different medium):\n• Light slows in denser medium → bends toward normal\n• Light speeds in less dense medium → bends away from normal\n• Total Internal Reflection: dense → less dense at angle > critical angle (optical fibres!)\n\nLenses:\n• Convex (converging): thicker in middle → corrects long-sightedness (hypermetropia)\n• Concave (diverging): thinner in middle → corrects short-sightedness (myopia)\n\nElectromagnetic spectrum (low to high frequency):\nRadio → Microwave → Infrared → Visible → UV → X-rays → Gamma',
+    formula:'c = 3 × 10⁸ m/s\nSnell\'s Law: n₁sinθ₁ = n₂sinθ₂'}},
+  {id:'phys-s05',label:'Electricity',emoji:'⚡',topic:'electricity',
+   concept:{title:'Electricity — Circuits and Ohm\'s Law',
+    body:"Ohm's Law: V = IR (Voltage = Current × Resistance)\n\nSeries circuit:\n• Same current throughout: I_total = I₁ = I₂\n• Voltages add: V_total = V₁ + V₂\n• Resistances add: R_total = R₁ + R₂\n\nParallel circuit:\n• Voltage same across all branches: V_total = V₁ = V₂\n• Currents add: I_total = I₁ + I₂\n• 1/R_total = 1/R₁ + 1/R₂\n\nElectrical Power:\nP = VI = I²R = V²/R (measured in Watts)\nEnergy = Power × Time (measured in Joules or kWh)\n\nSafety devices:\n• Fuse: thin wire that melts when current is too high\n• Circuit breaker (MCB): trips and can be reset\n• Earth wire: safety path for fault current",
+    formula:"V = IR | P = VI | Energy = Pt\nSeries: R_T = R₁+R₂ | Parallel: 1/R_T = 1/R₁+1/R₂"}},
+  {id:'phys-s06',label:'Modern Physics',emoji:'☢️',topic:'modern',
+   concept:{title:'Radioactivity and the Atom',
+    body:'Atomic nucleus: protons (Z) + neutrons (N = A − Z)\nIsotopes: same Z, different A (different neutrons)\n\nRadioactive decay: unstable nuclei emit radiation spontaneously.\n\nThree types of radiation:\n• Alpha (α): helium nucleus (2p + 2n), +2 charge, stopped by paper, least penetrating\n• Beta (β): high-energy electron, −1 charge, stopped by thin aluminium\n• Gamma (γ): electromagnetic wave, no charge, penetrates cm of lead, most dangerous\n\nHalf-life: time for half the radioactive nuclei to decay. Constant — not affected by temperature/pressure.\nAfter n half-lives: N = N₀ × (½)ⁿ\n\nApplications:\n• Medical: radiotherapy (cancer treatment), PET scans, sterilisation\n• Nuclear power: fission of U-235\n• Archaeology: carbon-14 dating',
+    formula:'After n half-lives: N = N₀ × (½)ⁿ\nα stopped by paper | β by Al | γ by lead'}},
+  {id:'phys-s07',label:'Pressure & Fluids',emoji:'🌊',topic:'pressure',
+   concept:{title:'Pressure in Solids, Liquids and Gases',
+    body:'Pressure = Force ÷ Area (Pa = N/m²)\nSmall area → high pressure (knife, pin, stiletto heel)\nLarge area → low pressure (snowshoes, caterpillar tracks)\n\nPressure in liquids:\nP = ρgh (ρ = density, g = 9.8 m/s², h = depth)\nLiquid pressure increases with depth\nActing equally in all directions (Pascal\'s Principle)\nApplications: hydraulic press, dams (thicker at base)\n\nArchimedes\' Principle:\nUpthrust = Weight of fluid displaced\nFloating: upthrust = weight of object\nSinking: weight > upthrust\nApplications: ships, submarines, hydrometers\n\nAtmospheric pressure: weight of air above = 101,325 Pa at sea level\nDecreases with altitude. Measured by barometer.',
+    formula:'P = F/A | P(fluid) = ρgh\nUpthrust = weight of fluid displaced'}},
+  {id:'phys-s08',label:'Energy & Machines',emoji:'⚙️',topic:'energy',
+   concept:{title:'Energy, Work and Simple Machines',
+    body:'Energy: ability to do work. Unit: Joule (J)\nLaw of Conservation of Energy: energy cannot be created or destroyed — only converted.\n\nForms: kinetic, potential (gravitational, elastic), thermal, chemical, electrical, nuclear, light, sound\n\nSimple Machines — make work easier:\n• Lever (3 classes): rigid bar pivoting on fulcrum\n• Pulley: changes direction and can multiply force\n• Inclined plane: ramp reduces effort needed\n• Wheel and axle: steering wheel, doorknob\n• Screw: rotating inclined plane\n• Wedge: two inclined planes\n\nEfficiency = (Useful output ÷ Total input) × 100%\nMechanical Advantage (MA) = Load ÷ Effort\nVelocity Ratio (VR) = Distance effort moves ÷ Distance load moves',
+    formula:'Efficiency = (Useful output/Total input) × 100%\nMA = Load ÷ Effort | W = Fd'}}
+];
+
 var WAEC_QUESTIONS={
   maths:WAEC_MATHS_QS,
   english:WAEC_ENGLISH_QS,
@@ -10266,6 +10422,164 @@ function finishReasoning(){
 // ════════════════════════════════════════
 
 // ── JSS SUBJECT HUB ───────────────────────────────────────────────────────────
+
+// ── SCIENCE LEARN MODULE ─────────────────────────────────────────────────────
+var _SCI_LESSON={}; // current lesson context
+
+function openScienceLearnModule(){
+  var key=WS.subject; // set by openWaecMode
+  var subj=WAEC_SUBJECTS.find(function(s){return s.key===key;});
+  var stagesMap={biology:BIO_LEARN_STAGES,chemistry:CHEM_LEARN_STAGES,physics:PHYSICS_LEARN_STAGES};
+  var stages=stagesMap[key]||[];
+  if(!stages.length){toast('Learn module coming soon.',2000);return;}
+  var t=document.getElementById('sci-learn-title');
+  if(t)t.textContent=(subj?subj.name:'Science')+' — Learn by Topic';
+  var list=document.getElementById('sci-learn-list');
+  if(!list)return;
+  var p=prog();
+  var color=(subj&&subj.color)||'#1E40AF';
+  var colorBg=(subj&&subj.colorBg)||'#EFF6FF';
+  list.innerHTML=stages.map(function(stage,i){
+    var doneKey='sci_done_'+stage.id;
+    var done=!!(p[doneKey]&&p[doneKey].passed);
+    var qs=(WAEC_QUESTIONS[key]||[]).filter(function(q){return q.topic===stage.topic;});
+    return '<div onclick="openScienceLesson(\''+key+'\','+i+')" style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer;display:flex;align-items:center;gap:12px">'
+      +'<div style="width:48px;height:48px;border-radius:12px;background:'+(done?'#DCFCE7':colorBg)+';display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">'
+      +(done?'✅':stage.emoji)+'</div>'
+      +'<div style="flex:1">'
+      +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+stage.label+'</div>'
+      +'<div style="font-size:12px;color:#6B7280;margin-top:2px">'+qs.length+' practice questions'+( done?' · Completed':'')+'</div>'
+      +'</div>'
+      +'<span style="font-size:20px;color:'+(done?'#16A34A':color)+'">›</span>'
+      +'</div>';
+  }).join('');
+  SS('science-learn');
+}
+
+function openScienceLesson(subjectKey, stageIdx){
+  var stagesMap={biology:BIO_LEARN_STAGES,chemistry:CHEM_LEARN_STAGES,physics:PHYSICS_LEARN_STAGES};
+  var stages=stagesMap[subjectKey]||[];
+  var stage=stages[stageIdx];
+  if(!stage)return;
+  var subj=WAEC_SUBJECTS.find(function(s){return s.key===subjectKey;});
+  var color=(subj&&subj.color)||'#1E40AF';
+  _SCI_LESSON={subjectKey:subjectKey,stageIdx:stageIdx,stage:stage,subj:subj,color:color};
+  var t=document.getElementById('sci-lesson-title');
+  if(t)t.textContent=stage.label;
+  var bar=document.getElementById('sci-lesson-topbar');
+  if(bar)bar.style.background='linear-gradient(135deg,'+color+','+color+')';
+  _renderSciConceptCard();
+  SS('science-lesson');
+}
+
+function _renderSciConceptCard(){
+  var stage=_SCI_LESSON.stage;
+  var color=_SCI_LESSON.color;
+  var content=document.getElementById('sci-lesson-content');
+  if(!content)return;
+  var c=stage.concept;
+  var bodyLines=(c.body||'').split('\n');
+  var bodyHtml=bodyLines.map(function(line){
+    if(!line.trim())return '<div style="height:8px"></div>';
+    if(line.match(/^[•·\-]/)){
+      return '<div style="display:flex;gap:8px;margin:3px 0"><span style="color:'+color+';font-weight:900;flex-shrink:0">•</span><span>'+line.replace(/^[•·\-]\s*/,'')+'</span></div>';
+    }
+    return '<div style="margin:3px 0">'+line+'</div>';
+  }).join('');
+  content.innerHTML=
+    '<div style="background:linear-gradient(135deg,'+color+','+color+'dd);border-radius:16px;padding:18px;color:#fff;margin-bottom:14px">'
+      +'<div style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.8px;opacity:.75;margin-bottom:8px">📖 Concept to learn</div>'
+      +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:18px;margin-bottom:12px">'+c.title+'</div>'
+      +'<div style="font-size:13px;line-height:1.7;opacity:.93">'+bodyHtml+'</div>'
+      +(c.formula?'<div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 14px;margin-top:14px;font-family:monospace;font-size:13px;font-weight:700;line-height:1.6">'+c.formula.replace(/\n/g,'<br>')+'</div>':'')
+    +'</div>'
+    +'<button onclick="_startSciPractice()" style="width:100%;padding:15px;background:'+color+';color:#fff;border:none;border-radius:14px;font-family:\'Nunito\',sans-serif;font-weight:900;font-size:16px;cursor:pointer">Got it! Practice now →</button>'
+    +'<button onclick="SS(\'science-learn\')" style="width:100%;padding:12px;background:transparent;color:#6B7280;border:none;font-family:\'Nunito\',sans-serif;font-weight:700;font-size:13px;cursor:pointer;margin-top:6px">← Back to topics</button>';
+}
+
+function _startSciPractice(){
+  var stage=_SCI_LESSON.stage;
+  var subjectKey=_SCI_LESSON.subjectKey;
+  // Use the WAEC infrastructure: set WS context and start topic-drill
+  WS.subject=subjectKey;
+  WS.mode='topic';
+  WS.topic=stage.topic;
+  WS._sciStageId=stage.id; // for progress tracking on completion
+  var allQs=WAEC_QUESTIONS[subjectKey]||[];
+  var pool=shuffle(allQs.filter(function(q){return q.topic===stage.topic;}));
+  if(!pool.length){toast('No questions for this topic yet.',2000);return;}
+  WS.questions=pool;
+  WS.qIdx=0;
+  WS.answers=[];
+  // Recolour for this subject
+  var subj=_SCI_LESSON.subj;
+  var color=_SCI_LESSON.color;
+  ['waec-play-topbar','waec-results-topbar'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.style.background='linear-gradient(135deg,'+color+','+color+')';
+  });
+  var nb=document.getElementById('waec-next');if(nb)nb.style.background=color;
+  var pb=document.getElementById('waec-prog');if(pb)pb.style.background=color;
+  _waecRenderQ();
+  SS('waec-play');
+}
+
+
+// ── TEACHER CLASS DASHBOARD ────────────────────────────────────────────────────
+// Shows per-class summary: student count, avg score, struggling students,
+// WhatsApp quick-message button and assignment shortcut.
+function renderTeacherClassDashboard(){
+  var tile=document.getElementById('teacher-class-dashboard');
+  var cards=document.getElementById('teacher-dashboard-cards');
+  if(!tile||!cards||!STAFF)return;
+  var classes=Array.isArray(STAFF.assignedClasses)?STAFF.assignedClasses:[];
+  if(!classes.length){tile.style.display='none';return;}
+  tile.style.display='';
+  // Build per-class stats from merged roster + progress
+  var roster=window._ADMIN_MERGED||ROSTER;
+  var allProg=lg(LK_PROG)||{};
+  cards.innerHTML=classes.map(function(cls){
+    var students=roster.filter(function(s){return s.classLabel===cls||_baseClass(s.classLabel)===_baseClass(cls);});
+    var scores=[];
+    var struggling=[]; // below 40% average
+    students.forEach(function(s){
+      var sk=s.uid||s.name;
+      var sp=allProg[sk]||{};
+      var vals=Object.values(sp).filter(function(v){return v&&v.bestScore>0;});
+      var avg=vals.length?vals.reduce(function(a,v){return a+v.bestScore;},0)/vals.length:null;
+      if(avg!==null)scores.push(avg);
+      if(avg!==null&&avg<40)struggling.push(s);
+    });
+    var avgScore=scores.length?(scores.reduce(function(a,b){return a+b;},0)/scores.length).toFixed(0):null;
+    var scoreColor=avgScore>=70?'#16A34A':avgScore>=50?'#CA8A04':'#DC2626';
+    var strugglingHtml=struggling.length
+      ? '<div style="margin-top:10px;border-top:1px solid #FEE2E2;padding-top:8px">'
+        +'<div style="font-size:11px;font-weight:900;color:#DC2626;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">⚠️ Needs attention (score < 40%)</div>'
+        +struggling.map(function(s){
+          var pwa=s.parentWA||'';
+          var waLink=pwa?('<a href="https://wa.me/'+pwa.replace('+','')+'" target="_blank" style="font-size:11px;background:#DCFCE7;color:#166534;border-radius:4px;padding:2px 8px;font-weight:800;text-decoration:none;margin-left:6px">📱 WhatsApp</a>'):'';
+          return '<div style="font-size:13px;font-weight:700;color:#1E1B4B;margin-bottom:4px">'+s.emoji+' '+_escapeHtml(s.name)+waLink+'</div>';
+        }).join('')
+        +'</div>'
+      : '';
+    var waLink='';
+    if(STAFF&&STAFF.phone){
+      waLink='<a href="https://wa.me/'+STAFF.phone.replace('+','')+'" target="_blank" style="font-size:11px;background:#DCFCE7;color:#166534;border-radius:4px;padding:4px 8px;font-weight:800;text-decoration:none">📱 Message class</a>';
+    }
+    return '<div style="background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.07)">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+        +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">🏫 '+_escapeHtml(cls)+'</div>'
+        +(avgScore!==null?'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:16px;color:'+scoreColor+'">Avg: '+avgScore+'%</div>':'')
+      +'</div>'
+      +'<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'
+        +'<div style="font-size:12px;color:#6B7280;font-weight:700">👥 '+students.length+' student'+(students.length!==1?'s':'')+'</div>'
+        +(struggling.length?'<div style="font-size:12px;color:#DC2626;font-weight:800;background:#FEF2F2;padding:2px 8px;border-radius:6px">'+struggling.length+' struggling</div>':'<div style="font-size:12px;color:#16A34A;font-weight:800">✅ All on track</div>')
+        +'<button onclick="openAssignments()" style="font-size:11px;background:#EDE9FE;color:#6D28D9;border:none;border-radius:4px;padding:4px 8px;font-weight:800;cursor:pointer">📋 Set task</button>'
+      +'</div>'
+      +strugglingHtml
+      +'</div>';
+  }).join('');
+}
+
 function openJSSHub(){
   // Reuse waec-hub screen with JSS subjects
   var title=document.getElementById('waec-hub-title');
@@ -10368,16 +10682,105 @@ function openWaecMode(subjectKey){
       return '<button onclick="waecStart(\'topic\',\''+t.key+'\')" style="display:inline-block;background:'+subj.colorBg+';color:'+subj.color+';border:none;border-radius:8px;padding:7px 11px;margin:3px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:12px;cursor:pointer">'+t.label+' · '+topicQs.length+'</button>';
     }).join('');
   }
+  // Show "Learn by Topic" button for subjects with a structured learn module
+  var learnBtn=document.getElementById('waec-learn-btn');
+  var _learnMaps={biology:true,chemistry:true,physics:true};
+  if(learnBtn) learnBtn.style.display=_learnMaps[subjectKey]?'':'none';
   SS('waec-mode');
 }
 
 function _waecTopicsForSubject(key){
-  // Each subject has its own topic taxonomy. Subjects without questions yet
-  // return [] which renders the "Coming soon" state.
-  if(key==='maths')return WAEC_MATHS_TOPICS;
-  if(key==='english')return WAEC_ENGLISH_TOPICS;
-  if(key==='biology')return WAEC_BIOLOGY_TOPICS;
-  return [];
+  var TOPICS={
+    maths:    WAEC_MATHS_TOPICS,
+    english:  WAEC_ENGLISH_TOPICS,
+    biology:  WAEC_BIOLOGY_TOPICS,
+    physics:[
+      {key:'mechanics',  label:'Mechanics & Motion'},
+      {key:'heat',       label:'Heat & Temperature'},
+      {key:'waves',      label:'Waves & Sound'},
+      {key:'light',      label:'Light & Optics'},
+      {key:'electricity',label:'Electricity & Magnetism'},
+      {key:'magnetism',  label:'Magnetism & Induction'},
+      {key:'modern',     label:'Modern Physics & Radioactivity'},
+      {key:'pressure',   label:'Pressure & Fluids'},
+      {key:'energy',     label:'Energy & Machines'},
+      {key:'measurement',label:'Measurement & Instruments'}
+    ],
+    chemistry:[
+      {key:'atomic',       label:'Atomic Structure & Bonding'},
+      {key:'bonding',      label:'Chemical Bonding'},
+      {key:'states',       label:'States of Matter'},
+      {key:'reactions',    label:'Chemical Reactions'},
+      {key:'acids',        label:'Acids, Bases & Salts'},
+      {key:'electrolysis', label:'Electrolysis'},
+      {key:'organic',      label:'Organic Chemistry'},
+      {key:'moles',        label:'Mole Calculations'},
+      {key:'gases',        label:'Gas Laws'},
+      {key:'periodic',     label:'Periodic Table'},
+      {key:'redox',        label:'Redox Reactions'},
+      {key:'environment',  label:'Environmental Chemistry'},
+      {key:'separation',   label:'Separation Techniques'},
+      {key:'equilibrium',  label:'Chemical Equilibrium'},
+      {key:'metals',       label:'Metals & Reactivity'},
+      {key:'water',        label:'Water Chemistry'},
+      {key:'lab',          label:'Laboratory Skills'}
+    ],
+    literature:[
+      {key:'drama',         label:'Drama & Stagecraft'},
+      {key:'prose',         label:'Prose & Narrative'},
+      {key:'poetry',        label:'Poetry & Verse'},
+      {key:'devices',       label:'Literary Devices'},
+      {key:'genre',         label:'Genre & Form'},
+      {key:'comprehension', label:'Comprehension & Close Reading'}
+    ],
+    economics:[
+      {key:'basic',        label:'Basic Economic Concepts'},
+      {key:'demand',       label:'Demand & Consumer Theory'},
+      {key:'supply',       label:'Supply & Production'},
+      {key:'elasticity',   label:'Elasticity'},
+      {key:'market',       label:'Market Structures'},
+      {key:'national',     label:'National Income & GDP'},
+      {key:'money',        label:'Money, Banking & Monetary Policy'},
+      {key:'trade',        label:'International Trade'},
+      {key:'government',   label:'Fiscal Policy & Government'},
+      {key:'development',  label:'Economic Development'},
+      {key:'production',   label:'Production & Cost Theory'}
+    ],
+    government:[
+      {key:'concepts',     label:'Basic Political Concepts'},
+      {key:'arms',         label:'Arms of Government'},
+      {key:'nigeria',      label:'Nigerian Government & History'},
+      {key:'political',    label:'Political Parties & Elections'},
+      {key:'concepts',     label:'Democracy & Governance'},
+      {key:'international',label:'International Relations & Orgs'},
+      {key:'constitution', label:'Constitution & Rule of Law'}
+    ],
+    agric:[
+      {key:'crops',        label:'Crop Production'},
+      {key:'soil',         label:'Soil Science'},
+      {key:'animals',      label:'Animal Husbandry'},
+      {key:'pest',         label:'Pest & Disease Management'},
+      {key:'farm',         label:'Farm Management'},
+      {key:'environment',  label:'Agricultural Environment'}
+    ],
+    accounting:[
+      {key:'basics',       label:'Accounting Concepts & Principles'},
+      {key:'ledger',       label:'Ledger & Double Entry'},
+      {key:'trial-balance',label:'Trial Balance & Errors'},
+      {key:'final-accounts',label:'Final Accounts'},
+      {key:'depreciation', label:'Depreciation'},
+      {key:'bank-rec',     label:'Bank Reconciliation'},
+      {key:'ratios',       label:'Financial Ratios'},
+      {key:'stock',        label:'Stock Valuation'},
+      {key:'partnership',  label:'Partnership Accounts'},
+      {key:'company',      label:'Company Accounts'},
+      {key:'non-profit',   label:'Non-Profit Accounts'},
+      {key:'cash-flow',    label:'Cash Flow Statement'},
+      {key:'control',      label:'Control Accounts'},
+      {key:'errors',       label:'Correction of Errors'}
+    ]
+  };
+  return TOPICS[key]||[];
 }
 
 function waecStart(mode, topicKey){
