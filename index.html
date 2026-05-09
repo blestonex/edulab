@@ -488,7 +488,20 @@ body.banner-open .screen.active{padding-bottom:80px}
   </div>
   <div class="setup-body">
     <div id="sw1"><div class="setup-hdr"><h2>What is your name?</h2><p>Your name shows on your progress</p></div><div class="setup-field"><input id="sw-name" class="setup-input" type="text" placeholder="Type your name…" maxlength="30" oninput="swCheck()"></div></div>
-    <div id="sw2" style="display:none"><div class="setup-hdr"><h2>What is your class?</h2><p>This sets the right level for you</p></div><div class="class-grid"><button class="class-btn" onclick="swCls(this,'Nursery 1')">Nursery 1</button><button class="class-btn" onclick="swCls(this,'Nursery 2')">Nursery 2</button><button class="class-btn" onclick="swCls(this,'Primary 1')">Primary 1</button><button class="class-btn" onclick="swCls(this,'Primary 2')">Primary 2</button><button class="class-btn" onclick="swCls(this,'Primary 3')">Primary 3</button><button class="class-btn" onclick="swCls(this,'Primary 4')">Primary 4</button><button class="class-btn" onclick="swCls(this,'Primary 5')">Primary 5</button><button class="class-btn" onclick="swCls(this,'Primary 6')">Primary 6</button><button class="class-btn" onclick="swCls(this,'JSS 1')">JSS 1</button><button class="class-btn" onclick="swCls(this,'JSS 2')">JSS 2</button><button class="class-btn" onclick="swCls(this,'JSS 3')">JSS 3</button><button class="class-btn" onclick="swCls(this,'SSS 1')">SSS 1</button><button class="class-btn" onclick="swCls(this,'SSS 2')">SSS 2</button><button class="class-btn" onclick="swCls(this,'WAEC/JAMB')">WAEC/JAMB</button></div></div>
+    <div id="sw2" style="display:none"><div class="setup-hdr"><h2>What is your class?</h2><p>This sets the right level for you</p></div><div class="class-grid"><button class="class-btn" onclick="swCls(this,'Nursery 1')">Nursery 1</button><button class="class-btn" onclick="swCls(this,'Nursery 2')">Nursery 2</button><button class="class-btn" onclick="swCls(this,'Primary 1')">Primary 1</button><button class="class-btn" onclick="swCls(this,'Primary 2')">Primary 2</button><button class="class-btn" onclick="swCls(this,'Primary 3')">Primary 3</button><button class="class-btn" onclick="swCls(this,'Primary 4')">Primary 4</button><button class="class-btn" onclick="swCls(this,'Primary 5')">Primary 5</button><button class="class-btn" onclick="swCls(this,'Primary 6')">Primary 6</button><button class="class-btn" onclick="swCls(this,'JSS 1')">JSS 1</button><button class="class-btn" onclick="swCls(this,'JSS 2')">JSS 2</button><button class="class-btn" onclick="swCls(this,'JSS 3')">JSS 3</button><button class="class-btn" onclick="swCls(this,'SSS 1')">SSS 1</button><button class="class-btn" onclick="swCls(this,'SSS 2')">SSS 2</button><button class="class-btn" onclick="swCls(this,'WAEC/JAMB')">WAEC/JAMB</button></div>
+      <!-- Section picker — shown only when SSS 1 or SSS 2 is selected -->
+      <div id="sw2-section" style="display:none;margin-top:16px">
+        <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.7);margin-bottom:8px;text-align:center">Which arm / section are you in?</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button class="class-btn sec-btn" onclick="swSection(this,'A')" style="min-width:52px;padding:12px 8px;font-size:18px">A</button>
+          <button class="class-btn sec-btn" onclick="swSection(this,'B')" style="min-width:52px;padding:12px 8px;font-size:18px">B</button>
+          <button class="class-btn sec-btn" onclick="swSection(this,'C')" style="min-width:52px;padding:12px 8px;font-size:18px">C</button>
+          <button class="class-btn sec-btn" onclick="swSection(this,'D')" style="min-width:52px;padding:12px 8px;font-size:18px">D</button>
+          <button class="class-btn sec-btn" onclick="swSection(this,'E')" style="min-width:52px;padding:12px 8px;font-size:18px">E</button>
+          <button class="class-btn sec-btn" onclick="swSection(this,'')" style="min-width:52px;padding:12px 8px;font-size:13px;opacity:.7">No arm</button>
+        </div>
+      </div>
+    </div>
     <div id="sw2b" style="display:none">
       <div class="setup-hdr"><h2>Parent's WhatsApp <span style="opacity:.55;font-size:15px;font-weight:700">(optional)</span></h2><p>Your parent gets a free weekly progress update every Friday. Skip if you don't have it now.</p></div>
       <div class="setup-field"><input id="sw-pwa" class="setup-input" type="tel" placeholder="e.g. 08012345678" maxlength="15" oninput="swPwaCheck()"></div>
@@ -579,6 +592,18 @@ body.banner-open .screen.active{padding-bottom:80px}
       <button class="class-btn" onclick="asCls(this,'SSS 1')">SSS 1</button>
       <button class="class-btn" onclick="asCls(this,'SSS 2')">SSS 2</button>
       <button class="class-btn" onclick="asCls(this,'WAEC/JAMB')">WAEC/JAMB</button>
+    </div>
+    <!-- Section picker for SSS classes -->
+    <div id="as-section-wrap" style="display:none;margin-top:8px">
+      <div style="font-size:12px;font-weight:800;color:#6B7280;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Which arm / section?</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="class-btn as-sec-btn" onclick="asSection(this,'A')" style="min-width:44px;padding:10px 6px;font-size:16px">A</button>
+        <button class="class-btn as-sec-btn" onclick="asSection(this,'B')" style="min-width:44px;padding:10px 6px;font-size:16px">B</button>
+        <button class="class-btn as-sec-btn" onclick="asSection(this,'C')" style="min-width:44px;padding:10px 6px;font-size:16px">C</button>
+        <button class="class-btn as-sec-btn" onclick="asSection(this,'D')" style="min-width:44px;padding:10px 6px;font-size:16px">D</button>
+        <button class="class-btn as-sec-btn" onclick="asSection(this,'E')" style="min-width:44px;padding:10px 6px;font-size:16px">E</button>
+        <button class="class-btn as-sec-btn" onclick="asSection(this,'')" style="min-width:52px;padding:10px 6px;font-size:12px;opacity:.7">No arm</button>
+      </div>
     </div>
     <div class="setup-hdr" style="margin-top:4px"><h2>Parent's WhatsApp <span style="opacity:.55;font-size:15px;font-weight:700">(optional)</span></h2><p>Send weekly progress to this number every Friday. Leave blank to skip.</p></div>
     <div class="setup-field"><input id="as-pwa" class="setup-input" type="tel" placeholder="e.g. 08012345678" maxlength="15"></div>
@@ -2983,6 +3008,14 @@ var UNITS=[
 // ════════════════════════════════════════
 var DMODE='';
 var STU={name:'',classLabel:'',uid:''};
+// Strip section letter from class label → "SSS 1A" → "SSS 1"
+function _baseClass(cl){ return (cl||'').replace(/\s*[A-E]$/i,'').trim(); }
+// Is the student a senior secondary student?
+function _isSeniorClass(cl){ return /^SSS\s*[123]/i.test(cl||'')||/WAEC|JAMB/i.test(cl||''); }
+// Resolve stage lookup with section fallback: STAGES["SSS 1A"] → STAGES["SSS 1"]
+function _resolveStageMap(map, cl){
+  return map[cl] || map[_baseClass(cl)] || null;
+}
 var S={
   unitKey:'animals',
   currentStages:[],
@@ -3419,7 +3452,10 @@ var _STAFF_CLASSES=[
   'Nursery 1','Nursery 2',
   'Primary 1','Primary 2','Primary 3','Primary 4','Primary 5','Primary 6',
   'JSS 1','JSS 2','JSS 3',
-  'SSS 1','SSS 2','WAEC/JAMB'
+  'SSS 1','SSS 1A','SSS 1B','SSS 1C','SSS 1D','SSS 1E',
+  'SSS 2','SSS 2A','SSS 2B','SSS 2C','SSS 2D','SSS 2E',
+  'SSS 3','SSS 3A','SSS 3B','SSS 3C','SSS 3D','SSS 3E',
+  'WAEC/JAMB'
 ];
 
 function openManageStaff(){
@@ -3844,7 +3880,8 @@ function _isStudentVisible(student){
   var allowed=_visibleClassesForCurrentStaff();
   if(allowed===null)return true;          // proprietor / no scope
   if(!allowed.length)return false;        // teacher with no classes assigned
-  return allowed.indexOf(student.classLabel)>=0;
+  return allowed.indexOf(student.classLabel)>=0
+      || allowed.indexOf(_baseClass(student.classLabel))>=0;
 }
 
 // Convenience: filter a list of students to only the visible ones.
@@ -4467,7 +4504,32 @@ function startSetup(){
   SS('setup');
 }
 function swCheck(){document.getElementById('sw-next').disabled=!document.getElementById('sw-name').value.trim();}
-function swCls(btn,cls){document.querySelectorAll('#sw2 .class-btn').forEach(function(b){b.classList.remove('sel');});btn.classList.add('sel');swClass=cls;document.getElementById('sw-next').disabled=false;}
+var _swBaseClass=''; // e.g. "SSS 1" before section is picked
+function swCls(btn,cls){
+  document.querySelectorAll('#sw2 .class-btn').forEach(function(b){b.classList.remove('sel');});
+  btn.classList.add('sel');
+  _swBaseClass=cls;
+  // Show section picker for SSS classes; hide for everything else
+  var sectionDiv=document.getElementById('sw2-section');
+  var needsSection=/^SSS\s*[123]/i.test(cls);
+  if(sectionDiv) sectionDiv.style.display=needsSection?'':'none';
+  // Reset section buttons
+  if(needsSection){
+    document.querySelectorAll('.sec-btn').forEach(function(b){b.classList.remove('sel');});
+    swClass=''; // wait for section pick before enabling Next
+    document.getElementById('sw-next').disabled=true;
+  } else {
+    swClass=cls;
+    document.getElementById('sw-next').disabled=false;
+  }
+}
+function swSection(btn,section){
+  document.querySelectorAll('.sec-btn').forEach(function(b){b.classList.remove('sel');});
+  btn.classList.add('sel');
+  // Combine base class + section → e.g. "SSS 1A" or "SSS 1" (if no arm)
+  swClass=section?_swBaseClass+section:_swBaseClass;
+  document.getElementById('sw-next').disabled=false;
+}
 function swDots(a){for(var i=0;i<4;i++){var d=document.getElementById('dot'+i);if(d)d.classList.toggle('active',i===a);}}
 
 // Back button on setup screens — walk back through the wizard steps, or go
@@ -4721,15 +4783,32 @@ function switchStudent(){if(DMODE==='shared')showRoster();else startSetup();}
 
 // ADD STUDENT
 var asClass='';
+var _asBaseClass='';
 function asCheck(){
   var n=document.getElementById('as-name');
   var b=document.getElementById('as-save');
   if(b)b.disabled=!((n&&n.value.trim())&&asClass);
 }
 function asCls(btn,cls){
-  asClass=cls;
+  _asBaseClass=cls;
   document.querySelectorAll('#add-student .class-btn').forEach(function(b){b.classList.remove('sel');});
-  btn.classList.add('sel');asCheck();
+  btn.classList.add('sel');
+  var sectionWrap=document.getElementById('as-section-wrap');
+  var needsSection=/^SSS\s*[123]/i.test(cls);
+  if(sectionWrap) sectionWrap.style.display=needsSection?'':'none';
+  if(needsSection){
+    document.querySelectorAll('.as-sec-btn').forEach(function(b){b.classList.remove('sel');});
+    asClass=''; // wait for section
+  } else {
+    asClass=cls;
+  }
+  asCheck();
+}
+function asSection(btn,section){
+  document.querySelectorAll('.as-sec-btn').forEach(function(b){b.classList.remove('sel');});
+  btn.classList.add('sel');
+  asClass=section?_asBaseClass+section:_asBaseClass;
+  asCheck();
 }
 function saveNewStudent(){
   var nameEl=document.getElementById('as-name');
@@ -5196,7 +5275,8 @@ function loadHome(){
   var waecCard=document.getElementById('waec-home-card');
   if(waecCard){
     var cl=STU.classLabel||'';
-    var isSenior=(cl==='SSS 2'||cl==='SSS 3'||cl==='WAEC/JAMB'||cl==='WAEC'||cl==='JAMB');
+    // Senior = SSS 1/2/3 (and any section A/B/C/D), WAEC/JAMB label
+    var isSenior=/^SSS\s*[123]/i.test(cl)||/WAEC|JAMB/i.test(cl);
     waecCard.style.display=isSenior?'':'none';
   }
   // Apply admin subject access filter (hides cards not in the school's plan)
@@ -5506,11 +5586,10 @@ function clearAllStudents(){
 function openLessonList(){
   if(DMODE==='shared')document.getElementById('lessons-sw').style.display='';
   var cl=STU.classLabel;
-  document.getElementById('lessons-bc').textContent=(cl==='SSS 1'||cl==='SSS 2'||cl==='WAEC/JAMB'?'Vocabulary › ':'English › ')+cl+' — All Units';
+  var isSenior=_isSeniorClass(cl);
+  document.getElementById('lessons-bc').textContent=(isSenior?'Vocabulary › ':'English › ')+cl+' — All Units';
   var p=prog();
   var outline=getCourseOutline();
-  // Senior class detection
-  var isSenior=(cl==='SSS 1'||cl==='SSS 2'||cl==='WAEC/JAMB');
   var seniorTitleOverrides={
     colours: {title:'Maths Vocabulary', emoji:'📐'},
     body:    {title:'Human Anatomy & Physiology', emoji:'🫀'},
@@ -7322,6 +7401,27 @@ MATH_STAGES['WAEC/JAMB']=[
   {id:'m-wj-s7',label:'Stage 7 — JAMB Speed Round',    emoji:'⚡',gen:function(){return genJAMBSpeed();}},
   {id:'m-wj-s8',label:'Stage 8 — Full Exam Simulation',emoji:'🏆',gen:function(){return genFullExam();}}
 ];
+
+// ── CLASS SECTION ALIASES ─────────────────────────────────────────────────────
+// When a student picks "SSS 1A", "SSS 2B" etc., alias all content stages to
+// the base class so they get the correct curriculum. The section letter is
+// only used for subject access (set by teacher) — not to differentiate content.
+(function(){
+  var sections=['A','B','C','D','E'];
+  var bases={
+    'JSS 1':true,'JSS 2':true,'JSS 3':true,
+    'SSS 1':true,'SSS 2':true,'SSS 3':true
+  };
+  Object.keys(bases).forEach(function(base){
+    sections.forEach(function(sec){
+      var label=base+sec; // e.g. "SSS 1A"
+      MATH_STAGES[label]=MATH_STAGES[base];
+    });
+  });
+  // Also ensure SSS 3 has content (alias to WAEC/JAMB level if not defined)
+  if(!MATH_STAGES['SSS 3']) MATH_STAGES['SSS 3']=MATH_STAGES['WAEC/JAMB'];
+  sections.forEach(function(sec){ if(!MATH_STAGES['SSS 3'+sec]) MATH_STAGES['SSS 3'+sec]=MATH_STAGES['SSS 3']; });
+})();
 
 function genTrigAdvanced(){
   var qs=[];
@@ -9579,14 +9679,14 @@ function switchMathLevel(level){
 
 function startMathStage(idx){
   var cl=STU.mathLevel||STU.classLabel||'Primary 1';
-  var stages=MATH_STAGES[cl]||MATH_STAGES['Primary 1']||[];
+  var stages=_resolveStageMap(MATH_STAGES,cl)||MATH_STAGES['Primary 1']||[];
   MS.mode='math';
   MS.stage=stages[idx];MS.stageIdx=idx;MS.classLabel=cl;
   MS.questions=shuffle(MS.stage.gen());
   MS.qIdx=0;MS.answers=[];
   var t=document.getElementById('math-play-title');if(t)t.textContent=MS.stage.label;
   // Show concept intro for senior classes (JSS+) before first question
-  var isSenior=/JSS|SSS|WAEC/.test(cl);
+  var isSenior=_isSeniorClass(cl)||/JSS/.test(cl);
   if(isSenior&&MS.stage.concept){
     _showConceptFlash(MS.stage.concept, function(){renderMathQ();});
     SS('math-play');
@@ -10821,27 +10921,40 @@ function applyClassSubjectAccess(){
   var cls=STU&&(STU.classLabel||STU.class);
   if(!cls)return;
   var cfg=loadClassConfig(cls);
-  if(!cfg)return; // no class config — school-level already applied
-  // Override with class-level settings
+  if(!cfg)return; // no class config — school-level gate already applied
+
   var access=cfg.allowedSubjects;
   var waecAccess=cfg.allowedWaecSubjects;
+
   if(Array.isArray(access)){
+    var schoolAccess=loadSubjectAccess(); // what school paid for (null = all)
     MAIN_SUBJECTS.forEach(function(s){
       var el=document.getElementById(s.card);
       if(!el)return;
-      if(access.indexOf(s.key)===-1)el.style.display='none';
+      // School must have paid for it AND class must allow it
+      var schoolAllows=(schoolAccess===null||schoolAccess[s.key]!==false);
+      var classAllows=access.indexOf(s.key)!==-1;
+      // Special rule: WAEC card visibility is ALSO controlled by the
+      // senior class gate above — only show if student is senior
+      if(s.key==='waec'){
+        var cl=STU&&(STU.classLabel||'');
+        var isSenior=/^SSS\s*[123]/i.test(cl)||/WAEC|JAMB/i.test(cl);
+        el.style.display=(schoolAllows&&classAllows&&isSenior)?'':'none';
+      } else {
+        el.style.display=(schoolAllows&&classAllows)?'':'none';
+      }
     });
   }
+
   if(Array.isArray(waecAccess)){
-    // Cache so getWaecSubjectList() picks it up for this session
     var waecMap={};
     WAEC_ACCESS_LIST.forEach(function(s){waecMap[s.key]=waecAccess.indexOf(s.key)!==-1;});
     localStorage.setItem(WAEC_ACCESS_KEY,JSON.stringify(waecMap));
   }
-  // Also fetch fresh from Firestore in background
+
+  // Fetch fresh config from Firestore in background silently
   fetchClassConfig(cls,function(freshCfg){
     if(freshCfg&&JSON.stringify(freshCfg)!==JSON.stringify(cfg)){
-      // Config changed — re-apply next time home loads
       localStorage.setItem(CLASS_CFG_PREFIX+cls,JSON.stringify(freshCfg));
     }
   });
