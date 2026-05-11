@@ -493,12 +493,10 @@ body.banner-open .screen.active{padding-bottom:80px}
       <div id="sw2-section" style="display:none;margin-top:16px">
         <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.7);margin-bottom:8px;text-align:center">Which arm / section are you in?</div>
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-          <button class="class-btn sec-btn" onclick="swSection(this,'A')" style="min-width:52px;padding:12px 8px;font-size:18px">A</button>
-          <button class="class-btn sec-btn" onclick="swSection(this,'B')" style="min-width:52px;padding:12px 8px;font-size:18px">B</button>
-          <button class="class-btn sec-btn" onclick="swSection(this,'C')" style="min-width:52px;padding:12px 8px;font-size:18px">C</button>
-          <button class="class-btn sec-btn" onclick="swSection(this,'D')" style="min-width:52px;padding:12px 8px;font-size:18px">D</button>
-          <button class="class-btn sec-btn" onclick="swSection(this,'E')" style="min-width:52px;padding:12px 8px;font-size:18px">E</button>
-          <button class="class-btn sec-btn" onclick="swSection(this,'')" style="min-width:52px;padding:12px 8px;font-size:13px;opacity:.7">No arm</button>
+          <button class="class-btn sec-btn" onclick="swSection(this,' Science')" style="min-width:80px;padding:10px 8px;font-size:13px;font-weight:900">🔬 Science</button>
+          <button class="class-btn sec-btn" onclick="swSection(this,' Art')" style="min-width:80px;padding:10px 8px;font-size:13px;font-weight:900">🎨 Art</button>
+          <button class="class-btn sec-btn" onclick="swSection(this,' Commercial')" style="min-width:80px;padding:10px 8px;font-size:13px;font-weight:900">💼 Commercial</button>
+          <button class="class-btn sec-btn" onclick="swSection(this,'')" style="min-width:80px;padding:10px 8px;font-size:13px;opacity:.75">General</button>
         </div>
       </div>
     </div>
@@ -593,16 +591,14 @@ body.banner-open .screen.active{padding-bottom:80px}
       <button class="class-btn" onclick="asCls(this,'SSS 2')">SSS 2</button>
       <button class="class-btn" onclick="asCls(this,'WAEC/JAMB')">WAEC/JAMB</button>
     </div>
-    <!-- Section picker for SSS classes -->
+    <!-- Section picker for JSS/SSS classes -->
     <div id="as-section-wrap" style="display:none;margin-top:8px">
       <div style="font-size:12px;font-weight:800;color:#6B7280;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Which arm / section?</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="class-btn as-sec-btn" onclick="asSection(this,'A')" style="min-width:44px;padding:10px 6px;font-size:16px">A</button>
-        <button class="class-btn as-sec-btn" onclick="asSection(this,'B')" style="min-width:44px;padding:10px 6px;font-size:16px">B</button>
-        <button class="class-btn as-sec-btn" onclick="asSection(this,'C')" style="min-width:44px;padding:10px 6px;font-size:16px">C</button>
-        <button class="class-btn as-sec-btn" onclick="asSection(this,'D')" style="min-width:44px;padding:10px 6px;font-size:16px">D</button>
-        <button class="class-btn as-sec-btn" onclick="asSection(this,'E')" style="min-width:44px;padding:10px 6px;font-size:16px">E</button>
-        <button class="class-btn as-sec-btn" onclick="asSection(this,'')" style="min-width:52px;padding:10px 6px;font-size:12px;opacity:.7">No arm</button>
+        <button class="class-btn as-sec-btn" onclick="asSection(this,' Science')" style="min-width:78px;padding:9px 6px;font-size:12px;font-weight:900">🔬 Science</button>
+        <button class="class-btn as-sec-btn" onclick="asSection(this,' Art')" style="min-width:78px;padding:9px 6px;font-size:12px;font-weight:900">🎨 Art</button>
+        <button class="class-btn as-sec-btn" onclick="asSection(this,' Commercial')" style="min-width:78px;padding:9px 6px;font-size:12px;font-weight:900">💼 Commercial</button>
+        <button class="class-btn as-sec-btn" onclick="asSection(this,'')" style="min-width:78px;padding:9px 6px;font-size:12px;opacity:.75">General</button>
       </div>
     </div>
     <div class="setup-hdr" style="margin-top:4px"><h2>Parent's WhatsApp <span style="opacity:.55;font-size:15px;font-weight:700">(optional)</span></h2><p>Send weekly progress to this number every Friday. Leave blank to skip.</p></div>
@@ -661,9 +657,6 @@ body.banner-open .screen.active{padding-bottom:80px}
       </button>
       <button onclick="openCourseOutline()" style="padding:14px 10px;background:#0F766E;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left">
         📋 Course Outline<br><span style="font-weight:600;opacity:.8;font-size:11px">Set syllabus order</span>
-      </button>
-      <button onclick="openAssignments()" style="padding:14px 10px;background:#7E22CE;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left">
-        📝 Assignments<br><span style="font-weight:600;opacity:.8;font-size:11px">Set homework stages</span>
       </button>
       <button onclick="openLessonNotes()" style="padding:14px 10px;background:#0369A1;color:#fff;border:none;border-radius:var(--rs);font-family:'Nunito',sans-serif;font-weight:900;font-size:13px;cursor:pointer;text-align:left;grid-column:1/-1">
         📖 Lesson Notes<br><span style="font-weight:600;opacity:.8;font-size:11px">Write reading content for students — definitions, examples, extra notes</span>
@@ -3038,8 +3031,8 @@ var UNITS=[
 // ════════════════════════════════════════
 var DMODE='';
 var STU={name:'',classLabel:'',uid:''};
-// Strip section letter from class label → "SSS 1A" → "SSS 1"
-function _baseClass(cl){ return (cl||'').replace(/\s*[A-E]$/i,'').trim(); }
+// Strip section name from class label → "SSS 1 Science" → "SSS 1", "JSS 2 Art" → "JSS 2"
+function _baseClass(cl){ return (cl||'').replace(/\s+(Science|Art|Commercial|General)$/i,'').replace(/\s*[A-E]$/i,'').trim(); }
 // Is the student a senior secondary student?
 function _isSeniorClass(cl){ return /^SSS\s*[123]/i.test(cl||'')||/WAEC|JAMB/i.test(cl||''); }
 // Resolve stage lookup with section fallback: STAGES["SSS 1A"] → STAGES["SSS 1"]
@@ -3481,12 +3474,12 @@ var _staffEdit={
 var _STAFF_CLASSES=[
   'Nursery 1','Nursery 2',
   'Primary 1','Primary 2','Primary 3','Primary 4','Primary 5','Primary 6',
-  'JSS 1','JSS 1A','JSS 1B','JSS 1C','JSS 1D','JSS 1E',
-  'JSS 2','JSS 2A','JSS 2B','JSS 2C','JSS 2D','JSS 2E',
-  'JSS 3','JSS 3A','JSS 3B','JSS 3C','JSS 3D','JSS 3E',
-  'SSS 1','SSS 1A','SSS 1B','SSS 1C','SSS 1D','SSS 1E',
-  'SSS 2','SSS 2A','SSS 2B','SSS 2C','SSS 2D','SSS 2E',
-  'SSS 3','SSS 3A','SSS 3B','SSS 3C','SSS 3D','SSS 3E',
+  'JSS 1','JSS 1 Science','JSS 1 Art','JSS 1 Commercial','JSS 1 General',
+  'JSS 2','JSS 2 Science','JSS 2 Art','JSS 2 Commercial','JSS 2 General',
+  'JSS 3','JSS 3 Science','JSS 3 Art','JSS 3 Commercial','JSS 3 General',
+  'SSS 1','SSS 1 Science','SSS 1 Art','SSS 1 Commercial','SSS 1 General',
+  'SSS 2','SSS 2 Science','SSS 2 Art','SSS 2 Commercial','SSS 2 General',
+  'SSS 3','SSS 3 Science','SSS 3 Art','SSS 3 Commercial','SSS 3 General',
   'WAEC/JAMB'
 ];
 
@@ -7041,38 +7034,38 @@ function genAlgebra(level){
     var x=1+Math.floor(Math.random()*10);
     var a=1+Math.floor(Math.random()*8);
     var b=1+Math.floor(Math.random()*10);
-    var q,ans;
+    var q,ans,why;
     if(level===1){
-      // x + a = b+a → find x
       ans=x;q='x + '+a+' = '+(x+a)+'\nFind x';
+      why='Step 1: We want x on its own.\nStep 2: Subtract '+a+' from both sides: x + '+a+' − '+a+' = '+(x+a)+' − '+a+'.\nStep 3: x = '+x+'.\nCheck: '+x+' + '+a+' = '+(x+a)+' ✓';
     }else{
-      // ax + b = ans → find x
       ans=x;q=a+'x + '+b+' = '+(a*x+b)+'\nFind x';
+      why='Step 1: Subtract '+b+' from both sides: '+a+'x = '+(a*x+b)+' − '+b+' = '+(a*x)+'.\nStep 2: Divide both sides by '+a+': x = '+(a*x)+' ÷ '+a+' = '+x+'.\nCheck: '+a+' × '+x+' + '+b+' = '+(a*x)+' + '+b+' = '+(a*x+b)+' ✓';
     }
     var opts=shuffle([String(ans)].concat(mathWrong(ans,3,5)));
-    qs.push(makeMathQ(q,ans,opts,'Algebra','x'));
+    qs.push(makeMathQ(q,ans,opts,'Algebra','x',why));
   }
   return qs;
 }
 function genGeometry(){
   var qs=[];
   var facts=[
-    {q:'Angles in a triangle add up to?',a:'180°',w:['90°','360°','270°']},
-    {q:'Angles in a quadrilateral add up to?',a:'360°',w:['180°','270°','90°']},
-    {q:'A right angle is?',a:'90°',w:['45°','180°','60°']},
-    {q:'How many sides does a hexagon have?',a:'6',w:['5','7','8']},
-    {q:'How many sides does a pentagon have?',a:'5',w:['4','6','7']},
-    {q:'Area of triangle = ½ × base × height\nBase = 6 cm, Height = 4 cm\nArea = ?',a:'12 cm²',w:['24 cm²','10 cm²','8 cm²']},
-    {q:'Circumference = π × diameter\nDiameter = 7 cm, π ≈ 22/7\nCircumference ≈ ?',a:'22 cm',w:['14 cm','44 cm','11 cm']},
-    {q:'Supplementary angles add up to?',a:'180°',w:['90°','360°','270°']},
-    {q:'Complementary angles add up to?',a:'90°',w:['180°','45°','360°']},
-    {q:'An equilateral triangle has how many equal sides?',a:'3',w:['2','1','4']}
+    {q:'Angles in a triangle add up to?',a:'180°',w:['90°','360°','270°'],why:'A triangle has 3 angles. They always add up to exactly 180°. You can prove it by tearing off the corners of any triangle and placing them in a line — they form a straight line = 180°.'},
+    {q:'Angles in a quadrilateral add up to?',a:'360°',w:['180°','270°','90°'],why:'A quadrilateral (4 sides) can be split into 2 triangles. Each triangle has 180°, so 2 × 180° = 360°. This works for any quadrilateral — rectangle, square, trapezium, parallelogram.'},
+    {q:'A right angle is?',a:'90°',w:['45°','180°','60°'],why:'A right angle is exactly 90° — the angle in a corner of a square or where a vertical meets a horizontal. It is shown by a small square symbol in diagrams.'},
+    {q:'How many sides does a hexagon have?',a:'6',w:['5','7','8'],why:'Hex = 6 (from Greek "hexa"). Polygon sides: triangle=3, quadrilateral=4, pentagon=5, HEXAGON=6, heptagon=7, octagon=8, nonagon=9, decagon=10.'},
+    {q:'How many sides does a pentagon have?',a:'5',w:['4','6','7'],why:'Penta = 5 (from Greek "pente"). The Pentagon building in the USA has this shape. Sum of interior angles of a pentagon = (5−2) × 180° = 540°.'},
+    {q:'Area of triangle = ½ × base × height\nBase = 6 cm, Height = 4 cm\nArea = ?',a:'12 cm²',w:['24 cm²','10 cm²','8 cm²'],why:'Area of triangle = ½ × base × height = ½ × 6 × 4 = ½ × 24 = 12 cm². The ½ is there because a triangle is half a rectangle of the same base and height.'},
+    {q:'Circumference = π × diameter\nDiameter = 7 cm, π ≈ 22/7\nCircumference ≈ ?',a:'22 cm',w:['14 cm','44 cm','11 cm'],why:'Circumference = π × d = 22/7 × 7 = 22 cm. The 7s cancel out! This is why 22/7 is a useful approximation — it simplifies calculations with diameter 7 (or multiples of 7).'},
+    {q:'Supplementary angles add up to?',a:'180°',w:['90°','360°','270°'],why:'Supplementary angles sum to 180° — they form a straight line. Example: 110° + 70° = 180°. Memory tip: Supplementary → Straight line → 180°. Complementary angles sum to 90°.'},
+    {q:'Complementary angles add up to?',a:'90°',w:['180°','45°','360°'],why:'Complementary angles sum to 90° — they form a right angle. Example: 35° + 55° = 90°. Memory tip: Complementary → Corner (right angle) → 90°. Supplementary = 180°.'},
+    {q:'An equilateral triangle has how many equal sides?',a:'3',w:['2','1','4'],why:'Equilateral triangle: ALL 3 sides equal AND all 3 angles equal (each = 60°). Isosceles: 2 equal sides. Scalene: no equal sides. Equi = equal, lateral = sides.'}
   ];
   var pool=shuffle(facts.slice());
   for(var i=0;i<10;i++){
     var f=pool[i%pool.length];
     var opts=shuffle([f.a].concat(f.w));
-    qs.push(makeMathQ(f.q,f.a,opts,'Geometry','📐'));
+    qs.push(makeMathQ(f.q,f.a,opts,'Geometry','📐',f.why));
   }
   return qs;
 }
@@ -7098,24 +7091,30 @@ function genStats(){
   var qs=[];
   for(var i=0;i<10;i++){
     var type=['mean','median','mode','range'][Math.floor(Math.random()*4)];
-    var data,ans;
+    var data,ans,why;
     if(type==='mean'){
       data=[2,4,6,8,10].map(function(){return 1+Math.floor(Math.random()*10);});
       ans=Math.round(data.reduce(function(a,b){return a+b;})/data.length);
-      qs.push(makeMathQ('Find the mean:\n'+data.join(', '),ans,shuffle([String(ans)].concat(mathWrong(ans,3,5))),'Mean','📊'));
+      var sum=data.reduce(function(a,b){return a+b;},0);
+      why='Mean = sum of all values ÷ how many values.\nStep 1: Add all the numbers: '+data.join(' + ')+' = '+sum+'.\nStep 2: Divide by '+data.length+' (how many numbers): '+sum+' ÷ '+data.length+' = '+ans+'.\nMean is the "average" — it balances all values.';
+      qs.push(makeMathQ('Find the mean:\n'+data.join(', '),ans,shuffle([String(ans)].concat(mathWrong(ans,3,5))),'Mean','📊',why));
     }else if(type==='median'){
       data=[2,4,6,8,9].map(function(){return 1+Math.floor(Math.random()*10);}).sort(function(a,b){return a-b;});
       ans=data[2];
-      qs.push(makeMathQ('Find the median:\n'+data.join(', '),ans,shuffle([String(ans)].concat(mathWrong(ans,3,4))),'Median','📊'));
+      why='Median = middle value when data is arranged in order.\nStep 1: Your data in order: '+data.join(', ')+'.\nStep 2: There are '+data.length+' values. The middle one is position '+(Math.ceil(data.length/2))+'.\nStep 3: Median = '+ans+'.\nTip: For an even number of values, take the average of the two middle numbers.';
+      qs.push(makeMathQ('Find the median:\n'+data.join(', '),ans,shuffle([String(ans)].concat(mathWrong(ans,3,4))),'Median','📊',why));
     }else if(type==='mode'){
       var rep=1+Math.floor(Math.random()*9);
       data=[rep,rep,1+Math.floor(Math.random()*9),1+Math.floor(Math.random()*9),1+Math.floor(Math.random()*9)];
       ans=rep;
-      qs.push(makeMathQ('Find the mode:\n'+shuffle(data.slice()).join(', '),ans,shuffle([String(ans)].concat(mathWrong(ans,3,5))),'Mode','📊'));
+      why='Mode = the value that appears MOST often.\nLook at the data: '+shuffle(data.slice()).join(', ')+'.\nThe number '+rep+' appears twice — more than any other number.\nSo the mode = '+rep+'.\nTip: A dataset can have no mode, one mode, or more than one mode.';
+      qs.push(makeMathQ('Find the mode:\n'+shuffle(data.slice()).join(', '),ans,shuffle([String(ans)].concat(mathWrong(ans,3,5))),'Mode','📊',why));
     }else{
       data=[2,4,6,8,10].map(function(){return 1+Math.floor(Math.random()*15);});
-      ans=Math.max.apply(null,data)-Math.min.apply(null,data);
-      qs.push(makeMathQ('Find the range:\n'+data.join(', '),ans,shuffle([String(ans)].concat(mathWrong(ans,3,5))),'Range','📊'));
+      var mx=Math.max.apply(null,data),mn=Math.min.apply(null,data);
+      ans=mx-mn;
+      why='Range = highest value − lowest value.\nStep 1: Find the highest number in '+data.join(', ')+' → '+mx+'.\nStep 2: Find the lowest number → '+mn+'.\nStep 3: Range = '+mx+' − '+mn+' = '+ans+'.\nRange tells us how spread out the data is.';
+      qs.push(makeMathQ('Find the range:\n'+data.join(', '),ans,shuffle([String(ans)].concat(mathWrong(ans,3,5))),'Range','📊',why));
     }
   }
   return qs;
@@ -7129,16 +7128,39 @@ function genMixed(level){
 function genIndices(){
   var qs=[];
   var templates=[
-    function(){var b=2+Math.floor(Math.random()*5),e=2+Math.floor(Math.random()*4);return {q:b+'^'+e+' = ?',a:Math.pow(b,e)};},
-    function(){var b=2+Math.floor(Math.random()*4),e=2+Math.floor(Math.random()*3);var r=Math.pow(b,e);return {q:'What is the value of '+b+' to the power '+e+'?',a:r};},
-    function(){var b=Math.floor(Math.random()*3)+2;return {q:b+'^0 = ?',a:1};},
-    function(){var b=2+Math.floor(Math.random()*5);return {q:b+'^1 = ?',a:b};},
-    function(){var n=[4,9,16,25,36,49,64,81,100][Math.floor(Math.random()*9)];return {q:'√'+n+' = ?',a:Math.round(Math.sqrt(n))};}
+    function(){
+      var b=2+Math.floor(Math.random()*5),e=2+Math.floor(Math.random()*4);
+      var ans=Math.pow(b,e);
+      var steps=[];for(var k=0;k<e;k++)steps.push(b);
+      var why=b+'^'+e+' means multiply '+b+' by itself '+e+' times.\n'+steps.join(' × ')+' = '+ans+'.\nRule: a^n = a × a × a ... (n times).';
+      return {q:b+'^'+e+' = ?',a:ans,why:why};
+    },
+    function(){
+      var b=2+Math.floor(Math.random()*4),e=2+Math.floor(Math.random()*3);
+      var r=Math.pow(b,e);
+      var why=''+b+' to the power '+e+' = '+b+'^'+e+'.\n';
+      var steps=[];for(var k=0;k<e;k++)steps.push(b);
+      why+=steps.join(' × ')+' = '+r+'.';
+      return {q:'What is '+b+' to the power '+e+'?',a:r,why:why};
+    },
+    function(){
+      var b=Math.floor(Math.random()*3)+2;
+      return {q:b+'^0 = ?',a:1,why:'Any number to the power 0 equals 1.\n'+b+'^0 = 1.\nRule: a^0 = 1 (for any non-zero a).\nWhy? Because a^n ÷ a^n = a^(n−n) = a^0, and any number ÷ itself = 1.'};
+    },
+    function(){
+      var b=2+Math.floor(Math.random()*5);
+      return {q:b+'^1 = ?',a:b,why:'Any number to the power 1 equals itself.\n'+b+'^1 = '+b+'.\nRule: a^1 = a.\nPower 1 means multiply by '+b+' just ONCE — so the answer is just '+b+' itself.'};
+    },
+    function(){
+      var n=[4,9,16,25,36,49,64,81,100][Math.floor(Math.random()*9)];
+      var rt=Math.round(Math.sqrt(n));
+      return {q:'√'+n+' = ?',a:rt,why:'√'+n+' asks: what number multiplied by itself gives '+n+'?\n'+rt+' × '+rt+' = '+n+'.\nSo √'+n+' = '+rt+'.\nRule: √(a²) = a. Square root is the inverse of squaring.'};
+    }
   ];
   for(var i=0;i<10;i++){
     var t=templates[i%templates.length]();
     var opts=shuffle([String(t.a)].concat(mathWrong(t.a,3,Math.max(3,t.a/2))));
-    qs.push(makeMathQ(t.q,t.a,opts,'Indices','🔢'));
+    qs.push(makeMathQ(t.q,t.a,opts,'Indices','🔢',t.why));
   }
   return qs;
 }
@@ -7153,14 +7175,21 @@ function genLCMHCF(){
     var ans=isLCM?lcm(a,b):gcd(a,b);
     var q=(isLCM?'LCM':'HCF')+' of '+a+' and '+b+' = ?';
     var opts=shuffle([String(ans)].concat(mathWrong(ans,3,Math.max(3,ans/2))));
-    qs.push(makeMathQ(q,ans,opts,isLCM?'LCM':'HCF','🔢'));
+    var why;
+    if(isLCM){
+      why='LCM (Lowest Common Multiple): the SMALLEST number that both '+a+' and '+b+' divide into.\nMethod: list multiples of each:\nMultiples of '+a+': '+[1,2,3,4,5,6].map(function(k){return k*a;}).join(', ')+'...\nMultiples of '+b+': '+[1,2,3,4,5,6].map(function(k){return k*b;}).join(', ')+'...\nFirst common multiple = '+ans+'.\nShortcut: LCM(a,b) = (a × b) ÷ HCF(a,b) = '+a+'×'+b+'÷'+gcd(a,b)+' = '+ans+'.';
+    }else{
+      var factors_a=[],factors_b=[];
+      for(var d=1;d<=a;d++)if(a%d===0)factors_a.push(d);
+      for(var d=1;d<=b;d++)if(b%d===0)factors_b.push(d);
+      why='HCF (Highest Common Factor): the LARGEST number that divides into both '+a+' and '+b+'.\nFactors of '+a+': '+factors_a.join(', ')+'.\nFactors of '+b+': '+factors_b.join(', ')+'.\nCommon factors: '+factors_a.filter(function(f){return b%f===0;}).join(', ')+'.\nHCF = '+ans+' (the largest).';
+    }
+    qs.push(makeMathQ(q,ans,opts,isLCM?'LCM':'HCF','🔢',why));
   }
   return qs;
 }
 function genSimultaneous(){
   var qs=[];
-  // ax + by = c, dx + ey = f — small integer solutions
-  var pairs=[[1,2],[2,3],[1,3],[2,5],[3,4],[1,5],[2,7],[3,5],[4,5],[1,4]];
   for(var i=0;i<10;i++){
     var x=1+Math.floor(Math.random()*5);
     var y=1+Math.floor(Math.random()*5);
@@ -7172,24 +7201,43 @@ function genSimultaneous(){
     var f=d*x+e*y;
     var q=a+'x + '+b+'y = '+c+'\n'+d+'x + '+e+'y = '+f+'\nFind x';
     var opts=shuffle([String(x)].concat(mathWrong(x,3,4)));
-    qs.push(makeMathQ(q,x,opts,'Simultaneous','x'));
+    var why='Use the ELIMINATION method:\n'
+      +'Equation 1: '+a+'x + '+b+'y = '+c+'.\n'
+      +'Equation 2: '+d+'x + '+e+'y = '+f+'.\n'
+      +'Step 1: Multiply Eq 1 by '+d+' → '+(a*d)+'x + '+(b*d)+'y = '+(c*d)+'.\n'
+      +'Step 2: Multiply Eq 2 by '+a+' → '+(d*a)+'x + '+(e*a)+'y = '+(f*a)+'.\n'
+      +'Step 3: Subtract to eliminate x: '+(b*d-e*a)+'y = '+(c*d-f*a)+'.\n'
+      +'Step 4: y = '+(c*d-f*a)+'÷'+(b*d-e*a)+' = '+y+'.\n'
+      +'Step 5: Substitute y = '+y+' into Eq 1: '+a+'x + '+(b*y)+' = '+c+', so '+a+'x = '+(c-b*y)+', x = '+x+'.\n'
+      +'Check: '+a+'('+x+')+'+b+'('+y+')='+c+' ✓ and '+d+'('+x+')+'+e+'('+y+')='+f+' ✓';
+    qs.push(makeMathQ(q,x,opts,'Simultaneous','x',why));
   }
   return qs;
 }
 function genCoordinates(){
   var qs=[
-    {q:'Point A is at (3, 4). Point B is at (7, 4).\nDistance AB = ?',a:'4',w:['3','7','8']},
-    {q:'Midpoint of (2, 4) and (6, 8) = ?',a:'(4, 6)',w:['(3, 5)','(8, 12)','(4, 4)']},
-    {q:'Gradient of line through (0,0) and (3,6) = ?',a:'2',w:['3','6','0.5']},
-    {q:'Gradient of line through (1,2) and (3,6) = ?',a:'2',w:['3','4','1']},
-    {q:'y-intercept of y = 3x + 5 is?',a:'5',w:['3','−5','0']},
-    {q:'Gradient of y = 2x − 7 is?',a:'2',w:['−7','7','−2']},
-    {q:'Point on y = 2x + 1 when x = 3?',a:'7',w:['5','6','8']},
-    {q:'Midpoint of (0,0) and (10,6) = ?',a:'(5, 3)',w:['(10, 6)','(4, 2)','(6, 4)']},
-    {q:'Distance from (0,0) to (3,4) = ?',a:'5',w:['7','4','3']},
-    {q:'Gradient of a horizontal line is?',a:'0',w:['1','undefined','−1']}
+    {q:'Point A is at (3, 4). Point B is at (7, 4).\nDistance AB = ?',a:'4',w:['3','7','8'],
+     why:'Both points have the same y-coordinate (4), so they are on a horizontal line.\nDistance = difference in x-values = 7 − 3 = 4 units.\nFor horizontal/vertical lines, just subtract the different coordinates.'},
+    {q:'Midpoint of (2, 4) and (6, 8) = ?',a:'(4, 6)',w:['(3, 5)','(8, 12)','(4, 4)'],
+     why:'Midpoint formula: ((x₁+x₂)/2, (y₁+y₂)/2).\nStep 1: x midpoint = (2+6)/2 = 8/2 = 4.\nStep 2: y midpoint = (4+8)/2 = 12/2 = 6.\nMidpoint = (4, 6). Think of it as finding the average of each coordinate.'},
+    {q:'Gradient of line through (0,0) and (3,6) = ?',a:'2',w:['3','6','0.5'],
+     why:'Gradient = rise ÷ run = (y₂−y₁) ÷ (x₂−x₁).\nStep 1: rise = 6−0 = 6. Step 2: run = 3−0 = 3.\nGradient = 6÷3 = 2.\nGradient 2 means: for every 1 step right, the line goes 2 steps up.'},
+    {q:'Gradient of line through (1,2) and (3,6) = ?',a:'2',w:['3','4','1'],
+     why:'Gradient = (y₂−y₁) ÷ (x₂−x₁) = (6−2) ÷ (3−1) = 4÷2 = 2.\nAlways subtract in the same order: (2nd y − 1st y) ÷ (2nd x − 1st x).'},
+    {q:'y-intercept of y = 3x + 5 is?',a:'5',w:['3','−5','0'],
+     why:'y = mx + c is the equation of a straight line.\nm = gradient (coefficient of x) = 3.\nc = y-intercept (where line crosses y-axis) = 5.\nSet x=0: y = 3(0) + 5 = 5. The line crosses the y-axis at (0, 5).'},
+    {q:'Gradient of y = 2x − 7 is?',a:'2',w:['−7','7','−2'],
+     why:'y = mx + c. In y = 2x − 7, the gradient m is the number in front of x.\nGradient = 2. The −7 is the y-intercept (where the line crosses the y-axis).\nThe gradient tells you: for every 1 unit right, the line rises 2 units.'},
+    {q:'Point on y = 2x + 1 when x = 3?',a:'7',w:['5','6','8'],
+     why:'To find the y-value, substitute x = 3 into the equation.\ny = 2(3) + 1 = 6 + 1 = 7.\nThe point is (3, 7). Always substitute carefully — multiply BEFORE adding.'},
+    {q:'Midpoint of (0,0) and (10,6) = ?',a:'(5, 3)',w:['(10, 6)','(4, 2)','(6, 4)'],
+     why:'Midpoint = ((x₁+x₂)/2, (y₁+y₂)/2).\nx midpoint = (0+10)/2 = 5. y midpoint = (0+6)/2 = 3.\nMidpoint = (5, 3).'},
+    {q:'Distance from (0,0) to (3,4) = ?',a:'5',w:['7','4','3'],
+     why:'Distance formula (Pythagoras): d = √((x₂−x₁)² + (y₂−y₁)²).\nd = √((3−0)² + (4−0)²) = √(9 + 16) = √25 = 5.\nThis is the famous 3-4-5 right triangle!'},
+    {q:'Gradient of a horizontal line is?',a:'0',w:['1','undefined','−1'],
+     why:'A horizontal line has NO rise — it stays flat as x changes.\nGradient = rise ÷ run = 0 ÷ run = 0.\nA VERTICAL line has UNDEFINED gradient (division by zero — no run).'}
   ];
-  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Coordinates','📍');});
+  return shuffle(qs).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Coordinates','📍',f.why);});
 }
 function genFactorise(){
   var qs=[];
@@ -7460,11 +7508,10 @@ MATH_STAGES['WAEC/JAMB']=[
 
 // ── CLASS SECTION ALIASES ─────────────────────────────────────────────────────
 (function(){
-  var sections=['A','B','C','D','E'];
+  var sections=[' Science',' Art',' Commercial',' General'];
   ['JSS 1','JSS 2','JSS 3','SSS 1','SSS 2','SSS 3'].forEach(function(base){
     sections.forEach(function(sec){
-      var label=base+sec;
-      MATH_STAGES[label]=MATH_STAGES[base];
+      MATH_STAGES[base+sec]=MATH_STAGES[base];
     });
   });
   if(!MATH_STAGES['SSS 3']) MATH_STAGES['SSS 3']=MATH_STAGES['WAEC/JAMB'];
@@ -7524,18 +7571,30 @@ function genMatrices(){
 function genProbability(){
   var qs=[];
   var items=[
-    {q:'P(A) + P(A\') = ?',a:'1',w:['0','0.5','2']},
-    {q:'A fair coin is tossed. P(Heads) = ?',a:'1/2',w:['1/4','1/3','2/3']},
-    {q:'A die is rolled. P(getting 6) = ?',a:'1/6',w:['1/2','1/3','1/4']},
-    {q:'A die is rolled. P(even number) = ?',a:'1/2',w:['1/3','2/3','1/6']},
-    {q:'P(A and B) if A and B are independent = ?',a:'P(A) × P(B)',w:['P(A) + P(B)','P(A) − P(B)','P(A) ÷ P(B)']},
-    {q:'P(A or B) if A and B are mutually exclusive = ?',a:'P(A) + P(B)',w:['P(A) × P(B)','P(A) − P(B)','1']},
-    {q:'A bag has 3 red and 2 blue balls. P(red) = ?',a:'3/5',w:['2/5','1/5','3/2']},
-    {q:'If P(A) = 0.3, P(B) = 0.4 (independent), P(A and B) = ?',a:'0.12',w:['0.7','0.1','0.34']},
-    {q:'Probability of impossible event = ?',a:'0',w:['1','0.5','undefined']},
-    {q:'Probability of certain event = ?',a:'1',w:['0','0.5','2']}
+    {q:'P(A) + P(A\') = ?',a:'1',w:['0','0.5','2'],
+     why:'P(A) is the probability of event A happening. P(A\') is the probability it does NOT happen. Since something must either happen or not, they add to 1.\nP(A) + P(A\') = 1.\nSo if P(A) = 0.3, then P(A\') = 1 − 0.3 = 0.7.'},
+    {q:'A fair coin is tossed. P(Heads) = ?',a:'1/2',w:['1/4','1/3','2/3'],
+     why:'P(event) = Number of favourable outcomes ÷ Total possible outcomes.\nA fair coin has 2 outcomes: Heads or Tails.\nP(Heads) = 1 favourable outcome ÷ 2 total = 1/2.\nFair means each outcome is equally likely.'},
+    {q:'A die is rolled. P(getting 6) = ?',a:'1/6',w:['1/2','1/3','1/4'],
+     why:'A standard die has 6 faces: 1, 2, 3, 4, 5, 6.\nOnly ONE face shows 6.\nP(6) = 1 favourable ÷ 6 total outcomes = 1/6 ≈ 0.167.'},
+    {q:'A die is rolled. P(even number) = ?',a:'1/2',w:['1/3','2/3','1/6'],
+     why:'Even numbers on a die: 2, 4, 6 — that\'s 3 outcomes.\nTotal outcomes = 6.\nP(even) = 3/6 = 1/2.\nHalf the numbers on a die are even.'},
+    {q:'P(A and B) if A and B are independent = ?',a:'P(A) × P(B)',w:['P(A) + P(B)','P(A) − P(B)','P(A) ÷ P(B)'],
+     why:'Independent events: the outcome of A does not affect B.\nMultiplication rule: P(A and B) = P(A) × P(B).\nExample: P(Heads AND rolling a 6) = 1/2 × 1/6 = 1/12.\nMultiply because BOTH must happen.'},
+    {q:'P(A or B) if A and B are mutually exclusive = ?',a:'P(A) + P(B)',w:['P(A) × P(B)','P(A) − P(B)','1'],
+     why:'Mutually exclusive: A and B CANNOT both happen at the same time.\nAddition rule: P(A or B) = P(A) + P(B).\nExample: Rolling a 1 or a 6 on a die: P(1 or 6) = 1/6 + 1/6 = 2/6 = 1/3.'},
+    {q:'A bag has 3 red and 2 blue balls. P(red) = ?',a:'3/5',w:['2/5','1/5','3/2'],
+     why:'Total balls = 3 red + 2 blue = 5 balls.\nFavourable outcomes (picking red) = 3.\nP(red) = 3/5.\nALWAYS find the total first, then count favourables.'},
+    {q:'A bag has 3 red and 2 blue. P(blue) = ?',a:'2/5',w:['3/5','1/5','2/3'],
+     why:'Total balls = 3 + 2 = 5.\nFavourable (blue) = 2.\nP(blue) = 2/5.\nNotice: P(red) + P(blue) = 3/5 + 2/5 = 5/5 = 1 ✓'},
+    {q:'P(impossible event) = ?',a:'0',w:['1','0.5','−1'],
+     why:'An impossible event can NEVER happen, so its probability is 0.\nProbability scale: 0 (impossible) ← → 1 (certain).\nExample: P(rolling a 7 on a 6-sided die) = 0 — there is no 7.'},
+    {q:'P(certain event) = ?',a:'1',w:['0','0.5','2'],
+     why:'A certain event ALWAYS happens, so its probability is 1.\nProbability is always between 0 and 1 inclusive.\nExample: P(rolling a number less than 10 on a normal die) = 1 — it always happens.'}
   ];
-  return shuffle(items).map(function(f){return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Probability','🎲');});
+  return shuffle(items).map(function(f){
+    return makeMathQ(f.q,f.a,shuffle([f.a].concat(f.w)),'Probability','🎲',f.why);
+  });
 }
 
 function genJAMBSpeed(){
@@ -9882,6 +9941,195 @@ var JSS_BASIC_TECH_QS=[
 // filtered by topic — reusing the entire existing infrastructure.
 // ════════════════════════════════════════════════════════════════
 
+// ── REMAINING LEARN MODULE STAGES ──────────────────────────────────────────────
+
+var LIT_LEARN_STAGES=[
+  {id:'lit-s01',label:'Drama & Stagecraft',emoji:'🎭',topic:'drama',
+   concept:{title:'Understanding Drama',
+    body:'Drama is literature written to be performed on stage.\n\nKey dramatic elements:\n• Plot: the sequence of events (exposition → rising action → climax → falling action → resolution/denouement)\n• Character: protagonist (main character), antagonist (opposes protagonist)\n• Conflict: the central struggle (person vs person, vs self, vs society, vs nature)\n• Theme: the central message or insight\n• Setting: time and place\n• Dramatic irony: audience knows what character doesn\'t\n• Tragic flaw (hamartia): the hero\'s weakness that leads to their downfall\n\nNigerian dramatists:\n• Wole Soyinka: The Lion and the Jewel, Death and the King\'s Horseman, The Road\n• J.P. Clark: Song of a Goat, The Masquerade, Ozidi\n• Ola Rotimi: The Gods Are Not to Blame, Our Husband Has Gone Mad Again',
+    formula:'Tragedy: hamartia → hubris → nemesis → catharsis\nComedy: misunderstanding → complication → resolution'}},
+  {id:'lit-s02',label:'Prose & Narrative',emoji:'📖',topic:'prose',
+   concept:{title:'Reading Prose — Narrative Technique',
+    body:'Prose is ordinary written language — novels, short stories, novellas.\n\nNarrative point of view:\n• First person ("I"): narrator is a character in the story. Intimate but limited.\n• Third person limited: "he/she" narration, access to one character\'s thoughts\n• Third person omniscient: narrator knows ALL characters\' thoughts\n• Unreliable narrator: one whose account cannot be fully trusted\n\nKey techniques:\n• Flashback (analepsis): interrupts present to show earlier events\n• In medias res: story begins in the middle of action\n• Foreshadowing: hints at events to come\n• Stream of consciousness: continuous flow of thoughts\n\nMajor works: Things Fall Apart (Achebe), Purple Hibiscus (Adichie), The African Child (Laye), Arrow of God (Achebe), Season of Anomy (Soyinka)',
+    formula:'Bildungsroman: coming-of-age novel\nAnalepsis (flashback) ↔ Prolepsis (flash-forward)'}},
+  {id:'lit-s03',label:'Poetry & Verse',emoji:'✍️',topic:'poetry',
+   concept:{title:'Elements of Poetry',
+    body:'Poetry: concentrated, rhythmic use of language to express ideas and emotions.\n\nStructural elements:\n• Stanza: a group of lines (couplet=2, tercet=3, quatrain=4, sestet=6, octave=8)\n• Meter: rhythm pattern. Iambic pentameter: 5 iambs (da-DUM) per line = 10 syllables\n• Rhyme scheme: pattern of end rhymes (ABAB, ABCABC, AABB)\n• Free verse: no fixed rhyme or meter\n\nKey African poets:\n• Christopher Okigbo: Heavensgate, Labyrinths (spiritual journey, modernist)\n• J.P. Clark: Abiku, Song of a Goat\n• Gabriel Okara: Piano and Drums (Western vs African tension)\n• Wole Soyinka: Idanre, A Shuttle in the Crypt\n\nPoetic movements: Negritude (Senghor, Césaire — affirming African identity)',
+    formula:'Sonnet: 14 lines (Shakespearean: 3 quatrains + couplet)\nIambic pentameter: da-DUM × 5 = 10 syllables per line'}},
+  {id:'lit-s04',label:'Literary Devices',emoji:'🔍',topic:'devices',
+   concept:{title:'Literary Devices — The Writer\'s Toolkit',
+    body:'Literary devices create meaning and effect beyond literal language.\n\nComparison devices:\n• Simile: comparison using "like" or "as" ("brave as a lion")\n• Metaphor: direct equation ("life is a journey")\n• Extended metaphor: metaphor sustained throughout a passage\n\nSound devices:\n• Alliteration: repeated initial consonants ("Peter Piper")\n• Assonance: repeated vowel sounds ("the rain in Spain")\n• Onomatopoeia: words that sound like their meaning (buzz, hiss)\n\nEmphasis and meaning:\n• Hyperbole: exaggeration ("I\'ve told you a million times")\n• Oxymoron: contradictory terms ("bittersweet", "deafening silence")\n• Irony: saying the opposite of what is meant\n• Dramatic irony: audience knows what character does not\n• Symbol: object representing something beyond itself\n• Allegory: extended symbolic narrative (Animal Farm = Soviet communism)',
+    formula:'SOAPSTONE: Speaker, Occasion, Audience, Purpose, Subject, Tone\nOILRIG (for contrast): Opposite, Irony, Literal, Rhetorical, Imagery, Graphic'}},
+  {id:'lit-s05',label:'Genre & African Literature',emoji:'🌍',topic:'genre',
+   concept:{title:'Literary Genres and African Writing',
+    body:'Genre: category of literary composition.\n\nMajor genres:\n• Epic: long narrative celebrating heroic deeds (Sundiata, Homer\'s Iliad)\n• Tragedy: protagonist\'s downfall through hamartia\n• Comedy: misunderstanding resolved happily\n• Satire: humour/irony to criticise society (Soyinka\'s Brother Jero, Orwell\'s Animal Farm)\n• Elegy: poem of mourning (Okigbo\'s Lament of the Drums)\n• Bildungsroman: coming-of-age novel (Purple Hibiscus, Great Expectations)\n\nPost-colonial African literature:\n• Examines identity, hybridity, effects of colonialism\n• "Writing back" to European narratives (Things Fall Apart rejects Heart of Darkness)\n• Chinua Achebe, Ngugi wa Thiong\'o, Wole Soyinka, Chimamanda Adichie\n\nNegritude movement (1930s-40s): Aimé Césaire, Léopold Sédar Senghor — affirmed African cultural identity against colonial devaluation',
+    formula:'Oral literature: performance + memory + community\nPost-colonial: identity + hybridity + resistance'}}
+];
+
+var ECON_LEARN_STAGES=[
+  {id:'eco-s01',label:'Foundations of Economics',emoji:'💡',topic:'basic',
+   concept:{title:'What is Economics?',
+    body:'Economics: the study of how scarce resources are allocated to satisfy unlimited wants.\n\nThe fundamental economic problem: SCARCITY — there is never enough of everything, so choices must be made.\n\nFactors of Production (productive resources):\n• Land: all natural resources (soil, oil, water, forests)\n• Labour: human physical and mental effort\n• Capital: man-made productive resources (machines, tools, buildings)\n• Enterprise: risk-taking and organising the other three\n\nRewards to factors: Rent (land), Wages (labour), Interest (capital), Profit (enterprise)\n\nOpportunity cost: the value of the next best alternative foregone when a choice is made. The "real" cost of any decision.\n\nBranches:\n• Microeconomics: individual consumers, firms and markets\n• Macroeconomics: the whole economy (GDP, inflation, unemployment)',
+    formula:'Opportunity cost = value of next best alternative\nFactors: Land, Labour, Capital, Enterprise'}},
+  {id:'eco-s02',label:'Demand & Supply',emoji:'📈',topic:'demand',
+   concept:{title:'Demand, Supply and Market Equilibrium',
+    body:'Law of Demand: as price rises, quantity demanded falls (ceteris paribus). Inverse relationship. Demand curve slopes downward.\n\nDemand shifts RIGHT when: income rises (normal goods), population grows, tastes improve, substitute price rises, complement price falls.\n\nLaw of Supply: as price rises, quantity supplied rises. Direct relationship. Supply curve slopes upward.\n\nMarket equilibrium: where quantity demanded = quantity supplied. The market "clears" — no shortage or surplus.\n\nPrice ceiling (below equilibrium): shortage (Qd > Qs). Example: rent controls.\nPrice floor (above equilibrium): surplus (Qs > Qd). Example: minimum wage.\n\nElasticity: measures responsiveness of Qd or Qs to a change in price.\nPED = %ΔQd ÷ %ΔP. Elastic (>1): responsive. Inelastic (<1): not responsive.',
+    formula:'PED = %ΔQd ÷ %ΔP\nEquilibrium: Qd = Qs'}},
+  {id:'eco-s03',label:'National Income & GDP',emoji:'🏦',topic:'national',
+   concept:{title:'Measuring the Economy',
+    body:'GDP (Gross Domestic Product): total monetary value of all finished goods and services produced within a country\'s borders in one year.\n\nGDP = C + I + G + (X − M)\n• C = Consumer spending\n• I = Investment (business spending)\n• G = Government spending\n• (X − M) = Net exports (exports minus imports)\n\nReal GDP: adjusted for inflation. Nominal GDP: at current prices.\nReal GDP = (Nominal GDP ÷ GDP Deflator) × 100\n\nEconomic indicators:\n• Inflation: sustained general rise in price level (measured by CPI)\n• Unemployment: frictional (between jobs), structural (skills mismatch), cyclical (recession)\n• Economic development: GDP growth PLUS improved living standards (HDI measures: life expectancy + education + income per capita)',
+    formula:'GDP = C + I + G + (X−M)\nReal GDP = (Nominal ÷ Deflator) × 100\nHDI: health + education + income'}},
+  {id:'eco-s04',label:'Money & Banking',emoji:'💳',topic:'money',
+   concept:{title:'Money, Banks and Monetary Policy',
+    body:'Money: anything generally accepted as a medium of exchange.\nFunctions: medium of exchange (primary), unit of account, store of value, standard of deferred payment.\n\nCommercial banks create money through credit creation (fractional reserve banking): keep fraction of deposits, lend the rest. Each loan creates a new deposit.\nMoney multiplier = 1 ÷ reserve ratio\n\nCentral Bank (CBN in Nigeria):\n• Banker to government and commercial banks\n• Monetary policy: controls money supply and interest rates\n• Monetary Policy Rate (MPR): the rate at which CBN lends to commercial banks\n\nTo fight inflation: RAISE MPR (borrowing more expensive → less spending → prices stabilise)\nTo stimulate economy: LOWER MPR (cheaper credit → more spending → growth)',
+    formula:'Money multiplier = 1 ÷ reserve ratio\nFight inflation: ↑ MPR → ↓ credit → ↓ spending → ↓ prices'}},
+  {id:'eco-s05',label:'International Trade',emoji:'🌐',topic:'trade',
+   concept:{title:'International Trade and Exchange Rates',
+    body:'International trade: countries specialise and trade because of comparative advantage.\n\nComparative advantage (Ricardo): produce goods at the lowest OPPORTUNITY COST relative to other countries. Even if one country is absolutely worse at producing everything, trade still benefits both.\n\nTrade barriers: tariff (tax on imports), quota (limit on quantity), embargo (ban).\nArguments for protection: infant industries, strategic industries, employment, unfair competition.\n\nBalance of Trade = Exports − Imports (goods only)\nSurplus: X > M. Deficit: M > X.\nBalance of Payments: broader — includes services, investment flows, transfers.\n\nExchange rate: price of one currency in terms of another.\nDevaluation: deliberate reduction → exports cheaper, imports dearer → corrects trade deficit.\n\nNigeria: ~90% of export earnings from crude oil — "Dutch Disease" vulnerability.',
+    formula:'Comparative advantage: lowest opportunity cost\nBOT = Exports − Imports'}},
+  {id:'eco-s06',label:'Market Structures',emoji:'🏪',topic:'market',
+   concept:{title:'Types of Market Structures',
+    body:'Markets differ in the number of firms, type of product and ease of entry.\n\nPerfect competition:\n• Many buyers and sellers, identical products, free entry/exit, perfect information\n• Each firm is a PRICE TAKER (cannot influence price)\n• Long-run profit = normal profit only\n\nMonopoly:\n• Single seller, unique product, high barriers to entry\n• PRICE MAKER — restricts output to charge higher price\n• Examples: public utilities, patented products\n\nOligopoly:\n• Few dominant firms, high barriers\n• Interdependent — each firm considers rivals\' reactions\n• Kinked demand curve explains price rigidity\n\nMonopolistic competition:\n• Many firms, slightly differentiated products (branding)\n• Some price-making power\n• Examples: restaurants, clothing brands',
+    formula:'Perfect competition: P = MC (efficient)\nMonopoly: P > MC (inefficient — deadweight loss)'}}
+];
+
+var GOVT_LEARN_STAGES=[
+  {id:'gov-s01',label:'The State & Sovereignty',emoji:'🏛️',topic:'concepts',
+   concept:{title:'The State, Power and Sovereignty',
+    body:'The State: a political unit with four essential elements:\n1. Territory — defined geographical area\n2. Population — permanent people\n3. Government — authority and administration\n4. Sovereignty — supreme, absolute power\n\nSovereignty (Jean Bodin):\n• Internal: authority over citizens and territory\n• External: independence from foreign powers\n\nLegitimacy: the right to exercise power, accepted by the governed.\n• Traditional legitimacy: custom and tradition (hereditary monarchs)\n• Charismatic legitimacy: personal qualities of the leader (Weber)\n• Rational-legal: based on rules, laws and elections (modern democracies)\n\nForms of government:\n• Democracy: power derived from the people\n• Authoritarianism: concentrated power, limited pluralism\n• Totalitarianism: total control over all aspects of life\n• Monarchy: hereditary ruler',
+    formula:'State = Territory + Population + Government + Sovereignty\nDemocracy: "rule by the people" (demos + kratia)'}},
+  {id:'gov-s02',label:'Arms of Government',emoji:'⚖️',topic:'arms',
+   concept:{title:'Separation of Powers and Checks & Balances',
+    body:'Three arms of government (Montesquieu, "The Spirit of the Laws", 1748):\n\n• Legislature: makes laws (Nigeria: National Assembly — Senate + House of Representatives)\n• Executive: implements laws (Nigeria: President, Vice-President, Federal Executive Council)\n• Judiciary: interprets laws (Nigeria: Supreme Court, Court of Appeal, Federal High Court)\n\nSeparation of powers: each arm independent — prevents tyranny.\nChecks and balances: each arm can limit the others.\n• Legislature passes laws → Executive can veto → Legislature can override\n• Courts can declare laws unconstitutional (judicial review)\n• Legislature can impeach the Executive (2/3 NASS majority in Nigeria)\n\nNigerian National Assembly:\n• Senate: 109 senators (3 per state + 1 FCT)\n• House of Representatives: 360 members (by population)',
+    formula:'Montesquieu → Separation of Powers\nChecks & Balances: Legislature ↔ Executive ↔ Judiciary'}},
+  {id:'gov-s03',label:'Nigerian Government',emoji:'🇳🇬',topic:'nigeria',
+   concept:{title:'Nigeria\'s Political System',
+    body:'Nigeria operates a PRESIDENTIAL FEDERAL DEMOCRACY:\n• Presidential: executive power in the elected President (head of state AND government)\n• Federal: power shared constitutionally between federal and 36 state governments\n• Democratic: citizens vote to choose leaders\n\nKey milestones:\n• Independence: 1 October 1960\n• Republic: 1 October 1963\n• Constitution: 1999 (current, as amended)\n• Fourth Republic (civilian rule): 1999 to present\n\nFederal structure (1999 Constitution):\n• Exclusive List: federal only (defence, currency, immigration)\n• Concurrent List: both federal and state\n• Residual powers: states\n\n36 states + FCT; 774 Local Government Areas\n\nKey institutions: INEC (elections), EFCC (anti-corruption), CBN (monetary), NJC (judiciary)',
+    formula:'Presidential: President = Head of State + Government\nFederal: Exclusive + Concurrent + Residual lists'}},
+  {id:'gov-s04',label:'Democracy & Elections',emoji:'🗳️',topic:'political',
+   concept:{title:'Democracy, Elections and Political Parties',
+    body:'Democracy: government derives its authority from the consent of the governed.\n• Direct democracy: citizens vote on all issues (ancient Athens)\n• Representative democracy: citizens elect representatives\n• Features: free elections, rule of law, fundamental rights, free press, independent judiciary\n\nElectoral systems:\n• First-Past-the-Post (FPTP): winner takes the seat — used in Nigeria\n• Proportional Representation (PR): seats in proportion to votes — ensures minority representation\n\nPolitical parties: organised groups seeking political power through elections.\n• Nigeria\'s major parties: APC (All Progressives Congress), PDP (Peoples Democratic Party)\n\nINEC: Independent National Electoral Commission — registers voters and parties, conducts elections.\n\nRule of Law (A.V. Dicey): supremacy of law, equality before the law, predominance of legal spirit.',
+    formula:'Rule of Law: no one above the law\nINEC: voter registration + election conduct'}},
+  {id:'gov-s05',label:'International Relations',emoji:'🌍',topic:'international',
+   concept:{title:'Nigeria in the World',
+    body:'International organisations Nigeria belongs to:\n\n• United Nations (UN): established 1945, Nigeria joined 1960. HQ: New York. Promotes peace, human rights, development. Nigeria is a major peacekeeping contributor.\n\n• African Union (AU): established 2002 (replaced OAU 1963). HQ: Addis Ababa. 55 members. Goals: African integration, peace, development.\n\n• ECOWAS: established 1975 (Treaty of Lagos). 15 West African states. Promotes economic integration, free movement of people. ECOMOG: peacekeeping force. HQ: Abuja.\n\n• Commonwealth of Nations: former British colonies. 56 members. Founded 1931.\n\nNigeria\'s foreign policy principles: African solidarity, non-alignment, respect for sovereignty, economic diplomacy.\n\nNigeria\'s soft power: largest African economy, most populous African nation, Nollywood, Afrobeats.',
+    formula:'UN (1945) → AU (2002) → ECOWAS (1975)\nNigeria: Africa\'s most populous + largest economy'}}
+];
+
+var AGRIC_LEARN_STAGES=[
+  {id:'agr-s01',label:'Crop Production',emoji:'🌾',topic:'crops',
+   concept:{title:'Crop Production — From Seed to Harvest',
+    body:'Crop production sequence:\n1. Land preparation (tillage): primary (ploughing) → secondary (harrowing → seedbed)\n2. Planting: broadcasting, row planting, transplanting (from nursery)\n3. Weeding: manual, chemical (herbicides), cultural (cover crops, mulch)\n4. Fertiliser application: NPK — Nitrogen (leafy growth), Phosphorus (roots/fruits), Potassium (disease resistance)\n5. Pest and disease control: pesticides, biological control\n6. Irrigation: when rainfall is insufficient\n7. Harvesting: when crops reach maturity\n8. Post-harvest: storage, processing, marketing\n\nNigeria\'s major crops:\n• Food crops: yam, cassava, maize, sorghum, millet, rice\n• Cash crops (export): cocoa (SW), groundnut (N), palm oil (SE), rubber\n• Nigeria is the world\'s largest yam producer',
+    formula:'NPK: N = leaves, P = roots/fruits, K = disease resistance\nCrop rotation: breaks pest cycles, restores soil nitrogen'}},
+  {id:'agr-s02',label:'Soil Science',emoji:'🌱',topic:'soil',
+   concept:{title:'Soil — The Foundation of Agriculture',
+    body:'Soil: the upper layer of the earth\'s surface, containing minerals, organic matter, water, air and organisms.\n\nSoil types:\n• Sandy soil: fast draining, low nutrients, easy to till\n• Clay soil: waterlogged, difficult to work, high nutrients\n• Loamy soil: IDEAL — good drainage, water retention, aeration, nutrient-rich\n• Silt soil: fertile but compacts easily\n\nSoil horizons (layers):\n• A horizon (topsoil): dark, rich in humus — most important for crops\n• B horizon (subsoil): less organic matter\n• C horizon: parent material (weathered rock)\n\nSoil pH: most crops prefer 5.5–7.0. Acid soils → add lime (CaCO₃). Alkaline → add sulphur.\n\nSoil conservation: contour ploughing, cover crops, mulching, terracing, windbreaks, zero tillage.',
+    formula:'Humus: decomposed organic matter → improves fertility + structure\npH 5.5–7.0 ideal for most crops'}},
+  {id:'agr-s03',label:'Animal Husbandry',emoji:'🐄',topic:'animals',
+   concept:{title:'Animal Husbandry — Livestock Management',
+    body:'Types of livestock in Nigeria:\n• Cattle: beef and dairy (Zebu, N\'Dama, Friesian)\n• Goats and sheep: meat, milk\n• Poultry: broilers (meat), layers (eggs), guinea fowl, turkeys\n• Pigs: monogastric, fast growth\n• Fish: aquaculture (catfish, tilapia)\n\nRuminants vs Monogastrics:\n• Ruminants (cattle, goats, sheep): 4-chambered stomach, digest cellulose via rumen microorganisms, ruminate (chew the cud)\n• Monogastrics (pigs, poultry, humans): single-chambered stomach\n\nPoultry management:\n• Day-old chicks: brooding temperature 32–35°C, reduce 3°C/week\n• Vaccines: Newcastle disease, Gumboro, Fowl pox\n• Feeds: starter → grower → finisher/layer\n\nGestation periods: Cattle ~280 days, Pig ~114 days, Goat ~150 days\n\nDisease control: vaccination, good nutrition, biosecurity, quarantine of new animals.',
+    formula:'Ruminants: 4-chamber stomach → can digest grass\nPoultry brooding: 32-35°C week 1, −3°C/week'}},
+  {id:'agr-s04',label:'Farm Management & Mechanisation',emoji:'🚜',topic:'farm',
+   concept:{title:'Farm Management and Agricultural Technology',
+    body:'Farm management: planning, organising and controlling farm resources for maximum profit.\n\nFarm records: essential for decisions — farm diary, inventory, cash book, production records.\n\nAgricultural mechanisation: use of machines (tractors, planters, harvesters) to replace manual labour.\nBenefits: speed, scale, precision, reduced labour cost\nChallenges in Nigeria: high initial cost, fuel cost, poor roads, maintenance, lack of skilled operators\n\nIrrigation methods:\n• Surface/furrow: water flows in channels between rows\n• Overhead/sprinkler: like rainfall, suits most crops\n• Drip/trickle: water directly to root zone, most water-efficient\n\nIPM (Integrated Pest Management): combines biological, cultural, mechanical and chemical methods — minimises pesticide use and resistance.\n\nAgricultural finance: cooperative societies, bank loans, government schemes, microfinance — key to smallholder development in Nigeria.',
+    formula:'IPM: biological + cultural + mechanical + chemical\nIrrigation: surface → sprinkler → drip (efficiency order)'}},
+  {id:'agr-s05',label:'Agric Science & Environment',emoji:'🌍',topic:'environment',
+   concept:{title:'Agriculture and the Environment',
+    body:'The relationship between farming and the environment is two-way: agriculture depends on the environment AND impacts it.\n\nEnvironmental challenges in Nigerian agriculture:\n• Soil erosion: rainfall + deforestation + poor practices → topsoil loss\n• Desertification: Sahara advancing south due to overgrazing + deforestation (especially NW Nigeria)\n• Flooding: poor drainage, climate change → crop loss\n• Oil pollution: Niger Delta — destroys farmland and fisheries\n\nSustainable agricultural practices:\n• Crop rotation: restores soil nutrients, breaks pest cycles\n• Agroforestry: trees + crops together — shade, windbreak, nitrogen fixation\n• Organic farming: natural inputs only\n• Zero tillage: preserves soil structure, prevents erosion\n• Conservation: protect biodiversity, wetlands, forests\n\nClimate change impacts: shifting rainfall patterns, higher temperatures, drought and flooding — requires adaptation (drought-resistant varieties, irrigation, early warning systems).',
+    formula:'Desertification: overgrazing + deforestation + drought\nSustainable: rotation + agroforestry + conservation'}}
+];
+
+var ACCT_LEARN_STAGES=[
+  {id:'acc-s01',label:'Accounting Fundamentals',emoji:'📊',topic:'basics',
+   concept:{title:'Principles and the Accounting Equation',
+    body:'Accounting: systematic recording, summarising and reporting of financial transactions.\n\nThe fundamental accounting equation:\nAssets = Liabilities + Capital\n• Assets: resources owned (cash, debtors, stock, machinery, property)\n• Liabilities: amounts owed to others (bank loan, trade creditors, overdraft)\n• Capital: owner\'s investment + retained profits\n\nKey accounting concepts:\n• Going concern: business will continue indefinitely\n• Accruals/matching: income and expenses recorded in the period they relate to, not when cash moves\n• Prudence: anticipate losses but NOT profits until realised\n• Consistency: same accounting methods from year to year\n• Materiality: only record significant items\n• Historical cost: assets recorded at original purchase price\n\nDouble-entry principle: every transaction has AT LEAST one debit and one credit of equal amount.\nDEAD CLIC: Debits increase Expenses, Assets, Drawings. Credits increase Liabilities, Income, Capital.',
+    formula:'Assets = Liabilities + Capital\nDEAD CLIC: Debits↑ Expenses,Assets,Drawings | Credits↑ Liabilities,Income,Capital'}},
+  {id:'acc-s02',label:'Ledger & Double Entry',emoji:'📝',topic:'ledger',
+   concept:{title:'Ledger Accounts and Double Entry',
+    body:'Every transaction is recorded in TWO accounts: one debited, one credited.\n\nRecording a sale on credit:\n• Debit: Debtors (asset increases — someone now owes us)\n• Credit: Sales (income increases)\n\nRecording payment of rent:\n• Debit: Rent expense (expense increases)\n• Credit: Cash/Bank (asset decreases)\n\nSpecial journals (books of original entry):\n• Sales Day Book: all credit sales\n• Purchases Day Book: all credit purchases\n• Cash Book: all cash and bank transactions (also a ledger account)\n• Returns Inwards Book: goods returned by customers\n• Returns Outwards Book: goods returned to suppliers\n• Journal Proper: other transactions (opening entries, depreciation, error correction)\n\nLedger: the book of accounts. Each account has: Date | Particulars | Folio | Debit | Credit | Balance',
+    formula:'Credit sale: Dr Debtors / Cr Sales\nCash payment: Dr Expense / Cr Cash\nCash Book = ledger account + book of original entry'}},
+  {id:'acc-s03',label:'Final Accounts',emoji:'💰',topic:'final-accounts',
+   concept:{title:'Trading, P&L Account and Balance Sheet',
+    body:'Final accounts are prepared at the end of the accounting period to show profitability and financial position.\n\nTrading Account:\nNet Sales − Cost of Goods Sold = Gross Profit\nCOGS = Opening Stock + Purchases + Carriage In − Returns Out − Closing Stock\n\nProfit & Loss Account:\nGross Profit + Other Income − All Operating Expenses = Net Profit\nOther income: rent received, discount received, interest received\nExpenses: wages, rent paid, insurance, depreciation, bad debts\n\nBalance Sheet (Statement of Financial Position):\nFixed Assets (property, machinery) + Current Assets (stock, debtors, cash) = Capital + Long-term Liabilities + Current Liabilities\n\nAdjustments before final accounts:\n• Accruals: expense incurred but not paid → add to expense + show as current liability\n• Prepayments: expense paid in advance → deduct from expense + show as current asset\n• Depreciation: reduce asset value + charge as expense',
+    formula:'Gross Profit = Net Sales − COGS\nNet Profit = GP + Other Income − Expenses\nAssets = Capital + Liabilities'}},
+  {id:'acc-s04',label:'Depreciation & Ratios',emoji:'📉',topic:'depreciation',
+   concept:{title:'Depreciation and Financial Ratios',
+    body:'Depreciation: systematic allocation of a fixed asset\'s cost over its useful life.\n\nMethods:\n• Straight-line: (Cost − Residual Value) ÷ Useful Life\n  Same amount each year. Simple.\n• Reducing Balance: fixed % of book value each year.\n  More depreciation early — matches how assets actually decline.\n\nFinancial Ratios for analysis:\n\nLiquidity:\n• Current Ratio = Current Assets ÷ Current Liabilities (ideal: 2:1)\n• Acid Test = (Current Assets − Stock) ÷ Current Liabilities (ideal: 1:1)\n\nProfitability:\n• Gross Profit Margin = (GP ÷ Sales) × 100%\n• Net Profit Margin = (NP ÷ Sales) × 100%\n• ROCE = (Net Profit ÷ Capital Employed) × 100%\n\nBank Reconciliation: explains differences between cash book (business records) and bank statement.\nCauses: unpresented cheques, outstanding lodgements, bank charges, errors.',
+    formula:'Straight-line depreciation = (Cost − Residual) ÷ Life\nCurrent Ratio = Current Assets ÷ Current Liabilities'}}
+];
+
+// JSS Basic Science Learn Module
+var BSC_LEARN_STAGES=[
+  {id:'bsc-s01',label:'Living Things & Cells',emoji:'🔬',topic:'living',
+   concept:{title:'Characteristics of Living Things and the Cell',
+    body:'Seven characteristics of living things (MRS NERG):\nMovement, Respiration, Sensitivity (response to stimuli), Nutrition, Excretion, Reproduction, Growth\n\nThe cell: basic unit of all living things.\n• Prokaryotic (bacteria): no true nucleus, no membrane-bound organelles. Simplest cells.\n• Eukaryotic (plants, animals, fungi): true nucleus, complex organelles.\n\nAnimal cell organelles:\n• Nucleus: control centre, contains DNA\n• Mitochondria: produces energy (ATP)\n• Ribosomes: makes proteins\n• Cell membrane: controls entry/exit\n\nPlant cell (also has):\n• Cell wall (cellulose): rigid, for support\n• Chloroplasts: photosynthesis (green = chlorophyll)\n• Large central vacuole: storage\n\nDiffusion: movement of particles from high to low concentration (no energy needed)\nOsmosis: movement of water through a semi-permeable membrane from high to low water concentration',
+    formula:'MRS NERG: Movement, Respiration, Sensitivity, Nutrition, Excretion, Reproduction, Growth\nPhotosynthesis: CO₂ + H₂O + light → glucose + O₂'}},
+  {id:'bsc-s02',label:'Matter & Materials',emoji:'⚗️',topic:'matter',
+   concept:{title:'States of Matter and Properties of Materials',
+    body:'Matter: anything that has mass and takes up space. Three main states:\n\n• Solid: fixed shape and volume. Particles close, vibrating in fixed positions.\n• Liquid: fixed volume, takes shape of container. Particles close but moving freely.\n• Gas: no fixed shape or volume. Particles far apart, moving randomly at high speed.\n\nChanges of state (all reversible):\n• Melting: solid → liquid (absorbs heat)\n• Freezing: liquid → solid (releases heat)\n• Evaporation/Boiling: liquid → gas (absorbs heat)\n• Condensation: gas → liquid (releases heat)\n• Sublimation: solid → gas directly (dry ice, iodine)\n\nMixtures vs Pure substances:\n• Pure substance: one type of particle (water, salt, iron)\n• Mixture: two or more substances combined (air, soil, seawater)\n\nSeparation techniques:\n• Filtration: insoluble solid from liquid\n• Evaporation: soluble solid from liquid\n• Distillation: liquids with different boiling points\n• Chromatography: dissolved substances by solubility',
+    formula:'Solid → Liquid: melting | Liquid → Gas: evaporation/boiling\nSubl. = solid → gas directly'}},
+  {id:'bsc-s03',label:'Energy & Forces',emoji:'⚡',topic:'energy',
+   concept:{title:'Energy, Forces and Simple Machines',
+    body:'Energy: the ability to do work. Cannot be created or destroyed, only converted (Law of Conservation of Energy).\n\nForms of energy: kinetic (motion), potential (stored), thermal (heat), chemical, electrical, light, sound, nuclear.\n\nForce: a push or pull. Unit: Newton (N). F = ma (Newton\'s 2nd Law)\n• Gravity: pulls everything toward Earth (weight = mass × 9.8 N/kg)\n• Friction: opposes motion between surfaces. Useful (brakes) and harmful (wears machines).\n• Pressure = Force ÷ Area (Pa = N/m²)\n\nSimple machines: make work easier by changing force direction or magnitude.\n• Lever: rigid bar pivoting on fulcrum (3 classes)\n• Pulley: changes direction of force\n• Inclined plane: ramp\n• Wheel and axle, screw, wedge\n\nMA = Load ÷ Effort\nEfficiency = (Useful output ÷ Total input) × 100%\nWork = Force × Distance (Joules)',
+    formula:'F = ma | P = F/A | W = Fd\nMA = Load ÷ Effort | Efficiency = (output/input) × 100%'}},
+  {id:'bsc-s04',label:'Electricity & Light',emoji:'💡',topic:'electricity',
+   concept:{title:'Basic Electricity and Light',
+    body:'Electric circuit: a closed path through which current flows.\n• Source: battery or power supply\n• Conductors: copper wire, metals\n• Insulators: plastic, rubber, wood\n• Switch: opens or closes the circuit\n\nSeries circuit: one path → same current through all. Voltage shared. One failure breaks all.\nParallel circuit: multiple paths → voltage same. Current shared. One failure doesn\'t break others. (House wiring = parallel)\n\nOhm\'s Law: V = IR (Voltage = Current × Resistance)\nP = VI (Power = Voltage × Current)\n\nLight: electromagnetic transverse wave, speed = 3 × 10⁸ m/s in vacuum.\nReflection: angle of incidence = angle of reflection\nRefraction: light bends when entering a different medium\n• Denser medium → bends toward normal (speed decreases)\n• Less dense → bends away from normal\n\nColours of light: Red, Orange, Yellow, Green, Blue, Indigo, Violet (ROY G BIV)\nWhite light → prism → spectrum',
+    formula:'V = IR | P = VI\nLight: c = 3 × 10⁸ m/s | reflection: angle in = angle out'}},
+  {id:'bsc-s05',label:'Ecology & Environment',emoji:'🌍',topic:'ecology',
+   concept:{title:'Ecology and Environmental Science',
+    body:'Ecology: study of how organisms interact with each other and their environment.\n\nEcological terms:\n• Habitat: where an organism lives\n• Niche: the role/function of an organism in its ecosystem\n• Population: all individuals of one species in one area\n• Community: all populations in an area\n• Ecosystem: community + non-living environment (soil, water, temperature, light)\n\nFeeding relationships:\nProducer (plants) → Primary consumer (herbivore) → Secondary consumer (carnivore) → Tertiary consumer\nOnly 10% of energy passes to the next level\nDecomposers (bacteria, fungi) return nutrients to soil\n\nPollution: introduction of harmful substances into the environment.\n• Air: burning fossil fuels, vehicle exhaust\n• Water: sewage, oil spills, agricultural runoff\n• Soil: pesticides, plastics, heavy metals\n\nConservation: protecting natural resources and biodiversity for future generations.',
+    formula:'Food chain: producer → 1° → 2° → 3° consumer\n10% energy rule: each level gets only 10% of previous'}}
+];
+
+// JSS Social Studies Learn Module
+var SOC_LEARN_STAGES=[
+  {id:'soc-s01',label:'Family & Society',emoji:'👨‍👩‍👧‍👦',topic:'family',
+   concept:{title:'Family, Community and Social Groups',
+    body:'The family is the basic unit of society — the first place where individuals learn values, language and social behaviour.\n\nTypes of family:\n• Nuclear family: parents + their children only\n• Extended family: parents + children + grandparents + aunts/uncles/cousins\n• Compound/polygamous: one man + multiple wives + their children\n\nFunctions of the family: procreation, socialisation (teaching values/norms), economic support, emotional support, protection.\n\nCommunity: a group of people living in a defined area sharing common interests and institutions.\nSocialisation: the process of learning society\'s values, norms and behaviour — primarily in family, then school, peers, media.\n\nSocial groups:\n• Primary groups: small, personal, face-to-face (family, close friends)\n• Secondary groups: larger, formal, goal-oriented (school, workplace, political party)\n\nCulture: the total way of life of a people — beliefs, customs, arts, language, material objects. It is LEARNED (not biologically inherited) and SHARED.',
+    formula:'Family → Community → Society\nSocialisation: family → school → peers → media'}},
+  {id:'soc-s02',label:'Government & Democracy',emoji:'🏛️',topic:'government',
+   concept:{title:'Government, Democracy and Citizenship',
+    body:'Government: the institution with authority to make and enforce rules for a society.\n\nFunctions of government: maintain law and order, national defence, provide public services (education, health, roads), manage the economy, protect rights.\n\nTypes of government:\n• Democracy: power derives from the people (direct or representative)\n• Monarchy: hereditary ruler (constitutional or absolute)\n• Authoritarian: concentrated power, limited rights\n• Military: armed forces in control\n\nDemocracy requires: free elections, rule of law, fundamental rights, independent judiciary, free press, political pluralism.\n\nCitizenship: legal membership of a state with rights and responsibilities.\nCivic duties: obey laws, pay taxes, vote, community service, environmental care, respect others.\n\nHuman rights: universal, inalienable rights belonging to all people by virtue of being human.\nUN Universal Declaration of Human Rights (1948); Nigeria\'s Chapter IV (1999 Constitution).',
+    formula:'Democracy: "demos" (people) + "kratia" (power)\nRule of Law: no one is above the law'}},
+  {id:'soc-s03',label:'Nigeria — History & Resources',emoji:'🇳🇬',topic:'nigeria',
+   concept:{title:'Nigeria — History and Natural Resources',
+    body:'Nigeria\'s political history:\n• Pre-colonial: great kingdoms — Oyo Empire, Benin Kingdom, Sokoto Caliphate, Igbo city-states\n• Colonial era: British colonisation, Berlin Conference (1884), amalgamation 1914\n• Nationalism: Azikiwe, Awolowo, Ahmadu Bello lead independence movement\n• Independence: 1st October 1960\n• Republic: 1st October 1963\n• Military coups: 1966, 1983, 1993\n• Return to democracy: 1999 (Fourth Republic)\n\nNigeria\'s natural resources:\n• Crude oil and natural gas: Niger Delta (Bayelsa, Rivers, Delta) — ~90% of export earnings\n• Solid minerals: coal (Enugu), tin (Plateau), iron ore, gold, limestone\n• Agricultural: fertile land, forests, rivers\n\nNigeria\'s geography:\n• 36 states + FCT, 774 LGAs\n• Population: ~220 million (largest in Africa)\n• Major cities: Lagos (commercial), Abuja (capital), Kano, Ibadan, Port Harcourt',
+    formula:'Independence: 1 Oct 1960 | Republic: 1 Oct 1963\nCrude oil: ~90% of Nigeria\'s export earnings'}}
+];
+
+// JSS Civic Education Learn Module
+var CIV_LEARN_STAGES=[
+  {id:'civ-s01',label:'Citizenship & Rights',emoji:'⚖️',topic:'citizenship',
+   concept:{title:'Citizenship and Fundamental Rights',
+    body:'Citizenship: legal membership of a state, conferring rights and responsibilities.\n\nHow Nigerian citizenship is acquired:\n• By birth: born in Nigeria (jus soli)\n• By descent: born to Nigerian parents abroad (jus sanguinis)\n• By naturalisation: living in Nigeria for specified years + meeting requirements\n• By registration: foreign spouse of Nigerian citizen\n\nFundamental Rights (Chapter IV, 1999 Constitution):\n• Right to life (Section 33)\n• Right to dignity of the human person (Section 34) — freedom from torture/degrading treatment\n• Right to personal liberty (Section 35)\n• Right to fair hearing (Section 36)\n• Right to privacy (Section 37)\n• Right to freedom of thought, conscience and religion (Section 38)\n• Right to freedom of expression and the press (Section 39)\n• Right to peaceful assembly and association (Section 40)\n• Right to freedom of movement (Section 41)\n• Right to freedom from discrimination (Section 42)\n\nNon-derogable rights: cannot be suspended even in emergencies — right to life, freedom from torture.',
+    formula:'Chapter IV = Fundamental Rights\nNon-derogable: right to life + freedom from torture'}},
+  {id:'civ-s02',label:'Democracy & Governance',emoji:'🗳️',topic:'democracy',
+   concept:{title:'Democratic Governance and the Rule of Law',
+    body:'Democracy: government of the people, by the people, for the people.\n\nFeatures of democracy:\n• Free and fair elections (universal adult suffrage — 18+ in Nigeria)\n• Political pluralism (multiple parties)\n• Rule of law (no one above the law)\n• Separation of powers with checks and balances\n• Fundamental rights protected\n• Free press and freedom of expression\n• Independent judiciary\n\nRule of Law (A.V. Dicey, 3 elements):\n1. Supremacy of law: only law has authority\n2. Equality before the law: everyone subject to the same law\n3. Predominance of legal spirit: rights protected by courts, not just decrees\n\nGood governance principles: accountability (leaders answerable for actions), transparency (open government), participation (citizens involved), effectiveness, equity, rule of law.\n\nNigerian elections: conducted by INEC (Independent National Electoral Commission) — voter registration, party registration, election management.',
+    formula:'Democracy: free elections + rights + rule of law\nRule of Law: supremacy + equality + legal spirit'}},
+  {id:'civ-s03',label:'Civic Responsibility',emoji:'🤝',topic:'society',
+   concept:{title:'Civic Responsibility and Nation Building',
+    body:'Civic responsibility: obligations of citizens to participate in their community and nation for the common good.\n\nCivic duties include:\n• Obeying the law\n• Paying taxes (funding public services)\n• Voting in elections (choosing leaders)\n• Community service (contributing to local needs)\n• Environmental protection\n• Respecting the rights of others\n• National service/defence when required\n\nNational consciousness: identifying as Nigerian first, above ethnic or religious identity — essential for unity in a diverse nation of 250+ ethnic groups.\n\nNational symbols: Green-white-green flag (green = agriculture, white = peace), National Anthem ("Arise O Compatriots"), National Pledge, Coat of Arms.\n\nChallenges to nation building in Nigeria:\n• Ethnicity and tribalism: loyalty to group over nation\n• Corruption: diverts resources, destroys trust\n• Religious intolerance: conflict between communities\n• Poverty and inequality: limits participation\n\nSolutions: education, tolerance, accountable leadership, anti-corruption, national unity campaigns.',
+    formula:'Civic duties: obey laws + pay taxes + vote + serve community\nNational symbols: flag + anthem + pledge + coat of arms'}}
+];
+
+// JSS Basic Technology Learn Module
+var BTECH_LEARN_STAGES=[
+  {id:'bte-s01',label:'Tools & Materials',emoji:'🔧',topic:'tools',
+   concept:{title:'Workshop Tools and Engineering Materials',
+    body:'Measuring tools: tape measure, ruler (300mm), try square (checks 90°), marking gauge, vernier callipers (0.1mm), micrometer screw gauge (0.01mm), spirit level.\n\nCutting tools: handsaw (crosscut, rip), hacksaw (metal), chisel (wood), plane, file (shaping metal/wood).\n\nDriving tools: claw hammer, mallet (for chisel), screwdriver (flat/Phillips), spanner/wrench.\n\nJoining tools: soldering iron (electrical joints), welding equipment (permanent metal joining).\n\nEngineering materials:\n• Ferrous metals (contain iron): steel, cast iron, stainless steel — magnetic, prone to rust\n• Non-ferrous metals (no iron): copper, aluminium, brass, bronze — generally corrosion resistant\n• Wood: hardwood (iroko, mahogany, teak — broad-leaved trees) | softwood (pine, cedar — conifers)\n• Plastics: thermoplastics (remeltable — PVC, polyethylene) | thermosets (not remeltable — Bakelite)\n• Concrete: cement + sand + gravel + water\n\nProperties: hardness, ductility (wire drawing), malleability (hammering into sheets), toughness, brittleness.',
+    formula:'Ferrous = iron-containing | Non-ferrous = no iron\nDuctility: drawn into wire | Malleability: hammered into sheets'}},
+  {id:'bte-s02',label:'Technical Drawing',emoji:'📐',topic:'drawing',
+   concept:{title:'Technical Drawing Principles',
+    body:'Technical drawing: precise, scaled representation of objects for manufacturing or construction.\n\nDrawing instruments:\n• Compass: drawing circles and arcs\n• Set square: 30°/60°/90° or 45°/45°/90° angles\n• Protractor: measuring angles\n• Ruler/straight edge: straight lines\n• T-square: horizontal lines\n\nLine types:\n• Continuous thick: visible outline of object\n• Dashed/dotted: hidden edges (not visible in current view)\n• Chain-dotted (centreline): axis of symmetry\n• Dimension line: shows measurements with arrows\n\nScale: ratio of drawing size to real size\n• 1:10 means 1 unit on drawing = 10 units real\n• 2:1 means drawing is twice real size (enlargement)\n\nOrthographic projection: shows 3D object as 2D views\n• Front elevation: view from front\n• Side/end elevation: view from side\n• Plan: view from above (top view)\nAll three views together fully describe the object.',
+    formula:'Scale 1:50 → 1cm on drawing = 50cm real\nOrthographic: front + side + plan = 3 views'}},
+  {id:'bte-s03',label:'Electricity & ICT',emoji:'💻',topic:'electricity',
+   concept:{title:'Basic Electricity and Information Technology',
+    body:'Electric circuit must be CLOSED (complete) for current to flow.\n\nSeries circuit: one path. Same current everywhere. Voltages add. One break stops all.\nParallel circuit: multiple paths. Same voltage across all. Currents add. One break doesn\'t stop others.\n(House wiring = parallel — each appliance independent)\n\nSafety:\n• Fuse: melts when current is too high — protects circuit\n• Earth wire (green/yellow): safety path for fault current\n• ALWAYS switch off and unplug before repairs\n• Nigerian wire colours: Live = Brown, Neutral = Blue, Earth = Green/Yellow\n\nICT basics:\n• Hardware: physical components (CPU, RAM, keyboard, monitor, printer)\n• Software: programs (Operating System + Applications + Utilities)\n• Input devices: keyboard, mouse, scanner, microphone\n• Output devices: monitor, printer, speaker\n• Internet: global network of interconnected computers\n\nSafety in ICT: protect personal data, avoid cyberbullying, use strong passwords, be aware of scams.',
+    formula:'Series: R_T = R₁+R₂ | Parallel: 1/R_T = 1/R₁+1/R₂\nEarth wire = Green/Yellow | Live = Brown | Neutral = Blue'}}
+];
+
 var BIO_LEARN_STAGES=[
   {id:'bio-s01',label:'Cell Biology',emoji:'🔬',topic:'cell',
    concept:{title:'The Cell — Unit of Life',
@@ -10427,9 +10675,18 @@ function finishReasoning(){
 var _SCI_LESSON={}; // current lesson context
 
 function openScienceLearnModule(){
-  var key=WS.subject; // set by openWaecMode
+  var key=WS.subject;
   var subj=WAEC_SUBJECTS.find(function(s){return s.key===key;});
-  var stagesMap={biology:BIO_LEARN_STAGES,chemistry:CHEM_LEARN_STAGES,physics:PHYSICS_LEARN_STAGES};
+  var stagesMap={
+    biology:BIO_LEARN_STAGES,
+    chemistry:CHEM_LEARN_STAGES,
+    physics:PHYSICS_LEARN_STAGES,
+    literature:LIT_LEARN_STAGES,
+    economics:ECON_LEARN_STAGES,
+    government:GOVT_LEARN_STAGES,
+    agric:AGRIC_LEARN_STAGES,
+    accounting:ACCT_LEARN_STAGES
+  };
   var stages=stagesMap[key]||[];
   if(!stages.length){toast('Learn module coming soon.',2000);return;}
   var t=document.getElementById('sci-learn-title');
@@ -10448,7 +10705,7 @@ function openScienceLearnModule(){
       +(done?'✅':stage.emoji)+'</div>'
       +'<div style="flex:1">'
       +'<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+stage.label+'</div>'
-      +'<div style="font-size:12px;color:#6B7280;margin-top:2px">'+qs.length+' practice questions'+( done?' · Completed':'')+'</div>'
+      +'<div style="font-size:12px;color:#6B7280;margin-top:2px">'+qs.length+' practice questions'+(done?' · Completed':'')+'</div>'
       +'</div>'
       +'<span style="font-size:20px;color:'+(done?'#16A34A':color)+'">›</span>'
       +'</div>';
@@ -10500,19 +10757,18 @@ function _renderSciConceptCard(){
 function _startSciPractice(){
   var stage=_SCI_LESSON.stage;
   var subjectKey=_SCI_LESSON.subjectKey;
-  // Use the WAEC infrastructure: set WS context and start topic-drill
   WS.subject=subjectKey;
   WS.mode='topic';
   WS.topic=stage.topic;
-  WS._sciStageId=stage.id; // for progress tracking on completion
-  var allQs=WAEC_QUESTIONS[subjectKey]||[];
+  WS._sciStageId=stage.id;
+  // JSS subjects pull from JSS_SUBJECTS, WAEC subjects from WAEC_QUESTIONS
+  var jssSubj=JSS_SUBJECTS[subjectKey];
+  var allQs=jssSubj?jssSubj.questions:(WAEC_QUESTIONS[subjectKey]||[]);
   var pool=shuffle(allQs.filter(function(q){return q.topic===stage.topic;}));
   if(!pool.length){toast('No questions for this topic yet.',2000);return;}
   WS.questions=pool;
   WS.qIdx=0;
   WS.answers=[];
-  // Recolour for this subject
-  var subj=_SCI_LESSON.subj;
   var color=_SCI_LESSON.color;
   ['waec-play-topbar','waec-results-topbar'].forEach(function(id){
     var el=document.getElementById(id);if(el)el.style.background='linear-gradient(135deg,'+color+','+color+')';
@@ -10573,7 +10829,7 @@ function renderTeacherClassDashboard(){
       +'<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'
         +'<div style="font-size:12px;color:#6B7280;font-weight:700">👥 '+students.length+' student'+(students.length!==1?'s':'')+'</div>'
         +(struggling.length?'<div style="font-size:12px;color:#DC2626;font-weight:800;background:#FEF2F2;padding:2px 8px;border-radius:6px">'+struggling.length+' struggling</div>':'<div style="font-size:12px;color:#16A34A;font-weight:800">✅ All on track</div>')
-        +'<button onclick="openAssignments()" style="font-size:11px;background:#EDE9FE;color:#6D28D9;border:none;border-radius:4px;padding:4px 8px;font-weight:800;cursor:pointer">📋 Set task</button>'
+        +'<button onclick="openAssignmentsForClass(\''+cls.replace(/'/g,"\\'")+'\')" style="font-size:11px;background:#EDE9FE;color:#6D28D9;border:none;border-radius:4px;padding:4px 8px;font-weight:800;cursor:pointer">📋 Set task</button>'
       +'</div>'
       +strugglingHtml
       +'</div>';
@@ -10607,17 +10863,69 @@ function openJSSHub(){
 function openJSSSubject(subjectKey){
   var subj=JSS_SUBJECTS[subjectKey];
   if(!subj)return;
-  WS.subject=subjectKey;
-  WS.mode='practice';
-  WS.questions=shuffle(subj.questions.slice()).slice(0,20);
-  WS.qIdx=0;
-  WS.answers=[];
-  WS._isJSS=true;
-  var t=document.getElementById('waec-hub-title');
-  if(t)t.textContent=subj.name+' Practice';
-  _waecRenderQ();
-  SS('waec-play');
+  // Check if this JSS subject has a learn module
+  var jssLearnMap={
+    basicScience: BSC_LEARN_STAGES,
+    socialStudies: SOC_LEARN_STAGES,
+    civicEd:      CIV_LEARN_STAGES,
+    basicTech:    BTECH_LEARN_STAGES
+  };
+  var stages=jssLearnMap[subjectKey]||[];
+  if(stages.length){
+    // Use the science learn infrastructure — set up WS context
+    WS.subject=subjectKey;
+    WS._jssSubj=subj;
+    // Render the learn topic list using science-learn screen
+    var t=document.getElementById('sci-learn-title');
+    if(t)t.textContent=subj.name+' — Learn by Topic';
+    var list=document.getElementById('sci-learn-list');
+    if(!list){SS('waec-hub');return;}
+    var p=prog();
+    list.innerHTML=stages.map(function(stage,i){
+      var doneKey='sci_done_'+stage.id;
+      var done=!!(p[doneKey]&&p[doneKey].passed);
+      var qs=(subj.questions||[]).filter(function(q){return q.topic===stage.topic;});
+      return '<div onclick="openJSSLesson(\''+subjectKey+'\','+i+')" style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer;display:flex;align-items:center;gap:12px">'
+        +'<div style="width:48px;height:48px;border-radius:12px;background:'+(done?'#DCFCE7':subj.colorBg)+';display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">'+(done?'✅':stage.emoji)+'</div>'
+        +'<div style="flex:1"><div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+stage.label+'</div>'
+        +'<div style="font-size:12px;color:#6B7280;margin-top:2px">'+qs.length+' practice questions'+(done?' · Completed':'')+'</div></div>'
+        +'<span style="font-size:20px;color:'+(done?'#16A34A':subj.color)+'">›</span>'
+        +'</div>';
+    }).join('');
+    SS('science-learn');
+  } else {
+    // Fallback: direct practice (no learn module)
+    WS.subject=subjectKey;
+    WS.mode='practice';
+    WS.questions=shuffle(subj.questions.slice()).slice(0,20);
+    WS.qIdx=0;
+    WS.answers=[];
+    WS._isJSS=true;
+    _waecRenderQ();
+    SS('waec-play');
+  }
 }
+
+function openJSSLesson(subjectKey, stageIdx){
+  var jssLearnMap={
+    basicScience: BSC_LEARN_STAGES,
+    socialStudies: SOC_LEARN_STAGES,
+    civicEd:      CIV_LEARN_STAGES,
+    basicTech:    BTECH_LEARN_STAGES
+  };
+  var stages=jssLearnMap[subjectKey]||[];
+  var stage=stages[stageIdx];
+  if(!stage)return;
+  var subj=JSS_SUBJECTS[subjectKey]||{color:'#059669',colorBg:'#ECFDF5'};
+  _SCI_LESSON={subjectKey:subjectKey,stageIdx:stageIdx,stage:stage,subj:subj,color:subj.color,_isJSS:true,_jssSubj:subj};
+  var t=document.getElementById('sci-lesson-title');
+  if(t)t.textContent=stage.label;
+  var bar=document.getElementById('sci-lesson-topbar');
+  if(bar)bar.style.background='linear-gradient(135deg,'+subj.color+','+subj.color+')';
+  _renderSciConceptCard();
+  SS('science-lesson');
+}
+
 
 function openWaecHub(){
   var list=document.getElementById('waec-subjects-list');
@@ -10682,9 +10990,9 @@ function openWaecMode(subjectKey){
       return '<button onclick="waecStart(\'topic\',\''+t.key+'\')" style="display:inline-block;background:'+subj.colorBg+';color:'+subj.color+';border:none;border-radius:8px;padding:7px 11px;margin:3px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:12px;cursor:pointer">'+t.label+' · '+topicQs.length+'</button>';
     }).join('');
   }
-  // Show "Learn by Topic" button for subjects with a structured learn module
+  // Show "Learn by Topic" for all subjects with a structured learn module
   var learnBtn=document.getElementById('waec-learn-btn');
-  var _learnMaps={biology:true,chemistry:true,physics:true};
+  var _learnMaps={biology:true,chemistry:true,physics:true,literature:true,economics:true,government:true,agric:true,accounting:true};
   if(learnBtn) learnBtn.style.display=_learnMaps[subjectKey]?'':'none';
   SS('waec-mode');
 }
@@ -13381,6 +13689,12 @@ function loadAssignmentsFromFirestore(cb){
       })
       .catch(function(){/* network error — local already shown */});
   });
+}
+
+// Open assignments scoped to a specific class (called from dashboard "Set task" button)
+function openAssignmentsForClass(cls){
+  _staffActiveClass=cls; // scope to this class so the assignment pre-selects it
+  openAssignments();
 }
 
 function openAssignments(){
