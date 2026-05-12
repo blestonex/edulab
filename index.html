@@ -11902,11 +11902,67 @@ function openClassSubjectPicker(className){
   var allowedMain=Array.isArray(cfg.allowedSubjects)?cfg.allowedSubjects:paid.slice();
   var allowedWaec=Array.isArray(cfg.allowedWaecSubjects)?cfg.allowedWaecSubjects:paidWaec.slice();
 
-  var labels={english:'📖 English & GS',maths:'🔢 Mathematics',verbal:'🔤 Verbal Reasoning',
-    quantitative:'🔢 Quant. Reasoning',waec:'🎓 WAEC/JAMB',competition:'🏆 Competition',leaderboard:'🏅 Leaderboard'};
-  var waecLabels={maths:'📐 Mathematics',english:'📖 English',biology:'🧬 Biology',
+  // Determine class level to show the right subjects in the right sections
+  var baseClass=_baseClass(className)||className;
+  var isJSS=/^JSS\s*[123]/i.test(baseClass);
+  var isSSS=/^SSS\s*[123]/i.test(baseClass)||/WAEC|JAMB/i.test(baseClass);
+  var isPrimary=!isJSS&&!isSSS;
+
+  // Main subjects labels
+  var labels={
+    english:'📖 English & GS',maths:'🔢 Mathematics',
+    verbal:'🔤 Verbal Reasoning',quantitative:'🔢 Quant. Reasoning',
+    waec:(isJSS?'🟢 JSS Subject Hub':'🎓 WAEC/JAMB'),
+    competition:'🏆 Competition',leaderboard:'🏅 Leaderboard'
+  };
+
+  // SSS WAEC subjects
+  var sssWaecLabels={
+    maths:'📐 Mathematics',english:'📖 English',biology:'🧬 Biology',
     physics:'⚛️ Physics',chemistry:'⚗️ Chemistry',literature:'📚 Literature',
-    agric:'🌾 Agric Science',accounting:'💼 Accounting',economics:'📊 Economics',government:'🏛️ Government'};
+    agric:'🌾 Agric Science',accounting:'💼 Accounting',
+    economics:'📊 Economics',government:'🏛️ Government'
+  };
+  // JSS subjects
+  var jssSubjLabels={
+    basicScience:'🔬 Basic Science',socialStudies:'🌍 Social Studies',
+    civicEd:'🏛️ Civic Education',basicTech:'⚙️ Basic Technology'
+  };
+
+  // Which secondary subjects to show, filtered by class level
+  var sssKeys=['maths','english','biology','physics','chemistry','literature','agric','accounting','economics','government'];
+  var jssKeys=['basicScience','socialStudies','civicEd','basicTech'];
+
+  var secondarySubjects=[]; // which subjects appear in the secondary section
+  var secondaryLabels={};
+  var sectionTitle='';
+  var sectionColor='#7F1D1D';
+  var checkBg='#FEF2F2';
+
+  if(isSSS){
+    // SSS: show WAEC/JAMB subjects, filter by what school paid for
+    sectionTitle='WAEC / JAMB Subjects';
+    sectionColor='#7F1D1D';
+    checkBg='#FEF2F2';
+    sssKeys.forEach(function(k){
+      if(paidWaec.indexOf(k)!==-1){
+        secondarySubjects.push(k);
+        secondaryLabels[k]=sssWaecLabels[k]||k;
+      }
+    });
+  } else if(isJSS){
+    // JSS: show JSS subjects (Basic Science etc.), filter by what school paid for
+    sectionTitle='JSS Subjects';
+    sectionColor='#065F46';
+    checkBg='#ECFDF5';
+    jssKeys.forEach(function(k){
+      if(paidWaec.indexOf(k)!==-1){
+        secondarySubjects.push(k);
+        secondaryLabels[k]=jssSubjLabels[k]||k;
+      }
+    });
+  }
+  // Primary: no secondary section at all
 
   // Build modal HTML
   var html='<div id="cls-picker-overlay" onclick="if(event.target===this)closeClassPicker()" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:flex;align-items:flex-end">'
@@ -11919,20 +11975,24 @@ function openClassSubjectPicker(className){
     var chk=allowedMain.indexOf(k)!==-1?'checked':'';
     html+='<div style="display:flex;align-items:center;gap:8px;background:#F0FDF4;border-radius:8px;padding:8px 10px">'
       +'<input type="checkbox" id="clsm-'+k+'" '+chk+' style="width:15px;height:15px;accent-color:#0D9488;cursor:pointer">'
-      +'<label for="clsm-'+k+'" style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;flex:1">'+labels[k]+'</label></div>';
+      +'<label for="clsm-'+k+'" style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;flex:1">'+(labels[k]||k)+'</label></div>';
   });
   html+='</div>';
-  if(paidWaec.length){
-    html+='<div style="font-weight:800;font-size:12px;color:#7F1D1D;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">WAEC / JAMB subjects</div>'
+
+  if(secondarySubjects.length){
+    html+='<div style="font-weight:800;font-size:12px;color:'+sectionColor+';text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">'+sectionTitle+'</div>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px" id="cls-waec-checks">';
-    paidWaec.forEach(function(k){
+    secondarySubjects.forEach(function(k){
       var chk=allowedWaec.indexOf(k)!==-1?'checked':'';
-      html+='<div style="display:flex;align-items:center;gap:8px;background:#FEF2F2;border-radius:8px;padding:8px 10px">'
-        +'<input type="checkbox" id="clsw-'+k+'" '+chk+' style="width:15px;height:15px;accent-color:#7F1D1D;cursor:pointer">'
-        +'<label for="clsw-'+k+'" style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;flex:1">'+waecLabels[k]+'</label></div>';
+      html+='<div style="display:flex;align-items:center;gap:8px;background:'+checkBg+';border-radius:8px;padding:8px 10px">'
+        +'<input type="checkbox" id="clsw-'+k+'" '+chk+' style="width:15px;height:15px;accent-color:'+sectionColor+';cursor:pointer">'
+        +'<label for="clsw-'+k+'" style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;flex:1">'+secondaryLabels[k]+'</label></div>';
     });
     html+='</div>';
+  } else if(isPrimary){
+    html+='<div style="font-size:12px;color:#9CA3AF;margin-bottom:12px;padding:10px;background:#F9FAFB;border-radius:8px">No subject-specific sections for Primary classes.</div>';
   }
+
   html+='<button onclick="confirmClassSubjectPicker(\''+_escapeHtml(className)+'\')" style="width:100%;padding:14px;background:#0D9488;color:#fff;border:none;border-radius:12px;font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;cursor:pointer">Save for '+_escapeHtml(className)+'</button>'
     +'<button onclick="closeClassPicker()" style="width:100%;padding:12px;background:transparent;color:#6B7280;border:none;font-family:\'Nunito\',sans-serif;font-weight:700;font-size:13px;cursor:pointer;margin-top:6px">Cancel</button>'
     +'</div></div>';
@@ -11948,7 +12008,19 @@ function confirmClassSubjectPicker(className){
   var paidWaec=_getSchoolPaidWaecSubjects();
   var main=[],waec=[];
   paid.forEach(function(k){var cb=document.getElementById('clsm-'+k);if(cb&&cb.checked)main.push(k);});
-  paidWaec.forEach(function(k){var cb=document.getElementById('clsw-'+k);if(cb&&cb.checked)waec.push(k);});
+  // Only read checkbox keys that were actually rendered for this class level
+  var baseClass=_baseClass(className)||className;
+  var isJSS=/^JSS\s*[123]/i.test(baseClass);
+  var isSSS=/^SSS\s*[123]/i.test(baseClass)||/WAEC|JAMB/i.test(baseClass);
+  var sssKeys=['maths','english','biology','physics','chemistry','literature','agric','accounting','economics','government'];
+  var jssKeys=['basicScience','socialStudies','civicEd','basicTech'];
+  var secondaryKeys=isSSS?sssKeys:(isJSS?jssKeys:[]);
+  secondaryKeys.forEach(function(k){
+    if(paidWaec.indexOf(k)!==-1){
+      var cb=document.getElementById('clsw-'+k);
+      if(cb&&cb.checked)waec.push(k);
+    }
+  });
   var cfg={allowedSubjects:main,allowedWaecSubjects:waec};
   closeClassPicker();
   saveClassConfig(className,cfg,function(ok,where){
