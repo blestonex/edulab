@@ -787,10 +787,13 @@ body.banner-open .screen.active{padding-bottom:80px}
       <label style="display:block;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--sm);margin-bottom:6px">Phone (optional)</label>
       <input id="as-staff-phone" type="tel" placeholder="+234 803 ..." style="width:100%;padding:11px;font-size:15px;border:1.5px solid #D1D5DB;border-radius:8px;margin-bottom:14px;font-family:'Nunito',sans-serif;font-weight:700;box-sizing:border-box" autocomplete="off">
       <label style="display:block;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--sm);margin-bottom:8px">Role</label>
-      <select id="as-staff-role" onchange="toggleStaffRoleFields()" style="width:100%;padding:11px;font-size:15px;border:1.5px solid #D1D5DB;border-radius:8px;margin-bottom:14px;font-family:'Nunito',sans-serif;font-weight:700;background:#fff">
-        <option value="teacher">Teacher / Staff</option>
-        <option value="parent">Parent (view child\'s progress only)</option>
-      </select>
+      <div style="position:relative;margin-bottom:14px">
+        <select id="as-staff-role" onchange="toggleStaffRoleFields()" style="width:100%;padding:11px 36px 11px 12px;font-size:15px;border:1.5px solid #7C3AED;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;background:#fff;color:#1E1B4B;-webkit-appearance:none;appearance:none;cursor:pointer;box-sizing:border-box">
+          <option value="teacher" style="color:#1E1B4B;background:#fff">👩‍🏫 Teacher / Staff</option>
+          <option value="parent" style="color:#1E1B4B;background:#fff">👨‍👩‍👧 Parent (progress view only)</option>
+        </select>
+        <div style="pointer-events:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#7C3AED;font-size:14px">▼</div>
+      </div>
       <!-- Class assignment — hidden for parents -->
       <div id="as-teacher-fields">
         <label style="display:block;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--sm);margin-bottom:8px">Which class(es) does she teach?</label>
