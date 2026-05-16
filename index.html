@@ -518,7 +518,7 @@ body.banner-open .screen.active{padding-bottom:80px}
     <div style="font-size:48px;margin-bottom:8px;text-align:center" id="staff-login-emoji">⚙️</div>
     <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;text-align:center;margin-bottom:6px" id="staff-login-h">School code</div>
     <div style="font-size:13px;color:rgba(255,255,255,.7);text-align:center;line-height:1.55;margin-bottom:24px" id="staff-login-sub">Enter your school's code to see staff list.</div>
-    <input id="staff-school-input" type="text" placeholder="e.g. AGUDA01" autocomplete="off" autocapitalize="characters" style="width:100%;padding:14px;font-size:20px;font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:3px;text-align:center;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(255,255,255,.95);color:#1E1B4B;margin-bottom:14px;box-sizing:border-box">
+    <input id="staff-school-input" type="text" placeholder="e.g. AGUDA01" autocomplete="off" autocapitalize="characters" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" style="width:100%;padding:14px;font-size:20px;font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:3px;text-align:center;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(255,255,255,.95);color:#1E1B4B;margin-bottom:14px;box-sizing:border-box">
     <div id="staff-school-status" style="font-size:13px;text-align:center;min-height:20px;margin-bottom:14px;color:rgba(255,255,255,.85)"></div>
     <button id="staff-school-btn" onclick="staffSubmitSchoolCode()" style="width:100%;padding:14px;background:#fff;color:#7C3AED;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;cursor:pointer">Continue →</button>
   </div>
@@ -3411,7 +3411,43 @@ function syncStudentToFirestore(){
     },{merge:true}).catch(function(e){
       console.warn('Student sync failed:',e.message);
     });
+    // PARENT-PLAN AUTO-LINK: if this is a parent-plan account, link this
+    // child's name to the parent's "linkedChild" field so the parent
+    // dashboard shows their progress automatically. Done once per child.
+    if(school.plan==='parent'&&STU.name){
+      _autoLinkChildToParent(school.code,STU.name);
+    }
   });
+}
+
+// Look up the parent staff doc on a parent-plan account and update its
+// linkedChild field with this child's name. Respects maxChildren limit.
+function _autoLinkChildToParent(schoolCode,childName){
+  if(!FB.db||!schoolCode||!childName)return;
+  var staffRef=FB.db.collection('schools').doc(schoolCode).collection('staff');
+  staffRef.where('role','==','parent').get().then(function(snap){
+    if(snap.empty)return;
+    // Find the first parent doc with no linkedChild (or matching name)
+    var unlinked=null;
+    var alreadyLinked=false;
+    snap.forEach(function(doc){
+      var d=doc.data();
+      if(d.linkedChild&&d.linkedChild.toLowerCase().trim()===childName.toLowerCase().trim()){
+        alreadyLinked=true;
+      }else if(!d.linkedChild&&!unlinked){
+        unlinked={id:doc.id,data:d};
+      }
+    });
+    if(alreadyLinked)return; // already linked, nothing to do
+    if(unlinked){
+      // Update the first empty parent slot
+      staffRef.doc(unlinked.id).set({linkedChild:childName},{merge:true})
+        .then(function(){console.log('[EduLab] Auto-linked child "'+childName+'" to parent slot');})
+        .catch(function(e){console.warn('Auto-link failed:',e.message);});
+    }
+    // If no empty slots, it means maxChildren is reached — silently ignore.
+    // The parent already manually linked enough children.
+  }).catch(function(e){console.warn('Parent lookup failed:',e.message);});
 }
 
 function loadSchoolRosterFromFirestore(cb){
@@ -4308,7 +4344,7 @@ function openStaffLogin(){
     if(emoji)emoji.textContent='👨‍👩‍👧';
     if(h)h.textContent='Access code';
     if(sub)sub.textContent='Enter the access code from your welcome message.';
-    if(input)input.placeholder='e.g. 482917';
+    if(input)input.placeholder='e.g. ADEYEMI';
   }else{
     if(title)title.textContent='Login as Admin';
     if(emoji)emoji.textContent='⚙️';
@@ -5409,8 +5445,14 @@ function openParentView(){
   var childCard=document.getElementById('pv-child-card');
   if(childCard){
     if(!childName){
-      childCard.innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#7C3AED;margin-bottom:8px">👧 My Child</div>'
-        +'<div style="font-size:13px;color:#6B7280;line-height:1.6">No child linked yet. Ask your school to update your parent account.</div>';
+      childCard.innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#7C3AED;margin-bottom:8px">👧 No child registered yet</div>'
+        +'<div style="font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:10px">Your child hasn\'t set up their account yet. To get them started:</div>'
+        +'<div style="font-size:12.5px;color:#1E1B4B;line-height:1.7;background:#F9FAFB;padding:10px 12px;border-radius:8px">'
+        +'1. Sign out (top right)<br>'
+        +'2. On the welcome screen, tap <b>"Set up my child\'s device"</b><br>'
+        +'3. When asked for a school code, your child enters <b>'+_escapeHtml((school&&school.code)||'YOUR-CODE')+'</b><br>'
+        +'4. Once your child practises, their progress appears here automatically'
+        +'</div>';
     }else{
       var roster=lg(LK_ROSTER)||[];
       var child=roster.find(function(s){
