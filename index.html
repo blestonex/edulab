@@ -465,7 +465,7 @@ body.banner-open .screen.active{padding-bottom:80px}
 <!-- RECOVERY — restore an existing student account using a recovery code -->
 <div id="recovery" class="screen" style="background:linear-gradient(135deg,#1E3A8A,#1E40AF)">
   <div class="topbar" style="background:transparent">
-    <button class="tback" onclick="SS('splash')">‹</button>
+    <button class="tback" onclick="recoveryBack()">‹</button>
     <div class="tlogo" style="color:#fff">Recover Account</div>
   </div>
   <div style="flex:1;padding:24px;display:flex;flex-direction:column;justify-content:center;max-width:420px;width:100%;margin:0 auto;box-sizing:border-box">
@@ -511,13 +511,13 @@ body.banner-open .screen.active{padding-bottom:80px}
 <!-- STAFF LOGIN — STEP 1: school code -->
 <div id="staff-login-school" class="screen" style="background:linear-gradient(135deg,#581C87,#7C3AED)">
   <div class="topbar" style="background:transparent">
-    <button class="tback" onclick="SS('splash')">‹</button>
-    <div class="tlogo" style="color:#fff">Login as Admin</div>
+    <button class="tback" onclick="staffLoginBack()">‹</button>
+    <div class="tlogo" style="color:#fff" id="staff-login-title">Login as Admin</div>
   </div>
   <div style="flex:1;padding:24px;display:flex;flex-direction:column;justify-content:center;max-width:420px;width:100%;margin:0 auto;box-sizing:border-box">
-    <div style="font-size:48px;margin-bottom:8px;text-align:center">⚙️</div>
-    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;text-align:center;margin-bottom:6px">School code</div>
-    <div style="font-size:13px;color:rgba(255,255,255,.7);text-align:center;line-height:1.55;margin-bottom:24px">Enter your school's code to see staff list.</div>
+    <div style="font-size:48px;margin-bottom:8px;text-align:center" id="staff-login-emoji">⚙️</div>
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#fff;text-align:center;margin-bottom:6px" id="staff-login-h">School code</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.7);text-align:center;line-height:1.55;margin-bottom:24px" id="staff-login-sub">Enter your school's code to see staff list.</div>
     <input id="staff-school-input" type="text" placeholder="e.g. AGUDA01" autocomplete="off" autocapitalize="characters" style="width:100%;padding:14px;font-size:20px;font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:3px;text-align:center;border:2px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(255,255,255,.95);color:#1E1B4B;margin-bottom:14px;box-sizing:border-box">
     <div id="staff-school-status" style="font-size:13px;text-align:center;min-height:20px;margin-bottom:14px;color:rgba(255,255,255,.85)"></div>
     <button id="staff-school-btn" onclick="staffSubmitSchoolCode()" style="width:100%;padding:14px;background:#fff;color:#7C3AED;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;cursor:pointer">Continue →</button>
@@ -3585,6 +3585,18 @@ function openRecoveryFromGate(){
   // From gate screen — set a temporary user type so recovery flow works
   if(!lg(LK_USER_TYPE))ls(LK_USER_TYPE,'school');
   openRecovery();
+  // Override origin after openRecovery has reset it
+  window._recoveryOrigin='gate';
+}
+
+// Back from recovery — return to wherever the user came from
+function recoveryBack(){
+  if(window._recoveryOrigin==='gate'){
+    window._recoveryOrigin=null;
+    SS('gate');
+  }else{
+    SS('splash');
+  }
 }
 
 // Adapt splash screen based on user type. Parent-mode hides school
@@ -3627,6 +3639,8 @@ function openParentLogin(){
 // RECOVERY FLOW (UI handlers)
 // ════════════════════════════════════════
 function openRecovery(){
+  // Default origin = splash. openRecoveryFromGate overrides this after calling us.
+  window._recoveryOrigin='splash';
   var schoolEl=document.getElementById('rec-school');
   var codeEl=document.getElementById('rec-code');
   var statusEl=document.getElementById('rec-status');
@@ -4283,8 +4297,33 @@ function openStaffLogin(){
   if(input&&cached&&cached.code)input.value=cached.code;
   var status=document.getElementById('staff-school-status');
   if(status)status.textContent='';
+  // Adapt labels based on user type
+  var isParent=(lg(LK_USER_TYPE)==='parent');
+  var title=document.getElementById('staff-login-title');
+  var emoji=document.getElementById('staff-login-emoji');
+  var h=document.getElementById('staff-login-h');
+  var sub=document.getElementById('staff-login-sub');
+  if(isParent){
+    if(title)title.textContent='Parent Login';
+    if(emoji)emoji.textContent='👨‍👩‍👧';
+    if(h)h.textContent='Access code';
+    if(sub)sub.textContent='Enter the access code from your welcome message.';
+    if(input)input.placeholder='e.g. 482917';
+  }else{
+    if(title)title.textContent='Login as Admin';
+    if(emoji)emoji.textContent='⚙️';
+    if(h)h.textContent='School code';
+    if(sub)sub.textContent="Enter your school's code to see staff list.";
+    if(input)input.placeholder='e.g. AGUDA01';
+  }
   SS('staff-login-school');
   if(input)setTimeout(function(){input.focus();},100);
+}
+
+// Back from staff login: parents go to splash, schools go to splash
+// (both want to return to splash since they came from there)
+function staffLoginBack(){
+  SS('splash');
 }
 
 function staffSubmitSchoolCode(){
@@ -5354,6 +5393,11 @@ function openAdmin(){
 
 // ── PARENT VIEW ───────────────────────────────────────────────────────────────
 function openParentView(){
+  // Guard: don't run if parent has signed out
+  if(!STAFF||STAFF.role!=='parent'){
+    window._pvLoading=false;
+    return;
+  }
   SS('parent-view');
   var childName=(STAFF&&STAFF.linkedChild)||'';
   var school=getSchool();
@@ -5365,7 +5409,7 @@ function openParentView(){
   var childCard=document.getElementById('pv-child-card');
   if(childCard){
     if(!childName){
-      childCard.innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#7C3AED;margin-bottom:8px">\U0001F467 My Child</div>'
+      childCard.innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#7C3AED;margin-bottom:8px">👧 My Child</div>'
         +'<div style="font-size:13px;color:#6B7280;line-height:1.6">No child linked yet. Ask your school to update your parent account.</div>';
     }else{
       var roster=lg(LK_ROSTER)||[];
@@ -5373,7 +5417,7 @@ function openParentView(){
         return s.name&&s.name.toLowerCase().trim()===childName.toLowerCase().trim();
       });
       childCard.innerHTML='<div style="display:flex;align-items:center;gap:12px">'
-        +'<div style="width:52px;height:52px;border-radius:14px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">'+(child&&child.emoji?child.emoji:'\U0001F467')+'</div>'
+        +'<div style="width:52px;height:52px;border-radius:14px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">'+(child&&child.emoji?child.emoji:'👧')+'</div>'
         +'<div><div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:17px;color:#1E1B4B">'+_escapeHtml(childName)+'</div>'
         +'<div style="font-size:13px;color:#7C3AED;font-weight:700;margin-top:2px">'+(child?child.classLabel:'')+'</div></div>'
         +'</div>';
@@ -5419,7 +5463,8 @@ function openParentView(){
           .filter(function(d){return !d.id.startsWith('_cfg__');})
           .map(function(d){return Object.assign({uid:d.id},d.data());});
         window._pvLoading=false;
-        openParentView();
+        // Only refresh view if parent is still signed in (not signed out during request)
+        if(STAFF&&STAFF.role==='parent')openParentView();
       })
       .catch(function(){window._pvLoading=false;});
   }
@@ -5688,10 +5733,14 @@ function _renderCapacity(count,cap,school){
   capBanner.innerHTML=bannerHtml;
 }
 
-// Sign out and go back to splash for parent role
+// Sign out and go back to gate screen — full sign out, parent has to log in again
 function parentBack(){
   STAFF=null;
   _adminVerified=false;
+  _staffSchoolCode=null;
+  _staffSelectedStaff=null;
+  // Parent stays in parent user-type but is signed out
+  // They need to enter access code + PIN again to come back in
   SS('splash');
 }
 
