@@ -277,6 +277,88 @@ body.banner-open .screen.active{padding-bottom:80px}
 </head>
 <body>
 
+<!-- ═════════════════════════════════════════════════════════════
+     INITIAL LOADING SCREEN — shown immediately on page load,
+     hidden once DOMContentLoaded fires. Critical for slow 3G:
+     without this users stare at a blank screen for ~30 seconds
+     wondering if the site is broken.
+     ═════════════════════════════════════════════════════════════ -->
+<div id="initial-loader" style="position:fixed;inset:0;z-index:9999;background:linear-gradient(160deg,#FF6B35 0%,#FF8E53 60%,#FCD34D 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#fff;padding:24px;text-align:center">
+  <div style="font-size:11px;letter-spacing:2.5px;font-weight:800;opacity:.7;margin-bottom:8px">BLESTONEX</div>
+  <div style="font-size:54px;font-weight:900;letter-spacing:-1px;line-height:1;margin-bottom:24px">Edu<span style="background:linear-gradient(135deg,#fff,#FFE7BA);-webkit-background-clip:text;background-clip:text;color:transparent">Lab</span></div>
+  <div style="width:64px;height:64px;border:4px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:loaderSpin 0.9s linear infinite;margin-bottom:20px"></div>
+  <div id="loader-status" style="font-size:14px;font-weight:700;opacity:.9;margin-bottom:4px">Loading EduLab...</div>
+  <div id="loader-tip" style="font-size:12px;opacity:.65;max-width:280px;line-height:1.5;margin-top:12px">First-time load may take 20–30 seconds on slow networks. After that, EduLab works fully offline.</div>
+</div>
+<style>
+@keyframes loaderSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+</style>
+<script>
+// Show progressive status messages while the page parses
+(function(){
+  var tips=['Loading 1,200+ questions...','Setting up your subjects...','Almost ready...','Just a few more seconds...'];
+  var i=0;
+  var statusEl=document.getElementById('loader-status');
+  var iv=setInterval(function(){
+    if(!statusEl||!document.getElementById('initial-loader')){clearInterval(iv);return;}
+    statusEl.textContent=tips[i%tips.length];
+    i++;
+  },2500);
+  // Hide once DOM is fully parsed (all <script> blocks done)
+  window.addEventListener('DOMContentLoaded',function(){
+    setTimeout(function(){
+      var el=document.getElementById('initial-loader');
+      if(!el)return;
+      el.style.transition='opacity .35s ease-out';
+      el.style.opacity='0';
+      setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);clearInterval(iv);},400);
+    },200);
+  });
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════
+     GATE SCREEN — first-time visitors choose Parent or School
+     This is shown ONCE; the choice is saved to LK_USER_TYPE.
+     Can be changed later via "Switch user type" in recover screen.
+     ═══════════════════════════════════════════════════════ -->
+<div id="gate" class="screen" style="background:linear-gradient(160deg,#581C87 0%,#7C3AED 50%,#0EA5E9 100%);overflow-y:auto;padding:0">
+  <div style="max-width:440px;width:100%;margin:0 auto;padding:32px 22px 24px;box-sizing:border-box;display:flex;flex-direction:column;min-height:100vh">
+    <div style="text-align:center;margin-top:20px;margin-bottom:36px">
+      <div style="font-size:11px;letter-spacing:2.5px;font-weight:800;color:rgba(255,255,255,.55);margin-bottom:6px">BLESTONEX GLOBAL SERVICES</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:46px;color:#fff;line-height:1;letter-spacing:-1px">Edu<span style="background:linear-gradient(135deg,#FCD34D,#F59E0B);-webkit-background-clip:text;background-clip:text;color:transparent">Lab</span></div>
+      <div style="margin-top:14px;color:rgba(255,255,255,.85);font-size:14px;line-height:1.5;max-width:300px;margin-left:auto;margin-right:auto">Nigerian-built learning app from Nursery to JAMB.</div>
+    </div>
+
+    <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);border-radius:18px;padding:18px;margin-bottom:14px">
+      <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;color:rgba(255,255,255,.6);text-align:center;margin-bottom:14px">Welcome — choose how you'll use EduLab</div>
+
+      <button onclick="pickUserType('parent')" style="width:100%;background:#fff;border:none;border-radius:14px;padding:18px 18px;margin-bottom:12px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.18);transition:transform .15s" onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#7C3AED,#5B21B6);display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0">👨‍👩‍👧</div>
+        <div style="flex:1;text-align:left">
+          <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;color:#1E1B4B;margin-bottom:2px">I'm a Parent</div>
+          <div style="font-size:12.5px;color:#6B7280;line-height:1.45">Subscribed for my child only.<br>Track their progress at home.</div>
+        </div>
+        <span style="font-size:22px;color:#7C3AED;flex-shrink:0">›</span>
+      </button>
+
+      <button onclick="pickUserType('school')" style="width:100%;background:#fff;border:none;border-radius:14px;padding:18px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.18);transition:transform .15s" onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#0EA5E9,#0284C7);display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0">🏫</div>
+        <div style="flex:1;text-align:left">
+          <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:17px;color:#1E1B4B;margin-bottom:2px">I'm with a School</div>
+          <div style="font-size:12.5px;color:#6B7280;line-height:1.45">Whole school subscription —<br>students, teachers, admin tools.</div>
+        </div>
+        <span style="font-size:22px;color:#0EA5E9;flex-shrink:0">›</span>
+      </button>
+    </div>
+
+    <div style="text-align:center;font-size:11.5px;color:rgba(255,255,255,.65);line-height:1.5;margin-top:auto;padding-top:18px">
+      Already have an EduLab account? <a href="#" onclick="event.preventDefault();openRecoveryFromGate()" style="color:#FCD34D;text-decoration:none;font-weight:800">Recover &rsaquo;</a>
+    </div>
+    <div style="text-align:center;font-size:10px;color:rgba(255,255,255,.4);margin-top:8px">Made in Nigeria · 🇳🇬</div>
+  </div>
+</div>
+
 <!-- SPLASH -->
 <div id="splash" class="screen">
   <div class="splash-inner">
@@ -286,29 +368,29 @@ body.banner-open .screen.active{padding-bottom:80px}
          illustration here, so the primary buttons sit above the fold
          on most phones without "scroll for more" hints. -->
     <div class="sp-hero">
-      <div class="sp-blestonex">Blestonex Global Services</div>
+      <div class="sp-blestonex sp-school-only">Blestonex Global Services</div>
       <div class="sp-logo">Edu<span class="lab">Lab</span></div>
-      <div class="sp-tag">The complete digital classroom for Nigerian schools — Nursery to JAMB.</div>
+      <div class="sp-tag" id="sp-tag-text">The complete digital classroom for Nigerian schools — Nursery to JAMB.</div>
     </div>
 
     <!-- CARD AREA ─────────────────────────────────────────────────── -->
     <div class="sp-card-area">
 
       <!-- PRIMARY ACTIONS — clean white cards with coral icon badges -->
-      <div class="splash-lbl">Get started</div>
+      <div class="splash-lbl" id="splash-lbl-start">Get started</div>
       <button class="mode-btn" onclick="pickMode('single')">
         <div class="mode-btn-icon">👤</div>
         <div class="mode-btn-body">
-          <span class="mt">My personal device</span>
-          <span class="md">One student uses this device</span>
+          <span class="mt" id="sp-single-mt">My personal device</span>
+          <span class="md" id="sp-single-md">One student uses this device</span>
         </div>
         <span class="mode-btn-chev">›</span>
       </button>
       <button class="mode-btn" onclick="pickMode('shared')">
         <div class="mode-btn-icon">👥</div>
         <div class="mode-btn-body">
-          <span class="mt">Shared class device</span>
-          <span class="md">Multiple students take turns</span>
+          <span class="mt" id="sp-shared-mt">Shared class device</span>
+          <span class="md" id="sp-shared-md">Multiple students take turns</span>
         </div>
         <span class="mode-btn-chev">›</span>
       </button>
@@ -316,7 +398,7 @@ body.banner-open .screen.active{padding-bottom:80px}
       <!-- FEATURE STRIP — horizontally scrollable on phones, single row.
            Shows what's inside the product in a way that feels alive without
            dominating the screen. -->
-      <div class="sp-feats" role="list" aria-label="Features">
+      <div class="sp-feats sp-school-only" role="list" aria-label="Features">
         <div class="sp-feat" role="listitem">
           <span class="sp-feat-em">📐</span>
           <div class="sp-feat-tx"><strong>WAEC / JAMB</strong>3 subjects · 150 questions</div>
@@ -336,14 +418,22 @@ body.banner-open .screen.active{padding-bottom:80px}
       </div>
 
       <!-- SECONDARY ACTIONS ─────────────────────────────────────── -->
-      <div class="sp-secondary-lbl">More options</div>
-      <button class="mode-btn mode-btn-admin" onclick="openStaffLogin()">
+      <div class="sp-secondary-lbl" id="sp-secondary-lbl">More options</div>
+      <button class="mode-btn mode-btn-admin sp-school-only" onclick="openStaffLogin()">
         <div class="mode-btn-icon">⚙️</div>
         <div class="mode-btn-body">
           <span class="mt">Login as Admin</span>
           <span class="md">For proprietors and teachers</span>
         </div>
         <span class="mode-btn-chev">›</span>
+      </button>
+      <button class="mode-btn sp-parent-only" onclick="openParentLogin()" style="background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border:1.5px solid #C4B5FD;display:none">
+        <div class="mode-btn-icon" style="background:#7C3AED;border-radius:10px;padding:2px">👨‍👩‍👧</div>
+        <div class="mode-btn-body">
+          <span class="mt" style="color:#5B21B6">Open my parent dashboard</span>
+          <span class="md" style="color:#7C3AED">View your child's progress</span>
+        </div>
+        <span class="mode-btn-chev" style="color:#7C3AED">›</span>
       </button>
       <button class="mode-btn mode-btn-recover" onclick="openRecovery()">
         <div class="mode-btn-icon">🔑</div>
@@ -353,7 +443,7 @@ body.banner-open .screen.active{padding-bottom:80px}
         </div>
         <span class="mode-btn-chev">›</span>
       </button>
-      <button class="mode-btn mode-btn-comp" onclick="openCompMenu()">
+      <button class="mode-btn mode-btn-comp sp-school-only" onclick="openCompMenu()">
         <div class="mode-btn-icon">🏆</div>
         <div class="mode-btn-body">
           <span class="mt">House Competition</span>
@@ -361,6 +451,11 @@ body.banner-open .screen.active{padding-bottom:80px}
         </div>
         <span class="mode-btn-chev">›</span>
       </button>
+
+      <!-- Switch user type — small text link, used when user wants to change context -->
+      <div style="text-align:center;margin-top:14px;padding:0 14px">
+        <a href="#" onclick="event.preventDefault();switchUserType()" style="font-size:11.5px;color:#9A3412;text-decoration:none;font-weight:700;opacity:.7">⇄ Switch user type</a>
+      </div>
 
       <div class="sp-footer"><span class="sp-footer-flag" aria-hidden="true"></span>Made in Nigeria · Built for Nigerian schools</div>
     </div>
@@ -616,25 +711,26 @@ body.banner-open .screen.active{padding-bottom:80px}
      PARENT VIEW — read-only child progress dashboard
      Shown to staff with role === 'parent'
      ════════════════════════════════════════════════ -->
-<div id="parent-view" class="screen" style="background:linear-gradient(180deg,#7C3AED 0%,#7C3AED 110px,#F5F3FF 110px)">
+<div id="parent-view" class="screen" style="background:linear-gradient(180deg,#7C3AED 0%,#7C3AED 110px,#F5F3FF 110px);z-index:1">
   <div class="topbar" style="background:linear-gradient(135deg,#7C3AED,#6D28D9)">
-    <button class="tback" onclick="adminBack()">‹</button>
+    <button class="tback" onclick="parentBack()" style="color:#fff">‹</button>
     <div class="tlogo">My Child's <span>Progress</span></div>
+    <button onclick="parentBack()" style="background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);border-radius:8px;color:#fff;padding:5px 10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer">Sign out</button>
   </div>
   <div class="content" style="padding:16px;gap:10px">
     <!-- Child info card -->
     <div id="pv-child-card" style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08)"></div>
-    <!-- Recent activity -->
+    <!-- Subject scores -->
     <div id="pv-activity" style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
       <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#7C3AED;margin-bottom:10px">📈 Subject Performance</div>
       <div id="pv-scores"></div>
     </div>
-    <!-- School info for parent -->
+    <!-- School info -->
     <div id="pv-school-card" style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08);font-size:13px;color:#6B7280;line-height:1.6">
       <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#7C3AED;margin-bottom:8px">🏫 School</div>
       <div id="pv-school-name"></div>
     </div>
-    <!-- Login details tile (child's codes) -->
+    <!-- Child login details -->
     <div id="pv-login-tile" style="background:#EDE9FE;border-radius:14px;padding:16px">
       <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#5B21B6;margin-bottom:8px">🔑 Child's Login Details</div>
       <div id="pv-login-details" style="font-size:13px;color:#5B21B6;line-height:1.8"></div>
@@ -839,6 +935,42 @@ body.banner-open .screen.active{padding-bottom:80px}
     <p id="home-cls">Lower Primary · English</p>
   </div>
   <div class="content">
+    <!-- ── PROGRESS HERO — student dashboard at-a-glance ──
+         Shows overall progress, current streak, and badges earned.
+         Designed to be the first thing student sees on opening the app. -->
+    <div id="my-progress-card" style="display:none;background:linear-gradient(135deg,#1E1B4B,#312E81);border-radius:16px;padding:14px 16px;margin-bottom:10px;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.15)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;letter-spacing:.8px;text-transform:uppercase;opacity:.65;font-weight:800">My Progress</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;margin-top:2px"><span id="mp-total-pct">0</span>% complete</div>
+          <div style="font-size:12px;opacity:.7;margin-top:1px"><span id="mp-stages-done">0</span> stages mastered</div>
+        </div>
+        <div style="text-align:center;flex-shrink:0">
+          <div style="font-size:28px;line-height:1">🔥</div>
+          <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:18px;line-height:1.1"><span id="mp-streak-days">0</span></div>
+          <div style="font-size:10px;opacity:.7;letter-spacing:.3px;text-transform:uppercase">day streak</div>
+        </div>
+      </div>
+      <!-- Overall progress bar -->
+      <div style="height:6px;background:rgba(255,255,255,.15);border-radius:3px;overflow:hidden;margin-bottom:10px">
+        <div id="mp-pbar" style="height:100%;width:0%;background:linear-gradient(90deg,#FCD34D,#F59E0B);border-radius:3px;transition:width .8s"></div>
+      </div>
+      <!-- Badges row -->
+      <div id="mp-badges" style="display:flex;gap:6px;flex-wrap:wrap;min-height:24px"></div>
+    </div>
+
+    <!-- ── CONTINUE WHERE YOU LEFT OFF —
+         Shows the most recent in-progress stage so the student can resume in one tap. -->
+    <div id="continue-card" onclick="resumeLastStage()" style="display:none;background:#FFF7ED;border:1.5px dashed #FB923C;border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer;align-items:center;gap:12px">
+      <div style="width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#FB923C,#F97316);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">⏯️</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:10px;letter-spacing:.8px;text-transform:uppercase;font-weight:800;color:#9A3412">Continue where you left off</div>
+        <div id="continue-label" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#7C2D12;margin-top:2px"></div>
+        <div id="continue-meta" style="font-size:11.5px;color:#C2410C;margin-top:1px"></div>
+      </div>
+      <span style="font-size:22px;color:#F97316;flex-shrink:0">›</span>
+    </div>
+
     <!-- Demo mode notice — shown when not activated -->
     <div id="demo-notice" style="display:none;background:#FEF3C7;border-radius:12px;padding:12px 14px;margin-bottom:4px;font-size:13px;color:#92400E;font-weight:700;text-align:center">
       🔑 Demo mode — first 2 stages only. Ask your school admin to activate the full app.
@@ -3101,6 +3233,8 @@ var S={
   testQ:[],testIdx:0,testAnswers:[]
 };
 var LK_MODE='el_mode',LK_STU='el_stu',LK_PROG='el_prog',LK_ROSTER='el_roster';
+var LK_USER_TYPE='el_user_type'; // 'parent' or 'school' — set on first gate screen visit
+var LK_STREAK='el_streak'; // {[sid]: {count, lastDate}}
 function lg(k){try{return JSON.parse(localStorage.getItem(k))||null}catch(e){return null}}
 function ls(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function sk(){return STU.uid||STU.name}
@@ -3123,9 +3257,52 @@ function saveProg(sid,data){
     }
   }
   p[sk()][sid]=prev;ls(LK_PROG,p);
+  // Update activity streak on any real progress save
+  if(data&&(data.passed!==undefined||data.bestScore!==undefined||data.attempts!==undefined)){
+    updateStreak();
+  }
   // Debounced sync — reduces Firestore writes from 1-per-question to 1-per-session
   debouncedSyncStudentToFirestore();
   return prev;
+}
+
+// ── STREAK TRACKING ─────────────────────────────────────────────────────────
+// Increments when student practises on a new day, resets if they skip a day.
+function _todayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function _yesterdayStr(){var d=new Date();d.setDate(d.getDate()-1);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function getStreak(){
+  if(!STU)return 0;
+  var s=lg(LK_STREAK)||{};
+  var entry=s[sk()];
+  if(!entry)return 0;
+  // If last activity was today or yesterday, streak is still alive
+  var today=_todayStr(),yest=_yesterdayStr();
+  if(entry.lastDate===today||entry.lastDate===yest)return entry.count||0;
+  return 0; // streak broken
+}
+function updateStreak(){
+  if(!STU)return;
+  var s=lg(LK_STREAK)||{};
+  var key=sk();
+  var entry=s[key]||{count:0,lastDate:null};
+  var today=_todayStr(),yest=_yesterdayStr();
+  if(entry.lastDate===today){
+    // already counted today — no change
+    return;
+  }
+  if(entry.lastDate===yest){
+    entry.count=(entry.count||0)+1; // consecutive day
+  }else{
+    entry.count=1; // new streak
+  }
+  entry.lastDate=today;
+  s[key]=entry;
+  ls(LK_STREAK,s);
+  // Live-update the home card if it's visible
+  if(document.getElementById('home')&&document.getElementById('home').classList.contains('active')){
+    var streakEl=document.getElementById('mp-streak-days');
+    if(streakEl)streakEl.textContent=entry.count;
+  }
 }
 
 // ── Firestore write debounce ────────────────────────────────────────────
@@ -3272,6 +3449,8 @@ function SS(id){
   if(typeof _syncPending!=='undefined'&&_syncPending)flushSyncNow();
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
   var t=document.getElementById(id);if(t)t.classList.add('active');
+  // Auto-apply parent/school styling when splash is shown
+  if(id==='splash'&&typeof applyUserTypeToSplash==='function')applyUserTypeToSplash();
 }
 
 // ════════════════════════════════════════
@@ -3358,6 +3537,14 @@ function init(){
         }).catch(function(){});
     }
   });
+  var userType=lg(LK_USER_TYPE);
+  if(!userType){
+    // First visit ever — show gate screen
+    SS('gate');
+    return;
+  }
+  // Apply parent-mode styling to splash if needed
+  applyUserTypeToSplash();
   var m=lg(LK_MODE);if(!m){SS('splash');return;}
   DMODE=m;
   if(DMODE==='single'){var s=lg(LK_STU);if(!s||!s.name){startSetup();return;}STU=s;loadHome();}
@@ -3368,6 +3555,73 @@ function init(){
 // SPLASH
 // ════════════════════════════════════════
 function pickMode(m){DMODE=m;ls(LK_MODE,m);if(m==='single')startSetup();else showRoster();}
+
+// ═══════════════════════════════════════════════════════
+// GATE SCREEN — user type management (parent vs school)
+// ═══════════════════════════════════════════════════════
+function pickUserType(type){
+  ls(LK_USER_TYPE,type);
+  applyUserTypeToSplash();
+  if(type==='parent'){
+    // Parents go straight to the parent login flow — they don't need to see
+    // the school splash. After login they'll see their child's progress only.
+    openParentLogin();
+  }else{
+    // Schools see the full splash with all options
+    SS('splash');
+  }
+}
+
+function switchUserType(){
+  if(!confirm('Switch user type? This will return you to the welcome screen. Your saved data is kept.'))return;
+  ls(LK_USER_TYPE,null);
+  // Clear any cached staff session so the new flow starts clean
+  STAFF=null;
+  _adminVerified=false;
+  SS('gate');
+}
+
+function openRecoveryFromGate(){
+  // From gate screen — set a temporary user type so recovery flow works
+  if(!lg(LK_USER_TYPE))ls(LK_USER_TYPE,'school');
+  openRecovery();
+}
+
+// Adapt splash screen based on user type. Parent-mode hides school
+// branding, admin button, competition button, and the feature strip;
+// adjusts copy on the main mode buttons.
+function applyUserTypeToSplash(){
+  var ut=lg(LK_USER_TYPE)||'school';
+  var isParent=(ut==='parent');
+  // Hide/show .sp-school-only elements
+  var schoolOnly=document.querySelectorAll('.sp-school-only');
+  schoolOnly.forEach(function(el){el.style.display=isParent?'none':'';});
+  // Show/hide .sp-parent-only elements
+  var parentOnly=document.querySelectorAll('.sp-parent-only');
+  parentOnly.forEach(function(el){el.style.display=isParent?'':'none';});
+  // Adjust tag and mode-button copy for parent context
+  var tag=document.getElementById('sp-tag-text');
+  if(tag)tag.textContent=isParent
+    ?'Help your child learn at home — Nursery to JAMB.'
+    :'The complete digital classroom for Nigerian schools — Nursery to JAMB.';
+  var singleMt=document.getElementById('sp-single-mt');
+  var singleMd=document.getElementById('sp-single-md');
+  var sharedMt=document.getElementById('sp-shared-mt');
+  var sharedMd=document.getElementById('sp-shared-md');
+  if(singleMt)singleMt.textContent=isParent?'Set up my child\'s device':'My personal device';
+  if(singleMd)singleMd.textContent=isParent?'One child uses this device':'One student uses this device';
+  if(sharedMt)sharedMt.textContent=isParent?'Share with my children':'Shared class device';
+  if(sharedMd)sharedMd.textContent=isParent?'Multiple siblings take turns':'Multiple students take turns';
+  var startLbl=document.getElementById('splash-lbl-start');
+  if(startLbl)startLbl.textContent=isParent?'Set up your child':'Get started';
+}
+
+// Parent login: re-uses the staff login flow under the hood (parents are
+// stored as staff with role='parent' on schools/{code}). Same screens.
+function openParentLogin(){
+  applyUserTypeToSplash(); // ensure styling is current
+  openStaffLogin();
+}
 
 // ════════════════════════════════════════
 // RECOVERY FLOW (UI handlers)
@@ -4120,21 +4374,41 @@ function _renderStaffPicker(school,staffList){
   if(bc)bc.textContent=(school&&school.name?school.name+' · ':'')+staffList.length+' staff';
   var list=document.getElementById('staff-pick-list');
   if(!list)return;
-  list.innerHTML=staffList.map(function(s,i){
-    var icon=s.role==='proprietor'?'🏫':'👩‍🏫';
-    var roleLabel=s.role==='proprietor'?'Proprietor':'Teacher';
-    var classes=Array.isArray(s.assignedClasses)&&s.assignedClasses.length
-      ? s.assignedClasses.join(' · ')
-      : (s.role==='proprietor'?'All classes':'No classes assigned');
-    return '<div onclick="staffPickStaff('+i+')" style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer">'
-      +'<div style="width:46px;height:46px;border-radius:12px;background:#F5F3FF;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">'+icon+'</div>'
-      +'<div style="flex:1;min-width:0">'
-      +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+_escapeHtml(s.name||'(unnamed)')+'</div>'
-      +  '<div style="font-size:12px;color:#6B7280;margin-top:3px">'+_escapeHtml(roleLabel)+' · '+_escapeHtml(classes)+'</div>'
-      +'</div>'
-      +'<span style="font-size:22px;color:#7C3AED">›</span>'
-      +'</div>';
-  }).join('');
+  // Separate teachers/proprietors from parents so parents have their own labelled group
+  var staffMembers=staffList.filter(function(s){return s.role!=='parent';});
+  var parents=staffList.filter(function(s){return s.role==='parent';});
+  var allGrouped=staffMembers.concat(parents); // render staff first, parents below
+  list.innerHTML=(staffMembers.length?'<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.55);margin-bottom:8px">Teachers & Staff</div>':'')
+    +staffMembers.map(function(s,i){
+      var idx=allGrouped.indexOf(s);
+      var icon=s.role==='proprietor'?'🏫':'👩‍🏫';
+      var roleLabel=s.role==='proprietor'?'Proprietor':'Teacher';
+      var classes=Array.isArray(s.assignedClasses)&&s.assignedClasses.length
+        ? s.assignedClasses.join(' · ')
+        : (s.role==='proprietor'?'All classes':'No classes assigned');
+      return '<div onclick="staffPickStaff('+idx+')" style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer">'
+        +'<div style="width:46px;height:46px;border-radius:12px;background:#F5F3FF;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">'+icon+'</div>'
+        +'<div style="flex:1;min-width:0">'
+        +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+_escapeHtml(s.name||'(unnamed)')+'</div>'
+        +  '<div style="font-size:12px;color:#6B7280;margin-top:3px">'+_escapeHtml(roleLabel)+' · '+_escapeHtml(classes)+'</div>'
+        +'</div>'
+        +'<span style="font-size:22px;color:#7C3AED">›</span>'
+        +'</div>';
+    }).join('')
+    +(parents.length?'<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.55);margin:16px 0 8px">Parents</div>':'')
+    +parents.map(function(s){
+      var idx=allGrouped.indexOf(s);
+      return '<div onclick="staffPickStaff('+idx+')" style="background:linear-gradient(135deg,#EDE9FE,#DDD6FE);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer">'
+        +'<div style="width:46px;height:46px;border-radius:12px;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">👨‍👩‍👧</div>'
+        +'<div style="flex:1;min-width:0">'
+        +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#3730A3">'+_escapeHtml(s.name||'(unnamed)')+'</div>'
+        +  '<div style="font-size:12px;color:#5B21B6;margin-top:3px">Parent · '+(s.linkedChild?_escapeHtml(s.linkedChild):'no child linked')+'</div>'
+        +'</div>'
+        +'<span style="font-size:22px;color:#7C3AED">›</span>'
+        +'</div>';
+    }).join('');
+  // Re-index _staffPickList to match allGrouped order
+  _staffPickList=allGrouped;
 }
 
 // ── Step 2: staff member tapped — go to PIN screen ──
@@ -4198,7 +4472,8 @@ function staffSubmitPin(){
         name:_staffSelectedStaff.name,
         role:_staffSelectedStaff.role||'teacher',
         assignedClasses:Array.isArray(_staffSelectedStaff.assignedClasses)?_staffSelectedStaff.assignedClasses.slice():[],
-        schoolCode:_staffSchoolCode
+        schoolCode:_staffSchoolCode,
+        linkedChild:_staffSelectedStaff.linkedChild||'' // carries child name for parent role
       };
       // Mark the existing _adminVerified flag too so any code paths still
       // looking at it keep working. _doOpenAdmin handles the rest.
@@ -5080,92 +5355,102 @@ function openAdmin(){
 // ── PARENT VIEW ───────────────────────────────────────────────────────────────
 function openParentView(){
   SS('parent-view');
-  var childName=STAFF.linkedChild||'';
+  var childName=(STAFF&&STAFF.linkedChild)||'';
   var school=getSchool();
 
-  // School name
   var schoolEl=document.getElementById('pv-school-name');
-  if(schoolEl) schoolEl.textContent=(school&&school.name)||'';
+  if(schoolEl)schoolEl.textContent=(school&&school.name)||'Your school';
 
   // Child card
   var childCard=document.getElementById('pv-child-card');
   if(childCard){
     if(!childName){
-      childCard.innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#7C3AED;margin-bottom:6px">👧 My Child</div>'
-        +'<div style="font-size:13px;color:#6B7280">No child linked. Ask your school to update your parent account with your child\'s name.</div>';
-    } else {
-      // Find child in roster
+      childCard.innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#7C3AED;margin-bottom:8px">\U0001F467 My Child</div>'
+        +'<div style="font-size:13px;color:#6B7280;line-height:1.6">No child linked yet. Ask your school to update your parent account.</div>';
+    }else{
       var roster=lg(LK_ROSTER)||[];
-      var child=roster.find(function(s){return s.name.toLowerCase()===childName.toLowerCase();});
-      childCard.innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:16px;color:#7C3AED;margin-bottom:4px">'
-        +(child?child.emoji+' ':'👧 ')+'<span>'+_escapeHtml(childName)+'</span></div>'
-        +'<div style="font-size:13px;color:#6B7280">'+(child?'Class: '+child.classLabel:'')+'</div>';
+      var child=roster.find(function(s){
+        return s.name&&s.name.toLowerCase().trim()===childName.toLowerCase().trim();
+      });
+      childCard.innerHTML='<div style="display:flex;align-items:center;gap:12px">'
+        +'<div style="width:52px;height:52px;border-radius:14px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">'+(child&&child.emoji?child.emoji:'\U0001F467')+'</div>'
+        +'<div><div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:17px;color:#1E1B4B">'+_escapeHtml(childName)+'</div>'
+        +'<div style="font-size:13px;color:#7C3AED;font-weight:700;margin-top:2px">'+(child?child.classLabel:'')+'</div></div>'
+        +'</div>';
     }
   }
 
-  // Scores from progress
+  // Subject scores
   var scoresEl=document.getElementById('pv-scores');
   if(scoresEl){
     var allProg=lg(LK_PROG)||{};
     var roster2=lg(LK_ROSTER)||[];
-    var child2=childName?roster2.find(function(s){return s.name.toLowerCase()===childName.toLowerCase();}):null;
-    var uid=child2&&(child2.uid||child2.name);
-    var childProg=uid?allProg[uid]:null;
-
-    // Also try Firestore cloud data if available
+    var child2=childName?roster2.find(function(s){
+      return s.name&&s.name.toLowerCase().trim()===childName.toLowerCase().trim();
+    }):null;
+    var childProg=null;
+    if(child2){
+      var uid=child2.uid||child2.name;
+      childProg=allProg[uid]||allProg[child2.name]||null;
+    }
     if(!childProg&&window._ADMIN_MERGED){
-      var cm=window._ADMIN_MERGED.find(function(s){return s.name&&s.name.toLowerCase()===childName.toLowerCase();});
-      if(cm)childProg=cm.progress;
+      var cm=window._ADMIN_MERGED.find(function(s){
+        return s.name&&s.name.toLowerCase().trim()===childName.toLowerCase().trim();
+      });
+      if(cm)childProg=cm.progress||cm.prog||null;
     }
-
-    if(!childProg||!Object.keys(childProg).length){
-      scoresEl.innerHTML='<div style="font-size:13px;color:#9CA3AF;text-align:center;padding:16px">No activity recorded yet. Check back after your child has practised some subjects.</div>';
-    } else {
-      var entries=Object.entries(childProg)
-        .filter(function(e){return e[1]&&e[1].bestScore>0;})
-        .sort(function(a,b){return (b[1].bestScore||0)-(a[1].bestScore||0);});
-      if(!entries.length){
-        scoresEl.innerHTML='<div style="font-size:13px;color:#9CA3AF;text-align:center;padding:16px">No scores yet.</div>';
-      } else {
-        scoresEl.innerHTML=entries.map(function(e){
-          var key=e[0];var val=e[1];
-          var pct=val.bestScore||0;
-          var bar=Math.round(pct);
-          var col=pct>=70?'#16A34A':pct>=50?'#CA8A04':'#DC2626';
-          return '<div style="margin-bottom:10px">'
-            +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
-            +'<div style="font-size:13px;font-weight:700;color:#1E1B4B">'+_escapeHtml(key.replace(/_/g,' '))+'</div>'
-            +'<div style="font-size:13px;font-weight:900;color:'+col+'">'+pct+'%</div>'
-            +'</div>'
-            +'<div style="height:6px;background:#F0F4F8;border-radius:3px;overflow:hidden">'
-            +'<div style="height:100%;width:'+bar+'%;background:'+col+';transition:width .3s"></div>'
-            +'</div></div>';
-        }).join('');
-      }
-    }
+    _renderParentScores(scoresEl,childProg);
   }
 
-  // Login details tile
+  // Login details
   var loginEl=document.getElementById('pv-login-details');
   if(loginEl&&school&&school.code){
-    loginEl.innerHTML='<b>School Code:</b> '+school.code+'<br>'
+    loginEl.innerHTML='<b>School Code:</b> '+_escapeHtml(school.code)+'<br>'
       +(childName?'<b>Child\'s Name:</b> '+_escapeHtml(childName)+'<br>':'')
-      +'<div style="font-size:11px;margin-top:8px;opacity:.7">Your child enters these on the EduLab app to access their account.</div>';
+      +'<div style="font-size:11px;margin-top:8px;opacity:.7;line-height:1.6">Your child enters these on the EduLab app to access their account on any device.</div>';
   }
 
-  // Try to load fresh data from Firestore
-  if(school&&school.code&&FB&&FB.db){
+  // Load fresh cloud data once
+  if(school&&school.code&&FB&&FB.db&&!window._pvLoading){
+    window._pvLoading=true;
     FB.db.collection('schools').doc(school.code).collection('students').get()
       .then(function(snap){
-        var merged={};
-        snap.forEach(function(doc){if(!doc.id.startsWith('_cfg__'))merged[doc.id]=doc.data().progress||{};});
-        window._ADMIN_MERGED=snap.docs.filter(function(d){return !d.id.startsWith('_cfg__');}).map(function(d){
-          return Object.assign({uid:d.id},d.data());
-        });
-        openParentView(); // re-render with fresh data
+        window._ADMIN_MERGED=snap.docs
+          .filter(function(d){return !d.id.startsWith('_cfg__');})
+          .map(function(d){return Object.assign({uid:d.id},d.data());});
+        window._pvLoading=false;
+        openParentView();
       })
-      .catch(function(){});
+      .catch(function(){window._pvLoading=false;});
   }
+}
+
+function _renderParentScores(el,childProg){
+  if(!childProg||!Object.keys(childProg).length){
+    el.innerHTML='<div style="font-size:13px;color:#9CA3AF;text-align:center;padding:20px 0">No activity recorded yet.<br>Check back after your child has practised some subjects.</div>';
+    return;
+  }
+  var entries=Object.entries(childProg)
+    .filter(function(e){return e[1]&&(e[1].bestScore||0)>0;})
+    .sort(function(a,b){return (b[1].bestScore||0)-(a[1].bestScore||0);});
+  if(!entries.length){
+    el.innerHTML='<div style="font-size:13px;color:#9CA3AF;text-align:center;padding:20px 0">No scores yet.</div>';
+    return;
+  }
+  el.innerHTML=entries.map(function(e){
+    var key=e[0];var val=e[1];
+    var pct=Math.round(val.bestScore||0);
+    var col=pct>=70?'#16A34A':pct>=50?'#CA8A04':'#DC2626';
+    var label=key.replace(/_/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
+    return '<div style="margin-bottom:12px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+      +'<div style="font-size:13px;font-weight:700;color:#1E1B4B">'+_escapeHtml(label)+'</div>'
+      +'<div style="font-size:13px;font-weight:900;color:'+col+'">'+pct+'%</div>'
+      +'</div>'
+      +'<div style="height:7px;background:#F0F4F8;border-radius:4px;overflow:hidden">'
+      +'<div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:4px;transition:width .4s"></div>'
+      +'</div></div>';
+  }).join('');
 }
 
 // Toggle fields in add-staff form when role changes
@@ -5403,6 +5688,13 @@ function _renderCapacity(count,cap,school){
   capBanner.innerHTML=bannerHtml;
 }
 
+// Sign out and go back to splash for parent role
+function parentBack(){
+  STAFF=null;
+  _adminVerified=false;
+  SS('splash');
+}
+
 function adminBack(){
   _adminVerified=false; // clear session so next open requires PIN again
   DMODE==='single'?SS('home'):SS('roster');
@@ -5432,6 +5724,9 @@ function loadHome(){
   checkAssignments();
   checkOnboarding();
   scheduleStudyReminder();
+  // Render student progress dashboard
+  renderProgressDashboard();
+  renderContinueCard();
   var p=prog();
   var totalStages=0,doneStages=0;
   UNITS.forEach(function(u){
@@ -12442,7 +12737,194 @@ function daysUntilExpiry(){
 
 // Show an amber banner on the Home screen when the subscription is in its
 // last 14 days. Amber at 14→8 days, red at 7→0 days, deep red after expiry.
-// The banner links to the renewal WhatsApp so proprietors can contact us.
+// ══════════════════════════════════════════════════════════════════
+// STUDENT PROGRESS DASHBOARD — home screen hero card
+// Shows overall progress, daily streak, and earned badges.
+// ══════════════════════════════════════════════════════════════════
+
+// Calculates overall progress across all unlocked subjects for this student.
+function _calcOverallProgress(){
+  if(!STU)return {done:0,total:0,pct:0,subjects:0};
+  var p=prog();
+  var totalStages=0,doneStages=0,activeSubjects=0;
+  // English/Vocab via UNITS
+  if(typeof UNITS!=='undefined'){
+    UNITS.forEach(function(u){
+      var stgs=u.stagesMap[STU.classLabel]||u.stagesMap['Nursery 2']||[];
+      totalStages+=stgs.length;
+      doneStages+=stgs.filter(function(st){return p[st.id]&&p[st.id].passed;}).length;
+    });
+    activeSubjects++;
+  }
+  // Maths
+  if(typeof MATH_STAGES!=='undefined'){
+    var ms=MATH_STAGES[STU.classLabel]||[];
+    totalStages+=ms.length;
+    doneStages+=ms.filter(function(st){return p[st.id]&&p[st.id].passed;}).length;
+    if(ms.length)activeSubjects++;
+  }
+  // Verbal & Quant Reasoning
+  ['VERBAL_STAGES','QUANT_STAGES'].forEach(function(k){
+    if(typeof window[k]!=='undefined'){
+      var stgs=window[k][STU.classLabel]||[];
+      totalStages+=stgs.length;
+      doneStages+=stgs.filter(function(st){return p[st.id]&&p[st.id].passed;}).length;
+      if(stgs.length)activeSubjects++;
+    }
+  });
+  var pct=totalStages>0?Math.round(doneStages/totalStages*100):0;
+  return {done:doneStages,total:totalStages,pct:pct,subjects:activeSubjects};
+}
+
+// Earned badges based on progress + streak
+function _earnedBadges(){
+  if(!STU)return [];
+  var p=prog();
+  var stats=_calcOverallProgress();
+  var streak=getStreak();
+  // Count perfect scores (100%) and stars
+  var perfectCount=0,totalStars=0;
+  Object.values(p).forEach(function(v){
+    if(v&&v.bestScore===100)perfectCount++;
+    if(v&&v.stars)totalStars+=v.stars;
+  });
+  var badges=[];
+  if(stats.done>=1)badges.push({emoji:'🌱',label:'First step'});
+  if(stats.done>=5)badges.push({emoji:'⭐',label:'5 done'});
+  if(stats.done>=20)badges.push({emoji:'🏅',label:'20 done'});
+  if(stats.done>=50)badges.push({emoji:'🏆',label:'50 done'});
+  if(perfectCount>=1)badges.push({emoji:'💯',label:'Perfect'});
+  if(perfectCount>=10)badges.push({emoji:'🎯',label:'Sharpshooter'});
+  if(streak>=3)badges.push({emoji:'🔥',label:streak+'-day fire'});
+  if(streak>=7)badges.push({emoji:'⚡',label:'Week warrior'});
+  if(streak>=30)badges.push({emoji:'🏔️',label:'Mountain climber'});
+  if(stats.pct>=50)badges.push({emoji:'🚀',label:'Halfway'});
+  if(stats.pct>=100)badges.push({emoji:'👑',label:'Champion'});
+  return badges;
+}
+
+function renderProgressDashboard(){
+  var card=document.getElementById('my-progress-card');
+  if(!card)return;
+  // Hide until student has at least one attempt
+  var p=prog();
+  if(!p||!Object.keys(p).length){card.style.display='none';return;}
+  card.style.display='';
+  var stats=_calcOverallProgress();
+  var streak=getStreak();
+  var totalPctEl=document.getElementById('mp-total-pct');
+  var stagesDoneEl=document.getElementById('mp-stages-done');
+  var streakEl=document.getElementById('mp-streak-days');
+  var pbarEl=document.getElementById('mp-pbar');
+  var badgesEl=document.getElementById('mp-badges');
+  if(totalPctEl)totalPctEl.textContent=stats.pct;
+  if(stagesDoneEl)stagesDoneEl.textContent=stats.done;
+  if(streakEl)streakEl.textContent=streak;
+  if(pbarEl)pbarEl.style.width=stats.pct+'%';
+  if(badgesEl){
+    var badges=_earnedBadges();
+    if(!badges.length){
+      badgesEl.innerHTML='<div style="font-size:11px;opacity:.6">Complete your first stage to earn a badge!</div>';
+    }else{
+      badgesEl.innerHTML=badges.slice(0,6).map(function(b){
+        return '<div title="'+_escapeHtml(b.label)+'" style="background:rgba(255,255,255,.15);border-radius:8px;padding:3px 8px;font-size:11px;display:flex;align-items:center;gap:4px;font-weight:700"><span style="font-size:14px">'+b.emoji+'</span>'+_escapeHtml(b.label)+'</div>';
+      }).join('');
+    }
+  }
+}
+
+// ── CONTINUE WHERE YOU LEFT OFF ─────────────────────────────────────
+// Tracks the most recent in-progress (started but not yet passed) stage
+// and offers a one-tap resume.
+function _findResumePoint(){
+  if(!STU)return null;
+  var p=prog();
+  if(!p||!Object.keys(p).length)return null;
+  // Find the stage with the most recent lastAttemptAt that isn't yet passed
+  var best=null,bestTime=0;
+  Object.entries(p).forEach(function(e){
+    var sid=e[0],pd=e[1];
+    if(!pd)return;
+    var t=pd.lastAttemptAt||0;
+    if(t>bestTime&&!pd.passed){
+      best=sid;
+      bestTime=t;
+    }
+  });
+  if(!best){
+    // No in-progress — find most recently passed one to suggest revising
+    Object.entries(p).forEach(function(e){
+      var sid=e[0],pd=e[1];
+      if(!pd)return;
+      var t=pd.lastAttemptAt||0;
+      if(t>bestTime){best=sid;bestTime=t;}
+    });
+  }
+  return best;
+}
+
+// Resolve a stage ID back to its display info (label, subject, etc.)
+function _resolveStageInfo(sid){
+  if(!sid||!STU)return null;
+  // English UNITS
+  if(typeof UNITS!=='undefined'){
+    for(var i=0;i<UNITS.length;i++){
+      var u=UNITS[i];
+      var stgs=u.stagesMap[STU.classLabel]||u.stagesMap['Nursery 2']||[];
+      for(var j=0;j<stgs.length;j++){
+        if(stgs[j].id===sid)return {sid:sid,label:stgs[j].label||stgs[j].title||sid,subject:'English',action:function(){openLessonList();}};
+      }
+    }
+  }
+  // Maths
+  if(typeof MATH_STAGES!=='undefined'){
+    var ms=MATH_STAGES[STU.classLabel]||[];
+    for(var k=0;k<ms.length;k++){
+      if(ms[k].id===sid)return {sid:sid,label:ms[k].label||sid,subject:'Mathematics',action:function(){openMathList();}};
+    }
+  }
+  // Reasoning
+  if(typeof VERBAL_STAGES!=='undefined'){
+    var vs=VERBAL_STAGES[STU.classLabel]||[];
+    for(var m=0;m<vs.length;m++){
+      if(vs[m].id===sid)return {sid:sid,label:vs[m].label||sid,subject:'Verbal Reasoning',action:function(){openReasoningList('verbal');}};
+    }
+  }
+  if(typeof QUANT_STAGES!=='undefined'){
+    var qs=QUANT_STAGES[STU.classLabel]||[];
+    for(var n=0;n<qs.length;n++){
+      if(qs[n].id===sid)return {sid:sid,label:qs[n].label||sid,subject:'Quantitative Reasoning',action:function(){openReasoningList('quantitative');}};
+    }
+  }
+  // WAEC / JSS subjects — use sid prefix to identify
+  if(/^[a-z]{2,3}\d+/.test(sid))return {sid:sid,label:'Practice session',subject:'WAEC/JSS Practice',action:function(){openWaecHub();}};
+  return null;
+}
+
+function renderContinueCard(){
+  var card=document.getElementById('continue-card');
+  if(!card)return;
+  var sid=_findResumePoint();
+  var info=sid?_resolveStageInfo(sid):null;
+  if(!info){card.style.display='none';return;}
+  card.style.display='flex';
+  window._resumeAction=info.action;
+  var lbl=document.getElementById('continue-label');
+  var meta=document.getElementById('continue-meta');
+  if(lbl)lbl.textContent=info.label;
+  if(meta){
+    var p=prog();var pd=p[sid]||{};
+    var bestScore=pd.bestScore||0;
+    meta.textContent=info.subject+(bestScore>0?' · Best so far: '+bestScore+'%':' · Pick up where you stopped');
+  }
+}
+
+function resumeLastStage(){
+  if(typeof window._resumeAction==='function')window._resumeAction();
+}
+
+// ── Expiry warning banner ─────────────────────────────────────────────
+// Shows a banner if the school's subscription is about to expire.
 function checkExpiryWarning(){
   var el=document.getElementById('expiry-notice');
   var txt=document.getElementById('expiry-notice-text');
