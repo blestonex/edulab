@@ -843,7 +843,7 @@ body.banner-open .screen.active{padding-bottom:80px}
     <div id="teacher-subject-tile" style="display:none;background:#fff;border-radius:var(--r);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-top:14px">
       <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#0D9488;margin-bottom:4px">📚 Class Subject Access</div>
       <div style="font-size:12px;color:var(--sm);margin-bottom:12px;line-height:1.5">Set which subjects each of your classes can access. You can only enable subjects your school has subscribed to.</div>
-      <div id="teacher-class-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div id="teacher-class-list" style="display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:4px"></div>
     </div>
 
     <!-- Sign out — clears the active staff session and returns to splash. -->
@@ -4534,12 +4534,15 @@ function staffSubmitPin(){
   if(btn){btn.disabled=true;btn.textContent='Checking…';}
   sha256Hex(entered).then(function(enteredHash){
     var staffPinHash=String(_staffSelectedStaff.pinHash||'').toLowerCase();
-    if(!staffPinHash){
+    // Fallback: accept plaintext 'pin' field if staff doc uses old format
+    var legacyPin=_staffSelectedStaff.pin||_staffSelectedStaff.PIN||'';
+    if(!staffPinHash&&!legacyPin){
       if(status){status.textContent='⚠️ This account has no PIN set. Ask your proprietor.';status.style.color='#FCD34D';}
       if(btn){btn.disabled=false;btn.textContent='Sign in →';}
       return;
     }
-    if(enteredHash===staffPinHash){
+    var pinValid=(staffPinHash&&enteredHash===staffPinHash)||(legacyPin&&entered===String(legacyPin).trim());
+    if(pinValid){
       _adminFailCount=0;
       // Successful sign-in. Build the active staff session.
       STAFF={
@@ -5435,16 +5438,30 @@ function openParentView(){
     return;
   }
   SS('parent-view');
-  var childName=(STAFF&&STAFF.linkedChild)||'';
   var school=getSchool();
 
   var schoolEl=document.getElementById('pv-school-name');
-  if(schoolEl)schoolEl.textContent=(school&&school.name)||'Your school';
+  if(schoolEl)schoolEl.textContent=(school&&school.name)||'Your family';
 
-  // Child card
+  // Combine local roster + cloud students. Cloud is authoritative — show what
+  // Firestore says, falling back to local while cloud loads. Filter out config docs.
+  var children=[];
+  if(window._ADMIN_MERGED&&window._ADMIN_MERGED.length){
+    children=window._ADMIN_MERGED.slice();
+  }else{
+    var roster=lg(LK_ROSTER)||[];
+    children=roster.map(function(s){
+      var prog=(lg(LK_PROG)||{})[s.uid||s.name]||{};
+      return Object.assign({},s,{progress:prog});
+    });
+  }
+  children=children.filter(function(c){return c.name&&!String(c.uid||'').startsWith('_cfg__');});
+
   var childCard=document.getElementById('pv-child-card');
+  var scoresEl=document.getElementById('pv-scores');
+
   if(childCard){
-    if(!childName){
+    if(!children.length){
       childCard.innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#7C3AED;margin-bottom:8px">👧 No child registered yet</div>'
         +'<div style="font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:10px">Your child hasn\'t set up their account yet. To get them started:</div>'
         +'<div style="font-size:12.5px;color:#1E1B4B;line-height:1.7;background:#F9FAFB;padding:10px 12px;border-radius:8px">'
@@ -5453,50 +5470,57 @@ function openParentView(){
         +'3. When asked for a school code, your child enters <b>'+_escapeHtml((school&&school.code)||'YOUR-CODE')+'</b><br>'
         +'4. Once your child practises, their progress appears here automatically'
         +'</div>';
+      if(scoresEl)scoresEl.innerHTML='';
     }else{
-      var roster=lg(LK_ROSTER)||[];
-      var child=roster.find(function(s){
-        return s.name&&s.name.toLowerCase().trim()===childName.toLowerCase().trim();
-      });
-      childCard.innerHTML='<div style="display:flex;align-items:center;gap:12px">'
-        +'<div style="width:52px;height:52px;border-radius:14px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">'+(child&&child.emoji?child.emoji:'👧')+'</div>'
-        +'<div><div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:17px;color:#1E1B4B">'+_escapeHtml(childName)+'</div>'
-        +'<div style="font-size:13px;color:#7C3AED;font-weight:700;margin-top:2px">'+(child?child.classLabel:'')+'</div></div>'
-        +'</div>';
+      var maxKids=parseInt((school&&(school.maxChildren||school.studentCap))||1,10);
+      childCard.innerHTML='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#7C3AED;margin-bottom:10px">👨‍👩‍👧 My Children ('+children.length+' of '+maxKids+')</div>'
+        +children.map(function(c,i){
+          return '<div style="display:flex;align-items:center;gap:12px;padding:10px;background:#F9FAFB;border-radius:10px;'+(i<children.length-1?'margin-bottom:8px':'')+'">'
+            +'<div style="width:46px;height:46px;border-radius:12px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">'+(c.emoji||'👧')+'</div>'
+            +'<div style="flex:1;min-width:0">'
+            +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#1E1B4B">'+_escapeHtml(c.name)+'</div>'
+            +  '<div style="font-size:12px;color:#7C3AED;font-weight:700;margin-top:1px">'+_escapeHtml(c.classLabel||'')+'</div>'
+            +'</div>'
+            +'</div>';
+        }).join('');
     }
   }
 
-  // Subject scores
-  var scoresEl=document.getElementById('pv-scores');
-  if(scoresEl){
-    var allProg=lg(LK_PROG)||{};
-    var roster2=lg(LK_ROSTER)||[];
-    var child2=childName?roster2.find(function(s){
-      return s.name&&s.name.toLowerCase().trim()===childName.toLowerCase().trim();
-    }):null;
-    var childProg=null;
-    if(child2){
-      var uid=child2.uid||child2.name;
-      childProg=allProg[uid]||allProg[child2.name]||null;
-    }
-    if(!childProg&&window._ADMIN_MERGED){
-      var cm=window._ADMIN_MERGED.find(function(s){
-        return s.name&&s.name.toLowerCase().trim()===childName.toLowerCase().trim();
-      });
-      if(cm)childProg=cm.progress||cm.prog||null;
-    }
-    _renderParentScores(scoresEl,childProg);
+  // Subject scores — combined across all children, grouped by child
+  if(scoresEl&&children.length){
+    scoresEl.innerHTML=children.map(function(c){
+      var nameLabel='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:14px;color:#7C3AED;margin-bottom:8px;margin-top:'+(c===children[0]?'0':'14px')+'">'+_escapeHtml(c.name)+'</div>';
+      var prog=c.progress||{};
+      var entries=Object.entries(prog)
+        .filter(function(e){return e[1]&&(e[1].bestScore||0)>0;})
+        .sort(function(a,b){return (b[1].bestScore||0)-(a[1].bestScore||0);});
+      if(!entries.length){
+        return nameLabel+'<div style="font-size:12px;color:#9CA3AF;padding:6px 0">No scores yet — '+_escapeHtml(c.name.split(' ')[0])+' hasn\'t practised yet.</div>';
+      }
+      return nameLabel+entries.map(function(e){
+        var pct=Math.round(e[1].bestScore||0);
+        var col=pct>=70?'#16A34A':pct>=50?'#CA8A04':'#DC2626';
+        var label=e[0].replace(/_/g,' ').replace(/\b\w/g,function(ch){return ch.toUpperCase();});
+        return '<div style="margin-bottom:8px">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
+          +'<div style="font-size:12.5px;font-weight:700;color:#1E1B4B">'+_escapeHtml(label)+'</div>'
+          +'<div style="font-size:12.5px;font-weight:900;color:'+col+'">'+pct+'%</div>'
+          +'</div>'
+          +'<div style="height:6px;background:#F0F4F8;border-radius:3px;overflow:hidden">'
+          +'<div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:3px;transition:width .4s"></div>'
+          +'</div></div>';
+      }).join('');
+    }).join('');
   }
 
   // Login details
   var loginEl=document.getElementById('pv-login-details');
   if(loginEl&&school&&school.code){
-    loginEl.innerHTML='<b>School Code:</b> '+_escapeHtml(school.code)+'<br>'
-      +(childName?'<b>Child\'s Name:</b> '+_escapeHtml(childName)+'<br>':'')
-      +'<div style="font-size:11px;margin-top:8px;opacity:.7;line-height:1.6">Your child enters these on the EduLab app to access their account on any device.</div>';
+    loginEl.innerHTML='<b>Access code:</b> '+_escapeHtml(school.code)+'<br>'
+      +'<div style="font-size:11px;margin-top:8px;opacity:.7;line-height:1.6">Your child enters this code on the EduLab app on any device to access their account.</div>';
   }
 
-  // Load fresh cloud data once
+  // Load fresh cloud data once per session
   if(school&&school.code&&FB&&FB.db&&!window._pvLoading){
     window._pvLoading=true;
     FB.db.collection('schools').doc(school.code).collection('students').get()
@@ -5505,7 +5529,6 @@ function openParentView(){
           .filter(function(d){return !d.id.startsWith('_cfg__');})
           .map(function(d){return Object.assign({uid:d.id},d.data());});
         window._pvLoading=false;
-        // Only refresh view if parent is still signed in (not signed out during request)
         if(STAFF&&STAFF.role==='parent')openParentView();
       })
       .catch(function(){window._pvLoading=false;});
@@ -5707,7 +5730,7 @@ function updateCapacityWidget(){
   if(!widget)return;
   var school=getSchool();
   if(!school||!school.code){widget.style.display='none';return;}
-  var cap=parseInt(school.studentCap)||999; // safe default
+  var cap=parseInt(school.studentCap||school.maxChildren)||999; // safe default — accepts either field name
   // For an immediate-render starting value, use the local roster size.
   // Then refresh from Firestore so the count reflects all devices for this school.
   var localCount=(lg(LK_ROSTER)||[]).length;
@@ -12806,8 +12829,13 @@ function isActivated(){
   if(!school||!school.code)return false;
   if(school.active===false)return false;
   if(school.expiry&&new Date(school.expiry)<new Date())return false;
-  // Require recent Firestore re-verification — shrinks the offline bypass window
+  // Require recent Firestore re-verification — shrinks the offline bypass window.
+  // If verifiedAt is missing or stale, we still trust the cached `expiry` field
+  // as long as the school is not expired and active is not explicitly false.
+  // This prevents "Not activated" appearing right after a fresh activation
+  // due to clock skew or missing verifiedAt on legacy docs.
   var verifiedAt=school.verifiedAt||0;
+  if(!verifiedAt&&school.expiry)return true; // expiry-only check, no verifiedAt
   var ageMs=Date.now()-verifiedAt;
   if(ageMs>MAX_OFFLINE_DAYS*24*60*60*1000)return false;
   return true;
@@ -13155,6 +13183,15 @@ function activateSchoolCode(code,cb){
           delete safeData.adminPin;
           delete safeData.adminPinHash;
           var school=Object.assign({code:code,verifiedAt:Date.now()},safeData);
+          // FIX: If we're switching to a DIFFERENT school code, clear roster/progress
+          // and the cloud cache so data from the previous school doesn't leak across.
+          var prevSchool=getSchool();
+          if(prevSchool&&prevSchool.code&&prevSchool.code!==code){
+            ls(LK_ROSTER,[]);
+            ls(LK_PROG,{});
+            window._ADMIN_MERGED=null;
+            console.log('[EduLab] Switched school '+prevSchool.code+' → '+code+', cleared local data');
+          }
           ls(LK_SCHOOL,school);
           // Register this device under the school — lets Blestonex see which devices
           // are in use and, later, enforce a per-license device cap via firestore.rules
@@ -13584,7 +13621,22 @@ function applyClassSubjectAccess(){
   var cls=STU&&(STU.classLabel||STU.class);
   if(!cls)return;
   var cfg=loadClassConfig(cls);
-  if(!cfg)return; // no class config — school-level gate already applied
+
+  // Fix 7: Even with no explicit class config, apply class-level defaults so
+  // SSS students don't see Primary subjects (English/Maths from Nursery curriculum).
+  // The default is: SSS shows only WAEC + leaderboard; JSS shows english+maths+JSS hub;
+  // Primary/Nursery shows english+maths+verbal+quantitative.
+  if(!cfg){
+    var isJSS=/^JSS\s*[123]/i.test(cls);
+    var isSSS=/^SSS\s*[123]/i.test(cls)||/WAEC|JAMB/i.test(cls);
+    if(isSSS){
+      cfg={allowedSubjects:['waec','leaderboard']};
+    }else if(isJSS){
+      cfg={allowedSubjects:['english','maths','waec','leaderboard']}; // waec card is JSS hub for JSS
+    }else{
+      cfg={allowedSubjects:['english','maths','verbal','quantitative','leaderboard']};
+    }
+  }
 
   var access=cfg.allowedSubjects;
   var waecAccess=cfg.allowedWaecSubjects;
@@ -13602,7 +13654,9 @@ function applyClassSubjectAccess(){
       if(s.key==='waec'){
         var cl=STU&&(STU.classLabel||'');
         var isSenior=/^SSS\s*[123]/i.test(cl)||/WAEC|JAMB/i.test(cl);
-        el.style.display=(schoolAllows&&classAllows&&isSenior)?'':'none';
+        // JSS uses the same card but as a JSS hub — allow for both
+        var isJSSlevel=/^JSS\s*[123]/i.test(cl);
+        el.style.display=(schoolAllows&&classAllows&&(isSenior||isJSSlevel))?'':'none';
       } else {
         el.style.display=(schoolAllows&&classAllows)?'':'none';
       }
@@ -13615,10 +13669,14 @@ function applyClassSubjectAccess(){
     localStorage.setItem(WAEC_ACCESS_KEY,JSON.stringify(waecMap));
   }
 
-  // Fetch fresh config from Firestore in background silently
+  // Fetch fresh config from Firestore in background silently — for SSS section
+  // students, this is critical so they get their teacher-set art/science/commercial
+  // subject access from the cloud as soon as the network reaches Firestore.
   fetchClassConfig(cls,function(freshCfg){
     if(freshCfg&&JSON.stringify(freshCfg)!==JSON.stringify(cfg)){
       localStorage.setItem(CLASS_CFG_PREFIX+cls,JSON.stringify(freshCfg));
+      // Re-apply immediately with fresh data
+      applyClassSubjectAccess();
     }
   });
 }
@@ -13668,6 +13726,17 @@ function loadAdminSchoolFields(){
   var codeEl=document.getElementById('admin-school-code');
   if(school&&school.name&&nameEl)nameEl.value=school.name;
   if(school&&school.code&&codeEl)codeEl.value=school.code;
+  // Auto re-verify activation in the background — if verifiedAt is stale,
+  // this refreshes it. Then re-render the status panel.
+  if(school&&school.code&&!window._adminAutoVerifying){
+    window._adminAutoVerifying=true;
+    activateSchoolCode(school.code,function(result){
+      window._adminAutoVerifying=false;
+      // Quietly re-render status section without disturbing the page
+      var statusEl=document.getElementById('admin-activation-status');
+      if(statusEl)loadAdminSchoolFields();
+    });
+  }
   // Load teacher details
   var t=getTeacher();
   var tn=document.getElementById('admin-teacher-name');
