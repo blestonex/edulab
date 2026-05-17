@@ -735,6 +735,15 @@ body.banner-open .screen.active{padding-bottom:80px}
       <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#5B21B6;margin-bottom:8px">🔑 Child's Login Details</div>
       <div id="pv-login-details" style="font-size:13px;color:#5B21B6;line-height:1.8"></div>
     </div>
+    <!-- Manage family — gives parent admin-style controls over their children/subjects -->
+    <button onclick="openParentAdmin()" style="background:#fff;border:1.5px solid #C4B5FD;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;text-align:left;width:100%;box-shadow:0 2px 10px rgba(0,0,0,.05)">
+      <div style="width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#7C3AED,#5B21B6);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">⚙️</div>
+      <div style="flex:1">
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:14px;color:#1E1B4B">Manage children & subjects</div>
+        <div style="font-size:12px;color:#7C3AED;margin-top:2px">Set subject access · remove children · view full report</div>
+      </div>
+      <span style="font-size:22px;color:#7C3AED">›</span>
+    </button>
   </div>
 </div>
 
@@ -3066,6 +3075,10 @@ var SOCIAL_STAGES={
   SCIENCE_STAGES[cl]=SCIENCE_STAGES['SSS 1'].map(function(s){return Object.assign({},s,{id:s.id.replace('sc-s1','sc-'+prefix)});});
   SOCIAL_STAGES[cl]=SOCIAL_STAGES['SSS 1'].map(function(s){return Object.assign({},s,{id:s.id.replace('ss-sss1','ss-'+prefix)});});
 });
+
+// ── ENGLISH UNIT SECTION ALIASES ──────────────────────────────────────────
+// Moved to a later position after VERBAL_STAGES and QUANT_STAGES are also defined,
+// so we can alias ALL stage maps in one pass. See "ALL STAGES SECTION ALIASES" below.
 // ════════════════════════════════════════
 // VERBAL REASONING STAGES
 // ════════════════════════════════════════
@@ -3188,6 +3201,42 @@ var QUANT_STAGES={
 ['SSS 1','SSS 2','SSS 3'].forEach(function(cl){
   QUANT_STAGES[cl]=QUANT_STAGES['JSS 3'];
 });
+
+// ════════════════════════════════════════════════════════════════════════
+// ALL STAGES SECTION ALIASES
+// ════════════════════════════════════════════════════════════════════════
+// Class section variants ("SSS 1 Art", "JSS 2 Science", "SSS 3 Commercial",
+// or alpha sections like "JSS 1 A") MUST resolve to the base-class content,
+// otherwise students fall back to Nursery 2 (English) or Primary 1 (Maths).
+// Runs once AFTER all stage maps are defined.
+(function(){
+  var sections=[' Science',' Art',' Commercial',
+                ' A',' B',' C',' D',' E']; // alpha sections too
+  var bases=['JSS 1','JSS 2','JSS 3','SSS 1','SSS 2','SSS 3'];
+  var maps=[
+    STAGES, BODY_STAGES, FOOD_STAGES, COLOUR_STAGES,
+    SCIENCE_STAGES, SOCIAL_STAGES,
+    VERBAL_STAGES, QUANT_STAGES
+    // MATH_STAGES is aliased separately later (it has its own loop)
+  ];
+  bases.forEach(function(base){
+    sections.forEach(function(sec){
+      var sectionLabel=base+sec;
+      maps.forEach(function(map){
+        if(map[base]&&!map[sectionLabel])map[sectionLabel]=map[base];
+      });
+    });
+  });
+  // SSS 3 fallback to WAEC/JAMB content if SSS 3 isn't separately defined
+  maps.forEach(function(map){
+    if(map['WAEC/JAMB']&&!map['SSS 3']){map['SSS 3']=map['WAEC/JAMB'];}
+    if(map['WAEC/JAMB']){
+      sections.forEach(function(sec){
+        if(!map['SSS 3'+sec])map['SSS 3'+sec]=map['WAEC/JAMB'];
+      });
+    }
+  });
+})();
 
 // ════════════════════════════════════════
 // (QUANTITATIVE REASONING STAGES are defined above, with real generators)
@@ -4246,16 +4295,22 @@ var _staffActiveClass=null;
 // Returns null to mean "no filter" (proprietor or pre-staff legacy session).
 function _visibleClassesForCurrentStaff(){
   // No staff session = legacy PIN-only flow = no restriction
-  if(!STAFF||!STAFF.id)return null;
+  if(!STAFF)return null;
   // Proprietor sees everything
   if(STAFF.role==='proprietor')return null;
+  // Parent role gets handled by openParentView (separate path) — fall through to teacher logic
+  // for safety: scope by their assignedClasses (which is empty for parents).
   // Teacher: respect their assignedClasses. Empty array means "no classes
   // assigned" — show nothing rather than everything (fail closed).
-  if(!Array.isArray(STAFF.assignedClasses))return [];
-  // If multi-class teacher has picked a single active class for this session,
-  // narrow further. Otherwise return their full assigned list.
-  if(_staffActiveClass)return [_staffActiveClass];
-  return STAFF.assignedClasses.slice();
+  if(STAFF.role==='teacher'){
+    if(!Array.isArray(STAFF.assignedClasses))return [];
+    if(_staffActiveClass)return [_staffActiveClass];
+    return STAFF.assignedClasses.slice();
+  }
+  // Legacy: STAFF object without explicit role (older sessions) — no restriction
+  if(!STAFF.id)return null;
+  // Has id but unknown role — fail closed
+  return [];
 }
 
 // Should this student be visible to the current staff member?
@@ -4269,11 +4324,21 @@ function _isStudentVisible(student){
 }
 
 // Convenience: filter a list of students to only the visible ones.
+// Matches section variants: a teacher assigned to "SSS 1" sees students in
+// "SSS 1", "SSS 1 Art", "SSS 1 Science", "SSS 1 Commercial" (any A-E section).
+// A teacher assigned to a specific section ("SSS 1 Art") only sees that section.
 function _filterVisibleStudents(arr){
   var allowed=_visibleClassesForCurrentStaff();
   if(allowed===null)return arr;
   if(!allowed.length)return [];
-  return arr.filter(function(s){return allowed.indexOf(s.classLabel)>=0;});
+  return arr.filter(function(s){
+    if(allowed.indexOf(s.classLabel)>=0)return true;
+    // If teacher is assigned to the base class (e.g. "SSS 1"), include any
+    // section variant of that base class (SSS 1 Art / Science / Commercial / A-E)
+    var base=_baseClass(s.classLabel);
+    if(base&&allowed.indexOf(base)>=0)return true;
+    return false;
+  });
 }
 
 // Is the current session a teacher (vs proprietor / no-staff legacy)?
@@ -5486,30 +5551,56 @@ function openParentView(){
     }
   }
 
-  // Subject scores — combined across all children, grouped by child
+  // Subject scores — combined across all children, grouped by SUBJECT (not raw stage ID)
   if(scoresEl&&children.length){
-    scoresEl.innerHTML=children.map(function(c){
-      var nameLabel='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:14px;color:#7C3AED;margin-bottom:8px;margin-top:'+(c===children[0]?'0':'14px')+'">'+_escapeHtml(c.name)+'</div>';
+    scoresEl.innerHTML=children.map(function(c,childIdx){
+      var nameLabel='<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:15px;color:#7C3AED;margin-bottom:10px;margin-top:'+(childIdx===0?'0':'18px')+'">'+_escapeHtml(c.name)+' <span style="font-weight:700;color:#9CA3AF;font-size:12px">— '+_escapeHtml(c.classLabel||'')+'</span></div>';
       var prog=c.progress||{};
-      var entries=Object.entries(prog)
-        .filter(function(e){return e[1]&&(e[1].bestScore||0)>0;})
-        .sort(function(a,b){return (b[1].bestScore||0)-(a[1].bestScore||0);});
+      var entries=Object.entries(prog).filter(function(e){return e[1]&&(e[1].bestScore||0)>0;});
       if(!entries.length){
-        return nameLabel+'<div style="font-size:12px;color:#9CA3AF;padding:6px 0">No scores yet — '+_escapeHtml(c.name.split(' ')[0])+' hasn\'t practised yet.</div>';
+        return nameLabel+'<div style="font-size:13px;color:#9CA3AF;padding:10px;background:#F9FAFB;border-radius:8px;text-align:center">'
+          +'No scores yet — '+_escapeHtml(c.name.split(' ')[0])+' hasn\'t practised yet.<br>'
+          +'<span style="font-size:11px">Ask them to open the app and try a few questions.</span>'
+          +'</div>';
       }
-      return nameLabel+entries.map(function(e){
-        var pct=Math.round(e[1].bestScore||0);
-        var col=pct>=70?'#16A34A':pct>=50?'#CA8A04':'#DC2626';
-        var label=e[0].replace(/_/g,' ').replace(/\b\w/g,function(ch){return ch.toUpperCase();});
-        return '<div style="margin-bottom:8px">'
-          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
-          +'<div style="font-size:12.5px;font-weight:700;color:#1E1B4B">'+_escapeHtml(label)+'</div>'
-          +'<div style="font-size:12.5px;font-weight:900;color:'+col+'">'+pct+'%</div>'
+      // Group entries by subject prefix in stage ID
+      var subjectGroups=_groupProgressBySubject(entries);
+      // Compute overall score across all subjects for this child
+      var totalScore=0,totalCount=0;
+      Object.values(subjectGroups).forEach(function(g){
+        g.stages.forEach(function(s){totalScore+=s.score;totalCount++;});
+      });
+      var overall=totalCount?Math.round(totalScore/totalCount):0;
+      var overallCol=overall>=70?'#16A34A':overall>=50?'#CA8A04':'#DC2626';
+      var overallMsg=overall>=80?'Doing great!':overall>=60?'Good progress':overall>=40?'Needs more practice':'Just getting started';
+      // Build the per-child block
+      var subjectHtml=Object.entries(subjectGroups).map(function(pair){
+        var subjKey=pair[0],group=pair[1];
+        var avg=Math.round(group.stages.reduce(function(a,s){return a+s.score;},0)/group.stages.length);
+        var col=avg>=70?'#16A34A':avg>=50?'#CA8A04':'#DC2626';
+        var stagesDone=group.stages.length;
+        return '<div style="margin-bottom:10px;background:#FAFAFA;border-radius:10px;padding:11px 13px;border-left:3px solid '+col+'">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+          +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:13.5px;color:#1E1B4B">'+group.icon+' '+_escapeHtml(group.label)+'</div>'
+          +  '<div style="font-size:14px;font-weight:900;color:'+col+'">'+avg+'%</div>'
           +'</div>'
-          +'<div style="height:6px;background:#F0F4F8;border-radius:3px;overflow:hidden">'
-          +'<div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:3px;transition:width .4s"></div>'
-          +'</div></div>';
+          +'<div style="height:5px;background:#E5E7EB;border-radius:3px;overflow:hidden;margin-bottom:6px">'
+          +  '<div style="height:100%;width:'+avg+'%;background:'+col+';border-radius:3px;transition:width .4s"></div>'
+          +'</div>'
+          +'<div style="font-size:11px;color:#6B7280">'+stagesDone+' lesson'+(stagesDone!==1?'s':'')+' completed</div>'
+          +'</div>';
       }).join('');
+      // Overall summary card at top of each child block
+      var summaryCard='<div style="background:linear-gradient(135deg,#EDE9FE,#DDD6FE);border-radius:12px;padding:12px 14px;margin-bottom:12px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center">'
+        +  '<div>'
+        +    '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:13px;color:#5B21B6">Overall</div>'
+        +    '<div style="font-size:11.5px;color:#7C3AED;margin-top:1px">'+overallMsg+' · '+totalCount+' lesson'+(totalCount!==1?'s':'')+' done</div>'
+        +  '</div>'
+        +  '<div style="font-family:\'Nunito\',sans-serif;font-weight:900;font-size:26px;color:'+overallCol+'">'+overall+'%</div>'
+        +'</div>'
+        +'</div>';
+      return nameLabel+summaryCard+subjectHtml;
     }).join('');
   }
 
@@ -5533,6 +5624,109 @@ function openParentView(){
       })
       .catch(function(){window._pvLoading=false;});
   }
+}
+
+// Translate raw stage IDs like 'f-n2-s1' into friendly subject groupings.
+// Stage ID format conventions in EduLab:
+//   f-* = Food unit (English)        m-* = Maths
+//   a-* = Animals unit (English)     v-* = Verbal Reasoning
+//   b-* = Body unit (English)        q-* = Quantitative Reasoning
+//   c-* = Colours unit (English)     waec_<subject>_* = WAEC subjects
+//   s-* = Science unit (English)     jss_<subject>_* = JSS subjects
+//   so-* = Social Studies (English)  ck_* = CRS / Knowledge etc.
+//   cj_* = Colour journey (English long words / vocab stages)
+function _groupProgressBySubject(entries){
+  // Returns: {english: {label, icon, stages: [...]}, maths: {...}, ...}
+  // Stage ID prefix conventions:
+  //   m-*    Mathematics              vr-*   Verbal Reasoning
+  //   qr-*   Quantitative Reasoning   sc-*   Basic Science
+  //   ss-*   Social Studies           f-*    Food unit (English)
+  //   b-*    Body unit (English)      c-*    Colours unit (English)
+  //   cj-*   Colour Journey (Eng)     p#-*   Primary class English
+  //   j#-*   JSS class English        s1-*   SSS 1 English
+  //   bj#-*  JSS Body                 fj#-*  JSS Food
+  //   cs1-*  SSS Colour                fs1-*  SSS Food                bs1-*  SSS Body
+  //   bio-*  WAEC Biology             chem-* WAEC Chemistry
+  //   phys-* WAEC Physics             agr-*  WAEC Agric
+  //   eco-*  WAEC Economics           gov-*  WAEC Government
+  //   geo-*  WAEC Geography           his-*  WAEC History
+  //   lit-*  WAEC Literature          crs-*  WAEC CRS
+  //   irk-*  WAEC IRK                 acc-*  WAEC Accounting
+  //   com-*  WAEC Commerce            hec-*  WAEC Home Econ
+  //   fms-*  WAEC Further Maths       bsc-*  JSS Basic Science
+  //   civ-*  JSS Civic Ed             bte-*  JSS Basic Tech
+  //   soc-*  JSS Social Studies       fre-*  JSS French
+  //   pes-*  JSS PE
+  var groups={};
+  function add(key,label,icon,stage){
+    if(!groups[key])groups[key]={label:label,icon:icon,stages:[]};
+    groups[key].stages.push(stage);
+  }
+  entries.forEach(function(e){
+    var sid=e[0],score=e[1].bestScore||0;
+    var stage={id:sid,score:score,label:_stageFriendlyLabel(sid)};
+    // Match by prefix, in priority order (most specific first)
+    if(/^m-/.test(sid))add('maths','Mathematics','🔢',stage);
+    else if(/^vr-/.test(sid))add('verbal','Verbal Reasoning','🔤',stage);
+    else if(/^qr-/.test(sid))add('quantitative','Quantitative Reasoning','📊',stage);
+    else if(/^bio-/.test(sid))add('biology','Biology','🧬',stage);
+    else if(/^chem-/.test(sid))add('chemistry','Chemistry','⚗️',stage);
+    else if(/^phys-/.test(sid))add('physics','Physics','⚛️',stage);
+    else if(/^lit-/.test(sid))add('literature','Literature','📚',stage);
+    else if(/^eco-/.test(sid))add('economics','Economics','💹',stage);
+    else if(/^gov-/.test(sid))add('government','Government','🏛️',stage);
+    else if(/^geo-/.test(sid))add('geography','Geography','🌍',stage);
+    else if(/^his-/.test(sid))add('history','History','📜',stage);
+    else if(/^agr-/.test(sid))add('agric','Agricultural Science','🌾',stage);
+    else if(/^acc-/.test(sid))add('accounting','Accounting','📒',stage);
+    else if(/^com-/.test(sid))add('commerce','Commerce','💼',stage);
+    else if(/^crs-/.test(sid))add('crs','Christian Religious Studies','✝️',stage);
+    else if(/^irk-/.test(sid))add('irk','Islamic Religious Knowledge','☪️',stage);
+    else if(/^hec-/.test(sid))add('homeec','Home Economics','🏠',stage);
+    else if(/^fms-/.test(sid))add('fmaths','Further Mathematics','📐',stage);
+    else if(/^bsc-/.test(sid))add('bsci','Basic Science','🔬',stage);
+    else if(/^civ-/.test(sid))add('civic','Civic Education','⚖️',stage);
+    else if(/^bte-/.test(sid))add('btech','Basic Technology','🔧',stage);
+    else if(/^soc-/.test(sid))add('socstud','Social Studies','🌐',stage);
+    else if(/^fre-/.test(sid))add('french','French','🇫🇷',stage);
+    else if(/^pes-/.test(sid))add('pe','Physical Education','🏃',stage);
+    else if(/^sc-/.test(sid))add('basicsci','Basic Science Vocab','🔬',stage);
+    else if(/^ss-/.test(sid))add('engsocial','English: Social Studies','🌍',stage);
+    else if(/^(f|fj|fs1)-/.test(sid))add('english','English & General Studies','📖',stage);
+    else if(/^(b|bj|bs1)-/.test(sid))add('english','English & General Studies','📖',stage);
+    else if(/^(c|cj|cs1)-/.test(sid))add('english','English & General Studies','📖',stage);
+    else if(/^(p[1-6]|j[1-3]|n[12]|s1)-/.test(sid))add('english','English & General Studies','📖',stage);
+    else add('other','Other Practice','✏️',stage);
+  });
+  return groups;
+}
+
+// Resolve a stage ID like 'f-n2-s1' to "Food: Nigerian Staples (Nursery 2)"
+function _stageFriendlyLabel(sid){
+  if(!sid)return sid;
+  // Try UNITS first — they hold the most detailed stage definitions
+  if(typeof UNITS!=='undefined'){
+    for(var i=0;i<UNITS.length;i++){
+      var u=UNITS[i];
+      if(!u.stagesMap)continue;
+      for(var cls in u.stagesMap){
+        var stages=u.stagesMap[cls];
+        if(!Array.isArray(stages))continue;
+        for(var j=0;j<stages.length;j++){
+          if(stages[j].id===sid){
+            return u.title+' — '+(stages[j].label||sid);
+          }
+        }
+      }
+    }
+  }
+  // Fall back to prettified ID
+  return sid.replace(/[-_]/g,' ').toUpperCase();
+}
+
+function _renderParentScores_unused(el,childProg){
+  // Legacy function — kept as no-op for backward compat. Modern parent dashboard
+  // uses inline rendering in openParentView() with subject grouping.
 }
 
 function _renderParentScores(el,childProg){
@@ -5576,7 +5770,9 @@ function toggleStaffRoleFields(){
 }
 
 function _doOpenAdmin(){
-  // Parent role: show read-only parent view, not admin
+  // Parent role: show read-only parent view by default. Parents who want
+  // admin controls use openParentAdmin() instead — which temporarily promotes
+  // them to proprietor-equivalent for THEIR family code.
   if(STAFF&&STAFF.role==='parent'){
     openParentView();
     return;
@@ -5746,7 +5942,9 @@ function updateCapacityWidget(){
     if(!FB.db)return;
     FB.db.collection('schools').doc(school.code).collection('students').get()
       .then(function(snap){
-        var actualCount=snap.size;
+        // Exclude class-config documents (_cfg__) — they're not students
+        var actualCount=0;
+        snap.forEach(function(d){if(!d.id.startsWith('_cfg__'))actualCount++;});
         _renderCapacity(actualCount,cap,school);
       })
       .catch(function(e){console.warn('Capacity count failed:',e.message);});
@@ -5809,7 +6007,37 @@ function parentBack(){
   SS('splash');
 }
 
+// Parents can access admin tools (set subjects, manage children, view full
+// reports) scoped to THEIR family code. Internally this temporarily uses
+// proprietor-level admin UI — the school code gate still applies so they
+// can only ever manage their own family.
+function openParentAdmin(){
+  if(!STAFF||STAFF.role!=='parent'){toast('Sign in as parent first',2000);return;}
+  // Stash original parent role so back button restores it
+  window._parentOriginalRole='parent';
+  STAFF.role='proprietor'; // promote for this admin session
+  _adminVerified=true;
+  _doOpenAdmin();
+}
+
+// Back from parent-admin returns to the parent dashboard, restoring the role.
+function parentAdminBack(){
+  if(window._parentOriginalRole==='parent'&&STAFF){
+    STAFF.role='parent';
+    window._parentOriginalRole=null;
+    openParentView();
+  }else{
+    SS('splash');
+  }
+}
+
 function adminBack(){
+  // If this admin session was opened from the parent dashboard via openParentAdmin,
+  // return to the parent dashboard rather than home/roster.
+  if(window._parentOriginalRole==='parent'&&STAFF){
+    parentAdminBack();
+    return;
+  }
   _adminVerified=false; // clear session so next open requires PIN again
   DMODE==='single'?SS('home'):SS('roster');
 }
@@ -5844,7 +6072,7 @@ function loadHome(){
   var p=prog();
   var totalStages=0,doneStages=0;
   UNITS.forEach(function(u){
-    var stgs=u.stagesMap[STU.classLabel]||u.stagesMap['Nursery 2']||[];
+    var stgs=_resolveStageMap(u.stagesMap, STU.classLabel)||u.stagesMap['Nursery 2']||[];
     totalStages+=stgs.length;
     doneStages+=stgs.filter(function(st){return p[st.id]&&p[st.id].passed;}).length;
   });
@@ -5855,7 +6083,7 @@ function loadHome(){
 
   // VR + QR progress bars on home — same structure as English
   function _reasoningPct(stagesMap){
-    var stgs=stagesMap[STU.classLabel]||stagesMap['Primary 3']||[];
+    var stgs=_resolveStageMap(stagesMap, STU.classLabel)||stagesMap['Primary 3']||[];
     var done=stgs.filter(function(st){return p[st.id]&&p[st.id].passed;}).length;
     return {total:stgs.length,done:done,pct:stgs.length>0?Math.round(done/stgs.length*100):0};
   }
@@ -6220,7 +6448,7 @@ function openLessonList(){
   };
   var list=document.getElementById('lessons-list');list.innerHTML='';
   UNITS.forEach(function(unit){
-    var stages=unit.stagesMap[cl]||unit.stagesMap['Nursery 2']||[];
+    var stages=_resolveStageMap(unit.stagesMap, cl)||unit.stagesMap['Nursery 2']||[];
     if(!stages.length)return;
     // Apply teacher outline: order and visibility
     var savedUnit=(outline[cl]||{})[unit.key]||[];
@@ -6281,7 +6509,7 @@ function openLessonList(){
 // ════════════════════════════════════════
 function startStage(unitKey,stageIdx){
   var unit=UNITS.find(function(u){return u.key===unitKey;})||UNITS[0];
-  var stages=unit.stagesMap[STU.classLabel]||unit.stagesMap['Nursery 2']||[];
+  var stages=_resolveStageMap(unit.stagesMap, STU.classLabel)||unit.stagesMap['Nursery 2']||[];
   S.unitKey=unitKey;S.currentStages=stages;
   S.stageIdx=stageIdx;
   S.allStageWords=[...new Set(stages[stageIdx].words)];
@@ -7075,7 +7303,7 @@ function doExport(encodedSchool){
       // Add detailed stage rows
       var stageRows='';
       UNITS.forEach(function(u){
-        var stgs=u.stagesMap[s.classLabel]||u.stagesMap['Primary 4']||[];
+        var stgs=_resolveStageMap(u.stagesMap, s.classLabel)||u.stagesMap['Primary 4']||[];
         stgs.forEach(function(st){
           var sv=sp[st.id];if(!sv||!sv.attempts)return;
           stageRows+='<tr style="background:#F9FAFB"><td style="padding-left:24px;font-size:12px;color:#6B7B8D">'+u.emoji+' '+u.title+' — '+st.label+'</td>'
@@ -7230,9 +7458,9 @@ function renderPerformance(){
     });
   }
   Object.keys(mathClassesToInclude).forEach(function(cl){
-    (MATH_STAGES[cl]||[]).forEach(function(st){validStageIds[st.id]=true;});
-    (VERBAL_STAGES[cl]||[]).forEach(function(st){validStageIds[st.id]=true;});
-    (QUANT_STAGES[cl]||[]).forEach(function(st){validStageIds[st.id]=true;});
+    (_resolveStageMap(MATH_STAGES, cl)||[]).forEach(function(st){validStageIds[st.id]=true;});
+    (_resolveStageMap(VERBAL_STAGES, cl)||[]).forEach(function(st){validStageIds[st.id]=true;});
+    (_resolveStageMap(QUANT_STAGES, cl)||[]).forEach(function(st){validStageIds[st.id]=true;});
   });
 
   filteredRoster.forEach(function(s){
@@ -9625,12 +9853,11 @@ var WAEC_MATHS_QS=[
 
   {id:'m05',topic:'numbers',diff:'mid',
    q:'Simplify: (2/3) + (3/4) − (1/6).',
-   opts:['11/12','5/6','13/12','7/12'],
-   a:'13/12',
-   why:'LCM is 12. (8/12) + (9/12) − (2/12) = 15/12 = 5/4 = 1¼. Wait — let me recheck: 8 + 9 − 2 = 15, so 15/12 = 5/4. Hmm, 5/4 isn\'t in the options. Recompute: 8+9=17, 17−2=15. 15/12 simplifies to 5/4 which equals 1.25 = 1 + 3/12 = 13/12? No, 13/12 = 1.0833. Correct value is 5/4 = 1.25 = 15/12. Of the four options, 5/4 is not present — the closest is 13/12. This needs to be 5/4: rewriting fractions: (2/3)=8/12, (3/4)=9/12, (1/6)=2/12; 8+9−2=15; 15/12=5/4. Pick 5/4.'},
+   opts:['11/12','5/4','13/12','7/12'],
+   a:'5/4',
+   why:'Find LCM = 12. (2/3)=8/12, (3/4)=9/12, (1/6)=2/12. Sum: 8/12 + 9/12 − 2/12 = 15/12 = 5/4.'},
 
-  // (Note to self: m05 above had a self-correction in the explanation — let me redo it cleanly)
-  // I'll replace m05 with a question I'm confident about
+  // (Old m05 had a confused self-correcting explanation — replaced with clean version above)
 
   {id:'m06',topic:'numbers',diff:'hard',
    q:'A car depreciates by 10% each year. If its initial value was ₦5,000,000, what is its value after 2 years?',
@@ -9745,7 +9972,7 @@ var WAEC_MATHS_QS=[
 
   {id:'m24',topic:'geometry',diff:'mid',
    q:'Find the volume of a cylinder of radius 5 cm and height 14 cm. (Use π = 22/7)',
-   opts:['1100 cm³','1078 cm³','1100 cm³','550 cm³'],
+   opts:['1100 cm³','1078 cm³','880 cm³','550 cm³'],
    a:'1100 cm³',
    why:'V = πr²h = (22/7) × 25 × 14 = 22 × 25 × 2 = 1100 cm³.'},
 
@@ -9900,8 +10127,8 @@ var WAEC_MATHS_QS=[
   {id:'m49',topic:'calculus',diff:'hard',
    q:'Evaluate: ∫₁³ (2x + 1) dx',
    opts:['8','10','12','14'],
-   a:'12',
-   why:'Antiderivative is x² + x. Evaluate from 1 to 3: (9 + 3) − (1 + 1) = 12 − 2 = 10. Recheck: (3² + 3) − (1² + 1) = 12 − 2 = 10. The correct answer is 10.'},
+   a:'10',
+   why:'Antiderivative is x² + x. Evaluate from 1 to 3: (3² + 3) − (1² + 1) = 12 − 2 = 10.'},
 
   {id:'m50',topic:'calculus',diff:'hard',
    q:'Find the maximum value of y = 4x − x².',
@@ -11640,7 +11867,7 @@ function openMathList(overrideClass){
   if(pick){
     pick.value=overrideClass||STU.mathLevel||'';
   }
-  var stages=MATH_STAGES[cl]||MATH_STAGES['Primary 1']||[];
+  var stages=_resolveStageMap(MATH_STAGES, cl)||MATH_STAGES['Primary 1']||[];
   // Apply teacher course outline for maths
   var _mOutline=getCourseOutline();
   var _mSaved=(_mOutline[cl]||{})['maths']||[];
@@ -11866,7 +12093,7 @@ function finishMath(){
   var ti=document.getElementById('math-res-title');if(ti)ti.textContent=pct===100?'Perfect!':pct>=80?'Excellent!':passed?'Well done!':'Almost there!';
   var sub=document.getElementById('math-res-sub');
   var cl=MS.classLabel;
-  var stages=MATH_STAGES[cl]||MATH_STAGES[STU.classLabel]||[];
+  var stages=_resolveStageMap(MATH_STAGES, cl)||_resolveStageMap(MATH_STAGES, STU.classLabel)||[];
   var isLast=MS.stageIdx>=stages.length-1;
   if(sub)sub.textContent=passed?(isLast?'All stages complete! 🎊':'Next stage unlocked!'):'You need 70% to pass. Try again!';
 
@@ -12869,7 +13096,7 @@ function _calcOverallProgress(){
   // English/Vocab via UNITS
   if(typeof UNITS!=='undefined'){
     UNITS.forEach(function(u){
-      var stgs=u.stagesMap[STU.classLabel]||u.stagesMap['Nursery 2']||[];
+      var stgs=_resolveStageMap(u.stagesMap, STU.classLabel)||u.stagesMap['Nursery 2']||[];
       totalStages+=stgs.length;
       doneStages+=stgs.filter(function(st){return p[st.id]&&p[st.id].passed;}).length;
     });
@@ -12877,7 +13104,7 @@ function _calcOverallProgress(){
   }
   // Maths
   if(typeof MATH_STAGES!=='undefined'){
-    var ms=MATH_STAGES[STU.classLabel]||[];
+    var ms=_resolveStageMap(MATH_STAGES, STU.classLabel)||[];
     totalStages+=ms.length;
     doneStages+=ms.filter(function(st){return p[st.id]&&p[st.id].passed;}).length;
     if(ms.length)activeSubjects++;
@@ -12989,7 +13216,7 @@ function _resolveStageInfo(sid){
   if(typeof UNITS!=='undefined'){
     for(var i=0;i<UNITS.length;i++){
       var u=UNITS[i];
-      var stgs=u.stagesMap[STU.classLabel]||u.stagesMap['Nursery 2']||[];
+      var stgs=_resolveStageMap(u.stagesMap, STU.classLabel)||u.stagesMap['Nursery 2']||[];
       for(var j=0;j<stgs.length;j++){
         if(stgs[j].id===sid)return {sid:sid,label:stgs[j].label||stgs[j].title||sid,subject:'English',action:function(){openLessonList();}};
       }
@@ -12997,20 +13224,20 @@ function _resolveStageInfo(sid){
   }
   // Maths
   if(typeof MATH_STAGES!=='undefined'){
-    var ms=MATH_STAGES[STU.classLabel]||[];
+    var ms=_resolveStageMap(MATH_STAGES, STU.classLabel)||[];
     for(var k=0;k<ms.length;k++){
       if(ms[k].id===sid)return {sid:sid,label:ms[k].label||sid,subject:'Mathematics',action:function(){openMathList();}};
     }
   }
   // Reasoning
   if(typeof VERBAL_STAGES!=='undefined'){
-    var vs=VERBAL_STAGES[STU.classLabel]||[];
+    var vs=_resolveStageMap(VERBAL_STAGES, STU.classLabel)||[];
     for(var m=0;m<vs.length;m++){
       if(vs[m].id===sid)return {sid:sid,label:vs[m].label||sid,subject:'Verbal Reasoning',action:function(){openReasoningList('verbal');}};
     }
   }
   if(typeof QUANT_STAGES!=='undefined'){
-    var qs=QUANT_STAGES[STU.classLabel]||[];
+    var qs=_resolveStageMap(QUANT_STAGES, STU.classLabel)||[];
     for(var n=0;n<qs.length;n++){
       if(qs[n].id===sid)return {sid:sid,label:qs[n].label||sid,subject:'Quantitative Reasoning',action:function(){openReasoningList('quantitative');}};
     }
@@ -13364,7 +13591,16 @@ function _getSchoolPaidWaecSubjects(){
 
 // Load a class config from localStorage cache
 function loadClassConfig(className){
-  try{return JSON.parse(localStorage.getItem(CLASS_CFG_PREFIX+className)||'null');}catch(e){return null;}
+  try{
+    var cfg=JSON.parse(localStorage.getItem(CLASS_CFG_PREFIX+className)||'null');
+    if(cfg)return cfg;
+    // Fall back to base class config if section variant has no local cache
+    var base=_baseClass(className);
+    if(base&&base!==className){
+      return JSON.parse(localStorage.getItem(CLASS_CFG_PREFIX+base)||'null');
+    }
+    return null;
+  }catch(e){return null;}
 }
 
 // ── CLASS CONFIG: save/fetch ──────────────────────────────────────────────────
@@ -13391,22 +13627,43 @@ function saveClassConfig(className, cfg, onDone){
     });
 }
 
-// Fetch class config from Firestore → cache locally
+// Fetch class config from Firestore → cache locally.
+// Falls back to the base class config if the exact section variant
+// has no Firestore doc — so a student in "SSS 1 Art" gets the config the
+// teacher set for "SSS 1" if "SSS 1 Art" doesn't have its own.
 function fetchClassConfig(className, onDone){
   var school=getSchool();
   if(!school||!school.code||!FB||!FB.db){onDone(loadClassConfig(className));return;}
   var docId=_cfgDocId(className);
+  var baseClass=_baseClass(className);
+  var hasSectionVariant=(baseClass&&baseClass!==className);
   FB.db.collection('schools').doc(school.code)
     .collection('students').doc(docId).get()
     .then(function(doc){
       if(doc.exists){
         var d=doc.data();
-        // Strip metadata — only keep allowedSubjects / allowedWaecSubjects
         var cfg={};
         if(Array.isArray(d.allowedSubjects))cfg.allowedSubjects=d.allowedSubjects;
         if(Array.isArray(d.allowedWaecSubjects))cfg.allowedWaecSubjects=d.allowedWaecSubjects;
         localStorage.setItem(CLASS_CFG_PREFIX+className,JSON.stringify(cfg));
         onDone(cfg);
+      } else if(hasSectionVariant){
+        // Try base class — e.g. "SSS 1 Art" → "SSS 1"
+        FB.db.collection('schools').doc(school.code)
+          .collection('students').doc(_cfgDocId(baseClass)).get()
+          .then(function(baseDoc){
+            if(baseDoc.exists){
+              var bd=baseDoc.data();
+              var cfg={};
+              if(Array.isArray(bd.allowedSubjects))cfg.allowedSubjects=bd.allowedSubjects;
+              if(Array.isArray(bd.allowedWaecSubjects))cfg.allowedWaecSubjects=bd.allowedWaecSubjects;
+              localStorage.setItem(CLASS_CFG_PREFIX+className,JSON.stringify(cfg));
+              onDone(cfg);
+            } else {
+              onDone(loadClassConfig(className));
+            }
+          })
+          .catch(function(){onDone(loadClassConfig(className));});
       } else {
         onDone(loadClassConfig(className));
       }
@@ -13624,13 +13881,15 @@ function applyClassSubjectAccess(){
 
   // Fix 7: Even with no explicit class config, apply class-level defaults so
   // SSS students don't see Primary subjects (English/Maths from Nursery curriculum).
-  // The default is: SSS shows only WAEC + leaderboard; JSS shows english+maths+JSS hub;
-  // Primary/Nursery shows english+maths+verbal+quantitative.
+  // Default visibility per level:
+  //   - SSS: English (senior vocabulary), Maths, WAEC hub, Leaderboard
+  //   - JSS: English, Maths, JSS hub (waec card), Leaderboard
+  //   - Primary/Nursery: English, Maths, Verbal, Quantitative, Leaderboard
   if(!cfg){
     var isJSS=/^JSS\s*[123]/i.test(cls);
     var isSSS=/^SSS\s*[123]/i.test(cls)||/WAEC|JAMB/i.test(cls);
     if(isSSS){
-      cfg={allowedSubjects:['waec','leaderboard']};
+      cfg={allowedSubjects:['english','maths','waec','leaderboard']};
     }else if(isJSS){
       cfg={allowedSubjects:['english','maths','waec','leaderboard']}; // waec card is JSS hub for JSS
     }else{
@@ -14481,14 +14740,14 @@ function loadLessonNoteStages(){
   var stagesSel=document.getElementById('ln-stage');if(!stagesSel)return;
   var stages=[];
   if(uk==='maths'){
-    stages=(MATH_STAGES[cl]||MATH_STAGES['Primary 1']||[]);
+    stages=(_resolveStageMap(MATH_STAGES, cl)||MATH_STAGES['Primary 1']||[]);
   }else if(uk==='verbal'){
-    stages=(VERBAL_STAGES[cl]||VERBAL_STAGES['Primary 3']||[]);
+    stages=(_resolveStageMap(VERBAL_STAGES, cl)||VERBAL_STAGES['Primary 3']||[]);
   }else if(uk==='quantitative'){
-    stages=(QUANT_STAGES[cl]||QUANT_STAGES['Primary 3']||[]);
+    stages=(_resolveStageMap(QUANT_STAGES, cl)||QUANT_STAGES['Primary 3']||[]);
   }else{
     var unit=UNITS.find(function(u){return u.key===uk;})||UNITS[0];
-    stages=(unit.stagesMap[cl]||unit.stagesMap['Nursery 2']||[]);
+    stages=(_resolveStageMap(unit.stagesMap, cl)||unit.stagesMap['Nursery 2']||[]);
   }
   stagesSel.innerHTML=stages.map(function(st){
     return '<option value="'+st.id+'">'+st.emoji+' '+st.label+'</option>';
@@ -14589,7 +14848,7 @@ function deleteLessonNote(){
 function openLessonReader(unitKey,stageIdx){
   var unit=UNITS.find(function(u){return u.key===unitKey;})||UNITS[0];
   var cl=STU.classLabel;
-  var stages=unit.stagesMap[cl]||unit.stagesMap['Nursery 2']||[];
+  var stages=_resolveStageMap(unit.stagesMap, cl)||unit.stagesMap['Nursery 2']||[];
   var st=stages[stageIdx];
   if(!st)return;
   var note=_LN_CACHE[st.id];
@@ -14766,11 +15025,11 @@ function _frBuildReport(student,allProg){
       if(m)return 'Maths — '+(m.label||'').replace(/^Stage\s+\d+\s*—\s*/,'');
     }
     for(var cl in VERBAL_STAGES){
-      var v=(VERBAL_STAGES[cl]||[]).find(function(s){return s.id===stageId;});
+      var v=(_resolveStageMap(VERBAL_STAGES, cl)||[]).find(function(s){return s.id===stageId;});
       if(v)return 'Verbal — '+(v.label||'').replace(/^Stage\s+\d+\s*—\s*/,'');
     }
     for(var cl in QUANT_STAGES){
-      var q=(QUANT_STAGES[cl]||[]).find(function(s){return s.id===stageId;});
+      var q=(_resolveStageMap(QUANT_STAGES, cl)||[]).find(function(s){return s.id===stageId;});
       if(q)return 'Quantitative — '+(q.label||'').replace(/^Stage\s+\d+\s*—\s*/,'');
     }
     return stageId;
@@ -15204,14 +15463,14 @@ function loadOutlineStages(){
   var uk=document.getElementById('outline-unit').value||'animals';
   var stages=[];
   if(uk==='maths'){
-    stages=(MATH_STAGES[cl]||MATH_STAGES['Primary 1']||[]).slice();
+    stages=(_resolveStageMap(MATH_STAGES, cl)||MATH_STAGES['Primary 1']||[]).slice();
   }else if(uk==='verbal'){
-    stages=(VERBAL_STAGES[cl]||VERBAL_STAGES['Primary 1']||[]).slice();
+    stages=(_resolveStageMap(VERBAL_STAGES, cl)||VERBAL_STAGES['Primary 1']||[]).slice();
   }else if(uk==='quantitative'){
-    stages=(QUANT_STAGES[cl]||QUANT_STAGES['Primary 1']||[]).slice();
+    stages=(_resolveStageMap(QUANT_STAGES, cl)||QUANT_STAGES['Primary 1']||[]).slice();
   }else{
     var unit=UNITS.find(function(u){return u.key===uk;})||UNITS[0];
-    stages=(unit.stagesMap[cl]||unit.stagesMap['Nursery 2']||[]).slice();
+    stages=(_resolveStageMap(unit.stagesMap, cl)||unit.stagesMap['Nursery 2']||[]).slice();
   }
   var outline=getCourseOutline();
   var saved=(outline[cl]||{})[uk]||[];
@@ -15647,7 +15906,7 @@ function startAssignmentStage(stageId){
     }
   }
   // Search verbal reasoning stages
-  var vstages=VERBAL_STAGES[cl]||VERBAL_STAGES['Primary 3']||[];
+  var vstages=_resolveStageMap(VERBAL_STAGES, cl)||VERBAL_STAGES['Primary 3']||[];
   for(var a=0;a<vstages.length;a++){
     if(vstages[a].id===stageId){
       openReasoningList('verbal');
@@ -15656,7 +15915,7 @@ function startAssignmentStage(stageId){
     }
   }
   // Search quantitative reasoning stages
-  var qstages=QUANT_STAGES[cl]||QUANT_STAGES['Primary 3']||[];
+  var qstages=_resolveStageMap(QUANT_STAGES, cl)||QUANT_STAGES['Primary 3']||[];
   for(var b=0;b<qstages.length;b++){
     if(qstages[b].id===stageId){
       openReasoningList('quantitative');
