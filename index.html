@@ -3515,6 +3515,36 @@ function loadSchoolRosterFromFirestore(cb){
 }
 function starsStr(n){var s='';for(var i=0;i<3;i++)s+=i<n?'★':'☆';return s;}
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+
+// Returns a clone of the question with options shuffled into a new order.
+// Does NOT mutate the original question. Answer (q.a) is a value, so the
+// existing `chosen===q.a` comparison continues to work after shuffling.
+// Stays predictable for any options the author marked as positional with
+// `_noShuffle:true` (e.g. "All of the above" style questions).
+function _shuffleQuestionOpts(q){
+  if(!q||!Array.isArray(q.opts)||q.opts.length<=1)return q;
+  if(q._noShuffle)return q;
+  // Detect positional options that must stay in place
+  var sticky=['All of the above','None of the above','All of these','None of these','Both A and B','Both A & B'];
+  var hasSticky=q.opts.some(function(o){return sticky.indexOf(String(o).trim())>=0;});
+  if(hasSticky){
+    // Shuffle only the non-sticky ones, keep sticky at the end
+    var fixed=q.opts.filter(function(o){return sticky.indexOf(String(o).trim())>=0;});
+    var movable=shuffle(q.opts.filter(function(o){return sticky.indexOf(String(o).trim())<0;}));
+    return Object.assign({},q,{opts:movable.concat(fixed)});
+  }
+  return Object.assign({},q,{opts:shuffle(q.opts)});
+}
+
+// Apply option-shuffling to a list of questions.
+function _shuffleQuestionsOpts(questions){
+  return (questions||[]).map(_shuffleQuestionOpts);
+}
+// Expose for tests and any future modules
+if(typeof window!=='undefined'){
+  window._shuffleQuestionOpts=_shuffleQuestionOpts;
+  window._shuffleQuestionsOpts=_shuffleQuestionsOpts;
+}
 // Distractor pool: first try stage words; if <3 available fall back to all unit words
 function getDistractors(key,count){
   var pool=S.words.filter(function(k){return k!==key;});
@@ -12343,7 +12373,7 @@ function _startSciPractice(){
   var allQs=jssSubj?jssSubj.questions:(WAEC_QUESTIONS[subjectKey]||[]);
   var pool=shuffle(allQs.filter(function(q){return q.topic===stage.topic;}));
   if(!pool.length){toast('No questions for this topic yet.',2000);return;}
-  WS.questions=pool;
+  WS.questions=_shuffleQuestionsOpts(pool);
   WS.qIdx=0;
   WS.answers=[];
   var color=_SCI_LESSON.color;
@@ -12479,7 +12509,7 @@ function openJSSSubject(subjectKey){
     // Fallback: direct practice (no learn module)
     WS.subject=subjectKey;
     WS.mode='practice';
-    WS.questions=shuffle(subj.questions.slice()).slice(0,20);
+    WS.questions=_shuffleQuestionsOpts(shuffle(subj.questions.slice()).slice(0,20));
     WS.qIdx=0;
     WS.answers=[];
     WS._isJSS=true;
@@ -12700,7 +12730,7 @@ function waecStart(mode, topicKey){
   // the student would bounce between passages — annoying and not how the
   // real exam works.
   pool=_waecGroupByPassage(pool);
-  WS.questions=pool;
+  WS.questions=_shuffleQuestionsOpts(pool);
   WS.qIdx=0;
   WS.answers=[];
   // Title for play screen
@@ -16124,37 +16154,517 @@ function _loadBlestonexDashboard(signedInEmail){
 }
 
 function _renderBlestonexDashboard(){
-  // Load all schools from Firestore
-  FB.onReady(function(){
-    if(!FB.db){alert('Firebase not available.');return;}
-    FB.db.collection('schools').get().then(function(snap){
-      var rows='';
-      var today=new Date().toISOString().slice(0,10);
-      snap.forEach(function(doc){
-        var d=doc.data();
-        var expired=d.expiry&&d.expiry<today;
-        rows+='<tr style="border-bottom:1px solid #eee">'
-          +'<td style="padding:8px 12px;font-weight:700">'+doc.id+'</td>'
-          +'<td style="padding:8px 12px">'+(d.name||'—')+'</td>'
-          +'<td style="padding:8px 12px">'+(d.expiry||'—')+'</td>'
-          +'<td style="padding:8px 12px"><span style="font-weight:800;color:'+(expired?'#DC2626':d.active===false?'#D97706':'#15803D')+'">'
-          +(expired?'EXPIRED':d.active===false?'INACTIVE':'ACTIVE')+'</span></td>'
-          +'</tr>';
-      });
-      var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Blestonex Dashboard</title>'
-        +'<style>body{font-family:Arial,sans-serif;margin:30px;color:#1E1B4B}h1{color:#7C3AED;margin-bottom:4px}'
-        +'h2{font-size:13px;color:#6B7B8D;font-weight:normal;margin:0 0 20px}'
-        +'table{width:100%;border-collapse:collapse}th{background:#7C3AED;color:#fff;padding:10px 12px;text-align:left;font-size:12px}'
-        +'td{padding:8px 12px}tr:nth-child(even){background:#F9FAFB}</style></head><body>'
-        +'<h1>\uD83D\uDCC8 Blestonex EduLab Dashboard</h1>'
-        +'<h2>All Schools \u00b7 Generated '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+'</h2>'
-        +'<table><thead><tr><th>Code</th><th>School</th><th>Expiry</th><th>Status</th></tr></thead>'
-        +'<tbody>'+rows+'</tbody></table></body></html>';
-      var win=window.open('','_blank');
-      if(win){win.document.write(html);win.document.close();}
-    }).catch(function(e){alert('Error: '+e.message);});
-  });
+  // Open in same window (full-page management UI) — easier than popups for forms.
+  var win=window;
+  document.title='Blestonex EduLab Dashboard';
+  document.body.innerHTML=
+    '<div id="bx-app" style="font-family:-apple-system,Segoe UI,Arial,sans-serif;background:#F5F3FF;min-height:100vh;color:#1E1B4B">'
+    + '<div style="background:linear-gradient(135deg,#5B21B6,#7C3AED);color:#fff;padding:18px 24px">'
+    +   '<div style="display:flex;justify-content:space-between;align-items:center;max-width:1100px;margin:0 auto">'
+    +     '<div>'
+    +       '<div style="font-size:11px;letter-spacing:2px;opacity:.7;font-weight:800">BLESTONEX</div>'
+    +       '<div style="font-size:24px;font-weight:900;line-height:1.1">EduLab Management Dashboard</div>'
+    +     '</div>'
+    +     '<button onclick="bxSignOut()" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;padding:8px 14px;border-radius:8px;font-weight:700;cursor:pointer">Sign out</button>'
+    +   '</div>'
+    + '</div>'
+
+    // Tab bar
+    + '<div style="background:#fff;border-bottom:1px solid #E5E7EB;padding:0 24px;position:sticky;top:0;z-index:10">'
+    +   '<div style="max-width:1100px;margin:0 auto;display:flex;gap:4px;overflow-x:auto">'
+    +     '<button id="bx-tab-list" class="bx-tab" onclick="bxShowTab(\'list\')" style="background:none;border:none;padding:14px 18px;font-size:14px;font-weight:800;color:#7C3AED;border-bottom:3px solid #7C3AED;cursor:pointer;white-space:nowrap">📋 Schools & Parents</button>'
+    +     '<button id="bx-tab-create-school" class="bx-tab" onclick="bxShowTab(\'create-school\')" style="background:none;border:none;padding:14px 18px;font-size:14px;font-weight:700;color:#6B7280;cursor:pointer;white-space:nowrap">🏫 Add School</button>'
+    +     '<button id="bx-tab-create-parent" class="bx-tab" onclick="bxShowTab(\'create-parent\')" style="background:none;border:none;padding:14px 18px;font-size:14px;font-weight:700;color:#6B7280;cursor:pointer;white-space:nowrap">👨‍👩‍👧 Add Parent</button>'
+    +     '<button id="bx-tab-stats" class="bx-tab" onclick="bxShowTab(\'stats\')" style="background:none;border:none;padding:14px 18px;font-size:14px;font-weight:700;color:#6B7280;cursor:pointer;white-space:nowrap">📊 Stats</button>'
+    +   '</div>'
+    + '</div>'
+
+    + '<div style="max-width:1100px;margin:0 auto;padding:24px">'
+    +   '<div id="bx-section-list"></div>'
+    +   '<div id="bx-section-create-school" style="display:none"></div>'
+    +   '<div id="bx-section-create-parent" style="display:none"></div>'
+    +   '<div id="bx-section-stats" style="display:none"></div>'
+    + '</div>'
+    + '</div>';
+
+  bxShowTab('list');
+  bxLoadList();
 }
+
+// ── Tab navigation ──
+window.bxShowTab=function(tab){
+  ['list','create-school','create-parent','stats'].forEach(function(t){
+    var sec=document.getElementById('bx-section-'+t);
+    var btn=document.getElementById('bx-tab-'+t);
+    if(sec)sec.style.display=(t===tab)?'':'none';
+    if(btn){
+      if(t===tab){btn.style.color='#7C3AED';btn.style.borderBottom='3px solid #7C3AED';btn.style.fontWeight='800';}
+      else{btn.style.color='#6B7280';btn.style.borderBottom='none';btn.style.fontWeight='700';}
+    }
+  });
+  if(tab==='list')bxLoadList();
+  if(tab==='create-school')bxRenderCreateSchool();
+  if(tab==='create-parent')bxRenderCreateParent();
+  if(tab==='stats')bxRenderStats();
+};
+
+window.bxSignOut=function(){
+  if(!confirm('Sign out of the dashboard?'))return;
+  if(typeof firebase!=='undefined'&&firebase.auth){
+    firebase.auth().signOut().then(function(){
+      window.location.href=window.location.pathname; // strip ?dashboard= param
+    });
+  }else{
+    window.location.href=window.location.pathname;
+  }
+};
+
+// ── SHA-1 hash helper for PINs (same as the app uses for staff PINs) ──
+window.bxSha1=function(text){
+  var msgBuffer=new TextEncoder().encode(text);
+  return crypto.subtle.digest('SHA-1',msgBuffer).then(function(buf){
+    return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+  });
+};
+
+// ════════════════════════════════════════
+// LIST: All schools & parents
+// ════════════════════════════════════════
+window.bxLoadList=function(){
+  var sec=document.getElementById('bx-section-list');
+  if(!sec)return;
+  sec.innerHTML='<div style="text-align:center;padding:40px;color:#6B7280">Loading…</div>';
+  FB.db.collection('schools').get().then(function(snap){
+    var schools=[],parents=[];
+    snap.forEach(function(doc){
+      var d=doc.data();
+      var entry=Object.assign({_id:doc.id},d);
+      if(d.plan==='parent')parents.push(entry);
+      else schools.push(entry);
+    });
+    schools.sort(function(a,b){return (a._id||'').localeCompare(b._id||'');});
+    parents.sort(function(a,b){return (a._id||'').localeCompare(b._id||'');});
+
+    var today=new Date().toISOString().slice(0,10);
+    function statusOf(d){
+      if(d.active===false)return {label:'SUSPENDED',color:'#D97706',bg:'#FEF3C7'};
+      if(d.expiry&&d.expiry<today)return {label:'EXPIRED',color:'#DC2626',bg:'#FEE2E2'};
+      return {label:'ACTIVE',color:'#16A34A',bg:'#DCFCE7'};
+    }
+
+    function renderTable(items,kind){
+      if(!items.length)return '<div style="padding:30px;color:#9CA3AF;text-align:center;background:#fff;border-radius:12px">No '+kind+'s yet. Use the "Add '+(kind==='school'?'School':'Parent')+'" tab to create one.</div>';
+      return '<div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)">'
+        +'<table style="width:100%;border-collapse:collapse"><thead><tr style="background:#F9FAFB;border-bottom:2px solid #E5E7EB">'
+        +'<th style="padding:12px 14px;text-align:left;font-size:11px;letter-spacing:1px;color:#6B7280">CODE</th>'
+        +'<th style="padding:12px 14px;text-align:left;font-size:11px;letter-spacing:1px;color:#6B7280">NAME</th>'
+        +'<th style="padding:12px 14px;text-align:left;font-size:11px;letter-spacing:1px;color:#6B7280">EXPIRY</th>'
+        +'<th style="padding:12px 14px;text-align:left;font-size:11px;letter-spacing:1px;color:#6B7280">'+(kind==='school'?'CAP':'KIDS')+'</th>'
+        +'<th style="padding:12px 14px;text-align:left;font-size:11px;letter-spacing:1px;color:#6B7280">STATUS</th>'
+        +'<th style="padding:12px 14px;text-align:left;font-size:11px;letter-spacing:1px;color:#6B7280">ACTIONS</th>'
+        +'</tr></thead><tbody>'
+        +items.map(function(d){
+          var s=statusOf(d);
+          return '<tr style="border-bottom:1px solid #F3F4F6">'
+            +'<td style="padding:12px 14px;font-weight:800;font-family:monospace">'+_escapeHtml(d._id)+'</td>'
+            +'<td style="padding:12px 14px">'+_escapeHtml(d.name||'—')+'</td>'
+            +'<td style="padding:12px 14px;color:#6B7280">'+(d.expiry||'—')+'</td>'
+            +'<td style="padding:12px 14px">'+(d.studentCap||d.maxChildren||'—')+'</td>'
+            +'<td style="padding:12px 14px"><span style="background:'+s.bg+';color:'+s.color+';padding:3px 9px;border-radius:6px;font-size:11px;font-weight:800">'+s.label+'</span></td>'
+            +'<td style="padding:12px 14px;white-space:nowrap">'
+            +  '<button onclick="bxRenew(\''+d._id+'\')" style="background:#16A34A;color:#fff;border:none;padding:5px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-right:4px">Renew</button>'
+            +  '<button onclick="bxToggle(\''+d._id+'\','+(d.active!==false)+')" style="background:#D97706;color:#fff;border:none;padding:5px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-right:4px">'+(d.active!==false?'Suspend':'Activate')+'</button>'
+            +  '<button onclick="bxDelete(\''+d._id+'\')" style="background:#DC2626;color:#fff;border:none;padding:5px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">Delete</button>'
+            +'</td>'
+            +'</tr>';
+        }).join('')
+        +'</tbody></table></div>';
+    }
+
+    sec.innerHTML=
+      '<div style="margin-bottom:24px">'
+      +'<div style="font-size:18px;font-weight:900;margin-bottom:12px;color:#1E1B4B">🏫 Schools ('+schools.length+')</div>'
+      +renderTable(schools,'school')
+      +'</div>'
+      +'<div>'
+      +'<div style="font-size:18px;font-weight:900;margin-bottom:12px;color:#1E1B4B">👨‍👩‍👧 Parent Accounts ('+parents.length+')</div>'
+      +renderTable(parents,'parent')
+      +'</div>';
+  }).catch(function(e){
+    sec.innerHTML='<div style="background:#FEE2E2;color:#991B1B;padding:20px;border-radius:12px">Error loading: '+e.message+'</div>';
+  });
+};
+
+// ── Actions: renew, suspend/activate, delete ──
+window.bxRenew=function(id){
+  var newDate=prompt('New expiry date (YYYY-MM-DD)\n\nExamples:\n• One month: '+_dateInDays(30)+'\n• One year: '+_dateInDays(365),_dateInDays(365));
+  if(!newDate)return;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(newDate)){alert('Use format YYYY-MM-DD');return;}
+  FB.db.collection('schools').doc(id).update({expiry:newDate}).then(function(){
+    alert('✓ Renewed '+id+' until '+newDate);
+    bxLoadList();
+  }).catch(function(e){alert('Error: '+e.message);});
+};
+
+window.bxToggle=function(id,currentlyActive){
+  var action=currentlyActive?'suspend':'activate';
+  if(!confirm((currentlyActive?'Suspend':'Activate')+' '+id+'?'))return;
+  FB.db.collection('schools').doc(id).update({active:!currentlyActive}).then(function(){
+    alert('✓ '+id+' '+(currentlyActive?'suspended':'activated'));
+    bxLoadList();
+  }).catch(function(e){alert('Error: '+e.message);});
+};
+
+window.bxDelete=function(id){
+  if(!confirm('PERMANENTLY DELETE '+id+'?\n\nThis cannot be undone. All student data is lost.\n\nType the code below to confirm.'))return;
+  var typed=prompt('Type the code "'+id+'" to confirm deletion:');
+  if(typed!==id){alert('Code did not match. Cancelled.');return;}
+  // Note: Firestore doesn't recursively delete sub-collections — but the school doc is enough
+  // to invalidate access. Sub-collection cleanup should be done from Firebase Console afterwards.
+  FB.db.collection('schools').doc(id).delete().then(function(){
+    alert('✓ Deleted '+id+'.\n\nNote: students/staff sub-collections still exist in Firestore but are inaccessible without the parent doc. Clean those up from Firebase Console if needed.');
+    bxLoadList();
+  }).catch(function(e){alert('Error: '+e.message);});
+};
+
+function _dateInDays(days){
+  var d=new Date();d.setDate(d.getDate()+days);
+  return d.toISOString().slice(0,10);
+}
+
+// ════════════════════════════════════════
+// CREATE SCHOOL form
+// ════════════════════════════════════════
+window.bxRenderCreateSchool=function(){
+  var sec=document.getElementById('bx-section-create-school');
+  if(!sec)return;
+  sec.innerHTML=
+    '<div style="background:#fff;border-radius:12px;padding:24px;max-width:600px;margin:0 auto;box-shadow:0 1px 3px rgba(0,0,0,.05)">'
+    +'<div style="font-size:20px;font-weight:900;margin-bottom:4px;color:#1E1B4B">🏫 Add a New School</div>'
+    +'<div style="color:#6B7280;font-size:13px;margin-bottom:24px">Creates a school account that a proprietor can sign into as admin.</div>'
+
+    +'<div style="margin-bottom:16px">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">SCHOOL CODE *</label>'
+    +'<input id="bx-cs-code" placeholder="e.g. AGUDA01" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,\'\')" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:monospace;font-weight:700;letter-spacing:2px;box-sizing:border-box">'
+    +'<div style="font-size:11px;color:#9CA3AF;margin-top:4px">Letters & numbers only, no spaces. This becomes the school\'s login code.</div>'
+    +'</div>'
+
+    +'<div style="margin-bottom:16px">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">SCHOOL NAME *</label>'
+    +'<input id="bx-cs-name" placeholder="e.g. Aguda Grammar School" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;box-sizing:border-box">'
+    +'</div>'
+
+    +'<div style="display:flex;gap:12px;margin-bottom:16px">'
+    +'<div style="flex:1">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">STUDENT CAP *</label>'
+    +'<input id="bx-cs-cap" type="number" value="50" min="1" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;box-sizing:border-box">'
+    +'</div>'
+    +'<div style="flex:1">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">EXPIRY *</label>'
+    +'<input id="bx-cs-expiry" type="date" value="'+_dateInDays(365)+'" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;box-sizing:border-box">'
+    +'</div>'
+    +'</div>'
+
+    +'<div style="margin-bottom:16px">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">PROPRIETOR PIN (4 digits) *</label>'
+    +'<input id="bx-cs-pin" placeholder="e.g. 1234" maxlength="4" pattern="\\d{4}" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:monospace;letter-spacing:6px;font-size:18px;box-sizing:border-box">'
+    +'<div style="font-size:11px;color:#9CA3AF;margin-top:4px">This is what the proprietor types to access admin. You\'ll send it to them via WhatsApp.</div>'
+    +'</div>'
+
+    +'<div style="margin-bottom:16px">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">CONTACT PHONE</label>'
+    +'<input id="bx-cs-phone" placeholder="+2348031234567" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;box-sizing:border-box">'
+    +'</div>'
+
+    +'<button onclick="bxCreateSchool()" style="width:100%;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;border:none;padding:14px;border-radius:10px;font-weight:900;font-size:15px;cursor:pointer;margin-top:8px">Create School</button>'
+    +'<div id="bx-cs-status" style="margin-top:12px;font-size:13px;text-align:center"></div>'
+    +'</div>';
+};
+
+window.bxCreateSchool=function(){
+  var code=document.getElementById('bx-cs-code').value.trim();
+  var name=document.getElementById('bx-cs-name').value.trim();
+  var cap=parseInt(document.getElementById('bx-cs-cap').value)||50;
+  var expiry=document.getElementById('bx-cs-expiry').value;
+  var pin=document.getElementById('bx-cs-pin').value.trim();
+  var phone=document.getElementById('bx-cs-phone').value.trim();
+  var status=document.getElementById('bx-cs-status');
+
+  if(!code||!name||!pin){status.innerHTML='<span style="color:#DC2626">All starred fields are required.</span>';return;}
+  if(!/^\d{4}$/.test(pin)){status.innerHTML='<span style="color:#DC2626">PIN must be exactly 4 digits.</span>';return;}
+
+  status.innerHTML='<span style="color:#6B7280">Hashing PIN…</span>';
+  bxSha1(pin).then(function(hash){
+    status.innerHTML='<span style="color:#6B7280">Checking if code already exists…</span>';
+    return FB.db.collection('schools').doc(code).get().then(function(doc){
+      if(doc.exists)throw new Error('Code "'+code+'" already taken. Pick another.');
+      // Build school doc
+      var schoolDoc={
+        plan:'school',
+        name:name,
+        active:true,
+        expiry:expiry,
+        studentCap:cap,
+        adminPinHash:hash,
+        contactPhone:phone||'',
+        verifiedAt:Date.now(),
+        createdAt:Date.now()
+      };
+      status.innerHTML='<span style="color:#6B7280">Creating school document…</span>';
+      return FB.db.collection('schools').doc(code).set(schoolDoc);
+    }).then(function(){
+      // Create the proprietor staff doc
+      status.innerHTML='<span style="color:#6B7280">Creating proprietor login…</span>';
+      return FB.db.collection('schools').doc(code).collection('staff').add({
+        name:'Proprietor',
+        role:'proprietor',
+        pinHash:hash,
+        assignedClasses:[],
+        active:true,
+        phone:phone||'',
+        lastSeen:0
+      });
+    }).then(function(){
+      status.innerHTML='<span style="color:#16A34A;font-weight:800">✓ School created!</span>';
+      // Show WhatsApp message
+      bxShowSetupMessage('school',{code:code,name:name,pin:pin,expiry:expiry,phone:phone});
+    });
+  }).catch(function(e){
+    status.innerHTML='<span style="color:#DC2626">Error: '+e.message+'</span>';
+  });
+};
+
+// ════════════════════════════════════════
+// CREATE PARENT form
+// ════════════════════════════════════════
+window.bxRenderCreateParent=function(){
+  var sec=document.getElementById('bx-section-create-parent');
+  if(!sec)return;
+  sec.innerHTML=
+    '<div style="background:#fff;border-radius:12px;padding:24px;max-width:600px;margin:0 auto;box-shadow:0 1px 3px rgba(0,0,0,.05)">'
+    +'<div style="font-size:20px;font-weight:900;margin-bottom:4px;color:#1E1B4B">👨‍👩‍👧 Add a New Parent</div>'
+    +'<div style="color:#6B7280;font-size:13px;margin-bottom:24px">Creates a parent-plan account. The family surname becomes the access code.</div>'
+
+    +'<div style="margin-bottom:16px">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">FAMILY SURNAME (the access code) *</label>'
+    +'<input id="bx-cp-code" placeholder="e.g. ADEYEMI" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,\'\')" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:monospace;font-weight:700;letter-spacing:2px;box-sizing:border-box">'
+    +'<div style="font-size:11px;color:#9CA3AF;margin-top:4px">All caps, no spaces. If surname is taken, add a number: ADEYEMI2, ADEYEMI3.</div>'
+    +'</div>'
+
+    +'<div style="margin-bottom:16px">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">DISPLAY NAME *</label>'
+    +'<input id="bx-cp-name" placeholder="e.g. Adeyemi Family" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;box-sizing:border-box">'
+    +'</div>'
+
+    +'<div style="margin-bottom:16px">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">PARENT FULL NAME *</label>'
+    +'<input id="bx-cp-parent" placeholder="e.g. Mr Adeyemi" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;box-sizing:border-box">'
+    +'</div>'
+
+    +'<div style="display:flex;gap:12px;margin-bottom:16px">'
+    +'<div style="flex:1">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">NUMBER OF CHILDREN *</label>'
+    +'<input id="bx-cp-kids" type="number" value="1" min="1" max="10" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;box-sizing:border-box">'
+    +'</div>'
+    +'<div style="flex:1">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">EXPIRY *</label>'
+    +'<input id="bx-cp-expiry" type="date" value="'+_dateInDays(30)+'" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;box-sizing:border-box">'
+    +'</div>'
+    +'</div>'
+
+    +'<div style="margin-bottom:16px">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">PARENT PIN (4 digits) *</label>'
+    +'<input id="bx-cp-pin" placeholder="e.g. 5821" maxlength="4" pattern="\\d{4}" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:monospace;letter-spacing:6px;font-size:18px;box-sizing:border-box">'
+    +'</div>'
+
+    +'<div style="margin-bottom:16px">'
+    +'<label style="display:block;font-size:12px;font-weight:800;color:#1E1B4B;margin-bottom:6px">WHATSAPP NUMBER</label>'
+    +'<input id="bx-cp-phone" placeholder="+2348031234567" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;box-sizing:border-box">'
+    +'</div>'
+
+    +'<button onclick="bxCreateParent()" style="width:100%;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;border:none;padding:14px;border-radius:10px;font-weight:900;font-size:15px;cursor:pointer;margin-top:8px">Create Parent Account</button>'
+    +'<div id="bx-cp-status" style="margin-top:12px;font-size:13px;text-align:center"></div>'
+    +'</div>';
+};
+
+window.bxCreateParent=function(){
+  var code=document.getElementById('bx-cp-code').value.trim();
+  var name=document.getElementById('bx-cp-name').value.trim();
+  var parentName=document.getElementById('bx-cp-parent').value.trim();
+  var kids=parseInt(document.getElementById('bx-cp-kids').value)||1;
+  var expiry=document.getElementById('bx-cp-expiry').value;
+  var pin=document.getElementById('bx-cp-pin').value.trim();
+  var phone=document.getElementById('bx-cp-phone').value.trim();
+  var status=document.getElementById('bx-cp-status');
+
+  if(!code||!name||!parentName||!pin){status.innerHTML='<span style="color:#DC2626">All starred fields are required.</span>';return;}
+  if(!/^\d{4}$/.test(pin)){status.innerHTML='<span style="color:#DC2626">PIN must be exactly 4 digits.</span>';return;}
+
+  status.innerHTML='<span style="color:#6B7280">Hashing PIN…</span>';
+  bxSha1(pin).then(function(hash){
+    status.innerHTML='<span style="color:#6B7280">Checking if code already exists…</span>';
+    return FB.db.collection('schools').doc(code).get().then(function(doc){
+      if(doc.exists)throw new Error('Code "'+code+'" already taken. Try adding a number: '+code+'2');
+      // Parent plan does NOT need adminPinHash — parents access the admin
+      // tools via the "Manage children & subjects" button after parent login,
+      // which doesn't require a separate admin PIN. Only one PIN to set up.
+      var parentDoc={
+        plan:'parent',
+        name:name,
+        active:true,
+        expiry:expiry,
+        studentCap:kids,
+        maxChildren:kids,
+        contactPhone:phone||'',
+        verifiedAt:Date.now(),
+        createdAt:Date.now()
+      };
+      status.innerHTML='<span style="color:#6B7280">Creating parent account…</span>';
+      return FB.db.collection('schools').doc(code).set(parentDoc);
+    }).then(function(){
+      status.innerHTML='<span style="color:#6B7280">Creating parent login…</span>';
+      return FB.db.collection('schools').doc(code).collection('staff').add({
+        name:parentName,
+        role:'parent',
+        pinHash:hash,
+        assignedClasses:[],
+        active:true,
+        phone:phone||'',
+        lastSeen:0
+      });
+    }).then(function(){
+      status.innerHTML='<span style="color:#16A34A;font-weight:800">✓ Parent account created!</span>';
+      bxShowSetupMessage('parent',{code:code,name:name,parentName:parentName,pin:pin,expiry:expiry,phone:phone,kids:kids});
+    });
+  }).catch(function(e){
+    status.innerHTML='<span style="color:#DC2626">Error: '+e.message+'</span>';
+  });
+};
+
+// ════════════════════════════════════════
+// SHOW WHATSAPP MESSAGE after successful create
+// ════════════════════════════════════════
+window.bxShowSetupMessage=function(kind,opts){
+  var msg='';
+  if(kind==='parent'){
+    msg='Hello '+opts.parentName+'! 👋\n\n'
+      +'Welcome to EduLab — your child\'s learning app.\n\n'
+      +'*Your login details:*\n'
+      +'🔑 Access code: *'+opts.code+'*\n'
+      +'👤 Your name: '+opts.parentName+'\n'
+      +'🔢 PIN: '+opts.pin+'\n\n'
+      +'*How to log in:*\n'
+      +'1. Open https://blestonex.github.io/edulab\n'
+      +'2. Tap "I\'m a Parent"\n'
+      +'3. Tap "Open my parent dashboard"\n'
+      +'4. Enter '+opts.code+', then your name and PIN\n\n'
+      +'*To set up your child'+(opts.kids>1?'ren':'')+':*\n'
+      +'1. On your dashboard, tap "Sign out"\n'
+      +'2. Tap "Set up my child\'s device"\n'
+      +'3. Enter your child\'s name and class\n'
+      +'4. When asked for a code, enter '+opts.code+'\n\n'
+      +'Once your child practises, their progress appears on your dashboard automatically.\n\n'
+      +'— Blestonex EduLab Team';
+  }else{
+    msg='Hello! 👋\n\n'
+      +'Welcome to EduLab — *'+opts.name+'*.\n\n'
+      +'*Proprietor login:*\n'
+      +'🔑 School code: *'+opts.code+'*\n'
+      +'🔢 Admin PIN: '+opts.pin+'\n\n'
+      +'*How to access admin:*\n'
+      +'1. Open https://blestonex.github.io/edulab\n'
+      +'2. Tap "I\'m with a School"\n'
+      +'3. Tap "Login as Admin"\n'
+      +'4. Enter '+opts.code+', then PIN\n\n'
+      +'From there you can: add teachers, register students, assign classes, set subject access, view reports.\n\n'
+      +'Your subscription expires '+opts.expiry+'.\n\n'
+      +'— Blestonex EduLab Team';
+  }
+
+  // Modal overlay
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML=
+    '<div style="background:#fff;border-radius:14px;max-width:540px;width:100%;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,.3)">'
+    +'<div style="font-size:18px;font-weight:900;color:#16A34A;margin-bottom:8px">✓ Account created successfully</div>'
+    +'<div style="font-size:13px;color:#6B7280;margin-bottom:16px">Copy this WhatsApp message and send it to '+(opts.phone||'them')+':</div>'
+    +'<textarea id="bx-msg-text" readonly style="width:100%;height:340px;padding:14px;border:1.5px solid #E5E7EB;border-radius:10px;font-family:monospace;font-size:12px;line-height:1.55;background:#F9FAFB;color:#1E1B4B;resize:vertical;box-sizing:border-box;white-space:pre-wrap">'+_escapeHtml(msg)+'</textarea>'
+    +'<div style="display:flex;gap:8px;margin-top:14px">'
+    +(opts.phone?'<a href="https://wa.me/'+opts.phone.replace(/\D/g,'')+'?text='+encodeURIComponent(msg)+'" target="_blank" style="flex:1;background:#25D366;color:#fff;border:none;padding:12px;border-radius:8px;font-weight:800;text-align:center;text-decoration:none;cursor:pointer">📱 Open in WhatsApp</a>':'')
+    +'<button onclick="bxCopyMessage()" style="flex:1;background:#7C3AED;color:#fff;border:none;padding:12px;border-radius:8px;font-weight:800;cursor:pointer">📋 Copy Message</button>'
+    +'<button onclick="this.parentNode.parentNode.parentNode.remove();bxShowTab(\'list\')" style="background:#E5E7EB;color:#1E1B4B;border:none;padding:12px 18px;border-radius:8px;font-weight:800;cursor:pointer">Done</button>'
+    +'</div>'
+    +'</div>';
+  document.body.appendChild(overlay);
+};
+
+window.bxCopyMessage=function(){
+  var ta=document.getElementById('bx-msg-text');
+  if(!ta)return;
+  ta.select();
+  try{document.execCommand('copy');alert('✓ Copied to clipboard');}catch(e){alert('Copy failed — select and copy manually');}
+};
+
+// ════════════════════════════════════════
+// STATS tab
+// ════════════════════════════════════════
+window.bxRenderStats=function(){
+  var sec=document.getElementById('bx-section-stats');
+  if(!sec)return;
+  sec.innerHTML='<div style="text-align:center;padding:40px;color:#6B7280">Loading stats…</div>';
+  FB.db.collection('schools').get().then(function(snap){
+    var schoolCount=0,parentCount=0,activeCount=0,expiredCount=0,suspendedCount=0;
+    var totalStudentCapacity=0;
+    var today=new Date().toISOString().slice(0,10);
+    var expiringSoon=[];
+    snap.forEach(function(doc){
+      var d=doc.data();
+      if(d.plan==='parent')parentCount++;
+      else schoolCount++;
+      if(d.active===false)suspendedCount++;
+      else if(d.expiry&&d.expiry<today)expiredCount++;
+      else activeCount++;
+      totalStudentCapacity+=parseInt(d.studentCap||d.maxChildren||0);
+      // Expiring in next 7 days
+      if(d.expiry&&d.active!==false&&d.expiry>=today){
+        var daysLeft=Math.ceil((new Date(d.expiry)-new Date(today))/86400000);
+        if(daysLeft<=7)expiringSoon.push({id:doc.id,name:d.name,daysLeft:daysLeft,expiry:d.expiry,phone:d.contactPhone});
+      }
+    });
+
+    function stat(label,value,color){
+      return '<div style="background:#fff;padding:18px;border-radius:12px;border-left:4px solid '+color+'">'
+        +'<div style="font-size:11px;letter-spacing:1.5px;color:#6B7280;font-weight:800">'+label+'</div>'
+        +'<div style="font-size:28px;font-weight:900;color:'+color+';margin-top:4px">'+value+'</div>'
+        +'</div>';
+    }
+
+    sec.innerHTML=
+      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px">'
+      +stat('SCHOOLS',schoolCount,'#7C3AED')
+      +stat('PARENTS',parentCount,'#0EA5E9')
+      +stat('ACTIVE',activeCount,'#16A34A')
+      +stat('EXPIRED',expiredCount,'#DC2626')
+      +stat('SUSPENDED',suspendedCount,'#D97706')
+      +stat('TOTAL SEATS',totalStudentCapacity,'#1E1B4B')
+      +'</div>'
+      +(expiringSoon.length?
+        '<div style="background:#fff;border-radius:12px;padding:20px;border-left:4px solid #D97706">'
+        +'<div style="font-size:16px;font-weight:900;color:#D97706;margin-bottom:12px">⏰ Expiring in 7 days ('+expiringSoon.length+')</div>'
+        +expiringSoon.map(function(x){
+          return '<div style="padding:10px;background:#FEF3C7;border-radius:8px;margin-bottom:8px">'
+            +'<div style="font-weight:800">'+_escapeHtml(x.id)+' — '+_escapeHtml(x.name||'')+'</div>'
+            +'<div style="font-size:12px;color:#92400E;margin-top:2px">Expires in '+x.daysLeft+' day'+(x.daysLeft!==1?'s':'')+' ('+x.expiry+')'
+            +(x.phone?' · <a href="https://wa.me/'+x.phone.replace(/\D/g,'')+'?text='+encodeURIComponent('Hi! Your EduLab subscription expires in '+x.daysLeft+' day'+(x.daysLeft!==1?'s':'')+' on '+x.expiry+'. Reply to renew.')+'" target="_blank" style="color:#16A34A;font-weight:700;text-decoration:none">Send renewal reminder →</a>':'')
+            +'</div></div>';
+        }).join('')
+        +'</div>':
+        '<div style="background:#DCFCE7;color:#15803D;padding:20px;border-radius:12px;text-align:center;font-weight:700">✓ No subscriptions expiring in the next 7 days</div>'
+      );
+  }).catch(function(e){
+    sec.innerHTML='<div style="background:#FEE2E2;color:#991B1B;padding:20px;border-radius:12px">Error: '+e.message+'</div>';
+  });
+};
 
 window.addEventListener('DOMContentLoaded',init);
 
