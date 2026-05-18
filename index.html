@@ -16136,21 +16136,49 @@ function openBlestonexDashboard(){
 }
 
 function _loadBlestonexDashboard(signedInEmail){
-  // Second check: even if sign-in succeeded, only proceed if the email is in the allowlist
-  FB.db.collection('config').doc('admins').get()
-    .then(function(adminDoc){
-      var allowed=(adminDoc.exists&&adminDoc.data().allowedEmails)||[];
-      if(allowed.map(function(e){return String(e).toLowerCase();}).indexOf(signedInEmail.toLowerCase())===-1){
-        alert('This account is not authorised for the Blestonex dashboard.');
-        firebase.auth().signOut().catch(function(){});
-        firebase.auth().signInAnonymously().catch(function(){});
-        return;
-      }
-      _renderBlestonexDashboard();
-    })
-    .catch(function(e){
-      alert('Could not verify admin access: '+e.message);
-    });
+  // Second check: even if sign-in succeeded, only proceed if the email is in the allowlist.
+  // We try a few candidate document IDs — Firebase Console sometimes saves the
+  // ID with extra characters ("admins doc", "admins-doc", etc.) which silently
+  // breaks the lookup. Trying multiple makes the dashboard work without forcing
+  // you to rename Firestore documents.
+  var candidates=['admins','admin','admins_doc','admins doc','admins-doc'];
+  var attempts=[];
+  function tryNext(){
+    if(!candidates.length){
+      alert('No admin allowlist found in Firestore.\n\nLooked for these doc IDs under "config" collection:\n'
+        +attempts.join('\n')
+        +'\n\nFix: open Firebase Console → Firestore → config → make sure your doc is named exactly "admins" (no spaces), with field "allowedEmails" (array) containing "'+signedInEmail+'".');
+      firebase.auth().signOut().catch(function(){});
+      firebase.auth().signInAnonymously().catch(function(){});
+      return;
+    }
+    var docId=candidates.shift();
+    attempts.push('  • config/'+docId);
+    FB.db.collection('config').doc(docId).get()
+      .then(function(adminDoc){
+        if(adminDoc.exists){
+          var allowed=(adminDoc.data().allowedEmails)||[];
+          var emails=allowed.map(function(e){return String(e).toLowerCase().trim();});
+          if(emails.indexOf(signedInEmail.toLowerCase().trim())===-1){
+            alert('This account ('+signedInEmail+') is not in the allowlist on config/'+docId+'.\n\n'
+              +'Allowed emails: '+(allowed.length?allowed.join(', '):'(none)')+'\n\n'
+              +'Add "'+signedInEmail+'" to allowedEmails in Firestore to gain access.');
+            firebase.auth().signOut().catch(function(){});
+            firebase.auth().signInAnonymously().catch(function(){});
+            return;
+          }
+          // Authorised — open the dashboard
+          _renderBlestonexDashboard();
+        }else{
+          tryNext();
+        }
+      })
+      .catch(function(e){
+        attempts[attempts.length-1]+=' (error: '+e.message+')';
+        tryNext();
+      });
+  }
+  tryNext();
 }
 
 function _renderBlestonexDashboard(){
