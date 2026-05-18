@@ -16199,7 +16199,10 @@ function _renderBlestonexDashboard(){
     +       '<div style="font-size:11px;letter-spacing:2px;opacity:.7;font-weight:800">BLESTONEX</div>'
     +       '<div style="font-size:24px;font-weight:900;line-height:1.1">EduLab Management Dashboard</div>'
     +     '</div>'
-    +     '<button onclick="bxSignOut()" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;padding:8px 14px;border-radius:8px;font-weight:700;cursor:pointer">Sign out</button>'
+    +     '<div style="display:flex;gap:8px">'
+    +       '<button onclick="bxDiagnose()" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;padding:8px 14px;border-radius:8px;font-weight:700;cursor:pointer">🔍 Diagnose</button>'
+    +       '<button onclick="bxSignOut()" style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;padding:8px 14px;border-radius:8px;font-weight:700;cursor:pointer">Sign out</button>'
+    +     '</div>'
     +   '</div>'
     + '</div>'
 
@@ -16324,22 +16327,221 @@ window.bxLoadList=function(){
       +renderTable(parents,'parent')
       +'</div>';
   }).catch(function(e){
-    var isPerms=/permission|insufficient/i.test(e.message);
+    var isPerms=_bxIsPermErr(e);
     if(isPerms){
       sec.innerHTML='<div style="background:#FEE2E2;color:#991B1B;padding:20px;border-radius:12px">'
         +'<div style="font-weight:900;font-size:16px;margin-bottom:8px">⚠️ Firestore Security Rules block this account</div>'
         +'<div style="font-size:13px;margin-bottom:14px">Your sign-in worked, but your Firestore rules don\'t allow this admin to read the <code>schools</code> collection.</div>'
-        +'<div style="font-weight:800;margin-bottom:6px">Fix in 30 seconds:</div>'
-        +'<ol style="margin:0 0 14px 20px;font-size:13px;line-height:1.7">'
-        +'<li>Open <a href="https://console.firebase.google.com/project/_/firestore/rules" target="_blank" style="color:#7C3AED;font-weight:700">Firebase Console → Firestore → Rules</a></li>'
-        +'<li>Paste the rules below</li>'
-        +'<li>Click <b>Publish</b> and refresh this page</li>'
-        +'</ol>'
-        +'<pre style="background:#fff;border:1px solid #FECACA;border-radius:8px;padding:12px;font-size:11px;line-height:1.5;overflow-x:auto;color:#1E1B4B;white-space:pre-wrap">rules_version = \'2\';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    // Admins (emails in config/admins.allowedEmails) get full read/write\n    function isAdmin() {\n      return request.auth != null &&\n        request.auth.token.email in get(/databases/$(database)/documents/config/admins).data.allowedEmails;\n    }\n    // Authenticated users can read any school (needed for staff login)\n    match /schools/{schoolId} {\n      allow read: if request.auth != null;\n      allow write: if isAdmin();\n      // Staff & students subcollections — readable & writable by anyone authenticated\n      match /staff/{staffId}  { allow read, write: if request.auth != null; }\n      match /students/{studentId} { allow read, write: if request.auth != null; }\n      match /devices/{deviceId}   { allow read, write: if request.auth != null; }\n      match /recovery/{recoveryId} { allow read, write: if request.auth != null; }\n    }\n    // Admin allowlist — admins can modify, anyone can read for the email check\n    match /config/{docId} { allow read: if true; allow write: if isAdmin(); }\n    // Competition collection (used by House Competition feature)\n    match /edulab_competitions/{compId} { allow read, write: if request.auth != null; }\n  }\n}</pre>'
+        +'<button onclick="bxDiagnose()" style="background:#7C3AED;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:800;cursor:pointer;font-size:13px;margin-bottom:14px">🔍 Run Diagnostic — find the exact cause</button>'
+        +'<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:800;font-size:13px">Or paste these rules manually →</summary>'
+        +'<div style="margin-top:10px"><pre style="background:#fff;border:1px solid #FECACA;border-radius:8px;padding:12px;font-size:11px;line-height:1.5;overflow-x:auto;color:#1E1B4B;white-space:pre-wrap">'+_escapeHtml(_bxRulesText())+'</pre></div>'
+        +'</details>'
         +'</div>';
     }else{
-      sec.innerHTML='<div style="background:#FEE2E2;color:#991B1B;padding:20px;border-radius:12px">Error loading: '+e.message+'</div>';
+      sec.innerHTML='<div style="background:#FEE2E2;color:#991B1B;padding:20px;border-radius:12px">Error loading: '+_escapeHtml(e.message||'unknown')+'</div>';
     }
+  });
+};
+
+// ── Shared helpers for security-rules error UX ──
+// Single source of truth for the canonical Firestore rules. Both bxLoadList and
+// bxDiagnose surface this so the user can copy-paste exactly the rules the app expects.
+window._bxRulesText=function(){
+  return "rules_version = '2';\n"
+    +"service cloud.firestore {\n"
+    +"  match /databases/{database}/documents {\n"
+    +"    // Admins (emails in config/admins.allowedEmails) get full read/write\n"
+    +"    function isAdmin() {\n"
+    +"      return request.auth != null &&\n"
+    +"        request.auth.token.email in get(/databases/$(database)/documents/config/admins).data.allowedEmails;\n"
+    +"    }\n"
+    +"    // Authenticated users can read any school (needed for staff login)\n"
+    +"    match /schools/{schoolId} {\n"
+    +"      allow read: if request.auth != null;\n"
+    +"      allow write: if isAdmin();\n"
+    +"      // Staff & students subcollections — readable & writable by anyone authenticated\n"
+    +"      match /staff/{staffId}      { allow read, write: if request.auth != null; }\n"
+    +"      match /students/{studentId} { allow read, write: if request.auth != null; }\n"
+    +"      match /devices/{deviceId}   { allow read, write: if request.auth != null; }\n"
+    +"      match /recovery/{recoveryId} { allow read, write: if request.auth != null; }\n"
+    +"    }\n"
+    +"    // Admin allowlist — admins can modify, anyone can read for the email check\n"
+    +"    match /config/{docId} { allow read: if true; allow write: if isAdmin(); }\n"
+    +"    // Competition collection (used by House Competition feature)\n"
+    +"    match /edulab_competitions/{compId} { allow read, write: if request.auth != null; }\n"
+    +"  }\n"
+    +"}";
+};
+
+// Detect Firestore permission errors regardless of whether code or message is set
+window._bxIsPermErr=function(e){
+  if(!e)return false;
+  if(e.code==='permission-denied')return true;
+  return /permission|insufficient|missing or insufficient/i.test(e.message||'');
+};
+
+// Alert for inline-action errors (Renew / Suspend / Delete). Routes perm errors to Diagnose.
+window._bxAlertPermError=function(operation,e){
+  if(!_bxIsPermErr(e)){alert('Error ('+operation+'): '+e.message);return;}
+  var email=(firebase.auth().currentUser||{}).email||'(not signed in)';
+  if(confirm('⚠️ Firestore blocked: '+operation+'\n\n'
+    +'Signed in as: '+email+'\n\n'
+    +'Your Firebase Security Rules don\'t grant this admin permission to write.\n\n'
+    +'Press OK to run the diagnostic — it will tell you exactly what to fix and give you the rules to paste.')){
+    bxDiagnose();
+  }
+};
+
+// HTML block for form-status errors (Create School / Create Parent)
+window._bxRenderPermError=function(operation){
+  var email=(firebase.auth().currentUser||{}).email||'(not signed in)';
+  return '<div style="background:#FEE2E2;color:#991B1B;padding:14px;border-radius:10px;text-align:left;margin-top:8px">'
+    +'<div style="font-weight:900;font-size:13px;margin-bottom:6px">⚠️ Firestore blocked '+_escapeHtml(operation)+'</div>'
+    +'<div style="font-size:12px;margin-bottom:8px">Signed in as <code>'+_escapeHtml(email)+'</code>. Your Firestore security rules don\'t allow this admin to write.</div>'
+    +'<button onclick="bxDiagnose()" style="background:#7C3AED;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-weight:800;cursor:pointer;font-size:12px">🔍 Run Diagnostic</button>'
+    +'</div>';
+};
+
+// ── Diagnostic modal: pinpoints why writes are failing ──
+window.bxDiagnose=function(){
+  // Remove any existing diag modal first
+  var existing=document.getElementById('bx-diag-modal');
+  if(existing)existing.remove();
+
+  var bd=document.createElement('div');
+  bd.id='bx-diag-modal';
+  bd.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto';
+  bd.onclick=function(e){if(e.target===bd)bd.remove();};
+  bd.innerHTML='<div style="background:#fff;border-radius:12px;max-width:720px;width:100%;padding:20px;font-family:-apple-system,Segoe UI,Arial,sans-serif;color:#1E1B4B;margin:20px 0;box-shadow:0 20px 50px rgba(0,0,0,.3)">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<div style="font-size:18px;font-weight:900">🔍 Permissions Diagnostic</div>'
+    +'<button onclick="document.getElementById(\'bx-diag-modal\').remove()" style="background:none;border:none;font-size:24px;color:#6B7280;cursor:pointer;line-height:1">×</button>'
+    +'</div>'
+    +'<div style="font-size:12px;color:#6B7280;margin-bottom:14px">Running 4 checks against your Firebase project. Any FAIL tells you exactly what to fix.</div>'
+    +'<div id="bx-diag-out" style="font-size:13px;line-height:1.7"></div>'
+    +'<div id="bx-diag-rules-section" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid #E5E7EB">'
+      +'<div style="font-weight:800;margin-bottom:6px;font-size:13px">📋 Canonical rules — copy & paste into Firebase Console → Firestore Database → Rules → Publish:</div>'
+      +'<pre id="bx-diag-rules" style="background:#0F172A;color:#E2E8F0;border-radius:8px;padding:12px;font-size:11px;line-height:1.5;overflow-x:auto;white-space:pre-wrap;max-height:280px;overflow-y:auto"></pre>'
+      +'<button id="bx-diag-copy" style="background:#7C3AED;color:#fff;border:none;padding:9px 14px;border-radius:8px;font-weight:800;cursor:pointer;font-size:12px;margin-top:8px">📋 Copy rules</button>'
+      +'<a href="https://console.firebase.google.com/project/_/firestore/rules" target="_blank" rel="noopener" style="display:inline-block;margin-left:8px;background:#1E1B4B;color:#fff;text-decoration:none;padding:9px 14px;border-radius:8px;font-weight:800;font-size:12px">Open Firebase Console →</a>'
+    +'</div>'
+    +'</div>';
+  document.body.appendChild(bd);
+
+  var rulesEl=document.getElementById('bx-diag-rules');
+  if(rulesEl)rulesEl.textContent=_bxRulesText();
+  var copyBtn=document.getElementById('bx-diag-copy');
+  if(copyBtn)copyBtn.onclick=function(){
+    var text=_bxRulesText();
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){copyBtn.textContent='✓ Copied';}).catch(function(){
+        // Fallback: select text
+        var r=document.createRange();r.selectNode(rulesEl);
+        window.getSelection().removeAllRanges();window.getSelection().addRange(r);
+        copyBtn.textContent='✓ Selected — press Ctrl+C';
+      });
+    }else{
+      var r=document.createRange();r.selectNode(rulesEl);
+      window.getSelection().removeAllRanges();window.getSelection().addRange(r);
+      copyBtn.textContent='✓ Selected — press Ctrl+C';
+    }
+  };
+
+  var out=document.getElementById('bx-diag-out');
+  var lines=[];
+  function push(emoji,label,detail,color){
+    var c=color||'#1E1B4B';
+    lines.push('<div style="margin-bottom:6px;padding:6px 8px;background:#F9FAFB;border-left:3px solid '+c+';border-radius:4px">'
+      +'<b style="color:'+c+'">'+emoji+' '+_escapeHtml(label)+'</b>'
+      +(detail?'<div style="font-size:12px;color:#374151;margin-top:2px;font-family:ui-monospace,Menlo,monospace;word-break:break-all">'+_escapeHtml(detail)+'</div>':'')
+      +'</div>');
+    out.innerHTML=lines.join('');
+  }
+  function showRules(){document.getElementById('bx-diag-rules-section').style.display='';}
+  function verdict(text,bg,color){
+    out.innerHTML=lines.join('')
+      +'<div style="margin-top:12px;padding:14px;border-radius:10px;background:'+bg+';color:'+color+';font-weight:800;font-size:13px;line-height:1.5">'+_escapeHtml(text)+'</div>';
+  }
+
+  // CHECK 1: Auth state
+  var user=(typeof firebase!=='undefined'&&firebase.auth)?firebase.auth().currentUser:null;
+  if(!user||!user.email){
+    push('❌','Not signed in with email','You\'re anonymous or not authenticated.','#DC2626');
+    verdict('Diagnosis: not signed in. Refresh and sign back into the dashboard with your admin email.','#FEE2E2','#991B1B');
+    return;
+  }
+  push('✓','Step 1: Signed in as',user.email,'#16A34A');
+  var myEmail=user.email.toLowerCase().trim();
+
+  // CHECK 2: Read config/admins (the EXACT path the security rules check)
+  FB.db.collection('config').doc('admins').get().then(function(d){
+    if(!d.exists){
+      push('❌','Step 2: config/admins doc does NOT exist at the exact path','Rules check /config/admins — your doc must live there exactly, not /config/admin or /config/admins_doc.','#DC2626');
+      showRules();
+      verdict('Fix: in Firebase Console → Firestore → start a new doc with ID exactly "admins" inside the "config" collection. Add a field "allowedEmails" (type: array) containing "'+user.email+'".','#FEE2E2','#991B1B');
+      return;
+    }
+    var raw=d.data().allowedEmails;
+    if(!Array.isArray(raw)){
+      push('❌','Step 2: allowedEmails field is missing or not an array',raw==null?'(field absent)':'type was '+typeof raw,'#DC2626');
+      showRules();
+      verdict('Fix: in Firebase Console → Firestore → config/admins, add a field "allowedEmails" of type array containing "'+user.email+'".','#FEE2E2','#991B1B');
+      return;
+    }
+    var allowed=raw.map(function(s){return String(s).toLowerCase().trim();});
+    push('✓','Step 2: config/admins.allowedEmails read OK','['+raw.join(', ')+']','#16A34A');
+    if(allowed.indexOf(myEmail)===-1){
+      push('❌','Your signed-in email is NOT in allowedEmails','isAdmin() returns false → all writes are denied.','#DC2626');
+      showRules();
+      verdict('Fix: in Firebase Console → Firestore → config/admins → allowedEmails, add "'+user.email+'" (the exact email you\'re signed in with) to the array. Then refresh.','#FEE2E2','#991B1B');
+      return;
+    }
+    push('✓','Step 3: Your email IS in the allowlist','isAdmin() should return true.','#16A34A');
+
+    // CHECK 4: Probe write permission on /schools without creating any junk.
+    // .update() on a non-existent doc returns "not-found" if rules allow, "permission-denied" if not.
+    // This is the cleanest test — leaves no orphan docs behind.
+    var probeId='__diag_probe_'+Date.now()+'__';
+    FB.db.collection('schools').doc(probeId).update({_probe:true}).then(function(){
+      // Shouldn't reach here — but if it does (race created the doc), clean it up.
+      FB.db.collection('schools').doc(probeId).delete().catch(function(){});
+      push('✓','Step 4: Write probe on /schools passed','(unexpectedly succeeded — probe doc auto-cleaned)','#16A34A');
+      verdict('✓ All checks passed. Renew and Add School should work now. Refresh the dashboard and retry.','#DCFCE7','#166534');
+    }).catch(function(e){
+      var code=e.code||'(no code)';
+      if(code==='not-found'||/no document to update|not.?found/i.test(e.message||'')){
+        // Rules allowed the write — Firestore rejected because the doc doesn't exist. This is what we WANT.
+        push('✓','Step 4: Write probe on /schools passed','(rules let the call through; "not-found" is the expected response for a non-existent probe doc)','#16A34A');
+        verdict('✓ All checks passed. Your rules grant write access. If Renew or Add School still fail, copy the exact error and report it.','#DCFCE7','#166534');
+      }else if(code==='permission-denied'||_bxIsPermErr(e)){
+        push('❌','Step 4: Write probe on /schools BLOCKED','code='+code+' · '+(e.message||''),'#DC2626');
+        // The dashboard's allowlist check (step 3) normalized to lowercase and matched,
+        // but Firestore Rules' `in` operator is CASE-SENSITIVE. If the casing of the
+        // signed-in email differs from the casing in allowedEmails, isAdmin() returns
+        // false at the rule level despite the dashboard letting them in. This is the
+        // single most common cause of "list works but write fails" — call it out.
+        var caseMatch=null;
+        for(var i=0;i<raw.length;i++){
+          if(String(raw[i]).trim()===user.email){caseMatch=true;break;}
+        }
+        if(caseMatch!==true){
+          push('🎯','LIKELY CAUSE: email case mismatch','Firebase Auth token email: "'+user.email+'" — but allowedEmails contains: '+raw.map(function(x){return '"'+x+'"';}).join(', ')+'. Firestore Rules `in` is case-sensitive, the dashboard\'s JS check is not. They must match EXACTLY.','#DC2626');
+          showRules();
+          verdict('Fix: in Firebase Console → Firestore → config/admins → allowedEmails, edit the entry to be EXACTLY "'+user.email+'" (matching the case of the email shown above). Save, wait 30 seconds for rule propagation, then refresh and retry.','#FEE2E2','#991B1B');
+        }else{
+          showRules();
+          verdict('Diagnosis: Your config/admins is set up correctly with exact-case match, but your deployed Firestore Rules do not grant write access to /schools. Paste the canonical rules below into Firebase Console → Firestore → Rules → Publish. (If you just published rules, wait 60 seconds for propagation and try again.)','#FEE2E2','#991B1B');
+        }
+      }else{
+        push('⚠️','Step 4: Write probe returned unexpected error','code='+code+' · '+(e.message||''),'#D97706');
+        showRules();
+        verdict('Unexpected error. Try pasting the canonical rules below as a starting point, then retry. If it still fails, report the error code shown above.','#FEF3C7','#92400E');
+      }
+    });
+  }).catch(function(e){
+    push('❌','Step 2: Read of config/admins failed','code='+(e.code||'?')+' · '+(e.message||''),'#DC2626');
+    showRules();
+    verdict('Diagnosis: Your rules don\'t even allow reading /config/admins. Paste the canonical rules below — they grant public read on /config/{docId} which is required for the allowlist check.','#FEE2E2','#991B1B');
   });
 };
 
@@ -16351,7 +16553,7 @@ window.bxRenew=function(id){
   FB.db.collection('schools').doc(id).update({expiry:newDate}).then(function(){
     alert('✓ Renewed '+id+' until '+newDate);
     bxLoadList();
-  }).catch(function(e){alert('Error: '+e.message);});
+  }).catch(function(e){_bxAlertPermError('renew '+id,e);});
 };
 
 window.bxToggle=function(id,currentlyActive){
@@ -16360,7 +16562,7 @@ window.bxToggle=function(id,currentlyActive){
   FB.db.collection('schools').doc(id).update({active:!currentlyActive}).then(function(){
     alert('✓ '+id+' '+(currentlyActive?'suspended':'activated'));
     bxLoadList();
-  }).catch(function(e){alert('Error: '+e.message);});
+  }).catch(function(e){_bxAlertPermError(action+' '+id,e);});
 };
 
 window.bxDelete=function(id){
@@ -16372,7 +16574,7 @@ window.bxDelete=function(id){
   FB.db.collection('schools').doc(id).delete().then(function(){
     alert('✓ Deleted '+id+'.\n\nNote: students/staff sub-collections still exist in Firestore but are inaccessible without the parent doc. Clean those up from Firebase Console if needed.');
     bxLoadList();
-  }).catch(function(e){alert('Error: '+e.message);});
+  }).catch(function(e){_bxAlertPermError('delete '+id,e);});
 };
 
 function _dateInDays(days){
@@ -16478,7 +16680,11 @@ window.bxCreateSchool=function(){
       bxShowSetupMessage('school',{code:code,name:name,pin:pin,expiry:expiry,phone:phone});
     });
   }).catch(function(e){
-    status.innerHTML='<span style="color:#DC2626">Error: '+e.message+'</span>';
+    if(_bxIsPermErr(e)){
+      status.innerHTML=_bxRenderPermError('Add School');
+    }else{
+      status.innerHTML='<span style="color:#DC2626">Error: '+_escapeHtml(e.message||'unknown')+'</span>';
+    }
   });
 };
 
@@ -16585,7 +16791,11 @@ window.bxCreateParent=function(){
       bxShowSetupMessage('parent',{code:code,name:name,parentName:parentName,pin:pin,expiry:expiry,phone:phone,kids:kids});
     });
   }).catch(function(e){
-    status.innerHTML='<span style="color:#DC2626">Error: '+e.message+'</span>';
+    if(_bxIsPermErr(e)){
+      status.innerHTML=_bxRenderPermError('Add Parent');
+    }else{
+      status.innerHTML='<span style="color:#DC2626">Error: '+_escapeHtml(e.message||'unknown')+'</span>';
+    }
   });
 };
 
